@@ -1,17 +1,27 @@
 // Firebase Configuration
 // Replace these values with your Firebase project config
 // Get these from: Firebase Console > Project Settings > Your apps > Web app
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCnVfqneLET0uUE_wnDXtqH7yh2qfBZWq4",
+  authDomain: "aws-study-hub.firebaseapp.com",
+  projectId: "aws-study-hub",
+  storageBucket: "aws-study-hub.firebasestorage.app",
+  messagingSenderId: "134626511244",
+  appId: "1:134626511244:web:ee0abcbd73191bc38b2ea9",
+  measurementId: "G-GQHQG5PP10"
 };
 
 export default firebaseConfig;
+
+
+
+
+
+
+
+
 
 /*
  * SETUP INSTRUCTIONS:
