@@ -1,0 +1,300 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Material Dark Theme - VS Code inspired */
+  --md-surface: #1e1e1e;
+  --md-surface-variant: #252526;
+  --md-surface-elevated: #2d2d2d;
+  --md-surface-hover: #3c3c3c;
+  --md-surface-active: #505050;
+  
+  --md-primary: #569cd6;
+  --md-primary-variant: #4fc1ff;
+  --md-secondary: #4ec9b0;
+  --md-accent: #c586c0;
+  --md-warning: #dcdcaa;
+  --md-error: #f14c4c;
+  --md-success: #89d185;
+  
+  --md-on-surface: #cccccc;
+  --md-on-surface-variant: #9d9d9d;
+  --md-on-surface-disabled: #6e6e6e;
+  --md-on-primary: #ffffff;
+  
+  --md-border: #3c3c3c;
+  --md-border-variant: #4d4d4d;
+  
+  --md-shadow-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  --md-shadow-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  --md-shadow-3: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  --md-shadow-4: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  
+  --md-radius-sm: 4px;
+  --md-radius-md: 8px;
+  --md-radius-lg: 12px;
+  --md-radius-xl: 16px;
+  
+  --md-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.game-container {
+  min-height: 100vh;
+  padding: 24px;
+  position: relative;
+  overflow-x: hidden;
+  background: var(--md-surface);
+}
+
+/* Subtle gradient overlay */
+.game-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse at top, rgba(86, 156, 214, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Material Button Base */
+button {
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all var(--md-transition);
+}
+
+/* Shared button styles */
+.back-button {
+  background: var(--md-surface-variant);
+  border: 1px solid var(--md-border);
+  color: var(--md-on-surface);
+  padding: 8px 16px;
+  border-radius: var(--md-radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.back-button:hover {
+  background: var(--md-surface-hover);
+  border-color: var(--md-border-variant);
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+  color: var(--md-on-surface);
+  letter-spacing: -0.5px;
+}
+
+.section-subtitle {
+  color: var(--md-on-surface-variant);
+  margin-bottom: 32px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Tab Navigation - Material Style */
+.tab-navigation {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 32px;
+  padding: 4px;
+  background: var(--md-surface-variant);
+  border-radius: var(--md-radius-lg);
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 10;
+  box-shadow: var(--md-shadow-1);
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  border-radius: var(--md-radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--md-on-surface-variant);
+  flex: 1;
+  justify-content: center;
+}
+
+.tab-btn:hover {
+  color: var(--md-on-surface);
+  background: var(--md-surface-hover);
+}
+
+.tab-btn.active {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  box-shadow: var(--md-shadow-1);
+}
+
+.tab-icon {
+  font-size: 16px;
+}
+
+.tab-label {
+  font-weight: 500;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--md-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--md-surface-active);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--md-on-surface-disabled);
+}
+
+/* Loading Screen */
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  color: var(--md-on-surface-variant);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--md-border);
+  border-top-color: var(--md-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* User Header */
+.user-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 0;
+  margin-bottom: 8px;
+}
+
+/* Login Prompt */
+.login-prompt {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.login-prompt-btn {
+  background: transparent;
+  border: 1px dashed var(--md-border);
+  border-radius: var(--md-radius-md);
+  color: var(--md-primary);
+  font-size: 13px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-prompt-btn:hover {
+  background: var(--md-surface-variant);
+  border-style: solid;
+}
+
+/* Auth Modal Overlay */
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.auth-modal-overlay > div {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* User Header with Back Link */
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  margin-bottom: 16px;
+}
+
+.back-to-hub-link {
+  color: var(--md-on-surface-variant);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.back-to-hub-link:hover {
+  color: var(--md-primary);
+}
+
+@media (max-width: 480px) {
+  .tab-navigation {
+    max-width: 100%;
+  }
+  
+  .tab-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .game-container {
+    padding: 16px;
+  }
+}

@@ -1,0 +1,25 @@
+.particle-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  animation: explode 0.5s cubic-bezier(0.4, 0, 0.2, 1) var(--delay) forwards;
+}
+
+@keyframes explode {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(-1 * var(--distance)));
+    opacity: 0;
+  }
+}

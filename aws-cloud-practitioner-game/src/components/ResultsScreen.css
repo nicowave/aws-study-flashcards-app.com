@@ -1,0 +1,137 @@
+.results-screen {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-top: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.results-card {
+  background: var(--md-surface-variant);
+  border: 1px solid var(--md-border);
+  border-radius: var(--md-radius-xl);
+  padding: 36px;
+  text-align: center;
+  box-shadow: var(--md-shadow-2);
+}
+
+.results-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+  animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+.results-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--md-on-surface);
+}
+
+.results-score {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.score-num {
+  font-size: 64px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--md-primary);
+}
+
+.score-divider {
+  font-size: 40px;
+  color: var(--md-on-surface-disabled);
+}
+
+.score-total {
+  font-size: 32px;
+  color: var(--md-on-surface-variant);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.results-percentage {
+  font-size: 16px;
+  color: var(--md-on-surface-variant);
+  margin-bottom: 24px;
+}
+
+.results-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 28px;
+  padding: 16px;
+  background: var(--md-surface);
+  border-radius: var(--md-radius-md);
+}
+
+.result-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--md-on-surface-variant);
+  font-size: 14px;
+}
+
+.stat-icon {
+  font-size: 18px;
+}
+
+.results-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-button {
+  padding: 14px;
+  border-radius: var(--md-radius-md);
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  transition: all var(--md-transition);
+}
+
+.result-button.primary {
+  color: var(--md-on-primary);
+  box-shadow: var(--md-shadow-1);
+}
+
+.result-button.primary:hover {
+  box-shadow: var(--md-shadow-2);
+  transform: translateY(-1px);
+}
+
+.result-button.secondary {
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  border: 1px solid var(--md-border);
+}
+
+.result-button.secondary:hover {
+  background: var(--md-surface-hover);
+}
+
+.result-button.tertiary {
+  background: transparent;
+  color: var(--md-on-surface-variant);
+}
+
+.result-button.tertiary:hover {
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+}

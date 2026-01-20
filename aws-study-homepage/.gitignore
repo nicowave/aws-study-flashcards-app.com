@@ -1,0 +1,13 @@
+# Node modules
+node_modules/
+node_modules/*
+
+
+# Archive && .zip files
+
+
+
+# Other files not needed in commits
+.DS_Store
+package-lock.json
+

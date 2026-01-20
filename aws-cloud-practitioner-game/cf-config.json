@@ -1,0 +1,156 @@
+{
+    "ETag": "EU5185GHBRZU",
+    "DistributionConfig": {
+        "CallerReference": "4419d738-a229-411a-9cec-238865397123",
+        "Aliases": {
+            "Quantity": 1,
+            "Items": [
+                "cloud.aws-study-flashcards-app.com"
+            ]
+        },
+        "DefaultRootObject": "/index.html",
+        "Origins": {
+            "Quantity": 2,
+            "Items": [
+                {
+                    "Id": "aws-ccp-flashcards-app.s3.us-east-1.amazonaws.com-mk62olxa118",
+                    "DomainName": "cloud.aws-study-flashcards-app.com.s3-website-us-east-1.amazonaws.com",
+                    "OriginPath": "",
+                    "CustomHeaders": {
+                        "Quantity": 0
+                    },
+                    "CustomOriginConfig": {
+                        "HTTPPort": 80,
+                        "HTTPSPort": 443,
+                        "OriginProtocolPolicy": "http-only",
+                        "OriginSslProtocols": {
+                            "Quantity": 4,
+                            "Items": [
+                                "SSLv3",
+                                "TLSv1",
+                                "TLSv1.1",
+                                "TLSv1.2"
+                            ]
+                        },
+                        "OriginReadTimeout": 30,
+                        "OriginKeepaliveTimeout": 5,
+                        "IpAddressType": "ipv4"
+                    },
+                    "ConnectionAttempts": 3,
+                    "ConnectionTimeout": 10,
+                    "OriginShield": {
+                        "Enabled": false
+                    },
+                    "OriginAccessControlId": ""
+                },
+                {
+                    "Id": "cloud.aws-study-flashcards-app.com.s3-website-us-east-1.amazonaws.com",
+                    "DomainName": "cloud.aws-study-flashcards-app.com.s3-website-us-east-1.amazonaws.com",
+                    "OriginPath": "",
+                    "CustomHeaders": {
+                        "Quantity": 0
+                    },
+                    "CustomOriginConfig": {
+                        "HTTPPort": 80,
+                        "HTTPSPort": 443,
+                        "OriginProtocolPolicy": "http-only",
+                        "OriginSslProtocols": {
+                            "Quantity": 4,
+                            "Items": [
+                                "SSLv3",
+                                "TLSv1",
+                                "TLSv1.1",
+                                "TLSv1.2"
+                            ]
+                        },
+                        "OriginReadTimeout": 30,
+                        "OriginKeepaliveTimeout": 5,
+                        "IpAddressType": "ipv4"
+                    },
+                    "ConnectionAttempts": 3,
+                    "ConnectionTimeout": 10,
+                    "OriginShield": {
+                        "Enabled": false
+                    },
+                    "OriginAccessControlId": ""
+                }
+            ]
+        },
+        "OriginGroups": {
+            "Quantity": 0
+        },
+        "DefaultCacheBehavior": {
+            "TargetOriginId": "cloud.aws-study-flashcards-app.com.s3-website-us-east-1.amazonaws.com",
+            "TrustedSigners": {
+                "Enabled": false,
+                "Quantity": 0
+            },
+            "TrustedKeyGroups": {
+                "Enabled": false,
+                "Quantity": 0
+            },
+            "ViewerProtocolPolicy": "redirect-to-https",
+            "AllowedMethods": {
+                "Quantity": 2,
+                "Items": [
+                    "HEAD",
+                    "GET"
+                ],
+                "CachedMethods": {
+                    "Quantity": 2,
+                    "Items": [
+                        "HEAD",
+                        "GET"
+                    ]
+                }
+            },
+            "SmoothStreaming": false,
+            "Compress": true,
+            "LambdaFunctionAssociations": {
+                "Quantity": 0
+            },
+            "FunctionAssociations": {
+                "Quantity": 0
+            },
+            "FieldLevelEncryptionId": "",
+            "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+            "GrpcConfig": {
+                "Enabled": false
+            }
+        },
+        "CacheBehaviors": {
+            "Quantity": 0
+        },
+        "CustomErrorResponses": {
+            "Quantity": 0
+        },
+        "Comment": "cloud.aws-study-flashcards-app.com",
+        "Logging": {
+            "Enabled": false,
+            "IncludeCookies": false,
+            "Bucket": "",
+            "Prefix": ""
+        },
+        "PriceClass": "PriceClass_All",
+        "Enabled": true,
+        "ViewerCertificate": {
+            "CloudFrontDefaultCertificate": false,
+            "ACMCertificateArn": "arn:aws:acm:us-east-1:418272768335:certificate/9c5abd7d-76d2-4506-9f2b-1f067e761abc",
+            "SSLSupportMethod": "sni-only",
+            "MinimumProtocolVersion": "TLSv1.2_2021",
+            "Certificate": "arn:aws:acm:us-east-1:418272768335:certificate/9c5abd7d-76d2-4506-9f2b-1f067e761abc",
+            "CertificateSource": "acm"
+        },
+        "Restrictions": {
+            "GeoRestriction": {
+                "RestrictionType": "none",
+                "Quantity": 0
+            }
+        },
+        "WebACLId": "arn:aws:wafv2:us-east-1:418272768335:global/webacl/CreatedByCloudFront-4f87b3fc/b1f3e88a-e374-4c35-828d-823e839dd2b5",
+        "HttpVersion": "http2and3",
+        "IsIPV6Enabled": false,
+        "ContinuousDeploymentPolicyId": "",
+        "Staging": false
+    }
+}
