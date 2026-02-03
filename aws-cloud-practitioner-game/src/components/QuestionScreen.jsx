@@ -1,6 +1,5 @@
 import React from 'react';
-import ParticleExplosion from './ParticleExplosion';
-import './QuestionScreen.css';
+import { ArrowLeftIcon, ArrowRightIcon, FlameIcon, TargetIcon } from './Icons';
 
 const QuestionScreen = ({
   domain,
@@ -14,99 +13,116 @@ const QuestionScreen = ({
   onNext,
   onQuit
 }) => {
-  const currentQuestion = questions[currentIndex];
+  const question = questions[currentIndex];
+  const { streak = 0, correct = 0, answered = 0 } = sessionStats || {};
+  const progress = ((currentIndex + 1) / questions.length) * 100;
+
+  if (!question) {
+    return (
+      <div className="question-screen">
+        <p>Loading question...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="playing-screen" style={{ '--domain-color': domain.color }}>
-      <div className="game-nav">
-        <button className="quit-button" onClick={onQuit}>
-          ✕ Quit
+    <div className="question-screen">
+      {/* Particle effect on correct answer */}
+      {showParticles && <div className="particles-container" />}
+
+      {/* Header */}
+      <div className="question-header">
+        <button className="quit-btn" onClick={onQuit}>
+          <ArrowLeftIcon size={18} />
+          <span>Quit</span>
         </button>
-        <div className="streak-display">
-          {sessionStats.streak > 0 && <>🔥 {sessionStats.streak}</>}
+        
+        <div className="session-stats">
+          <div className="stat-badge">
+            <FlameIcon size={16} />
+            <span>{streak}</span>
+          </div>
+          <div className="stat-badge">
+            <TargetIcon size={16} />
+            <span>{answered > 0 ? Math.round((correct / answered) * 100) : 0}%</span>
+          </div>
         </div>
       </div>
 
-      <div className="progress-header">
-        <div className="domain-badge" style={{ background: domain.gradient }}>
-          {domain.icon} {domain.name}
+      {/* Progress bar */}
+      <div className="progress-container">
+        <div className="progress-bar">
+          <div className="progress-fill" style={{ width: `${progress}%` }} />
         </div>
-        <div className="question-counter">
-          Question {currentIndex + 1} of {questions.length}
-        </div>
+        <span className="progress-text">
+          {currentIndex + 1} / {questions.length}
+        </span>
       </div>
 
-      <div className="progress-bar">
-        <div
-          className="progress-fill"
-          style={{
-            width: `${((currentIndex + (selectedAnswer !== null ? 1 : 0)) / questions.length) * 100}%`,
-            background: domain.gradient
-          }}
-        />
+      {/* Domain label */}
+      <div className="domain-label">
+        <span className="domain-icon">{domain?.icon || '📚'}</span>
+        <span>{domain?.name || 'Quiz'}</span>
       </div>
 
-      <div className="question-card">
-        <div className="question-text">{currentQuestion.question}</div>
+      {/* Question */}
+      <div className="question-container">
+        <h2 className="question-text">{question.question}</h2>
 
-        <div className="options-grid">
-          {currentQuestion.options.map((option, index) => {
-            let optionClass = 'option-button';
+        <div className="answers-grid">
+          {question.options.map((option, index) => {
+            let answerClass = 'answer-btn';
+            
             if (selectedAnswer !== null) {
-              if (index === currentQuestion.correctAnswer) {
-                optionClass += ' correct';
-              } else if (index === selectedAnswer) {
-                optionClass += ' incorrect';
+              if (index === question.correct) {
+                answerClass += ' correct';
+              } else if (index === selectedAnswer && index !== question.correct) {
+                answerClass += ' incorrect';
+              } else {
+                answerClass += ' disabled';
               }
             }
 
             return (
               <button
                 key={index}
-                className={optionClass}
+                className={answerClass}
                 onClick={() => onAnswer(index)}
                 disabled={selectedAnswer !== null}
               >
-                <span className="option-letter">
+                <span className="answer-letter">
                   {String.fromCharCode(65 + index)}
                 </span>
-                <span className="option-text">{option}</span>
-                {selectedAnswer !== null && index === currentQuestion.correctAnswer && (
-                  <span className="correct-icon">✓</span>
-                )}
-                {selectedAnswer === index && index !== currentQuestion.correctAnswer && (
-                  <span className="incorrect-icon">✗</span>
-                )}
+                <span className="answer-text">{option}</span>
               </button>
             );
           })}
         </div>
 
-        <ParticleExplosion active={showParticles} color={domain.color} />
-
-        {showExplanation && (
+        {/* Explanation */}
+        {showExplanation && question.explanation && (
           <div className="explanation-box">
-            <div className="explanation-header">
-              {selectedAnswer === currentQuestion.correctAnswer ? (
-                <span className="result-correct">✓ Correct!</span>
-              ) : (
-                <span className="result-incorrect">✗ Incorrect</span>
-              )}
-            </div>
-            <p className="explanation-text">{currentQuestion.explanation}</p>
-            <button
-              className="next-button"
-              onClick={onNext}
-              style={{ background: domain.gradient }}
-            >
-              {currentIndex < questions.length - 1 ? 'Next Question →' : 'See Results →'}
-            </button>
+            <h4>Explanation</h4>
+            <p>{question.explanation}</p>
           </div>
         )}
-      </div>
 
-      <div className="session-score">
-        Score: {sessionStats.correct}/{sessionStats.total}
+        {/* Next button */}
+        {selectedAnswer !== null && (
+          <button className="next-btn" onClick={onNext}>
+            {currentIndex < questions.length - 1 ? (
+              <>
+                <span>Next Question</span>
+                <ArrowRightIcon size={18} />
+              </>
+            ) : (
+              <>
+                <span>See Results</span>
+                <ArrowRightIcon size={18} />
+              </>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,57 +1,69 @@
 import React from 'react';
-import { getAllDomains } from '../data';
-import { CloudIcon, SecurityIcon, GearIcon, PricingIcon } from './Icons';
-import './DomainSelect.css';
-
-// Map domain IDs to icons
-const domainIconMap = {
-  'cloud-concepts': CloudIcon,
-  'security-compliance': SecurityIcon,
-  'cloud-technology': GearIcon,
-  'billing-support': PricingIcon,
-};
+import { domains } from '../data';
+import { ArrowLeftIcon, CheckCircleIcon, LockIcon } from './Icons';
 
 const DomainSelect = ({ globalStats, onSelectDomain, onBack }) => {
-  const domains = getAllDomains();
+  const domainStats = globalStats?.domainStats || {};
+
+  const getDomainProgress = (domainId) => {
+    const stats = domainStats[domainId];
+    if (!stats) return { completed: 0, total: 0, accuracy: 0 };
+    return {
+      completed: stats.totalAnswered || 0,
+      total: stats.totalQuestions || 10,
+      accuracy: stats.totalAnswered > 0 
+        ? Math.round((stats.totalCorrect / stats.totalAnswered) * 100) 
+        : 0
+    };
+  };
 
   return (
-    <div className="domain-select-screen">
-      <button className="back-button" onClick={onBack}>
-        ← Back
-      </button>
-      <h2 className="section-title">Select a Domain</h2>
-      <p className="section-subtitle">Choose a topic to study today</p>
+    <div className="domain-select">
+      <div className="domain-header">
+        <button className="back-btn" onClick={onBack}>
+          <ArrowLeftIcon size={20} />
+          <span>Back</span>
+        </button>
+        <h2>Select a Domain</h2>
+        <p className="domain-subtitle">Choose an AWS AI topic to study</p>
+      </div>
 
       <div className="domain-grid">
-        {domains.map(domain => {
-          const progress = globalStats.domainProgress[domain.id];
-          const completionPercent = progress?.bestScore 
-            ? Math.round(progress.bestScore * 100) 
-            : 0;
-          const IconComponent = domainIconMap[domain.id] || CloudIcon;
-
+        {domains.map((domain) => {
+          const progress = getDomainProgress(domain.id);
+          const isCompleted = progress.accuracy >= 80 && progress.completed >= 5;
+          
           return (
             <button
               key={domain.id}
-              className="domain-card"
+              className={`domain-card ${isCompleted ? 'completed' : ''}`}
               onClick={() => onSelectDomain(domain.id)}
-              style={{ 
-                '--domain-color': domain.color, 
-                '--domain-gradient': domain.gradient 
-              }}
             >
-              <div className="domain-icon"><IconComponent size={28} /></div>
-              <div className="domain-name">{domain.name}</div>
-              <div className="domain-weight">Exam Weight: {domain.weight}</div>
-              <div className="domain-progress-bar">
-                <div
-                  className="domain-progress-fill"
-                  style={{ width: `${completionPercent}%` }}
-                />
+              <div className="domain-icon">{domain.icon || '📚'}</div>
+              <div className="domain-info">
+                <h3 className="domain-name">{domain.name}</h3>
+                <p className="domain-description">{domain.description}</p>
               </div>
-              <div className="domain-sessions">
-                {progress?.completed || 0} sessions • Best: {completionPercent}%
+              
+              <div className="domain-progress">
+                <div className="progress-bar">
+                  <div 
+                    className="progress-fill"
+                    style={{ width: `${Math.min(progress.accuracy, 100)}%` }}
+                  />
+                </div>
+                <div className="progress-stats">
+                  <span>{progress.completed} answered</span>
+                  <span>{progress.accuracy}% accuracy</span>
+                </div>
               </div>
+
+              {isCompleted && (
+                <div className="completed-badge">
+                  <CheckCircleIcon size={16} />
+                  <span>Mastered</span>
+                </div>
+              )}
             </button>
           );
         })}

@@ -1,77 +1,80 @@
 import React from 'react';
-import { currentLevelProgress } from '../data/constants';
-import { GameIcon, StatsIcon, SoundOnIcon, SoundOffIcon, CloudIcon, HomeIcon } from './Icons';
-import './MenuScreen.css';
-import './Navigation.css';
+import { TrophyIcon, TargetIcon, FlameIcon, VolumeIcon, VolumeOffIcon, BookOpenIcon, ChartIcon } from './Icons';
 
 const MenuScreen = ({ 
   globalStats, 
   onStartGame, 
-  onViewStats, 
+  onViewStats,
+  onStudyGuide,
   soundEnabled, 
   onToggleSound 
 }) => {
-  const levelXp = currentLevelProgress(globalStats.xp);
-  
+  const { level = 1, xp = 0, totalAnswered = 0, totalCorrect = 0, maxStreak = 0 } = globalStats || {};
+  const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+  const xpForNextLevel = level * 100;
+  const xpProgress = (xp % 100) / 100 * 100;
+
   return (
     <div className="menu-screen">
-      <nav className="breadcrumb">
-        <a href="https://aws-study-flashcards-app.com" className="breadcrumb-link home">
-          <HomeIcon size={16} />
-          <span>Study Hub</span>
-        </a>
-      </nav>
-
-      <div className="game-header">
-        <div className="aws-badge">AWS</div>
-        <h1 className="game-title">Cloud Practitioner</h1>
-        <p className="game-subtitle">Certification Study Game</p>
+      <div className="menu-header">
+        <h1 className="game-title">
+          <span className="title-icon">🤖</span>
+          AI Practitioner
+        </h1>
+        <p className="game-subtitle">AWS Certification Quiz Game</p>
       </div>
 
-      <div className="level-display">
-        <div className="level-badge">Level {globalStats.level}</div>
-        <div className="xp-bar-container">
-          <div
-            className="xp-bar-fill"
-            style={{ width: `${levelXp}%` }}
-          />
+      {/* Stats Overview */}
+      <div className="stats-overview">
+        <div className="level-display">
+          <span className="level-label">Level</span>
+          <span className="level-value">{level}</span>
+          <div className="xp-bar">
+            <div className="xp-fill" style={{ width: `${xpProgress}%` }}></div>
+          </div>
+          <span className="xp-text">{xp % 100} / {xpForNextLevel} XP</span>
         </div>
-        <div className="xp-text">{levelXp} / 100 XP</div>
+
+        <div className="quick-stats">
+          <div className="stat-item">
+            <TargetIcon size={20} />
+            <span className="stat-value">{accuracy}%</span>
+            <span className="stat-label">Accuracy</span>
+          </div>
+          <div className="stat-item">
+            <FlameIcon size={20} />
+            <span className="stat-value">{maxStreak}</span>
+            <span className="stat-label">Best Streak</span>
+          </div>
+          <div className="stat-item">
+            <TrophyIcon size={20} />
+            <span className="stat-value">{totalAnswered}</span>
+            <span className="stat-label">Questions</span>
+          </div>
+        </div>
       </div>
 
-      <div className="menu-buttons">
-        <button className="menu-button primary" onClick={onStartGame}>
-          <span className="button-icon"><GameIcon size={20} /></span>
-          Start Studying
+      {/* Menu Actions */}
+      <div className="menu-actions">
+        <button className="menu-btn primary" onClick={onStartGame}>
+          <span className="btn-icon">🎮</span>
+          Start Quiz
         </button>
-        <button className="menu-button secondary" onClick={onViewStats}>
-          <span className="button-icon"><StatsIcon size={20} /></span>
-          View Progress
+        <button className="menu-btn secondary" onClick={onStudyGuide}>
+          <span className="btn-icon">📖</span>
+          Study Guide
         </button>
-        <button className="menu-button tertiary" onClick={onToggleSound}>
-          <span className="button-icon">{soundEnabled ? <SoundOnIcon size={20} /> : <SoundOffIcon size={20} />}</span>
-          Sound: {soundEnabled ? 'On' : 'Off'}
+        <button className="menu-btn secondary" onClick={onViewStats}>
+          <span className="btn-icon">📊</span>
+          View Stats
         </button>
       </div>
 
-      <div className="quick-stats">
-        <div className="quick-stat">
-          <span className="stat-value">{globalStats.totalAnswered}</span>
-          <span className="stat-label">Questions</span>
-        </div>
-        <div className="quick-stat">
-          <span className="stat-value">
-            {globalStats.totalAnswered > 0
-              ? Math.round((globalStats.totalCorrect / globalStats.totalAnswered) * 100)
-              : 0}%
-          </span>
-          <span className="stat-label">Accuracy</span>
-        </div>
-        <div className="quick-stat">
-          <span className="stat-value">{globalStats.maxStreak}</span>
-          <span className="stat-label">Best Streak</span>
-        </div>
-      </div>
+      {/* Sound Toggle */}
+      <button className="sound-toggle" onClick={onToggleSound}>
+        {soundEnabled ? <VolumeIcon size={20} /> : <VolumeOffIcon size={20} />}
+        <span>{soundEnabled ? 'Sound On' : 'Sound Off'}</span>
+      </button>
     </div>
   );
 };

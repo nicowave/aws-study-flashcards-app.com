@@ -1,8 +1,5 @@
 import React from 'react';
-import { TrophyIcon, StarIcon, CheckIcon, BookIcon, RefreshIcon, HomeIcon, ClockIcon, FireIcon } from './Icons';
-import SocialShare from './SocialShare';
-import './ResultsScreen.css';
-import './Navigation.css';
+import { TrophyIcon, TargetIcon, FlameIcon, RefreshIcon, HomeIcon, GridIcon } from './Icons';
 
 const ResultsScreen = ({
   domain,
@@ -12,73 +9,109 @@ const ResultsScreen = ({
   onSelectDomain,
   onMainMenu
 }) => {
-  const percentage = Math.round((sessionStats.correct / totalQuestions) * 100);
-
-  const getResultIcon = () => {
-    if (percentage === 100) return <TrophyIcon size={48} />;
-    if (percentage >= 80) return <StarIcon size={48} />;
-    if (percentage >= 60) return <CheckIcon size={48} />;
-    return <BookIcon size={48} />;
-  };
-
-  const getResultMessage = () => {
-    if (percentage === 100) return 'Perfect Score!';
-    if (percentage >= 80) return 'Great Job!';
-    if (percentage >= 60) return 'Good Effort!';
-    return 'Keep Practicing!';
-  };
+  const { correct = 0, answered = 0, maxStreak = 0, xpEarned = 0 } = sessionStats || {};
+  const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  
+  // Determine performance level
+  let performanceLevel = 'needs-work';
+  let performanceMessage = 'Keep practicing!';
+  let performanceEmoji = '📚';
+  
+  if (accuracy >= 90) {
+    performanceLevel = 'excellent';
+    performanceMessage = 'Outstanding! You\'re an AI expert!';
+    performanceEmoji = '🏆';
+  } else if (accuracy >= 80) {
+    performanceLevel = 'great';
+    performanceMessage = 'Great job! Almost perfect!';
+    performanceEmoji = '🌟';
+  } else if (accuracy >= 70) {
+    performanceLevel = 'good';
+    performanceMessage = 'Good work! Keep it up!';
+    performanceEmoji = '👍';
+  } else if (accuracy >= 60) {
+    performanceLevel = 'okay';
+    performanceMessage = 'Not bad! Room for improvement.';
+    performanceEmoji = '💪';
+  }
 
   return (
-    <div className="results-screen" style={{ '--domain-color': domain?.color }}>
-      <div className="results-card">
-        <div className="results-icon">{getResultIcon()}</div>
-        <h2 className="results-title">{getResultMessage()}</h2>
+    <div className="results-screen">
+      <div className="results-header">
+        <span className="results-emoji">{performanceEmoji}</span>
+        <h1 className="results-title">Quiz Complete!</h1>
+        <p className={`results-message ${performanceLevel}`}>{performanceMessage}</p>
+      </div>
 
-        <div className="results-score">
-          <span className="score-num">{sessionStats.correct}</span>
-          <span className="score-divider">/</span>
-          <span className="score-total">{totalQuestions}</span>
-        </div>
+      {/* Domain info */}
+      <div className="results-domain">
+        <span className="domain-icon">{domain?.icon || '📚'}</span>
+        <span className="domain-name">{domain?.name || 'Quiz'}</span>
+      </div>
 
-        <div className="results-percentage">{percentage}% Correct</div>
-
-        <div className="results-stats">
-          <div className="result-stat">
-            <span className="stat-icon"><ClockIcon size={18} /></span>
-            <span className="stat-info">
-              {Math.round((Date.now() - sessionStats.startTime) / 1000)}s
-            </span>
+      {/* Score display */}
+      <div className="score-display">
+        <div className="score-circle">
+          <svg viewBox="0 0 100 100">
+            <circle
+              className="score-bg"
+              cx="50"
+              cy="50"
+              r="45"
+              fill="none"
+              strokeWidth="8"
+            />
+            <circle
+              className="score-fill"
+              cx="50"
+              cy="50"
+              r="45"
+              fill="none"
+              strokeWidth="8"
+              strokeDasharray={`${accuracy * 2.83} 283`}
+              transform="rotate(-90 50 50)"
+            />
+          </svg>
+          <div className="score-text">
+            <span className="score-value">{accuracy}%</span>
+            <span className="score-label">Accuracy</span>
           </div>
-          <div className="result-stat">
-            <span className="stat-icon"><FireIcon size={18} /></span>
-            <span className="stat-info">Best Streak: {sessionStats.streak}</span>
-          </div>
         </div>
+      </div>
 
-        <div className="results-share">
-          <SocialShare 
-            score={sessionStats.correct}
-            total={totalQuestions}
-            certName="AWS Cloud Practitioner"
-            siteUrl="https://cloud.aws-study-flashcards-app.com"
-          />
+      {/* Stats grid */}
+      <div className="results-stats">
+        <div className="result-stat">
+          <TargetIcon size={24} />
+          <span className="stat-value">{correct}/{answered}</span>
+          <span className="stat-label">Correct</span>
         </div>
+        <div className="result-stat">
+          <FlameIcon size={24} />
+          <span className="stat-value">{maxStreak}</span>
+          <span className="stat-label">Best Streak</span>
+        </div>
+        <div className="result-stat">
+          <TrophyIcon size={24} />
+          <span className="stat-value">+{xpEarned}</span>
+          <span className="stat-label">XP Earned</span>
+        </div>
+      </div>
 
-        <div className="results-actions">
-          <button
-            className="result-button primary"
-            onClick={onRetry}
-            style={{ background: domain?.gradient }}
-          >
-            <RefreshIcon size={18} /> Try Again
-          </button>
-          <button className="result-button secondary" onClick={onSelectDomain}>
-            <BookIcon size={18} /> Other Domains
-          </button>
-          <button className="result-button tertiary" onClick={onMainMenu}>
-            <HomeIcon size={18} /> Main Menu
-          </button>
-        </div>
+      {/* Actions */}
+      <div className="results-actions">
+        <button className="action-btn primary" onClick={onRetry}>
+          <RefreshIcon size={18} />
+          <span>Try Again</span>
+        </button>
+        <button className="action-btn secondary" onClick={onSelectDomain}>
+          <GridIcon size={18} />
+          <span>Other Domains</span>
+        </button>
+        <button className="action-btn tertiary" onClick={onMainMenu}>
+          <HomeIcon size={18} />
+          <span>Main Menu</span>
+        </button>
       </div>
     </div>
   );

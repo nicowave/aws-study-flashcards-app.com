@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
-  SecurityIcon, 
-  CheckIcon, 
+  LockIcon, 
+  CheckCircleIcon, 
   ArrowRightIcon,
   BookIcon,
   HomeIcon
@@ -15,30 +15,56 @@ const CloseIcon = ({ size = 24 }) => (
   </svg>
 );
 
-const AuthScreen = ({ onSuccess, hubUrl = 'https://aws-study-flashcards.app' }) => {
+const MailIcon = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+    <polyline points="22,6 12,13 2,6" />
+  </svg>
+);
+
+const UserIcon = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+const AuthScreen = ({ 
+  onSuccess, 
+  onGuestMode,
+  hubUrl = 'https://aws-study-flashcards.app',
+  showGuestOption = false,
+  siteName = 'AWS Study Hub'
+}) => {
   const [mode, setMode] = useState('login');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [showEmail, setShowEmail] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localError, setLocalError] = useState(null);
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
   
-  const { login, register, error, clearError } = useAuth();
+  const { login, register, loginAsGuest, resendVerification, error, clearError } = useAuth();
+
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalError(null);
     clearError();
+    setShowVerificationMessage(false);
 
-    if (!username.trim()) {
-      setLocalError('Username is required');
+    // Validation
+    if (!email.trim()) {
+      setLocalError('Email is required');
       return;
     }
 
-    if (username.length < 3) {
-      setLocalError('Username must be at least 3 characters');
+    if (!validateEmail(email)) {
+      setLocalError('Please enter a valid email address');
       return;
     }
 
@@ -61,9 +87,27 @@ const AuthScreen = ({ onSuccess, hubUrl = 'https://aws-study-flashcards.app' }) 
 
     let result;
     if (mode === 'login') {
-      result = await login(username, password);
+      result = await login(email, password);
+      
+      // Handle email verification needed
+      if (result.needsVerification) {
+        setShowVerificationMessage(true);
+        setVerificationEmail(email);
+        setIsSubmitting(false);
+        return;
+      }
     } else {
-      result = await register(username, password, email || null);
+      result = await register(email, password);
+      
+      if (result.success) {
+        setShowVerificationMessage(true);
+        setVerificationEmail(email);
+        setMode('login');
+        setPassword('');
+        setConfirmPassword('');
+        setIsSubmitting(false);
+        return;
+      }
     }
 
     setIsSubmitting(false);
@@ -73,13 +117,31 @@ const AuthScreen = ({ onSuccess, hubUrl = 'https://aws-study-flashcards.app' }) 
     }
   };
 
+  const handleResendVerification = async () => {
+    const result = await resendVerification();
+    if (result.success) {
+      setLocalError(null);
+      setShowVerificationMessage(true);
+    }
+  };
+
+  const handleGuestMode = async () => {
+    setIsSubmitting(true);
+    const result = await loginAsGuest();
+    setIsSubmitting(false);
+    
+    if (result.success) {
+      onGuestMode?.();
+      onSuccess?.();
+    }
+  };
+
   const toggleMode = () => {
     setMode(mode === 'login' ? 'register' : 'login');
     setLocalError(null);
     clearError();
     setConfirmPassword('');
-    setEmail('');
-    setShowEmail(false);
+    setShowVerificationMessage(false);
   };
 
   const displayError = localError || error;
@@ -105,36 +167,66 @@ const AuthScreen = ({ onSuccess, hubUrl = 'https://aws-study-flashcards.app' }) 
 
           <div className="auth-header">
             <div className="auth-icon">
-              <SecurityIcon size={28} />
+              <LockIcon size={28} />
             </div>
             <h2 className="auth-title">
               {mode === 'login' ? 'Welcome Back' : 'Create Account'}
             </h2>
             <p className="auth-subtitle">
               {mode === 'login' 
-                ? 'Sign in to access your study materials' 
-                : 'Create an account to start studying'}
+                ? `Sign in to access ${siteName}` 
+                : 'Create an account to save your progress'}
             </p>
           </div>
 
-          {displayError && (
+          {/* Email Verification Message */}
+          {showVerificationMessage && (
+            <div className="auth-success">
+              <MailIcon size={20} />
+              <div className="success-content">
+                <strong>Verification Email Sent!</strong>
+                <p>We sent a verification link to <strong>{verificationEmail}</strong></p>
+                <p className="small">Please check your email and click the link to verify your account.</p>
+                <button 
+                  type="button"
+                  className="resend-btn"
+                  onClick={handleResendVerification}
+                >
+                  Resend verification email
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {displayError && !showVerificationMessage && (
             <div className="auth-error">
               <CloseIcon size={16} />
               <span>{displayError}</span>
+              {displayError.includes('verify your email') && (
+                <button 
+                  type="button"
+                  className="resend-btn-inline"
+                  onClick={handleResendVerification}
+                >
+                  Resend verification
+                </button>
+              )}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="email">Email Address</label>
               <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
-                autoComplete="username"
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                autoComplete="email"
                 disabled={isSubmitting}
+                required
               />
             </div>
 
@@ -145,52 +237,27 @@ const AuthScreen = ({ onSuccess, hubUrl = 'https://aws-study-flashcards.app' }) 
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
+                placeholder="Enter password (min 6 characters)"
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                 disabled={isSubmitting}
+                required
               />
             </div>
 
             {mode === 'register' && (
-              <>
-                <div className="form-group">
-                  <label htmlFor="confirmPassword">Confirm Password</label>
-                  <input
-                    type="password"
-                    id="confirmPassword"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm password"
-                    autoComplete="new-password"
-                    disabled={isSubmitting}
-                  />
-                </div>
-
-                <div className="form-group optional">
-                  <button 
-                    type="button" 
-                    className="toggle-email-btn"
-                    onClick={() => setShowEmail(!showEmail)}
-                  >
-                    {showEmail ? '− Hide email (optional)' : '+ Add email (optional)'}
-                  </button>
-                  
-                  {showEmail && (
-                    <input
-                      type="email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="email@example.com"
-                      autoComplete="email"
-                      disabled={isSubmitting}
-                    />
-                  )}
-                  <span className="helper-text">
-                    Email allows password recovery
-                  </span>
-                </div>
-              </>
+              <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm password"
+                  autoComplete="new-password"
+                  disabled={isSubmitting}
+                  required
+                />
+              </div>
             )}
 
             <button 
@@ -209,6 +276,24 @@ const AuthScreen = ({ onSuccess, hubUrl = 'https://aws-study-flashcards.app' }) 
             </button>
           </form>
 
+          {/* Guest Mode Button */}
+          {showGuestOption && (
+            <>
+              <div className="auth-divider">
+                <span>OR</span>
+              </div>
+              <button 
+                className="guest-mode-btn"
+                onClick={handleGuestMode}
+                disabled={isSubmitting}
+              >
+                <UserIcon size={20} />
+                Continue as Guest
+                <span className="guest-note">(Progress not saved)</span>
+              </button>
+            </>
+          )}
+
           <div className="auth-footer">
             <button className="toggle-mode-btn" onClick={toggleMode}>
               {mode === 'login' 
@@ -220,10 +305,10 @@ const AuthScreen = ({ onSuccess, hubUrl = 'https://aws-study-flashcards.app' }) 
           <div className="auth-benefits">
             <h4>Account Benefits</h4>
             <ul>
-              <li><CheckIcon size={14} /> Access all AWS certification study materials</li>
-              <li><CheckIcon size={14} /> Track progress across all certifications</li>
-              <li><CheckIcon size={14} /> Sync your stats across devices</li>
-              <li><CheckIcon size={14} /> Earn achievements and compete on leaderboards</li>
+              <li><CheckCircleIcon size={14} /> Access all AWS certification study materials</li>
+              <li><CheckCircleIcon size={14} /> Track progress across all certifications</li>
+              <li><CheckCircleIcon size={14} /> Sync your stats across devices</li>
+              <li><CheckCircleIcon size={14} /> Email verification for account security</li>
             </ul>
           </div>
         </div>

@@ -1,15 +1,19 @@
 import React from 'react';
-import './AchievementNotification.css';
 
 const AchievementNotification = ({ achievement }) => {
   if (!achievement) return null;
 
   return (
     <div className="achievement-notification">
-      <div className="achievement-icon">{achievement.icon}</div>
-      <div className="achievement-info">
-        <div className="achievement-title">Achievement Unlocked!</div>
-        <div className="achievement-name">{achievement.name}</div>
+      <div className="achievement-content">
+        <span className="achievement-icon">🏆</span>
+        <div className="achievement-text">
+          <span className="achievement-label">Achievement Unlocked!</span>
+          <span className="achievement-name">{achievement.name}</span>
+          {achievement.xpReward && (
+            <span className="achievement-xp">+{achievement.xpReward} XP</span>
+          )}
+        </div>
       </div>
     </div>
   );
