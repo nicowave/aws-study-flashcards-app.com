@@ -13,7 +13,7 @@ import {
 import StudyGuide from './components/StudyGuide';
 import AuthScreen from './components/AuthScreen';
 import UserBadge from './components/UserBadge';
-import { GameIcon, BookIcon } from './components/Icons';
+import { PlayIcon, BookIcon } from './components/Icons';
 import './styles/global.css';
 import './components/AuthScreen.css';
 
@@ -47,7 +47,7 @@ const TabNavigation = ({ activeTab, onTabChange }) => {
         className={`tab-btn ${activeTab === 'game' ? 'active' : ''}`}
         onClick={() => onTabChange('game')}
       >
-        <span className="tab-icon"><GameIcon size={18} /></span>
+        <span className="tab-icon"><PlayIcon size={18} /></span>
         <span className="tab-label">Quiz Game</span>
       </button>
       <button 

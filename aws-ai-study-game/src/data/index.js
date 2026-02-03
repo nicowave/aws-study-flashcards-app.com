@@ -2,7 +2,7 @@ import { domain1, domain2 } from './domains/fundamentals';
 import { domain3 } from './domains/applications';
 import { domain4, domain5 } from './domains/governance';
 
-export const examDomains = {
+export const domains = {
   domain1,
   domain2,
   domain3,

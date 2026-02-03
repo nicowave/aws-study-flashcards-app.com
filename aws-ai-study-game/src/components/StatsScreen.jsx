@@ -1,98 +1,168 @@
-import React from 'react';
-import { getAllDomains } from '../data';
-import { achievements } from '../data/achievements';
-import './StatsScreen.css';
+import React, { useState } from 'react';
+import { domains } from '../data';
+import { 
+  ArrowLeftIcon, 
+  TrophyIcon, 
+  TargetIcon, 
+  FlameIcon, 
+  TrashIcon,
+  StarIcon,
+  CheckCircleIcon
+} from './Icons';
 
 const StatsScreen = ({ globalStats, onBack, onReset }) => {
-  const domains = getAllDomains();
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  
+  const {
+    level = 1,
+    xp = 0,
+    totalAnswered = 0,
+    totalCorrect = 0,
+    maxStreak = 0,
+    gamesPlayed = 0,
+    domainStats = {},
+    achievements = []
+  } = globalStats || {};
 
-  const handleReset = () => {
-    if (window.confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
-      onReset();
-    }
+  const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+  const xpForNextLevel = level * 100;
+  const xpProgress = (xp % 100);
+
+  const handleResetClick = () => {
+    setShowResetConfirm(true);
+  };
+
+  const handleConfirmReset = () => {
+    onReset();
+    setShowResetConfirm(false);
   };
 
   return (
     <div className="stats-screen">
-      <button className="back-button" onClick={onBack}>
-        ← Back
-      </button>
+      <div className="stats-header">
+        <button className="back-btn" onClick={onBack}>
+          <ArrowLeftIcon size={20} />
+          <span>Back</span>
+        </button>
+        <h2>Your Statistics</h2>
+      </div>
 
-      <h2 className="section-title">Your Progress</h2>
-
-      <div className="stats-overview">
-        <div className="stat-card">
-          <div className="stat-card-value">{globalStats.totalAnswered}</div>
-          <div className="stat-card-label">Total Questions</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-card-value">
-            {globalStats.totalAnswered > 0
-              ? Math.round((globalStats.totalCorrect / globalStats.totalAnswered) * 100)
-              : 0}%
+      {/* Level & XP */}
+      <div className="level-card">
+        <div className="level-info">
+          <span className="level-badge">Level {level}</span>
+          <div className="xp-bar-large">
+            <div 
+              className="xp-fill" 
+              style={{ width: `${(xpProgress / xpForNextLevel) * 100}%` }}
+            />
           </div>
-          <div className="stat-card-label">Accuracy</div>
+          <span className="xp-text">{xpProgress} / {xpForNextLevel} XP to next level</span>
         </div>
-        <div className="stat-card">
-          <div className="stat-card-value">{globalStats.maxStreak}</div>
-          <div className="stat-card-label">Best Streak</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-card-value">{globalStats.perfectDomains}</div>
-          <div className="stat-card-label">Perfect Sessions</div>
+        <div className="total-xp">
+          <StarIcon size={24} />
+          <span>{xp} Total XP</span>
         </div>
       </div>
 
-      <h3 className="subsection-title">Domain Progress</h3>
-      <div className="domain-stats-list">
-        {domains.map(domain => {
-          const progress = globalStats.domainProgress[domain.id];
-          return (
-            <div key={domain.id} className="domain-stat-item">
-              <div className="domain-stat-header">
-                <span className="domain-stat-icon" style={{ color: domain.color }}>
-                  {domain.icon}
-                </span>
-                <span className="domain-stat-name">{domain.name}</span>
+      {/* Overall Stats */}
+      <div className="overall-stats">
+        <h3>Overall Performance</h3>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <TargetIcon size={28} />
+            <span className="stat-value">{accuracy}%</span>
+            <span className="stat-label">Accuracy</span>
+          </div>
+          <div className="stat-card">
+            <FlameIcon size={28} />
+            <span className="stat-value">{maxStreak}</span>
+            <span className="stat-label">Best Streak</span>
+          </div>
+          <div className="stat-card">
+            <TrophyIcon size={28} />
+            <span className="stat-value">{gamesPlayed}</span>
+            <span className="stat-label">Games Played</span>
+          </div>
+          <div className="stat-card">
+            <CheckCircleIcon size={28} />
+            <span className="stat-value">{totalCorrect}/{totalAnswered}</span>
+            <span className="stat-label">Correct Answers</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Domain Progress */}
+      <div className="domain-stats">
+        <h3>Domain Progress</h3>
+        <div className="domain-list">
+          {domains.map((domain) => {
+            const stats = domainStats[domain.id] || {};
+            const domainAccuracy = stats.totalAnswered > 0
+              ? Math.round((stats.totalCorrect / stats.totalAnswered) * 100)
+              : 0;
+            const isMastered = domainAccuracy >= 80 && (stats.totalAnswered || 0) >= 5;
+
+            return (
+              <div key={domain.id} className={`domain-stat-row ${isMastered ? 'mastered' : ''}`}>
+                <div className="domain-info">
+                  <span className="domain-icon">{domain.icon || '📚'}</span>
+                  <span className="domain-name">{domain.name}</span>
+                </div>
+                <div className="domain-progress">
+                  <div className="mini-progress-bar">
+                    <div 
+                      className="mini-progress-fill"
+                      style={{ width: `${domainAccuracy}%` }}
+                    />
+                  </div>
+                  <span className="domain-accuracy">{domainAccuracy}%</span>
+                </div>
+                {isMastered && (
+                  <CheckCircleIcon size={16} className="mastered-icon" />
+                )}
               </div>
-              <div className="domain-stat-bar">
-                <div
-                  className="domain-stat-fill"
-                  style={{
-                    width: `${progress?.bestScore ? progress.bestScore * 100 : 0}%`,
-                    background: domain.gradient
-                  }}
-                />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Achievements */}
+      {achievements.length > 0 && (
+        <div className="achievements-section">
+          <h3>Achievements ({achievements.length})</h3>
+          <div className="achievements-grid">
+            {achievements.map((achievement, index) => (
+              <div key={index} className="achievement-card">
+                <span className="achievement-icon">🏆</span>
+                <span className="achievement-name">{achievement.name || achievement}</span>
               </div>
-              <div className="domain-stat-info">
-                {progress?.completed || 0} sessions • Best:{' '}
-                {progress?.bestScore ? Math.round(progress.bestScore * 100) : 0}%
-              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Reset Button */}
+      <div className="reset-section">
+        {!showResetConfirm ? (
+          <button className="reset-btn" onClick={handleResetClick}>
+            <TrashIcon size={16} />
+            <span>Reset All Progress</span>
+          </button>
+        ) : (
+          <div className="reset-confirm">
+            <p>Are you sure? This cannot be undone.</p>
+            <div className="confirm-buttons">
+              <button className="confirm-yes" onClick={handleConfirmReset}>
+                Yes, Reset
+              </button>
+              <button className="confirm-no" onClick={() => setShowResetConfirm(false)}>
+                Cancel
+              </button>
             </div>
-          );
-        })}
+          </div>
+        )}
       </div>
-
-      <h3 className="subsection-title">Achievements</h3>
-      <div className="achievements-grid">
-        {achievements.map(achievement => {
-          const isUnlocked = globalStats.unlockedAchievements.includes(achievement.id);
-          return (
-            <div
-              key={achievement.id}
-              className={`achievement-card ${isUnlocked ? 'unlocked' : 'locked'}`}
-            >
-              <div className="achievement-card-icon">{achievement.icon}</div>
-              <div className="achievement-card-name">{achievement.name}</div>
-              <div className="achievement-card-desc">{achievement.description}</div>
-            </div>
-          );
-        })}
-      </div>
-
-      <button className="reset-button" onClick={handleReset}>
-        🗑️ Reset All Progress
-      </button>
     </div>
   );
 };
