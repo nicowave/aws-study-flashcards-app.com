@@ -1,12 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
-  onAuthChange, 
-  loginUser, 
   registerUser, 
+  loginUser, 
   logoutUser, 
+  signInAsGuest,
+  isGuestUser,
+  resendVerificationEmail,
+  onAuthChange, 
   getUserData,
-  syncProgress 
-} from '../services/firebase';
+  getStoredUserData,
+  syncProgress
+} from '../services/sharedAuth';
 
 const AuthContext = createContext(null);
 
@@ -22,19 +26,32 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [error, setError] = useState(null);
+  const [needsVerification, setNeedsVerification] = useState(false);
 
+  // Listen for auth state changes
   useEffect(() => {
+    console.log('[AuthContext] Setting up auth listener...');
+    
     const unsubscribe = onAuthChange(async (firebaseUser) => {
-      setUser(firebaseUser);
+      console.log('[AuthContext] Auth state changed:', firebaseUser?.email || 'No user');
       
       if (firebaseUser) {
-        const result = await getUserData(firebaseUser.uid);
-        if (result.success) {
-          setUserData(result.data);
+        setUser(firebaseUser);
+        
+        // Check if this is a guest user
+        if (firebaseUser.isAnonymous || isGuestUser()) {
+          setUserData({ isGuest: true });
+        } else {
+          // Fetch user data from Firestore
+          const result = await getUserData(firebaseUser.uid);
+          if (result.success) {
+            setUserData(result.data);
+          }
         }
       } else {
+        setUser(null);
         setUserData(null);
       }
       
@@ -42,35 +59,110 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
       setAuthChecked(true);
     });
 
+    // Check for stored user data on mount (for faster initial render)
+    const storedUser = getStoredUserData();
+    if (storedUser) {
+      console.log('[AuthContext] Found stored user:', storedUser.email);
+    }
+
     return () => unsubscribe();
   }, []);
 
-  const login = async (username, password) => {
+  // Clear error
+  const clearError = () => {
     setError(null);
-    const result = await loginUser(username, password);
+    setNeedsVerification(false);
+  };
+
+  // Register with REAL email (required for verification)
+  const register = async (email, password, displayName = null) => {
+    setLoading(true);
+    setError(null);
+    setNeedsVerification(false);
     
-    if (!result.success) {
+    console.log('[AuthContext] Registering user:', email);
+    
+    const result = await registerUser(email, password, displayName);
+    
+    if (result.success) {
+      setNeedsVerification(true);
+      console.log('[AuthContext] Registration successful, verification email sent');
+    } else {
       setError(result.error);
+      console.log('[AuthContext] Registration failed:', result.error);
     }
     
+    setLoading(false);
     return result;
   };
 
-  const register = async (username, password, email = null) => {
+  // Login with email
+  const login = async (email, password) => {
+    setLoading(true);
     setError(null);
-    const result = await registerUser(username, password, email);
+    setNeedsVerification(false);
     
-    if (!result.success) {
+    console.log('[AuthContext] Logging in user:', email);
+    
+    const result = await loginUser(email, password);
+    
+    if (result.success) {
+      console.log('[AuthContext] Login successful');
+    } else {
       setError(result.error);
+      if (result.needsVerification) {
+        setNeedsVerification(true);
+        setUser(result.user); // Store user for resend verification
+      }
+      console.log('[AuthContext] Login failed:', result.error);
     }
     
+    setLoading(false);
     return result;
   };
 
+  // Logout
   const logout = async () => {
-    setError(null);
+    setLoading(true);
+    console.log('[AuthContext] Logging out...');
+    
     const result = await logoutUser();
     
+    if (result.success) {
+      setUser(null);
+      setUserData(null);
+      console.log('[AuthContext] Logout successful');
+    }
+    
+    setLoading(false);
+    return result;
+  };
+
+  // Guest login
+  const loginAsGuest = async () => {
+    setLoading(true);
+    setError(null);
+    
+    console.log('[AuthContext] Signing in as guest...');
+    
+    const result = await signInAsGuest();
+    
+    if (result.success) {
+      setUserData({ isGuest: true });
+      console.log('[AuthContext] Guest login successful');
+    } else {
+      setError(result.error);
+    }
+    
+    setLoading(false);
+    return result;
+  };
+
+  // Resend verification email
+  const resendVerification = async () => {
+    console.log('[AuthContext] Resending verification email...');
+    const result = await resendVerificationEmail();
+    
     if (!result.success) {
       setError(result.error);
     }
@@ -78,40 +170,32 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     return result;
   };
 
-  const syncLocalProgress = async (localStats, certId = null) => {
-    if (!user) return { success: false, error: 'Not logged in' };
-    
-    const result = await syncProgress(user.uid, localStats, certId);
-    
-    if (result.success) {
-      setUserData(prev => ({ ...prev, stats: result.stats }));
+  // Sync progress to cloud
+  const syncUserProgress = async (localStats, certId = null) => {
+    if (!user || isGuestUser()) {
+      console.log('[AuthContext] Cannot sync - no authenticated user');
+      return { success: false, error: 'Not authenticated' };
     }
     
-    return result;
-  };
-
-  const refreshUserData = async () => {
-    if (!user) return;
-    const result = await getUserData(user.uid);
-    if (result.success) {
-      setUserData(result.data);
-    }
+    return await syncProgress(user.uid, localStats, certId);
   };
 
   const value = {
     user,
     userData,
     loading,
-    error,
     authChecked,
-    isAuthenticated: !!user,
-    requireAuth,
-    login,
+    error,
+    needsVerification,
+    isAuthenticated: !!user && (user.emailVerified || user.isAnonymous || isGuestUser()),
+    isGuest: isGuestUser(),
     register,
+    login,
     logout,
-    syncLocalProgress,
-    refreshUserData,
-    clearError: () => setError(null)
+    loginAsGuest,
+    resendVerification,
+    clearError,
+    syncUserProgress
   };
 
   return (
