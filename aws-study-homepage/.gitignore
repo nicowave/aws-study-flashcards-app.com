@@ -4,7 +4,10 @@ node_modules/*
 
 
 # Archive && .zip files
-
+.zip
+../docs/*
+../zip/*
+../data/*
 
 
 # Other files not needed in commits
