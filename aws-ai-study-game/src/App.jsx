@@ -259,12 +259,13 @@ function GameContent() {
   );
 }
 
+
 // Main App with Auth Gate
 function AppContent() {
-  const { isAuthenticated, loading, authChecked } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   // Show loading while checking auth
-  if (loading || !authChecked) {
+  if (loading) {
     return <LoadingScreen />;
   }
 
