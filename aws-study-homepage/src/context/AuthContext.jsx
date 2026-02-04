@@ -1,16 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { auth, db } from '../config/firebase.config';
 import { 
-  registerUser, 
-  loginUser, 
-  logoutUser, 
-  signInAsGuest,
-  isGuestUser,
-  resendVerificationEmail,
-  onAuthChange, 
-  getUserData,
-  getStoredUserData,
-  syncProgress
-} from '../services/sharedAuth';
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  sendEmailVerification,
+  updateProfile
+} from 'firebase/auth';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 const AuthContext = createContext(null);
 
@@ -22,180 +20,279 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = ({ children, requireAuth = false }) => {
-  const [user, setUser] = useState(null);
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [error, setError] = useState(null);
-  const [needsVerification, setNeedsVerification] = useState(false);
+// Cookie helpers for cross-domain auth
+const COOKIE_NAME = 'awsStudyAuth';
+const COOKIE_DOMAIN = window.location.hostname === 'localhost' 
+  ? '' 
+  : '.aws-study-flashcards-app.com';
 
-  // Listen for auth state changes
+const setCookie = (userData) => {
+  const cookieData = JSON.stringify({
+    uid: userData.uid,
+    email: userData.email,
+    displayName: userData.displayName,
+    timestamp: Date.now()
+  });
+  
+  const expires = new Date();
+  expires.setDate(expires.getDate() + 7); // 7 days
+  
+  const cookieString = COOKIE_DOMAIN
+    ? `${COOKIE_NAME}=${encodeURIComponent(cookieData)}; expires=${expires.toUTCString()}; path=/; domain=${COOKIE_DOMAIN}; Secure; SameSite=Lax`
+    : `${COOKIE_NAME}=${encodeURIComponent(cookieData)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+  
+  document.cookie = cookieString;
+  console.log('[Auth] Cookie set for domain:', COOKIE_DOMAIN || 'localhost');
+};
+
+const clearCookie = () => {
+  const cookieString = COOKIE_DOMAIN
+    ? `${COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${COOKIE_DOMAIN}`
+    : `${COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+  
+  document.cookie = cookieString;
+  console.log('[Auth] Cookie cleared');
+};
+
+const getCookie = () => {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === COOKIE_NAME && value) {
+      try {
+        return JSON.parse(decodeURIComponent(value));
+      } catch (e) {
+        console.error('[Auth] Failed to parse cookie:', e);
+        return null;
+      }
+    }
+  }
+  return null;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     console.log('[AuthContext] Setting up auth listener...');
     
-    const unsubscribe = onAuthChange(async (firebaseUser) => {
-      console.log('[AuthContext] Auth state changed:', firebaseUser?.email || 'No user');
-      
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        setUser(firebaseUser);
+        console.log('[AuthContext] Auth state changed: User logged in -', firebaseUser.email);
         
-        // Check if this is a guest user
-        if (firebaseUser.isAnonymous || isGuestUser()) {
-          setUserData({ isGuest: true });
-        } else {
-          // Fetch user data from Firestore
-          const result = await getUserData(firebaseUser.uid);
-          if (result.success) {
-            setUserData(result.data);
-          }
+        // Create user object
+        const userData = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0],
+          emailVerified: firebaseUser.emailVerified
+        };
+        
+        setUser(userData);
+        setCookie(userData);
+        
+        // Warn if email not verified
+        if (!firebaseUser.emailVerified) {
+          console.log('[AuthContext] Email not verified for:', firebaseUser.email);
         }
       } else {
+        console.log('[AuthContext] Auth state changed: No user');
         setUser(null);
-        setUserData(null);
+        
+        // Check for cross-domain cookie
+        const cookieData = getCookie();
+        if (cookieData) {
+          console.log('[AuthContext] Found cookie, user may be logged in on another domain');
+        }
       }
-      
       setLoading(false);
-      setAuthChecked(true);
     });
-
-    // Check for stored user data on mount (for faster initial render)
-    const storedUser = getStoredUserData();
-    if (storedUser) {
-      console.log('[AuthContext] Found stored user:', storedUser.email);
-    }
 
     return () => unsubscribe();
   }, []);
 
-  // Clear error
-  const clearError = () => {
+  // Register with EMAIL (primary), password, and optional username
+  const register = async (email, password, username = '') => {
     setError(null);
-    setNeedsVerification(false);
-  };
-
-  // Register with REAL email (required for verification)
-  const register = async (email, password, displayName = null) => {
     setLoading(true);
-    setError(null);
-    setNeedsVerification(false);
     
-    console.log('[AuthContext] Registering user:', email);
+    console.log('[AuthContext] Registering user with email:', email);
     
-    const result = await registerUser(email, password, displayName);
-    
-    if (result.success) {
-      setNeedsVerification(true);
-      console.log('[AuthContext] Registration successful, verification email sent');
-    } else {
-      setError(result.error);
-      console.log('[AuthContext] Registration failed:', result.error);
+    // Validate email
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      const errorMsg = 'Please enter a valid email address';
+      console.log('[AuthContext] Registration failed:', errorMsg);
+      setError(errorMsg);
+      setLoading(false);
+      throw new Error(errorMsg);
     }
     
-    setLoading(false);
-    return result;
+    // Block fake email patterns
+    const fakePatterns = ['@studyhub.local', '@fake.', '@test.local', '@example.local'];
+    if (fakePatterns.some(pattern => email.toLowerCase().includes(pattern))) {
+      const errorMsg = 'Please use a real email address for verification';
+      console.log('[AuthContext] Registration failed:', errorMsg);
+      setError(errorMsg);
+      setLoading(false);
+      throw new Error(errorMsg);
+    }
+
+    try {
+      // Create user with Firebase
+      console.log('[AuthContext] Creating Firebase user...');
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
+      
+      console.log('[AuthContext] User created:', firebaseUser.uid);
+
+      // Set display name
+      const displayName = username || email.split('@')[0];
+      await updateProfile(firebaseUser, { displayName });
+      console.log('[AuthContext] Display name set:', displayName);
+
+      // Send verification email
+      try {
+        await sendEmailVerification(firebaseUser, {
+          url: window.location.origin,
+          handleCodeInApp: false
+        });
+        console.log('[AuthContext] Verification email sent to:', email);
+      } catch (emailErr) {
+        console.warn('[AuthContext] Could not send verification email:', emailErr.message);
+      }
+
+      // Save to Firestore
+      try {
+        await setDoc(doc(db, 'users', firebaseUser.uid), {
+          uid: firebaseUser.uid,
+          email: email,
+          username: displayName,
+          createdAt: serverTimestamp(),
+          emailVerified: false
+        });
+        console.log('[AuthContext] User document created in Firestore');
+      } catch (dbErr) {
+        console.warn('[AuthContext] Could not save to Firestore:', dbErr.message);
+      }
+
+      setLoading(false);
+      return firebaseUser;
+      
+    } catch (err) {
+      console.error('[AuthContext] Registration error:', err.code, err.message);
+      
+      let errorMessage = 'Registration failed';
+      switch (err.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'This email is already registered. Try signing in.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Please enter a valid email address';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'Password must be at least 6 characters';
+          break;
+        case 'auth/operation-not-allowed':
+          errorMessage = 'Email/password sign-up is not enabled. Please contact support.';
+          break;
+        default:
+          errorMessage = err.message || 'Registration failed';
+      }
+      
+      setError(errorMessage);
+      setLoading(false);
+      throw new Error(errorMessage);
+    }
   };
 
-  // Login with email
+  // Login with EMAIL and password
   const login = async (email, password) => {
-    setLoading(true);
     setError(null);
-    setNeedsVerification(false);
+    setLoading(true);
     
     console.log('[AuthContext] Logging in user:', email);
-    
-    const result = await loginUser(email, password);
-    
-    if (result.success) {
-      console.log('[AuthContext] Login successful');
-    } else {
-      setError(result.error);
-      if (result.needsVerification) {
-        setNeedsVerification(true);
-        setUser(result.user); // Store user for resend verification
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('[AuthContext] Login successful for:', email);
+      setLoading(false);
+      return userCredential.user;
+      
+    } catch (err) {
+      console.error('[AuthContext] Login error:', err.code, err.message);
+      
+      let errorMessage = 'Login failed';
+      switch (err.code) {
+        case 'auth/user-not-found':
+          errorMessage = 'No account found with this email';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Incorrect password';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Please enter a valid email address';
+          break;
+        case 'auth/invalid-credential':
+          errorMessage = 'Invalid email or password';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many failed attempts. Please try again later.';
+          break;
+        default:
+          errorMessage = err.message || 'Login failed';
       }
-      console.log('[AuthContext] Login failed:', result.error);
+      
+      setError(errorMessage);
+      setLoading(false);
+      throw new Error(errorMessage);
     }
-    
-    setLoading(false);
-    return result;
   };
 
   // Logout
   const logout = async () => {
-    setLoading(true);
     console.log('[AuthContext] Logging out...');
-    
-    const result = await logoutUser();
-    
-    if (result.success) {
+    try {
+      await signOut(auth);
+      clearCookie();
       setUser(null);
-      setUserData(null);
       console.log('[AuthContext] Logout successful');
+    } catch (err) {
+      console.error('[AuthContext] Logout error:', err);
+      throw err;
     }
-    
-    setLoading(false);
-    return result;
-  };
-
-  // Guest login
-  const loginAsGuest = async () => {
-    setLoading(true);
-    setError(null);
-    
-    console.log('[AuthContext] Signing in as guest...');
-    
-    const result = await signInAsGuest();
-    
-    if (result.success) {
-      setUserData({ isGuest: true });
-      console.log('[AuthContext] Guest login successful');
-    } else {
-      setError(result.error);
-    }
-    
-    setLoading(false);
-    return result;
   };
 
   // Resend verification email
-  const resendVerification = async () => {
-    console.log('[AuthContext] Resending verification email...');
-    const result = await resendVerificationEmail();
-    
-    if (!result.success) {
-      setError(result.error);
+  const resendVerificationEmail = async () => {
+    if (auth.currentUser && !auth.currentUser.emailVerified) {
+      try {
+        await sendEmailVerification(auth.currentUser);
+        console.log('[AuthContext] Verification email resent');
+        return true;
+      } catch (err) {
+        console.error('[AuthContext] Failed to resend verification:', err);
+        throw err;
+      }
     }
-    
-    return result;
+    return false;
   };
 
-  // Sync progress to cloud
-  const syncUserProgress = async (localStats, certId = null) => {
-    if (!user || isGuestUser()) {
-      console.log('[AuthContext] Cannot sync - no authenticated user');
-      return { success: false, error: 'Not authenticated' };
-    }
-    
-    return await syncProgress(user.uid, localStats, certId);
-  };
+  // Clear error
+  const clearError = () => setError(null);
 
   const value = {
     user,
-    userData,
     loading,
-    authChecked,
     error,
-    needsVerification,
-    isAuthenticated: !!user && (user.emailVerified || user.isAnonymous || isGuestUser()),
-    isGuest: isGuestUser(),
-    register,
     login,
+    register,
     logout,
-    loginAsGuest,
-    resendVerification,
     clearError,
-    syncUserProgress
+    resendVerificationEmail,
+    isAuthenticated: !!user,
+    isEmailVerified: user?.emailVerified || false
   };
 
   return (
