@@ -282,6 +282,40 @@ export const AuthProvider = ({ children }) => {
   // Clear error
   const clearError = () => setError(null);
 
+  // Sync local progress to Firestore
+  const syncLocalProgress = async (localStats, certId) => {
+    if (!user || !localStats) return;
+    
+    try {
+      const progressRef = doc(db, 'users', user.uid, 'progress', certId);
+      await setDoc(progressRef, {
+        ...localStats,
+        certId,
+        lastUpdated: serverTimestamp()
+      }, { merge: true });
+      console.log('[AuthContext] Progress synced for:', certId);
+    } catch (err) {
+      console.warn('[AuthContext] Failed to sync progress:', err.message);
+    }
+  };
+
+  // Load progress from Firestore
+  const loadProgress = async (certId) => {
+    if (!user) return null;
+    
+    try {
+      const progressRef = doc(db, 'users', user.uid, 'progress', certId);
+      const progressDoc = await getDoc(progressRef);
+      if (progressDoc.exists()) {
+        console.log('[AuthContext] Progress loaded for:', certId);
+        return progressDoc.data();
+      }
+    } catch (err) {
+      console.warn('[AuthContext] Failed to load progress:', err.message);
+    }
+    return null;
+  };
+
   const value = {
     user,
     loading,
@@ -291,6 +325,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     clearError,
     resendVerificationEmail,
+    syncLocalProgress,
+    loadProgress,
     isAuthenticated: !!user,
     isEmailVerified: user?.emailVerified || false
   };
