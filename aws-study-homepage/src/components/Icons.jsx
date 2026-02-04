@@ -300,6 +300,14 @@ export const MailIcon = (props) => (
   </Icon>
 );
 
+export const KeyIcon = ({ size = 24, className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="7.5" cy="15.5" r="5.5"/>
+    <path d="m21 2-9.6 9.6"/>
+    <path d="m15.5 7.5 3 3L22 7l-3-3"/>
+  </svg>
+);
+
 // Lock Icon
 export const LockIcon = (props) => (
   <Icon {...props}>

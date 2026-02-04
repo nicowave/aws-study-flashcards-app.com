@@ -24,7 +24,10 @@ import {
   ExternalLinkIcon,
   ClockIcon,
   ListIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  MailIcon,
+  KeyIcon,
+  UserIcon
 } from './components/Icons';
 import './styles/global.css';
 import './styles/homepage.css';
@@ -47,10 +50,25 @@ const certIconMap = {
   'sap-on-aws-specialty': ServerIcon
 };
 
+// Eye icons for password visibility
+const EyeIcon = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+
+const EyeOffIcon = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+
 // Header Component
 const Header = ({ onLogout }) => {
-  const { user, userData } = useAuth();
-  const displayName = user?.displayName || userData?.username || 'User';
+  const { user } = useAuth();
+  const displayName = user?.displayName || user?.email?.split('@')[0] || 'User';
   const initials = displayName.slice(0, 2).toUpperCase();
 
   return (
@@ -66,9 +84,9 @@ const Header = ({ onLogout }) => {
           <a href="#certifications" className="nav-link">Certifications</a>
           <a href="#about" className="nav-link">About</a>
           <a href="#resources" className="nav-link">Resources</a>
-          <a 
-            href="https://aws.amazon.com/certification/" 
-            target="_blank" 
+          <a
+            href="https://aws.amazon.com/certification/"
+            target="_blank"
             rel="noopener noreferrer"
             className="nav-link external"
           >
@@ -89,7 +107,7 @@ const Header = ({ onLogout }) => {
 // Hero Section (always authenticated when shown)
 const Hero = () => {
   const { user } = useAuth();
-  
+
   return (
     <section className="hero">
       <div className="hero-content">
@@ -101,15 +119,15 @@ const Hero = () => {
           Master Your <span className="highlight">AWS Certification</span>
         </h1>
         <p className="hero-subtitle">
-          Interactive flashcards, quiz games, and study guides for every AWS certification path. 
+          Interactive flashcards, quiz games, and study guides for every AWS certification path.
           Built by developers, for developers.
         </p>
         <div className="hero-actions">
           <a href="#certifications" className="btn btn-primary">
             Browse Certifications
           </a>
-          <a 
-            href="https://cloud.aws-study-flashcards.app" 
+          <a
+            href="https://cloud.aws-study-flashcards-app.com"
             className="btn btn-secondary"
           >
             <CloudIcon size={20} />
@@ -117,7 +135,7 @@ const Hero = () => {
           </a>
         </div>
         <div className="hero-welcome">
-          Welcome back, <strong>{user?.displayName || 'Learner'}</strong>! Ready to continue your AWS journey?
+          Welcome back, <strong>{user?.displayName || user?.email?.split('@')[0] || 'Learner'}</strong>! Ready to continue your AWS journey?
         </div>
         <div className="hero-stats">
           <div className="stat">
@@ -145,7 +163,7 @@ const Hero = () => {
 const CertCard = ({ cert }) => {
   const isAvailable = cert.status === 'available';
   const IconComponent = certIconMap[cert.id] || CloudIcon;
-  
+
   return (
     <div className={`cert-card ${!isAvailable ? 'coming-soon' : ''}`}>
       {!isAvailable && <div className="coming-soon-badge">Coming Soon</div>}
@@ -158,7 +176,7 @@ const CertCard = ({ cert }) => {
       <h3 className="cert-name">{cert.name}</h3>
       <p className="cert-code mono">{cert.code}</p>
       <p className="cert-description">{cert.description}</p>
-      
+
       <div className="cert-details">
         <span className="cert-detail">
           <ClockIcon size={14} />
@@ -169,13 +187,13 @@ const CertCard = ({ cert }) => {
           {cert.questions}
         </span>
       </div>
-      
+
       <div className="cert-features">
         {cert.features.map((feature, idx) => (
           <span key={idx} className="feature-tag">{feature}</span>
         ))}
       </div>
-      
+
       <div className="cert-actions">
         {isAvailable ? (
           <a href={cert.url} className="btn btn-card-primary">
@@ -186,9 +204,9 @@ const CertCard = ({ cert }) => {
             Coming Soon
           </button>
         )}
-        <a 
-          href={cert.officialUrl} 
-          target="_blank" 
+        <a
+          href={cert.officialUrl}
+          target="_blank"
           rel="noopener noreferrer"
           className="btn btn-card-secondary"
         >
@@ -208,7 +226,7 @@ const Certifications = () => (
         Choose your certification path and start preparing with our interactive study tools
       </p>
     </div>
-    
+
     {categories.map(category => {
       const certs = certifications.filter(c => c.category === category.id);
       return (
@@ -289,9 +307,9 @@ const Resources = () => (
       Supplement your studies with these official AWS learning resources
     </p>
     <div className="resources-grid">
-      <a 
-        href="https://aws.amazon.com/certification/" 
-        target="_blank" 
+      <a
+        href="https://aws.amazon.com/certification/"
+        target="_blank"
         rel="noopener noreferrer"
         className="resource-card"
       >
@@ -302,9 +320,9 @@ const Resources = () => (
         <p>Official certification portal with exam guides, pricing, and registration</p>
         <span className="resource-link">aws.amazon.com/certification <ExternalLinkIcon size={12} /></span>
       </a>
-      <a 
-        href="https://explore.skillbuilder.aws/" 
-        target="_blank" 
+      <a
+        href="https://explore.skillbuilder.aws/"
+        target="_blank"
         rel="noopener noreferrer"
         className="resource-card"
       >
@@ -315,9 +333,9 @@ const Resources = () => (
         <p>Free and paid courses, labs, and learning paths from AWS</p>
         <span className="resource-link">explore.skillbuilder.aws <ExternalLinkIcon size={12} /></span>
       </a>
-      <a 
-        href="https://docs.aws.amazon.com/" 
-        target="_blank" 
+      <a
+        href="https://docs.aws.amazon.com/"
+        target="_blank"
         rel="noopener noreferrer"
         className="resource-card"
       >
@@ -328,9 +346,9 @@ const Resources = () => (
         <p>Complete technical documentation for all AWS services</p>
         <span className="resource-link">docs.aws.amazon.com <ExternalLinkIcon size={12} /></span>
       </a>
-      <a 
-        href="https://aws.amazon.com/free/" 
-        target="_blank" 
+      <a
+        href="https://aws.amazon.com/free/"
+        target="_blank"
         rel="noopener noreferrer"
         className="resource-card"
       >
@@ -394,26 +412,49 @@ const LoadingScreen = () => (
   </div>
 );
 
-// Auth Screen for Homepage (full page)
+// Auth Screen for Homepage (full page) - EMAIL BASED
 const HomepageAuthScreen = () => {
   const [mode, setMode] = useState('login');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [showEmail, setShowEmail] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localError, setLocalError] = useState(null);
-  
+
   const { login, register, error, clearError } = useAuth();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setLocalError(null);
+    if (error) clearError();
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalError(null);
-    clearError();
+    if (error) clearError();
 
-    if (!username.trim() || username.length < 3) {
-      setLocalError('Username must be at least 3 characters');
+    const { username, email, password, confirmPassword } = formData;
+
+    // Validation
+    if (!email.trim()) {
+      setLocalError('Email is required');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setLocalError('Please enter a valid email address');
       return;
     }
 
@@ -422,22 +463,38 @@ const HomepageAuthScreen = () => {
       return;
     }
 
-    if (mode === 'register' && password !== confirmPassword) {
-      setLocalError('Passwords do not match');
-      return;
+    if (mode === 'register') {
+      if (!username.trim() || username.length < 3) {
+        setLocalError('Username must be at least 3 characters');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setLocalError('Passwords do not match');
+        return;
+      }
     }
 
     setIsSubmitting(true);
-    const result = mode === 'login' 
-      ? await login(username, password)
-      : await register(username, password, email || null);
+    try {
+      if (mode === 'login') {
+        console.log('[HomepageAuth] Logging in with email:', email);
+        await login(email, password);
+      } else {
+        console.log('[HomepageAuth] Registering with email:', email, 'username:', username);
+        await register(email, password, username);
+      }
+    } catch (err) {
+      console.error('[HomepageAuth] Error:', err);
+      setLocalError(err.message);
+    }
     setIsSubmitting(false);
   };
 
   const toggleMode = () => {
     setMode(mode === 'login' ? 'register' : 'login');
     setLocalError(null);
-    clearError();
+    if (error) clearError();
+    setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
   };
 
   const displayError = localError || error;
@@ -479,57 +536,93 @@ const HomepageAuthScreen = () => {
             )}
 
             <form onSubmit={handleSubmit}>
+              {/* Email Field - REQUIRED */}
               <div className="form-field">
-                <label>Username</label>
+                <label>
+                  <MailIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+                  Email <span className="required-star">*</span>
+                </label>
                 <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter username"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="your.email@example.com"
                   disabled={isSubmitting}
+                  required
                 />
               </div>
 
-              <div className="form-field">
-                <label>Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
-                  disabled={isSubmitting}
-                />
-              </div>
-
+              {/* Username Field - Only for Register */}
               {mode === 'register' && (
-                <>
-                  <div className="form-field">
-                    <label>Confirm Password</label>
+                <div className="form-field">
+                  <label>
+                    <UserIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+                    Username <span className="required-star">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    placeholder="Choose a username"
+                    disabled={isSubmitting}
+                  />
+                </div>
+              )}
+
+              {/* Password Field with Toggle */}
+              <div className="form-field">
+                <label>
+                  <KeyIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+                  Password
+                </label>
+                <div className="password-input-wrapper">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    placeholder="Enter password"
+                    disabled={isSubmitting}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password - Only for Register */}
+              {mode === 'register' && (
+                <div className="form-field">
+                  <label>
+                    <KeyIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+                    Confirm Password
+                  </label>
+                  <div className="password-input-wrapper">
                     <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
                       placeholder="Confirm password"
                       disabled={isSubmitting}
                     />
-                  </div>
-
-                  <div className="form-field optional">
-                    <button type="button" className="toggle-optional" onClick={() => setShowEmail(!showEmail)}>
-                      {showEmail ? '− Hide email' : '+ Add email (optional)'}
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      tabIndex={-1}
+                    >
+                      {showConfirmPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
                     </button>
-                    {showEmail && (
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="email@example.com"
-                        disabled={isSubmitting}
-                      />
-                    )}
-                    <span className="helper">Email allows password recovery</span>
                   </div>
-                </>
+                </div>
               )}
 
               <button type="submit" className="submit-btn" disabled={isSubmitting}>
@@ -578,9 +671,10 @@ function AuthenticatedContent() {
 
 // Main App Content with Auth Gate
 function AppContent() {
-  const { isAuthenticated, loading, authChecked } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
-  if (loading || !authChecked) {
+  // Only check loading state - authChecked was removed
+  if (loading) {
     return <LoadingScreen />;
   }
 
@@ -594,7 +688,7 @@ function AppContent() {
 // App with Auth Provider
 function App() {
   return (
-    <AuthProvider requireAuth={true}>
+    <AuthProvider>
       <AppContent />
     </AuthProvider>
   );
