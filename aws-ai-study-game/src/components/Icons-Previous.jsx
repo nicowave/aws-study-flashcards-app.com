@@ -119,14 +119,6 @@ export const BookIcon = (props) => (
   </Icon>
 );
 
-// Book Open Icon
-export const BookOpenIcon = (props) => (
-  <Icon {...props}>
-    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-  </Icon>
-);
-
 // Flashcard Icon
 export const FlashcardIcon = (props) => (
   <Icon {...props}>
@@ -362,8 +354,6 @@ export const StatsIcon = (props) => (
     <line x1="6" y1="20" x2="6" y2="14" />
   </Icon>
 );
-// Alias
-export const ChartIcon = StatsIcon;
 
 // Sound On / Volume Icon
 export const SoundOnIcon = (props) => (
@@ -373,8 +363,6 @@ export const SoundOnIcon = (props) => (
     <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
   </Icon>
 );
-// Alias
-export const VolumeIcon = SoundOnIcon;
 
 // Sound Off / Volume Mute Icon
 export const SoundOffIcon = (props) => (
@@ -384,8 +372,6 @@ export const SoundOffIcon = (props) => (
     <line x1="17" y1="9" x2="23" y2="15" />
   </Icon>
 );
-// Alias
-export const VolumeOffIcon = SoundOffIcon;
 
 // Play Icon
 export const PlayIcon = (props) => (
@@ -408,8 +394,6 @@ export const FireIcon = (props) => (
     <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
   </Icon>
 );
-// Alias for FlameIcon
-export const FlameIcon = FireIcon;
 
 // Zap/Lightning Icon
 export const ZapIcon = (props) => (
