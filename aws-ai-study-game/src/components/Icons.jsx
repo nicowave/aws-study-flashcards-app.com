@@ -264,6 +264,16 @@ export const XIcon = (props) => (
   </Icon>
 );
 
+// Grid Icon
+export const GridIcon = (props) => (
+  <Icon {...props}>
+    <rect x="3" y="3" width="7" height="7" />
+    <rect x="14" y="3" width="7" height="7" />
+    <rect x="14" y="14" width="7" height="7" />
+    <rect x="3" y="14" width="7" height="7" />
+  </Icon>
+);
+
 // Menu Icon
 export const MenuIcon = (props) => (
   <Icon {...props}>
@@ -570,5 +580,7 @@ export const VerifiedIcon = (props) => (
     <polyline points="22 4 12 14.01 9 11.01" />
   </Icon>
 );
+// Alias
+export const CheckCircleIcon = VerifiedIcon;
 
 export default Icon;
