@@ -29,6 +29,10 @@ dist-ssr
 *.zip
 
 
+# Config files, API keys
+firebase.config.js
+
+
 # Other files and folders
 
 zip/*
