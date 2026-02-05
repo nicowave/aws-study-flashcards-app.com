@@ -30,7 +30,10 @@ dist-ssr
 
 
 # Config files, API keys
-firebase.config.js
+./aws-cloud-practitioner-game/src/config/firebase.config.js
+./aws-study-homepage/src/config/firebase.config.js
+./aws-ai-study-game/src/config/firebase.config.js
+.config*
 
 
 # Other files and folders
