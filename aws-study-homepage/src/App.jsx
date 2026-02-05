@@ -65,11 +65,15 @@ const EyeOffIcon = ({ size = 24 }) => (
   </svg>
 );
 
-// Header Component
-const Header = ({ onLogout }) => {
-  const { user } = useAuth();
+// Header Component - Now handles both logged in and logged out states
+const Header = ({ onShowLogin }) => {
+  const { user, isAuthenticated, logout } = useAuth();
   const displayName = user?.displayName || user?.email?.split('@')[0] || 'User';
-  const initials = displayName.slice(0, 2).toUpperCase();
+  const initials = displayName ? displayName.slice(0, 2).toUpperCase() : 'U';
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   return (
     <header className="header">
@@ -93,20 +97,28 @@ const Header = ({ onLogout }) => {
             Official AWS Certs <ExternalLinkIcon size={14} style={{ marginLeft: 4, verticalAlign: 'middle' }} />
           </a>
           <div className="nav-divider" />
-          <div className="user-menu-header">
-            <div className="user-avatar-small">{initials}</div>
-            <span className="user-name-header">{displayName}</span>
-            <button className="logout-btn-header" onClick={onLogout}>Sign Out</button>
-          </div>
+          
+          {isAuthenticated ? (
+            <div className="user-menu-header">
+              <div className="user-avatar-small">{initials}</div>
+              <span className="user-name-header">{displayName}</span>
+              <button className="logout-btn-header" onClick={handleLogout}>Sign Out</button>
+            </div>
+          ) : (
+            <button className="signin-btn-header" onClick={onShowLogin}>
+              <UserIcon size={16} />
+              Sign In
+            </button>
+          )}
         </nav>
       </div>
     </header>
   );
 };
 
-// Hero Section (always authenticated when shown)
+// Hero Section - Works for both authenticated and unauthenticated users
 const Hero = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   return (
     <section className="hero">
@@ -134,9 +146,11 @@ const Hero = () => {
             Start Cloud Practitioner
           </a>
         </div>
-        <div className="hero-welcome">
-          Welcome back, <strong>{user?.displayName || user?.email?.split('@')[0] || 'Learner'}</strong>! Ready to continue your AWS journey?
-        </div>
+        {isAuthenticated && (
+          <div className="hero-welcome">
+            Welcome back, <strong>{user?.displayName || user?.email?.split('@')[0] || 'Learner'}</strong>! Ready to continue your AWS journey?
+          </div>
+        )}
         <div className="hero-stats">
           <div className="stat">
             <span className="stat-value mono">14</span>
@@ -412,8 +426,8 @@ const LoadingScreen = () => (
   </div>
 );
 
-// Auth Screen for Homepage (full page) - EMAIL BASED
-const HomepageAuthScreen = () => {
+// Login Modal (Optional sign-in from hub)
+const LoginModal = ({ onClose }) => {
   const [mode, setMode] = useState('login');
   const [formData, setFormData] = useState({
     username: '',
@@ -447,7 +461,6 @@ const HomepageAuthScreen = () => {
 
     const { username, email, password, confirmPassword } = formData;
 
-    // Validation
     if (!email.trim()) {
       setLocalError('Email is required');
       return;
@@ -477,14 +490,13 @@ const HomepageAuthScreen = () => {
     setIsSubmitting(true);
     try {
       if (mode === 'login') {
-        console.log('[HomepageAuth] Logging in with email:', email);
         await login(email, password);
+        onClose(); // Close modal on success
       } else {
-        console.log('[HomepageAuth] Registering with email:', email, 'username:', username);
         await register(email, password, username);
+        onClose(); // Close modal on success
       }
     } catch (err) {
-      console.error('[HomepageAuth] Error:', err);
       setLocalError(err.message);
     }
     setIsSubmitting(false);
@@ -500,164 +512,129 @@ const HomepageAuthScreen = () => {
   const displayError = localError || error;
 
   return (
-    <div className="homepage-auth">
-      <div className="homepage-auth-container">
-        <div className="auth-hero">
-          <div className="auth-brand-large">
-            <BookIcon size={48} />
-            <h1><span className="aws-orange">AWS</span> Study Hub</h1>
-          </div>
-          <p className="auth-tagline">
-            Master your AWS certification with interactive flashcards, quiz games, and comprehensive study guides.
-          </p>
-          <div className="auth-features">
-            <div className="auth-feature">
-              <FlashcardIcon size={24} />
-              <span>Interactive Flashcards</span>
-            </div>
-            <div className="auth-feature">
-              <GameIcon size={24} />
-              <span>Quiz Games</span>
-            </div>
-            <div className="auth-feature">
-              <TargetIcon size={24} />
-              <span>Progress Tracking</span>
-            </div>
-          </div>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="login-modal" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>×</button>
+        
+        <div className="modal-header">
+          <BookIcon size={32} />
+          <h2>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
+          <p>{mode === 'login' ? 'Sign in to sync your progress' : 'Start your AWS journey today'}</p>
         </div>
 
-        <div className="auth-form-container">
-          <div className="auth-form-card">
-            <h2>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
-            <p>{mode === 'login' ? 'Sign in to continue studying' : 'Start your AWS journey today'}</p>
+        {displayError && (
+          <div className="auth-error-box">{displayError}</div>
+        )}
 
-            {displayError && (
-              <div className="auth-error-box">{displayError}</div>
-            )}
+        <form onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label>
+              <MailIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder="your.email@example.com"
+              disabled={isSubmitting}
+              required
+            />
+          </div>
 
-            <form onSubmit={handleSubmit}>
-              {/* Email Field - REQUIRED */}
-              <div className="form-field">
-                <label>
-                  <MailIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-                  Email <span className="required-star">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="your.email@example.com"
-                  disabled={isSubmitting}
-                  required
-                />
-              </div>
+          {mode === 'register' && (
+            <div className="form-field">
+              <label>
+                <UserIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+                Username
+              </label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                placeholder="Choose a username"
+                disabled={isSubmitting}
+              />
+            </div>
+          )}
 
-              {/* Username Field - Only for Register */}
-              {mode === 'register' && (
-                <div className="form-field">
-                  <label>
-                    <UserIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-                    Username <span className="required-star">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    placeholder="Choose a username"
-                    disabled={isSubmitting}
-                  />
-                </div>
-              )}
-
-              {/* Password Field with Toggle */}
-              <div className="form-field">
-                <label>
-                  <KeyIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-                  Password
-                </label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    placeholder="Enter password"
-                    disabled={isSubmitting}
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
-                    tabIndex={-1}
-                  >
-                    {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm Password - Only for Register */}
-              {mode === 'register' && (
-                <div className="form-field">
-                  <label>
-                    <KeyIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-                    Confirm Password
-                  </label>
-                  <div className="password-input-wrapper">
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      placeholder="Confirm password"
-                      disabled={isSubmitting}
-                    />
-                    <button
-                      type="button"
-                      className="password-toggle"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      tabIndex={-1}
-                    >
-                      {showConfirmPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <button type="submit" className="submit-btn" disabled={isSubmitting}>
-                {isSubmitting ? 'Please wait...' : (mode === 'login' ? 'Sign In' : 'Create Account')}
-                {!isSubmitting && <ArrowRightIcon size={18} />}
-              </button>
-            </form>
-
-            <div className="auth-toggle">
-              <button onClick={toggleMode}>
-                {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+          <div className="form-field">
+            <label>
+              <KeyIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+              Password
+            </label>
+            <div className="password-input-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter password"
+                disabled={isSubmitting}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
               </button>
             </div>
           </div>
 
-          <p className="auth-footer-text">
-            Free forever • No credit card required • 14 certifications
-          </p>
+          {mode === 'register' && (
+            <div className="form-field">
+              <label>
+                <KeyIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+                Confirm Password
+              </label>
+              <div className="password-input-wrapper">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  placeholder="Confirm password"
+                  disabled={isSubmitting}
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <button type="submit" className="submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? 'Please wait...' : (mode === 'login' ? 'Sign In' : 'Create Account')}
+            {!isSubmitting && <ArrowRightIcon size={18} />}
+          </button>
+        </form>
+
+        <div className="auth-toggle">
+          <button onClick={toggleMode}>
+            {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-// Authenticated Homepage Content
-function AuthenticatedContent() {
-  const { logout } = useAuth();
-
-  const handleLogout = async () => {
-    await logout();
-  };
+// Main Homepage Content (no auth required)
+function HomepageContent() {
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   return (
     <div className="app">
-      <Header onLogout={handleLogout} />
+      <Header onShowLogin={() => setShowLoginModal(true)} />
       <main>
         <Hero />
         <Certifications />
@@ -665,30 +642,31 @@ function AuthenticatedContent() {
         <Resources />
       </main>
       <Footer />
+      
+      {showLoginModal && (
+        <LoginModal onClose={() => setShowLoginModal(false)} />
+      )}
     </div>
   );
 }
 
-// Main App Content with Auth Gate
+// Main App Content - NO AUTH REQUIRED for hub
 function AppContent() {
-  const { isAuthenticated, loading } = useAuth();
+  const { loading } = useAuth();
 
-  // Only check loading state - authChecked was removed
+  // Show loading while Firebase initializes
   if (loading) {
     return <LoadingScreen />;
   }
 
-  if (!isAuthenticated) {
-    return <HomepageAuthScreen />;
-  }
-
-  return <AuthenticatedContent />;
+  // Show homepage regardless of auth state
+  return <HomepageContent />;
 }
 
-// App with Auth Provider
+// App with Auth Provider (but not requiring auth)
 function App() {
   return (
-    <AuthProvider>
+    <AuthProvider requireAuth={false}>
       <AppContent />
     </AuthProvider>
   );

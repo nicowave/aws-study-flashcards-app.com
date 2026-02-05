@@ -18,7 +18,7 @@ const StudyGuide = ({ onBack }) => {
         // Convert questions to flashcard format
         const questionCards = domain.questions.map(q => ({
           front: q.question,
-          back: q.options[q.correct] + (q.explanation ? `\n\n${q.explanation}` : '')
+          back: q.options[q.correctAnswer] + (q.explanation ? `\n\n${q.explanation}` : '')
         }));
         setCards(questionCards);
       } else {
