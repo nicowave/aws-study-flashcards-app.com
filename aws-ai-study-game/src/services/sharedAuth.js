@@ -1,6 +1,7 @@
-import { initializeApp } from 'firebase/app';
+// Shared Authentication Service for AWS Study Hub
+// Uses the already-initialized Firebase instances from firebase.config.js
+
 import { 
-  getAuth, 
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
@@ -8,24 +9,21 @@ import {
   sendEmailVerification,
   setPersistence,
   browserLocalPersistence,
-  signInAnonymously
+  signInAnonymously,
+  updateProfile
 } from 'firebase/auth';
 import { 
-  getFirestore, 
   doc, 
   setDoc, 
   getDoc, 
   updateDoc 
 } from 'firebase/firestore';
-import firebaseConfig from '../config/firebase.config';
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Import already-initialized Firebase instances (prevents duplicate initialization)
+import { auth, db } from '../config/firebase.config';
 
 // Set persistence to local
-setPersistence(auth, browserLocalPersistence);
+setPersistence(auth, browserLocalPersistence).catch(console.error);
 
 // ============================================
 // COOKIE CONFIGURATION - CRITICAL FOR CROSS-DOMAIN AUTH
@@ -136,9 +134,7 @@ export const registerUser = async (email, password, displayName = null) => {
     
     // Update display name if provided
     if (displayName) {
-      await import('firebase/auth').then(({ updateProfile }) => {
-        return updateProfile(user, { displayName });
-      });
+      await updateProfile(user, { displayName });
     }
     
     // Send verification email

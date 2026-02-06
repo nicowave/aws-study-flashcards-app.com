@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/zsh
 # =============================================================================
-# AWS Study Hub - Universal Deployment Script
+# AWS Study Hub - Universal Deployment Script (ZSH Compatible)
 # =============================================================================
 # Deploys Study Hub Homepage, Cloud Practitioner Game, and AI Study Game
 # Run from: ~/dev/sites/aws-study-flashcards.com/
@@ -17,30 +17,8 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
 
-# Site configurations
-declare -A SITES
-SITES=(
-    ["hub,name"]="Study Hub Homepage"
-    ["hub,folder"]="aws-study-homepage"
-    ["hub,bucket"]="aws-study-flashcards-app-home"
-    ["hub,dist_id"]="E3D126UT3L72OL"
-    
-    ["cloud,name"]="Cloud Practitioner Game"
-    ["cloud,folder"]="aws-cloud-practitioner-game"
-    ["cloud,bucket"]="cloud.aws-study-flashcards-app.com"
-    ["cloud,dist_id"]="E6NUXKK8FTCR1"
-    
-    ["ai,name"]="AI Study Game"
-    ["ai,folder"]="aws-ai-study-game"
-    ["ai,bucket"]="ai.aws-study-flashcards-app.com"
-    ["ai,dist_id"]="E23TPCWLVKFC65"
-)
-
 # Get the script's directory (root of project)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-
-# Track deployment results
-declare -A RESULTS
+SCRIPT_DIR="${0:A:h}"
 
 # =============================================================================
 # Helper Functions
@@ -48,131 +26,189 @@ declare -A RESULTS
 
 print_header() {
     echo ""
-    echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
-    echo -e "${CYAN}  $1${NC}"
-    echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+    echo "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+    echo "${CYAN}  $1${NC}"
+    echo "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
     echo ""
 }
 
 print_step() {
-    echo -e "${YELLOW}▶ $1${NC}"
+    echo "${YELLOW}▶ $1${NC}"
 }
 
 print_success() {
-    echo -e "${GREEN}✓ $1${NC}"
+    echo "${GREEN}✓ $1${NC}"
 }
 
 print_error() {
-    echo -e "${RED}✗ $1${NC}"
+    echo "${RED}✗ $1${NC}"
 }
 
 print_info() {
-    echo -e "${CYAN}ℹ $1${NC}"
+    echo "${CYAN}ℹ $1${NC}"
 }
 
 # =============================================================================
 # Deployment Function
 # =============================================================================
 
-deploy_site() {
-    local site_key=$1
-    local site_name="${SITES[${site_key},name]}"
-    local folder="${SITES[${site_key},folder]}"
-    local bucket="${SITES[${site_key},bucket]}"
-    local dist_id="${SITES[${site_key},dist_id]}"
+deploy_hub() {
+    local site_name="Study Hub Homepage"
+    local folder="aws-study-homepage"
+    local bucket="aws-study-flashcards-app-home"
+    local dist_id="E3D126UT3L72OL"
     local site_path="${SCRIPT_DIR}/${folder}"
     
     print_header "Deploying: ${site_name}"
     
-    # Check if directory exists
     if [ ! -d "$site_path" ]; then
         print_error "Directory not found: $site_path"
-        RESULTS[$site_key]="FAILED - Directory not found"
         return 1
     fi
     
     cd "$site_path"
     print_info "Working in: $site_path"
     
-    # Step 1: Install dependencies (if node_modules doesn't exist or package.json changed)
+    # Install dependencies if needed
     print_step "Checking dependencies..."
-    if [ ! -d "node_modules" ] || [ "package.json" -nt "node_modules" ]; then
+    if [ ! -d "node_modules" ]; then
         print_step "Installing dependencies..."
         npm install
-        print_success "Dependencies installed"
-    else
-        print_success "Dependencies up to date"
     fi
+    print_success "Dependencies ready"
     
-    # Step 2: Build
+    # Build
     print_step "Building ${site_name}..."
     npm run build
-    
-    if [ ! -d "dist" ]; then
-        print_error "Build failed - dist folder not found"
-        RESULTS[$site_key]="FAILED - Build error"
-        return 1
-    fi
     print_success "Build complete"
     
-    # Step 3: Sync to S3
+    # Sync to S3
     print_step "Uploading to S3: s3://${bucket}/"
-    
-    # Sync all files except index.html (with cache)
     aws s3 sync dist/ "s3://${bucket}/" \
         --delete \
         --exclude "index.html" \
         --cache-control "max-age=31536000,public"
     
-    # Upload index.html with no-cache
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
         --cache-control "no-cache,no-store,must-revalidate"
-    
     print_success "Files uploaded to S3"
     
-    # Step 4: Invalidate CloudFront
-    print_step "Invalidating CloudFront cache (${dist_id})..."
-    INVALIDATION_ID=$(aws cloudfront create-invalidation \
+    # Invalidate CloudFront
+    print_step "Invalidating CloudFront cache..."
+    aws cloudfront create-invalidation \
         --distribution-id "$dist_id" \
-        --paths "/*" \
-        --query 'Invalidation.Id' \
-        --output text)
+        --paths "/*" > /dev/null
+    print_success "CloudFront invalidation created"
     
-    print_success "CloudFront invalidation created: ${INVALIDATION_ID}"
-    
-    # Return to script directory
     cd "$SCRIPT_DIR"
-    
-    RESULTS[$site_key]="SUCCESS"
-    print_success "${site_name} deployed successfully!"
-    
-    return 0
+    print_success "${site_name} deployed!"
+    echo "  🌐 https://aws-study-flashcards-app.com"
 }
 
-# =============================================================================
-# Menu Functions
-# =============================================================================
-
-show_menu() {
-    print_header "AWS Study Hub Deployment"
-    echo "  Select what to deploy:"
-    echo ""
-    echo "  ${BOLD}1)${NC} Deploy ALL sites"
-    echo "  ${BOLD}2)${NC} Study Hub Homepage    (aws-study-flashcards-app.com)"
-    echo "  ${BOLD}3)${NC} Cloud Practitioner    (cloud.aws-study-flashcards-app.com)"
-    echo "  ${BOLD}4)${NC} AI Study Game         (ai.aws-study-flashcards-app.com)"
-    echo "  ${BOLD}5)${NC} Exit"
-    echo ""
-    read -p "Enter choice [1-5]: " choice
+deploy_cloud() {
+    local site_name="Cloud Practitioner Game"
+    local folder="aws-cloud-practitioner-game"
+    local bucket="cloud.aws-study-flashcards-app.com"
+    local dist_id="E6NUXKK8FTCR1"
+    local site_path="${SCRIPT_DIR}/${folder}"
     
-    case $choice in
-        1) deploy_all ;;
-        2) deploy_site "hub" ;;
-        3) deploy_site "cloud" ;;
-        4) deploy_site "ai" ;;
-        5) echo "Goodbye!"; exit 0 ;;
-        *) print_error "Invalid choice"; show_menu ;;
-    esac
+    print_header "Deploying: ${site_name}"
+    
+    if [ ! -d "$site_path" ]; then
+        print_error "Directory not found: $site_path"
+        return 1
+    fi
+    
+    cd "$site_path"
+    print_info "Working in: $site_path"
+    
+    # Install dependencies if needed
+    print_step "Checking dependencies..."
+    if [ ! -d "node_modules" ]; then
+        print_step "Installing dependencies..."
+        npm install
+    fi
+    print_success "Dependencies ready"
+    
+    # Build
+    print_step "Building ${site_name}..."
+    npm run build
+    print_success "Build complete"
+    
+    # Sync to S3
+    print_step "Uploading to S3: s3://${bucket}/"
+    aws s3 sync dist/ "s3://${bucket}/" \
+        --delete \
+        --exclude "index.html" \
+        --cache-control "max-age=31536000,public"
+    
+    aws s3 cp dist/index.html "s3://${bucket}/index.html" \
+        --cache-control "no-cache,no-store,must-revalidate"
+    print_success "Files uploaded to S3"
+    
+    # Invalidate CloudFront
+    print_step "Invalidating CloudFront cache..."
+    aws cloudfront create-invalidation \
+        --distribution-id "$dist_id" \
+        --paths "/*" > /dev/null
+    print_success "CloudFront invalidation created"
+    
+    cd "$SCRIPT_DIR"
+    print_success "${site_name} deployed!"
+    echo "  ☁️  https://cloud.aws-study-flashcards-app.com"
+}
+
+deploy_ai() {
+    local site_name="AI Study Game"
+    local folder="aws-ai-study-game"
+    local bucket="ai.aws-study-flashcards-app.com"
+    local dist_id="E23TPCWLVKFC65"
+    local site_path="${SCRIPT_DIR}/${folder}"
+    
+    print_header "Deploying: ${site_name}"
+    
+    if [ ! -d "$site_path" ]; then
+        print_error "Directory not found: $site_path"
+        return 1
+    fi
+    
+    cd "$site_path"
+    print_info "Working in: $site_path"
+    
+    # Install dependencies if needed
+    print_step "Checking dependencies..."
+    if [ ! -d "node_modules" ]; then
+        print_step "Installing dependencies..."
+        npm install
+    fi
+    print_success "Dependencies ready"
+    
+    # Build
+    print_step "Building ${site_name}..."
+    npm run build
+    print_success "Build complete"
+    
+    # Sync to S3
+    print_step "Uploading to S3: s3://${bucket}/"
+    aws s3 sync dist/ "s3://${bucket}/" \
+        --delete \
+        --exclude "index.html" \
+        --cache-control "max-age=31536000,public"
+    
+    aws s3 cp dist/index.html "s3://${bucket}/index.html" \
+        --cache-control "no-cache,no-store,must-revalidate"
+    print_success "Files uploaded to S3"
+    
+    # Invalidate CloudFront
+    print_step "Invalidating CloudFront cache..."
+    aws cloudfront create-invalidation \
+        --distribution-id "$dist_id" \
+        --paths "/*" > /dev/null
+    print_success "CloudFront invalidation created"
+    
+    cd "$SCRIPT_DIR"
+    print_success "${site_name} deployed!"
+    echo "  🤖 https://ai.aws-study-flashcards-app.com"
 }
 
 deploy_all() {
@@ -181,41 +217,29 @@ deploy_all() {
     local start_time=$(date +%s)
     local failed=0
     
-    for site_key in hub cloud ai; do
-        deploy_site "$site_key" || ((failed++))
-        echo ""
-    done
+    deploy_hub || ((failed++))
+    echo ""
+    deploy_cloud || ((failed++))
+    echo ""
+    deploy_ai || ((failed++))
     
     local end_time=$(date +%s)
     local duration=$((end_time - start_time))
     
-    # Summary
-    print_header "Deployment Summary"
+    print_header "Deployment Complete!"
     echo ""
-    for site_key in hub cloud ai; do
-        local site_name="${SITES[${site_key},name]}"
-        local result="${RESULTS[$site_key]}"
-        if [[ "$result" == "SUCCESS" ]]; then
-            echo -e "  ${GREEN}✓${NC} ${site_name}: ${GREEN}${result}${NC}"
-        else
-            echo -e "  ${RED}✗${NC} ${site_name}: ${RED}${result}${NC}"
-        fi
-    done
-    echo ""
-    echo -e "  ${CYAN}Total time: ${duration} seconds${NC}"
-    echo ""
-    
-    if [ $failed -gt 0 ]; then
-        print_error "$failed deployment(s) failed"
-        return 1
+    if [ $failed -eq 0 ]; then
+        print_success "All 3 sites deployed successfully in ${duration} seconds"
     else
-        print_success "All deployments completed successfully!"
-        echo ""
-        echo "  🌐 Hub:   https://aws-study-flashcards-app.com"
-        echo "  ☁️  Cloud: https://cloud.aws-study-flashcards-app.com"
-        echo "  🤖 AI:    https://ai.aws-study-flashcards-app.com"
-        echo ""
+        print_error "$failed deployment(s) failed"
     fi
+    echo ""
+    echo "  🌐 Hub:   https://aws-study-flashcards-app.com"
+    echo "  ☁️  Cloud: https://cloud.aws-study-flashcards-app.com"
+    echo "  🤖 AI:    https://ai.aws-study-flashcards-app.com"
+    echo ""
+    print_info "CloudFront invalidations may take 1-2 minutes to propagate"
+    echo ""
 }
 
 # =============================================================================
@@ -228,25 +252,19 @@ if ! command -v aws &> /dev/null; then
     exit 1
 fi
 
-# Check AWS credentials
-if ! aws sts get-caller-identity &> /dev/null; then
-    print_error "AWS credentials not configured. Run 'aws configure' first."
-    exit 1
-fi
-
 # Parse command line arguments
 case "${1:-}" in
     all)
         deploy_all
         ;;
     hub)
-        deploy_site "hub"
+        deploy_hub
         ;;
     cloud)
-        deploy_site "cloud"
+        deploy_cloud
         ;;
     ai)
-        deploy_site "ai"
+        deploy_ai
         ;;
     -h|--help)
         echo "Usage: $0 [all|hub|cloud|ai]"
@@ -257,10 +275,26 @@ case "${1:-}" in
         echo "  cloud  Deploy Cloud Practitioner Game only"
         echo "  ai     Deploy AI Study Game only"
         echo ""
-        echo "Run without arguments for interactive menu."
         ;;
     "")
-        show_menu
+        echo ""
+        echo "AWS Study Hub Deployment"
+        echo "========================"
+        echo ""
+        echo "  1) all    - Deploy ALL sites"
+        echo "  2) hub    - Study Hub Homepage"
+        echo "  3) cloud  - Cloud Practitioner Game"
+        echo "  4) ai     - AI Study Game"
+        echo ""
+        read "choice?Enter choice [all/hub/cloud/ai]: "
+        
+        case $choice in
+            1|all) deploy_all ;;
+            2|hub) deploy_hub ;;
+            3|cloud) deploy_cloud ;;
+            4|ai) deploy_ai ;;
+            *) print_error "Invalid choice" ;;
+        esac
         ;;
     *)
         print_error "Unknown option: $1"

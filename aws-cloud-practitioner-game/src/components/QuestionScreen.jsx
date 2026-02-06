@@ -74,9 +74,9 @@ const QuestionScreen = ({
             let answerClass = 'answer-btn';
             
             if (selectedAnswer !== null) {
-              if (index === question.correct) {
+              if (index === question.correctAnswer) {
                 answerClass += ' correct';
-              } else if (index === selectedAnswer && index !== question.correct) {
+              } else if (index === selectedAnswer && index !== question.correctAnswer) {
                 answerClass += ' incorrect';
               } else {
                 answerClass += ' disabled';
