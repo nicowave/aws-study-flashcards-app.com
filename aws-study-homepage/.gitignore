@@ -10,6 +10,11 @@ node_modules/*
 ../data/*
 
 
+# Environment variables (API keys, secrets)
+.env
+.env.local
+.env.*.local
+
 # Other files not needed in commits
 .DS_Store
 package-lock.json

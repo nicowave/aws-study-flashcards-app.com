@@ -202,6 +202,7 @@ function GameContent() {
               globalStats={globalStats}
               onStartGame={() => setGameState('domainSelect')}
               onViewStats={() => setGameState('stats')}
+              onStudyGuide={() => setActiveTab('study')}
               soundEnabled={soundEnabled}
               onToggleSound={() => setSoundEnabled(!soundEnabled)}
             />

@@ -18,7 +18,7 @@ const EyeOffIcon = ({ size = 24 }) => (
   </svg>
 );
 
-const AuthScreen = ({ onGuestContinue }) => {
+const AuthScreen = ({ onGuestContinue, hubUrl }) => {
   const { login, register, loading, error, clearError } = useAuth();
   
   const [isLogin, setIsLogin] = useState(true);
@@ -121,6 +121,9 @@ const AuthScreen = ({ onGuestContinue }) => {
   return (
     <div className="auth-screen">
       <div className="auth-container">
+        {hubUrl && (
+          <a href={hubUrl} className="back-to-hub-link auth-hub-link">&larr; Study Hub</a>
+        )}
         <div className="auth-header">
           <h1 className="auth-title">
             {isLogin ? 'Welcome Back' : 'Create Account'}

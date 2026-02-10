@@ -2,15 +2,15 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getFunctions } from 'firebase/functions';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCnVfqneLET0uUE_wnDXtqH7yh2qfBZWq4",
-  authDomain: "aws-study-hub.firebaseapp.com",
-  projectId: "aws-study-hub",
-  storageBucket: "aws-study-hub.firebasestorage.app",
-  messagingSenderId: "134626511244",
-  appId: "1:134626511244:web:ee0abcbd73191bc38b2ea9",
-  // measurementId: "G-GQHQG5PP10"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
@@ -19,6 +19,7 @@ const app = initializeApp(firebaseConfig);
 // Initialize and export services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const functions = getFunctions(app);
 
 export default app;
 

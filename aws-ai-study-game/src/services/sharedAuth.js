@@ -1,8 +1,7 @@
-import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
+import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithCustomToken,
   signOut,
   onAuthStateChanged,
   sendEmailVerification,
@@ -10,19 +9,14 @@ import {
   browserLocalPersistence,
   signInAnonymously
 } from 'firebase/auth';
-import { 
-  getFirestore, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc 
+import {
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc
 } from 'firebase/firestore';
-import firebaseConfig from '../config/firebase.config';
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+import { httpsCallable } from 'firebase/functions';
+import { auth, db, functions } from '../config/firebase.config';
 
 // Set persistence to local
 setPersistence(auth, browserLocalPersistence);
@@ -335,9 +329,9 @@ export const onAuthChange = (callback) => {
       // Update stored user data
       storeUserData(user);
       
-      // Refresh token and update cookie (keeps cross-domain auth fresh)
+      // Update cookie with current token (refreshes only when expired)
       try {
-        const idToken = await user.getIdToken(true);
+        const idToken = await user.getIdToken(false);
         setAuthCookie(idToken);
       } catch (error) {
         console.error('[Auth] Failed to refresh token:', error);
@@ -421,6 +415,61 @@ export const syncProgress = async (uid, localStats, certId = null) => {
     return { success: false, error: 'User not found' };
   } catch (error) {
     return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Try to auto-login from the shared cross-domain cookie.
+ * Used for SSO: if a user is logged in on one subdomain,
+ * other subdomains can establish their own Firebase session
+ * by exchanging the ID token via a Cloud Function.
+ *
+ * @returns {Object|null} Firebase user object on success, null on failure
+ */
+export const tryAutoLoginFromCookie = async () => {
+  // Skip if already signed in locally
+  if (auth.currentUser) {
+    console.log('[Auth] Already signed in, skipping cookie auto-login');
+    return auth.currentUser;
+  }
+
+  // Check for shared cookie
+  const idToken = getAuthCookie();
+  if (!idToken) {
+    console.log('[Auth] No auth cookie found');
+    return null;
+  }
+
+  console.log('[Auth] Found auth cookie, attempting cross-domain login...');
+
+  try {
+    // Call Cloud Function to exchange ID token for a Custom Token
+    const exchangeTokenFn = httpsCallable(functions, 'exchangeToken');
+    const result = await exchangeTokenFn({ idToken });
+    const { customToken } = result.data;
+
+    if (!customToken) {
+      console.error('[Auth] Cloud Function returned no custom token');
+      deleteAuthCookie();
+      return null;
+    }
+
+    // Sign in with the custom token to establish a local Firebase session
+    const userCredential = await signInWithCustomToken(auth, customToken);
+    console.log('[Auth] Cross-domain login successful for:', userCredential.user.email);
+
+    // Update cookie with fresh token and store user data
+    const freshToken = await userCredential.user.getIdToken();
+    setAuthCookie(freshToken);
+    storeUserData(userCredential.user);
+
+    return userCredential.user;
+  } catch (error) {
+    console.error('[Auth] Cross-domain login failed:', error.message || error);
+
+    // Delete stale cookie so we don't retry endlessly
+    deleteAuthCookie();
+    return null;
   }
 };
 

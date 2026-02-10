@@ -1,15 +1,16 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  registerUser, 
-  loginUser, 
-  logoutUser, 
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import {
+  registerUser,
+  loginUser,
+  logoutUser,
   signInAsGuest,
   isGuestUser,
   resendVerificationEmail,
-  onAuthChange, 
+  onAuthChange,
   getUserData,
   getStoredUserData,
-  syncProgress
+  syncProgress,
+  tryAutoLoginFromCookie
 } from '../services/sharedAuth';
 
 const AuthContext = createContext(null);
@@ -29,34 +30,49 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
   const [authChecked, setAuthChecked] = useState(false);
   const [error, setError] = useState(null);
   const [needsVerification, setNeedsVerification] = useState(false);
+  const autoLoginAttempted = useRef(false);
 
   // Listen for auth state changes
   useEffect(() => {
     console.log('[AuthContext] Setting up auth listener...');
-    
+    let isMounted = true;
+
     const unsubscribe = onAuthChange(async (firebaseUser) => {
+      if (!isMounted) return;
       console.log('[AuthContext] Auth state changed:', firebaseUser?.email || 'No user');
-      
+
       if (firebaseUser) {
         setUser(firebaseUser);
-        
+
         // Check if this is a guest user
         if (firebaseUser.isAnonymous || isGuestUser()) {
           setUserData({ isGuest: true });
         } else {
           // Fetch user data from Firestore
           const result = await getUserData(firebaseUser.uid);
-          if (result.success) {
+          if (result.success && isMounted) {
             setUserData(result.data);
           }
         }
       } else {
-        setUser(null);
-        setUserData(null);
+        // Try cross-domain auto-login from shared cookie (only once)
+        if (!autoLoginAttempted.current) {
+          autoLoginAttempted.current = true;
+          const cookieUser = await tryAutoLoginFromCookie();
+          if (cookieUser && isMounted) {
+            return; // onAuthChange will fire again with the signed-in user
+          }
+        }
+        if (isMounted) {
+          setUser(null);
+          setUserData(null);
+        }
       }
-      
-      setLoading(false);
-      setAuthChecked(true);
+
+      if (isMounted) {
+        setLoading(false);
+        setAuthChecked(true);
+      }
     });
 
     // Check for stored user data on mount (for faster initial render)
@@ -65,7 +81,7 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
       console.log('[AuthContext] Found stored user:', storedUser.email);
     }
 
-    return () => unsubscribe();
+    return () => { isMounted = false; unsubscribe(); };
   }, []);
 
   // Clear error

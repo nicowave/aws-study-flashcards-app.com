@@ -29,6 +29,11 @@ dist-ssr
 *.zip
 
 
+# Environment variables (API keys, secrets)
+.env
+.env.local
+.env.*.local
+
 # Config files, API keys
 ./aws-cloud-practitioner-game/src/config/firebase.config.js
 ./aws-study-homepage/src/config/firebase.config.js
