@@ -36,7 +36,7 @@ exports.exchangeToken = onCall(
       const decodedToken = await getAuth().verifyIdToken(idToken);
 
       // Ensure email is verified (matches existing app requirement)
-      if (!decodedToken.email_verified && !decodedToken.provider_id === "anonymous") {
+      if (!decodedToken.email_verified && decodedToken.provider_id !== "anonymous") {
         throw new HttpsError(
           "permission-denied",
           "Email must be verified before cross-domain login"

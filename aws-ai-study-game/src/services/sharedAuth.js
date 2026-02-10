@@ -330,7 +330,7 @@ export const onAuthChange = (callback) => {
       
       // Update cookie with current token (refreshes only when expired)
       try {
-        const idToken = await user.getIdToken(false);
+        const idToken = await user.getIdToken(true);
         setAuthCookie(idToken);
       } catch (error) {
         console.error('[Auth] Failed to refresh token:', error);
