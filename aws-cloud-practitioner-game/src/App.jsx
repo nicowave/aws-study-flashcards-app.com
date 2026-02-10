@@ -17,7 +17,7 @@ import { PlayIcon, BookIcon } from './components/Icons';
 import './styles/global.css';
 import './components/AuthScreen.css';
 
-const HUB_URL = 'https://aws-study-flashcards.app';
+const HUB_URL = 'https://aws-study-flashcards-app.com';
 const CERT_ID = 'cloud-practitioner';
 
 const shuffleArray = (array) => {
