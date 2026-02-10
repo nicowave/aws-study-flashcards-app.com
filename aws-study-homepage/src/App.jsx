@@ -125,7 +125,7 @@ const Hero = () => {
       <div className="hero-content">
         <div className="hero-badge">
           <TargetIcon size={16} className="badge-icon" />
-          <span className="badge-text mono">Free Study Materials</span>
+          <span className="badge-text mono">Free Study Materials - Beta Version 1.0</span>
         </div>
         <h1 className="hero-title">
           Master Your <span className="highlight">AWS Certification</span>
