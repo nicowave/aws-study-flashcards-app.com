@@ -92,6 +92,73 @@ export const domain4 = {
       ],
       correct: 1,
       explanation: 'Human-in-the-loop ensures humans can oversee, validate, and intervene in AI decisions, especially important for high-stakes applications.'
+    },
+    {
+      id: 'd4q9',
+      question: 'What is Amazon Augmented AI (Amazon A2I) used for?',
+      options: [
+        'Automated model training',
+        'Building human review workflows into ML applications',
+        'Generating synthetic training data',
+        'Monitoring model performance'
+      ],
+      correct: 1,
+      explanation: 'Amazon A2I builds human review workflows that route low-confidence predictions to human reviewers. It integrates with Textract, Rekognition, and custom models, supporting private, public, or vendor workforces.'
+    },
+    {
+      id: 'd4q10',
+      question: 'Which legal risk is specific to generative AI producing outputs that resemble copyrighted material?',
+      options: [
+        'Data drift',
+        'IP (Intellectual Property) infringement claims',
+        'Model latency',
+        'Feature attribution drift'
+      ],
+      correct: 1,
+      explanation: 'GenAI may produce outputs resembling copyrighted material, exposing organizations to IP infringement lawsuits. Mitigation includes content filtering, guardrails, disclaimers, and human review for high-stakes outputs.'
+    },
+    {
+      id: 'd4q11',
+      question: 'How does choosing a smaller AI model support environmental sustainability?',
+      options: [
+        'Smaller models are always more accurate',
+        'Smaller models require less energy for training and inference, reducing carbon emissions',
+        'Smaller models do not require any compute resources',
+        'There is no sustainability benefit to smaller models'
+      ],
+      correct: 1,
+      explanation: 'Larger models consume more energy. Right-sizing models, using distilled/quantized architectures, and choosing AWS regions with renewable energy all reduce the environmental footprint of AI workloads.'
+    },
+    {
+      id: 'd4q12',
+      question: 'What is the most common root cause of biased model behavior?',
+      options: [
+        'Using too many GPUs for training',
+        'Poor data diversity and lack of representativeness in training data',
+        'Having too many model parameters',
+        'Deploying models in the wrong AWS region'
+      ],
+      correct: 1,
+      explanation: 'Poor data diversity is the most common root cause of bias. Datasets should be inclusive, diverse, balanced, and curated from vetted sources to prevent models from learning unfair patterns.'
+    },
+    {
+      id: 'd4q13',
+      question: 'What tradeoff exists between model interpretability and performance?',
+      options: [
+        'More interpretable models are always more performant',
+        'Simple, explainable models often underperform complex deep neural networks on difficult tasks',
+        'Interpretability has no relationship to performance',
+        'Complex models are always more interpretable'
+      ],
+      correct: 1,
+      explanation: 'Simple models (decision trees, linear regression) are more explainable but often underperform complex ones (deep neural networks). Post-hoc techniques like SHAP and LIME help explain complex models.'
+    },
+    {
+      id: 'd4q14',
+      question: 'What does SageMaker Clarify use to explain individual model predictions?',
+      options: ['Random sampling', 'SHAP (SHapley Additive exPlanations) values', 'Principal Component Analysis', 'K-means clustering'],
+      correct: 1,
+      explanation: 'SageMaker Clarify uses SHAP-based feature importance to explain predictions, helping understand which features contributed most to each decision and enabling bias detection across demographic groups.'
     }
   ]
 };
@@ -185,6 +252,87 @@ export const domain5 = {
       ],
       correct: 2,
       explanation: 'Responsible AI governance requires documenting model details, training data, intended use cases, limitations, and potential biases through model cards and similar artifacts.'
+    },
+    {
+      id: 'd5q9',
+      question: 'Which AWS service automatically scans EC2 instances and container images for software vulnerabilities?',
+      options: ['AWS Trusted Advisor', 'Amazon GuardDuty', 'Amazon Inspector', 'AWS Config'],
+      correct: 2,
+      explanation: 'Amazon Inspector automatically scans EC2 instances and container images (ECR) for software vulnerabilities (CVEs), prioritizes findings by severity, and integrates with Security Hub.'
+    },
+    {
+      id: 'd5q10',
+      question: 'What is AWS Audit Manager used for in AI compliance?',
+      options: [
+        'Training ML models on audit data',
+        'Continuously auditing AWS usage with prebuilt compliance frameworks and automated evidence collection',
+        'Encrypting audit logs',
+        'Managing user permissions'
+      ],
+      correct: 1,
+      explanation: 'AWS Audit Manager provides prebuilt frameworks (SOC 2, GDPR, HIPAA, NIST), automated evidence collection, audit-ready reports, and custom frameworks for AI-specific governance.'
+    },
+    {
+      id: 'd5q11',
+      question: 'What are the five categories that AWS Trusted Advisor provides recommendations for?',
+      options: [
+        'Speed, Memory, Storage, Network, Compute',
+        'Cost Optimization, Performance, Security, Fault Tolerance, Service Limits',
+        'Identity, Access, Encryption, Logging, Monitoring',
+        'Development, Testing, Staging, Production, Archival'
+      ],
+      correct: 1,
+      explanation: 'AWS Trusted Advisor provides best practice recommendations across five categories: Cost Optimization, Performance, Security, Fault Tolerance, and Service Limits.'
+    },
+    {
+      id: 'd5q12',
+      question: 'What is "prompt injection" in AI security?',
+      options: [
+        'Injecting new data into training datasets',
+        'An attack where malicious inputs manipulate the model to bypass instructions or perform unintended actions',
+        'Adding more prompts to improve response quality',
+        'A technique for faster model inference'
+      ],
+      correct: 1,
+      explanation: 'Prompt injection is a security attack where malicious inputs override system instructions. It includes direct injection (user-crafted) and indirect injection (malicious content in retrieved documents). Mitigations include Amazon Bedrock Guardrails and input sanitization.'
+    },
+    {
+      id: 'd5q13',
+      question: 'What are Amazon SageMaker Model Cards used for?',
+      options: [
+        'Storing model weights and parameters',
+        'Structured documentation capturing model purpose, training details, evaluation metrics, and ethical considerations',
+        'Managing billing for model training',
+        'Scaling model endpoints'
+      ],
+      correct: 1,
+      explanation: 'SageMaker Model Cards provide standardized documentation for audits — including model purpose, training data, evaluation metrics, limitations, risk ratings, and bias analysis. They are exportable as PDF or JSON.'
+    },
+    {
+      id: 'd5q14',
+      question: 'Which privacy-enhancing technology adds mathematical noise to protect individual records in training data?',
+      options: ['Tokenization', 'Differential privacy', 'Data masking', 'VPC endpoints'],
+      correct: 1,
+      explanation: 'Differential privacy adds controlled mathematical noise to data to protect individual records while preserving overall statistical properties. Other PETs include anonymization, pseudonymization, federated learning, and tokenization.'
+    },
+    {
+      id: 'd5q15',
+      question: 'What is the purpose of the Generative AI Security Scoping Matrix?',
+      options: [
+        'To calculate model training costs',
+        'A governance framework that maps AI use cases to appropriate security requirements based on risk level',
+        'To measure model accuracy across demographics',
+        'To manage API rate limits'
+      ],
+      correct: 1,
+      explanation: 'The GenAI Security Scoping Matrix maps AI use cases to security requirements across dimensions like data classification, user access scope, integration level, and autonomy level — helping organizations apply proportionate controls.'
+    },
+    {
+      id: 'd5q16',
+      question: 'Which AWS service provides API-level audit trails for AI workload compliance?',
+      options: ['Amazon CloudWatch', 'AWS CloudTrail', 'AWS Config', 'Amazon Inspector'],
+      correct: 1,
+      explanation: 'AWS CloudTrail logs all API calls and user activities, providing a comprehensive audit trail essential for compliance. S3 access logging and model invocation logging complement CloudTrail for full data lifecycle visibility.'
     }
   ]
 };

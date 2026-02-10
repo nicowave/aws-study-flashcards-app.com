@@ -782,9 +782,9 @@ button {
 
 .answer-btn:hover:not(:disabled) {
   border-color: var(--md-primary);
-  background: var(--md-surface-hover);
+  background: var(--md-surface);
   transform: translateX(4px);
-  box-shadow: -4px 0 0 0 var(--md-primary), var(--md-shadow-1);
+  box-shadow: 0 0 0 1px var(--md-primary), 0 0 12px rgba(86, 156, 214, 0.25);
 }
 
 .answer-btn:hover:not(:disabled) .answer-letter {
@@ -1459,7 +1459,7 @@ button {
 .flashcard:hover .flashcard-front,
 .flashcard:hover .flashcard-back {
   border-color: var(--md-primary);
-  box-shadow: var(--md-shadow-3), 0 0 20px rgba(86, 156, 214, 0.12);
+  box-shadow: 0 0 0 1px var(--md-primary), 0 0 15px rgba(86, 156, 214, 0.3);
 }
 
 .flashcard-back {
@@ -1470,7 +1470,7 @@ button {
 
 .flashcard:hover .flashcard-back {
   border-color: var(--md-secondary);
-  box-shadow: var(--md-shadow-3), 0 0 20px rgba(78, 201, 176, 0.12);
+  box-shadow: 0 0 0 1px var(--md-secondary), 0 0 15px rgba(78, 201, 176, 0.3);
 }
 
 .card-icon {

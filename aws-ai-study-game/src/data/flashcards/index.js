@@ -8,11 +8,23 @@ import {
 import { module2 } from './module2-training-data';
 import { module3, moduleVisuals } from './module3-inferencing';
 
+// Import AIF-C01 Exam domains
+import { domain1 } from './domain1-ai-ml-fundamentals';
+import { domain2 } from './domain2-genai-fundamentals';
+import { domain3 } from './domain3-foundation-models';
+import { domain4 } from './domain4-responsible-ai';
+import { domain5 } from './domain5-security-compliance';
+
 // Combine all flashcard decks
 export const flashcardDecks = {
   ...module1Decks,
   module2,
-  module3
+  module3,
+  domain1,
+  domain2,
+  domain3,
+  domain4,
+  domain5
 };
 
 // Export visual data for diagrams
