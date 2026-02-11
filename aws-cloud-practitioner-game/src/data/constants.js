@@ -13,7 +13,7 @@ export const INITIAL_STATS = {
   level: 1
 };
 
-export const STORAGE_KEY = 'aws-ai-game-stats';
+export const STORAGE_KEY = 'aws-cloud-game-stats';
 
 export const XP_PER_LEVEL = 100;
 

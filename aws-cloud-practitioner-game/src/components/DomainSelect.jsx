@@ -3,17 +3,14 @@ import { domains } from '../data';
 import { ArrowLeftIcon, CheckCircleIcon, LockIcon } from './Icons';
 
 const DomainSelect = ({ globalStats, onSelectDomain, onBack }) => {
-  const domainStats = globalStats?.domainStats || {};
+  const domainProgress = globalStats?.domainProgress || {};
 
   const getDomainProgress = (domainId) => {
-    const stats = domainStats[domainId];
-    if (!stats) return { completed: 0, total: 0, accuracy: 0 };
+    const stats = domainProgress[domainId];
+    if (!stats) return { sessions: 0, accuracy: 0 };
     return {
-      completed: stats.totalAnswered || 0,
-      total: stats.totalQuestions || 10,
-      accuracy: stats.totalAnswered > 0 
-        ? Math.round((stats.totalCorrect / stats.totalAnswered) * 100) 
-        : 0
+      sessions: stats.completed || 0,
+      accuracy: stats.bestScore ? Math.round(stats.bestScore * 100) : 0
     };
   };
 
@@ -31,7 +28,7 @@ const DomainSelect = ({ globalStats, onSelectDomain, onBack }) => {
       <div className="domain-grid">
         {domains.map((domain) => {
           const progress = getDomainProgress(domain.id);
-          const isCompleted = progress.accuracy >= 80 && progress.completed >= 5;
+          const isCompleted = progress.accuracy >= 80 && progress.sessions >= 3;
           
           return (
             <button
@@ -53,7 +50,7 @@ const DomainSelect = ({ globalStats, onSelectDomain, onBack }) => {
                   />
                 </div>
                 <div className="progress-stats">
-                  <span>{progress.completed} answered</span>
+                  <span>{progress.sessions} quizzes</span>
                   <span>{progress.accuracy}% accuracy</span>
                 </div>
               </div>

@@ -19,9 +19,9 @@ const StatsScreen = ({ globalStats, onBack, onReset }) => {
     totalAnswered = 0,
     totalCorrect = 0,
     maxStreak = 0,
-    gamesPlayed = 0,
-    domainStats = {},
-    achievements = []
+    totalSessions = 0,
+    domainProgress = {},
+    unlockedAchievements = []
   } = globalStats || {};
 
   const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
@@ -81,7 +81,7 @@ const StatsScreen = ({ globalStats, onBack, onReset }) => {
           </div>
           <div className="stat-card">
             <TrophyIcon size={28} />
-            <span className="stat-value">{gamesPlayed}</span>
+            <span className="stat-value">{totalSessions}</span>
             <span className="stat-label">Games Played</span>
           </div>
           <div className="stat-card">
@@ -97,11 +97,11 @@ const StatsScreen = ({ globalStats, onBack, onReset }) => {
         <h3>Domain Progress</h3>
         <div className="domain-list">
           {domains.map((domain) => {
-            const stats = domainStats[domain.id] || {};
-            const domainAccuracy = stats.totalAnswered > 0
-              ? Math.round((stats.totalCorrect / stats.totalAnswered) * 100)
+            const stats = domainProgress[domain.id] || {};
+            const domainAccuracy = stats.bestScore
+              ? Math.round(stats.bestScore * 100)
               : 0;
-            const isMastered = domainAccuracy >= 80 && (stats.totalAnswered || 0) >= 5;
+            const isMastered = domainAccuracy >= 80 && (stats.completed || 0) >= 3;
 
             return (
               <div key={domain.id} className={`domain-stat-row ${isMastered ? 'mastered' : ''}`}>
@@ -128,11 +128,11 @@ const StatsScreen = ({ globalStats, onBack, onReset }) => {
       </div>
 
       {/* Achievements */}
-      {achievements.length > 0 && (
+      {unlockedAchievements.length > 0 && (
         <div className="achievements-section">
-          <h3>Achievements ({achievements.length})</h3>
+          <h3>Achievements ({unlockedAchievements.length})</h3>
           <div className="achievements-grid">
-            {achievements.map((achievement, index) => (
+            {unlockedAchievements.map((achievement, index) => (
               <div key={index} className="achievement-card">
                 <span className="achievement-icon">🏆</span>
                 <span className="achievement-name">{achievement.name || achievement}</span>

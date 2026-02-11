@@ -8,7 +8,8 @@ import {
   onAuthChange,
   resendVerificationEmail as resendVerification,
   tryAutoLoginFromCookie,
-  signInWithGoogle
+  signInWithGoogle,
+  checkGoogleRedirectResult
 } from '../services/sharedAuth';
 
 const AuthContext = createContext(null);
@@ -30,6 +31,13 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     console.log('[AuthContext] Setting up auth listener...');
     let isMounted = true;
+
+    // Check for pending Google redirect result (from signInWithRedirect fallback)
+    checkGoogleRedirectResult().then((result) => {
+      if (result && result.success) {
+        console.log('[AuthContext] Google redirect sign-in completed');
+      }
+    });
 
     const unsubscribe = onAuthChange(async (firebaseUser) => {
       if (!isMounted) return;

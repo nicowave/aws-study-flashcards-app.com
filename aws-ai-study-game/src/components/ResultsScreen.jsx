@@ -9,8 +9,8 @@ const ResultsScreen = ({
   onSelectDomain,
   onMainMenu
 }) => {
-  const { correct = 0, answered = 0, maxStreak = 0, xpEarned = 0 } = sessionStats || {};
-  const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  const { correct = 0, total = 0, streak = 0, xpEarned = 0 } = sessionStats || {};
+  const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
   
   // Determine performance level
   let performanceLevel = 'needs-work';
@@ -83,12 +83,12 @@ const ResultsScreen = ({
       <div className="results-stats">
         <div className="result-stat">
           <TargetIcon size={24} />
-          <span className="stat-value">{correct}/{answered}</span>
+          <span className="stat-value">{correct}/{total}</span>
           <span className="stat-label">Correct</span>
         </div>
         <div className="result-stat">
           <FlameIcon size={24} />
-          <span className="stat-value">{maxStreak}</span>
+          <span className="stat-value">{streak}</span>
           <span className="stat-label">Best Streak</span>
         </div>
         <div className="result-stat">

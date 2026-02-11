@@ -96,6 +96,48 @@ export const useGameStats = () => {
     return checkNewAchievements(globalStats, globalStats.unlockedAchievements);
   }, [globalStats]);
 
+  // Merge cloud stats with local (take the higher value for each field)
+  const mergeCloudStats = useCallback((cloudData) => {
+    if (!cloudData) return;
+    setGlobalStats(prev => {
+      // Merge domain progress (take best scores and max completions)
+      const mergedDomainProgress = { ...prev.domainProgress };
+      const cloudDomainProgress = cloudData.domainProgress || {};
+      for (const domainId of Object.keys(cloudDomainProgress)) {
+        if (!mergedDomainProgress[domainId]) {
+          mergedDomainProgress[domainId] = { ...cloudDomainProgress[domainId] };
+        } else {
+          mergedDomainProgress[domainId] = {
+            completed: Math.max(mergedDomainProgress[domainId].completed || 0, cloudDomainProgress[domainId].completed || 0),
+            bestScore: Math.max(mergedDomainProgress[domainId].bestScore || 0, cloudDomainProgress[domainId].bestScore || 0)
+          };
+        }
+      }
+
+      // Merge unlocked achievements (union of both sets)
+      const localAchievements = prev.unlockedAchievements || [];
+      const cloudAchievements = cloudData.unlockedAchievements || [];
+      const mergedAchievements = [...new Set([...localAchievements, ...cloudAchievements])];
+
+      const mergedXp = Math.max(prev.xp || 0, cloudData.xp || 0);
+
+      return {
+        ...prev,
+        totalAnswered: Math.max(prev.totalAnswered, cloudData.totalAnswered || 0),
+        totalCorrect: Math.max(prev.totalCorrect, cloudData.totalCorrect || 0),
+        maxStreak: Math.max(prev.maxStreak, cloudData.maxStreak || 0),
+        perfectDomains: Math.max(prev.perfectDomains, cloudData.perfectDomains || 0),
+        domainsCompleted: Math.max(prev.domainsCompleted, cloudData.domainsCompleted || 0),
+        fastAnswers: Math.max(prev.fastAnswers, cloudData.fastAnswers || 0),
+        totalSessions: Math.max(prev.totalSessions, cloudData.totalSessions || 0),
+        xp: mergedXp,
+        level: calculateLevel(mergedXp),
+        domainProgress: mergedDomainProgress,
+        unlockedAchievements: mergedAchievements
+      };
+    });
+  }, []);
+
   // Reset all stats
   const resetStats = useCallback(() => {
     setGlobalStats(INITIAL_STATS);
@@ -108,7 +150,8 @@ export const useGameStats = () => {
     completeSession,
     unlockAchievement,
     getNewAchievements,
-    resetStats
+    resetStats,
+    mergeCloudStats
   };
 };
 

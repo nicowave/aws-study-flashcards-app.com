@@ -10,7 +10,9 @@ import {
   signInAnonymously,
   updateProfile,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult
 } from 'firebase/auth';
 import {
   doc,
@@ -475,62 +477,103 @@ export const tryAutoLoginFromCookie = async () => {
 };
 
 /**
- * Sign in with Google using Firebase popup
+ * Handle the Google user after sign-in (popup or redirect)
+ * Creates Firestore doc if new user, sets cookie
+ */
+const handleGoogleUser = async (user) => {
+  console.log('[Auth] Google sign-in successful for:', user.email);
+
+  // Check if user document exists in Firestore, create if new
+  let isNewUser = false;
+  const userDocRef = doc(db, 'users', user.uid);
+  const userDoc = await getDoc(userDocRef);
+
+  if (!userDoc.exists()) {
+    isNewUser = true;
+    await setDoc(userDocRef, {
+      email: user.email,
+      displayName: user.displayName || user.email.split('@')[0],
+      createdAt: new Date().toISOString(),
+      emailVerified: true,
+      authProvider: 'google',
+      stats: {
+        totalXp: 0,
+        level: 1,
+        totalAnswered: 0,
+        totalCorrect: 0,
+        maxStreak: 0,
+        sessionsCompleted: 0
+      },
+      certProgress: {}
+    });
+    console.log('[Auth] Created Firestore user document for new Google user');
+  }
+
+  // Get ID token and set cookie for cross-domain auth
+  const idToken = await user.getIdToken();
+  setAuthCookie(idToken);
+  storeUserData(user);
+
+  return { success: true, user, isNewUser };
+};
+
+/**
+ * Check for pending Google redirect result on page load
+ * Must be called once when the app initializes
+ */
+export const checkGoogleRedirectResult = async () => {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result && result.user) {
+      console.log('[Auth] Google redirect result found');
+      return await handleGoogleUser(result.user);
+    }
+    return null;
+  } catch (error) {
+    console.error('[Auth] Google redirect result error:', error.code, error.message);
+    return null;
+  }
+};
+
+/**
+ * Sign in with Google — tries popup first, falls back to redirect
  * Works for both new and existing users
  */
 export const signInWithGoogle = async () => {
+  const provider = new GoogleAuthProvider();
+
+  // Try popup first (works on most desktop browsers)
   try {
-    const provider = new GoogleAuthProvider();
     const userCredential = await signInWithPopup(auth, provider);
-    const user = userCredential.user;
+    return await handleGoogleUser(userCredential.user);
+  } catch (error) {
+    console.warn('[Auth] Google popup failed:', error.code, error.message);
 
-    console.log('[Auth] Google sign-in successful for:', user.email);
-
-    // Check if user document exists in Firestore, create if new
-    let isNewUser = false;
-    const userDocRef = doc(db, 'users', user.uid);
-    const userDoc = await getDoc(userDocRef);
-
-    if (!userDoc.exists()) {
-      isNewUser = true;
-      await setDoc(userDocRef, {
-        email: user.email,
-        displayName: user.displayName || user.email.split('@')[0],
-        createdAt: new Date().toISOString(),
-        emailVerified: true,
-        authProvider: 'google',
-        stats: {
-          totalXp: 0,
-          level: 1,
-          totalAnswered: 0,
-          totalCorrect: 0,
-          maxStreak: 0,
-          sessionsCompleted: 0
-        },
-        certProgress: {}
-      });
-      console.log('[Auth] Created Firestore user document for new Google user');
+    // For these errors, fall back to redirect flow
+    if (
+      error.code === 'auth/popup-blocked' ||
+      error.code === 'auth/unauthorized-domain' ||
+      error.code === 'auth/operation-not-supported-in-this-environment' ||
+      error.code === 'auth/internal-error'
+    ) {
+      console.log('[Auth] Falling back to redirect flow...');
+      try {
+        await signInWithRedirect(auth, provider);
+        // Page will redirect — this line won't execute
+        return { success: false, error: 'Redirecting to Google...' };
+      } catch (redirectError) {
+        console.error('[Auth] Google redirect also failed:', redirectError.code, redirectError.message);
+        return { success: false, error: 'Google sign-in failed. Please try again.' };
+      }
     }
 
-    // Get ID token and set cookie for cross-domain auth
-    const idToken = await user.getIdToken();
-    setAuthCookie(idToken);
-    storeUserData(user);
-
-    return { success: true, user, isNewUser };
-  } catch (error) {
-    console.error('[Auth] Google sign-in error:', error.code, error.message);
-
+    // For user-initiated cancellations, just return the message
     let errorMessage = 'Google sign-in failed';
 
-    if (error.code === 'auth/popup-closed-by-user') {
+    if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
       errorMessage = 'Sign-in cancelled';
-    } else if (error.code === 'auth/popup-blocked') {
-      errorMessage = 'Pop-up blocked by browser. Please allow pop-ups and try again.';
     } else if (error.code === 'auth/account-exists-with-different-credential') {
       errorMessage = 'An account already exists with this email using a different sign-in method.';
-    } else if (error.code === 'auth/cancelled-popup-request') {
-      errorMessage = 'Sign-in cancelled';
     }
 
     return { success: false, error: errorMessage };

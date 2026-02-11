@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { getDomainById } from './data';
 import { useSound, useGameStats } from './hooks';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -63,7 +63,7 @@ const TabNavigation = ({ activeTab, onTabChange }) => {
 
 // Main Game Content (only rendered when authenticated)
 function GameContent() {
-  const { user, syncLocalProgress, logout } = useAuth();
+  const { user, syncLocalProgress, loadProgress, logout } = useAuth();
   
   // Main app tab state
   const [activeTab, setActiveTab] = useState('game');
@@ -75,8 +75,8 @@ function GameContent() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [sessionStats, setSessionStats] = useState({ 
-    correct: 0, total: 0, streak: 0, startTime: null 
+  const [sessionStats, setSessionStats] = useState({
+    correct: 0, total: 0, streak: 0, xpEarned: 0, startTime: null
   });
   const [showParticles, setShowParticles] = useState(false);
   const [newAchievement, setNewAchievement] = useState(null);
@@ -91,15 +91,33 @@ function GameContent() {
     completeSession,
     unlockAchievement,
     getNewAchievements,
-    resetStats
+    resetStats,
+    mergeCloudStats
   } = useGameStats();
 
-  // Sync progress on mount and when stats change significantly
+  // Load progress from Firestore on login (merge with local)
+  const hasLoadedProgress = useRef(false);
   useEffect(() => {
-    if (user && globalStats) {
+    if (user && !hasLoadedProgress.current) {
+      hasLoadedProgress.current = true;
+      loadProgress(CERT_ID).then((cloudData) => {
+        if (cloudData) {
+          console.log('[App] Loaded cloud progress, merging with local stats');
+          mergeCloudStats(cloudData);
+        }
+      });
+    }
+    if (!user) {
+      hasLoadedProgress.current = false;
+    }
+  }, [user, loadProgress, mergeCloudStats]);
+
+  // Sync progress to Firestore whenever totalSessions changes (after quiz completion)
+  useEffect(() => {
+    if (user && globalStats && globalStats.totalSessions > 0) {
       syncLocalProgress(globalStats, CERT_ID);
     }
-  }, [user, globalStats.sessionsCompleted]);
+  }, [user, globalStats.totalSessions]);
 
   useEffect(() => {
     const newAchievements = getNewAchievements();
@@ -120,7 +138,7 @@ function GameContent() {
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setShowExplanation(false);
-    setSessionStats({ correct: 0, total: 0, streak: 0, startTime: Date.now() });
+    setSessionStats({ correct: 0, total: 0, streak: 0, xpEarned: 0, startTime: Date.now() });
     setQuestionStartTime(Date.now());
     setGameState('playing');
   }, []);
@@ -136,14 +154,17 @@ function GameContent() {
       playSound('correct');
       setShowParticles(true);
       setTimeout(() => setShowParticles(false), 600);
-      recordCorrectAnswer(responseTime);
+      const xpGained = recordCorrectAnswer(responseTime);
       setSessionStats(prev => ({
-        ...prev, correct: prev.correct + 1, total: prev.total + 1, streak: prev.streak + 1
+        ...prev, correct: prev.correct + 1, total: prev.total + 1,
+        streak: prev.streak + 1, xpEarned: prev.xpEarned + (xpGained || 0)
       }));
     } else {
       playSound('incorrect');
       recordIncorrectAnswer();
-      setSessionStats(prev => ({ ...prev, total: prev.total + 1, streak: 0 }));
+      setSessionStats(prev => ({
+        ...prev, total: prev.total + 1, streak: 0, xpEarned: prev.xpEarned + 2
+      }));
     }
   }, [selectedAnswer, currentQuestions, currentQuestionIndex, questionStartTime, playSound, recordCorrectAnswer, recordIncorrectAnswer]);
 
@@ -155,13 +176,10 @@ function GameContent() {
       setQuestionStartTime(Date.now());
     } else {
       completeSession(selectedDomain.id, sessionStats.correct, currentQuestions.length);
-      // Sync after completing session
-      if (user) {
-        syncLocalProgress(globalStats, CERT_ID);
-      }
+      // Firestore sync is handled by useEffect on globalStats.totalSessions
       setGameState('results');
     }
-  }, [currentQuestionIndex, currentQuestions.length, completeSession, selectedDomain, sessionStats.correct, user, syncLocalProgress, globalStats]);
+  }, [currentQuestionIndex, currentQuestions.length, completeSession, selectedDomain, sessionStats.correct]);
 
   const handleTabChange = useCallback((tab) => {
     setActiveTab(tab);
