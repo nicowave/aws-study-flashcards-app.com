@@ -12,13 +12,18 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
-  getRedirectResult
+  getRedirectResult,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  updatePassword as firebaseUpdatePassword,
+  deleteUser as firebaseDeleteUser
 } from 'firebase/auth';
 import {
   doc,
   setDoc,
   getDoc,
-  updateDoc
+  updateDoc,
+  deleteDoc
 } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { auth, db, functions } from '../config/firebase.config';
@@ -593,6 +598,206 @@ export const signInWithGoogle = async () => {
       errorMessage = 'Sign-in cancelled';
     } else if (error.code === 'auth/account-exists-with-different-credential') {
       errorMessage = 'An account already exists with this email using a different sign-in method.';
+    }
+
+    return { success: false, error: errorMessage };
+  }
+};
+
+// ============================================
+// SETTINGS PAGE FUNCTIONS
+// ============================================
+
+/**
+ * Re-authenticate user with email/password credential
+ * Required before sensitive operations like password change or account deletion
+ */
+export const reauthenticateUser = async (password) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      return { success: false, error: 'No user signed in' };
+    }
+
+    const credential = EmailAuthProvider.credential(user.email, password);
+    await reauthenticateWithCredential(user, credential);
+    console.log('[Auth] Re-authentication successful');
+    return { success: true };
+  } catch (error) {
+    console.error('[Auth] Re-authentication error:', error.code, error.message);
+
+    let errorMessage = 'Re-authentication failed';
+    if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+      errorMessage = 'Incorrect password';
+    } else if (error.code === 'auth/too-many-requests') {
+      errorMessage = 'Too many attempts. Please try again later.';
+    }
+
+    return { success: false, error: errorMessage };
+  }
+};
+
+/**
+ * Change user password
+ * Requires recent authentication — call reauthenticateUser first
+ */
+export const changePassword = async (currentPassword, newPassword) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      return { success: false, error: 'No user signed in' };
+    }
+
+    // Re-authenticate first
+    const reauth = await reauthenticateUser(currentPassword);
+    if (!reauth.success) {
+      return reauth;
+    }
+
+    // Update password
+    await firebaseUpdatePassword(user, newPassword);
+
+    // Refresh token after password change
+    await user.getIdToken(true);
+    const freshToken = await user.getIdToken();
+    setAuthCookie(freshToken);
+
+    console.log('[Auth] Password changed successfully');
+    return { success: true };
+  } catch (error) {
+    console.error('[Auth] Change password error:', error.code, error.message);
+
+    let errorMessage = 'Failed to change password';
+    if (error.code === 'auth/weak-password') {
+      errorMessage = 'New password must be at least 6 characters';
+    } else if (error.code === 'auth/requires-recent-login') {
+      errorMessage = 'Please sign out and sign back in, then try again';
+    }
+
+    return { success: false, error: errorMessage };
+  }
+};
+
+/**
+ * Update user avatar in Firestore
+ * @param {string} uid - User ID
+ * @param {object} avatarData - { type: 'initials'|'emoji'|'pattern'|'image', value: string|null, bgColor: string }
+ */
+export const updateUserAvatar = async (uid, avatarData) => {
+  try {
+    const docRef = doc(db, 'users', uid);
+    await updateDoc(docRef, { avatar: avatarData });
+    console.log('[Auth] Avatar updated for user:', uid);
+    return { success: true };
+  } catch (error) {
+    console.error('[Auth] Update avatar error:', error.message);
+    return { success: false, error: 'Failed to update avatar' };
+  }
+};
+
+/**
+ * Update user display name in both Firebase Auth and Firestore
+ * @param {string} uid - User ID
+ * @param {string} newDisplayName - New display name
+ */
+export const updateDisplayName = async (uid, newDisplayName) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      return { success: false, error: 'No user signed in' };
+    }
+
+    // Validate display name
+    const trimmed = newDisplayName.trim();
+    if (!trimmed || trimmed.length < 2) {
+      return { success: false, error: 'Display name must be at least 2 characters' };
+    }
+    if (trimmed.length > 30) {
+      return { success: false, error: 'Display name must be 30 characters or less' };
+    }
+
+    // Update Firebase Auth profile
+    await updateProfile(user, { displayName: trimmed });
+
+    // Update Firestore document
+    const docRef = doc(db, 'users', uid);
+    await updateDoc(docRef, { displayName: trimmed });
+
+    // Update stored user data
+    storeUserData(user);
+
+    console.log('[Auth] Display name updated to:', trimmed);
+    return { success: true };
+  } catch (error) {
+    console.error('[Auth] Update display name error:', error.message);
+    return { success: false, error: 'Failed to update display name' };
+  }
+};
+
+/**
+ * Delete user account permanently
+ * For email users: requires password re-auth
+ * For Google users: requires Google popup re-auth
+ * Deletes Firestore doc first, then Firebase Auth account, then clears local data
+ */
+export const deleteAccount = async (password = null) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      return { success: false, error: 'No user signed in' };
+    }
+
+    // Determine auth provider
+    const isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
+
+    // Re-authenticate based on provider
+    if (isGoogleUser) {
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (popupError) {
+        if (popupError.code === 'auth/popup-closed-by-user' || popupError.code === 'auth/cancelled-popup-request') {
+          return { success: false, error: 'Account deletion cancelled' };
+        }
+        return { success: false, error: 'Google re-authentication failed. Please try again.' };
+      }
+    } else {
+      if (!password) {
+        return { success: false, error: 'Password is required to delete your account' };
+      }
+      const reauth = await reauthenticateUser(password);
+      if (!reauth.success) {
+        return reauth;
+      }
+    }
+
+    // Delete Firestore user document first (while still authenticated)
+    try {
+      const docRef = doc(db, 'users', user.uid);
+      await deleteDoc(docRef);
+      console.log('[Auth] Firestore user document deleted');
+    } catch (firestoreError) {
+      console.error('[Auth] Firestore deletion error (continuing):', firestoreError.message);
+      // Continue with auth deletion even if Firestore fails
+    }
+
+    // Delete Firebase Auth account
+    await firebaseDeleteUser(user);
+    console.log('[Auth] Firebase Auth account deleted');
+
+    // Clear all local data
+    deleteAuthCookie();
+    storeUserData(null);
+    localStorage.removeItem('awsStudyGuest');
+    localStorage.removeItem('awsStudyUser');
+
+    return { success: true };
+  } catch (error) {
+    console.error('[Auth] Delete account error:', error.code, error.message);
+
+    let errorMessage = 'Failed to delete account';
+    if (error.code === 'auth/requires-recent-login') {
+      errorMessage = 'Please sign out and sign back in, then try again';
     }
 
     return { success: false, error: errorMessage };

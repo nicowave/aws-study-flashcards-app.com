@@ -13,7 +13,9 @@ import {
 import StudyGuide from './components/StudyGuide';
 import AuthScreen from './components/AuthScreen';
 import UserBadge from './components/UserBadge';
+import SettingsPage from './components/SettingsPage';
 import { PlayIcon, BookIcon } from './components/Icons';
+import { applyAnalyticsPreference } from './services/analytics';
 import './styles/global.css';
 import './components/AuthScreen.css';
 
@@ -94,6 +96,9 @@ function GameContent() {
     resetStats,
     mergeCloudStats
   } = useGameStats();
+
+  // Apply analytics opt-out preference on mount
+  useEffect(() => { applyAnalyticsPreference(); }, []);
 
   // Load progress from Firestore on login (merge with local)
   const hasLoadedProgress = useRef(false);
@@ -200,10 +205,14 @@ function GameContent() {
       <AchievementNotification achievement={newAchievement} />
       
       {/* User Header */}
-      {(gameState === 'menu' || activeTab === 'study') && (
+      {(gameState === 'menu' || gameState === 'settings' || activeTab === 'study') && (
         <div className="user-header">
           <a href={HUB_URL} className="back-to-hub-link">← Study Hub</a>
-          <UserBadge onLogout={handleLogout} />
+          <UserBadge
+            onLogout={handleLogout}
+            onOpenSettings={() => { setActiveTab('game'); setGameState('settings'); }}
+            onViewStats={() => { setActiveTab('game'); setGameState('stats'); }}
+          />
         </div>
       )}
       
@@ -266,6 +275,10 @@ function GameContent() {
               onBack={() => setGameState('menu')}
               onReset={resetStats}
             />
+          )}
+
+          {gameState === 'settings' && (
+            <SettingsPage onBack={() => setGameState('menu')} />
           )}
         </>
       )}

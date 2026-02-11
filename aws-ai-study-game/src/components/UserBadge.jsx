@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { GearIcon, StatsIcon } from './Icons';
 import './UserBadge.css';
 
 const CheckmarkIcon = ({ size = 16 }) => (
@@ -29,8 +30,46 @@ const ChevronDownIcon = ({ size = 16 }) => (
   </svg>
 );
 
-const UserBadge = ({ onLogout }) => {
-  const { user, isAuthenticated, isGuest, logout } = useAuth();
+// Render avatar based on Firestore userData
+const AvatarDisplay = ({ userData, user, size = 32, fontSize = 13 }) => {
+  const avatar = userData?.avatar;
+  const displayName = userData?.displayName || user?.displayName || user?.email || '?';
+  const initial = displayName[0]?.toUpperCase() || '?';
+
+  if (avatar?.type === 'emoji' && avatar.value) {
+    return (
+      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#FF9900', fontSize: Math.round(size * 0.55) }}>
+        {avatar.value}
+      </div>
+    );
+  }
+
+  if ((avatar?.type === 'pattern' || avatar?.type === 'image') && avatar.value) {
+    return (
+      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#FF9900' }}>
+        <img src={avatar.value} alt="Avatar" />
+      </div>
+    );
+  }
+
+  if (avatar?.type === 'initials' && avatar.bgColor) {
+    return (
+      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor, fontSize }}>
+        {initial}
+      </div>
+    );
+  }
+
+  // Default: orange gradient with initials
+  return (
+    <div className="user-avatar" style={{ fontSize }}>
+      {initial}
+    </div>
+  );
+};
+
+const UserBadge = ({ onLogout, onOpenSettings, onViewStats }) => {
+  const { user, userData, isAuthenticated, isGuest, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!isAuthenticated && !isGuest) return null;
@@ -54,8 +93,8 @@ const UserBadge = ({ onLogout }) => {
             <span className="user-status guest">Progress not saved</span>
           </div>
         </div>
-        <button 
-          className="btn-sign-out-small" 
+        <button
+          className="btn-sign-out-small"
           onClick={handleLogout}
           title="Exit guest mode"
         >
@@ -67,22 +106,19 @@ const UserBadge = ({ onLogout }) => {
 
   // Authenticated user
   const email = user?.email || '';
-  const displayName = email.split('@')[0];
-  const initials = displayName.slice(0, 2).toUpperCase();
+  const displayName = userData?.displayName || user?.displayName || email.split('@')[0];
   const isVerified = user?.emailVerified;
 
   return (
     <div className="user-badge">
-      <button 
+      <button
         className="user-badge-button"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
-        <div className="user-avatar">
-          {initials}
-        </div>
+        <AvatarDisplay userData={userData} user={user} size={32} fontSize={13} />
         <div className="user-info">
-          <span className="user-name">{email}</span>
+          <span className="user-name">{displayName}</span>
           {isVerified && (
             <span className="user-status verified">
               <CheckmarkIcon size={12} />
@@ -98,8 +134,9 @@ const UserBadge = ({ onLogout }) => {
           <div className="user-badge-overlay" onClick={() => setIsOpen(false)} />
           <div className="user-badge-dropdown">
             <div className="dropdown-header">
-              <div className="dropdown-avatar">{initials}</div>
+              <AvatarDisplay userData={userData} user={user} size={40} fontSize={16} />
               <div className="dropdown-info">
+                <div className="dropdown-name">{displayName}</div>
                 <div className="dropdown-email">{email}</div>
                 {isVerified ? (
                   <div className="dropdown-status verified">
@@ -114,8 +151,27 @@ const UserBadge = ({ onLogout }) => {
               </div>
             </div>
             <div className="dropdown-divider" />
-            <button 
-              className="dropdown-item" 
+            {onOpenSettings && (
+              <button
+                className="dropdown-item"
+                onClick={() => { setIsOpen(false); onOpenSettings(); }}
+              >
+                <GearIcon size={16} />
+                Settings
+              </button>
+            )}
+            {onViewStats && (
+              <button
+                className="dropdown-item"
+                onClick={() => { setIsOpen(false); onViewStats(); }}
+              >
+                <StatsIcon size={16} />
+                View Stats
+              </button>
+            )}
+            {(onOpenSettings || onViewStats) && <div className="dropdown-divider" />}
+            <button
+              className="dropdown-item"
               onClick={handleLogout}
             >
               <SignOutIcon size={16} />

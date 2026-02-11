@@ -9,7 +9,15 @@ import {
   resendVerificationEmail as resendVerification,
   tryAutoLoginFromCookie,
   signInWithGoogle,
-  checkGoogleRedirectResult
+  checkGoogleRedirectResult,
+  getUserData,
+  getStoredUserData,
+  isGuestUser,
+  reauthenticateUser,
+  changePassword,
+  updateUserAvatar,
+  updateDisplayName,
+  deleteAccount
 } from '../services/sharedAuth';
 
 const AuthContext = createContext(null);
@@ -24,6 +32,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const autoLoginAttempted = useRef(false);
@@ -45,6 +54,12 @@ export const AuthProvider = ({ children }) => {
       if (firebaseUser) {
         console.log('[AuthContext] Auth state changed: User logged in -', firebaseUser.email);
         setUser(firebaseUser);
+
+        // Fetch user data from Firestore
+        const result = await getUserData(firebaseUser.uid);
+        if (result.success && isMounted) {
+          setUserData(result.data);
+        }
       } else {
         console.log('[AuthContext] Auth state changed: No user');
 
@@ -62,6 +77,7 @@ export const AuthProvider = ({ children }) => {
 
         if (isMounted) {
           setUser(null);
+          setUserData(null);
         }
       }
 
@@ -137,6 +153,7 @@ export const AuthProvider = ({ children }) => {
       const result = await logoutUser();
       if (result.success) {
         setUser(null);
+        setUserData(null);
         autoLoginAttempted.current = false; // Reset for next session
         console.log('[AuthContext] Logout successful');
       }
@@ -225,8 +242,77 @@ export const AuthProvider = ({ children }) => {
     return null;
   };
 
+  // ============================================
+  // SETTINGS FUNCTIONS
+  // ============================================
+
+  // Change password
+  const changeUserPassword = async (currentPassword, newPassword) => {
+    console.log('[AuthContext] Changing password...');
+    const result = await changePassword(currentPassword, newPassword);
+    if (result.success) {
+      console.log('[AuthContext] Password changed successfully');
+    } else {
+      console.log('[AuthContext] Password change failed:', result.error);
+    }
+    return result;
+  };
+
+  // Update avatar
+  const updateAvatar = async (avatarData) => {
+    if (!user) {
+      return { success: false, error: 'Not authenticated' };
+    }
+    console.log('[AuthContext] Updating avatar...');
+    const result = await updateUserAvatar(user.uid, avatarData);
+    if (result.success) {
+      // Update local userData with new avatar
+      setUserData(prev => prev ? { ...prev, avatar: avatarData } : prev);
+      console.log('[AuthContext] Avatar updated successfully');
+    }
+    return result;
+  };
+
+  // Change display name
+  const changeDisplayName = async (newName) => {
+    if (!user) {
+      return { success: false, error: 'Not authenticated' };
+    }
+    console.log('[AuthContext] Updating display name...');
+    const result = await updateDisplayName(user.uid, newName);
+    if (result.success) {
+      // Update local userData with new name
+      setUserData(prev => prev ? { ...prev, displayName: newName.trim() } : prev);
+      console.log('[AuthContext] Display name updated successfully');
+    }
+    return result;
+  };
+
+  // Delete account
+  const deleteUserAccount = async (password = null) => {
+    console.log('[AuthContext] Deleting account...');
+    const result = await deleteAccount(password);
+    if (result.success) {
+      setUser(null);
+      setUserData(null);
+      console.log('[AuthContext] Account deleted successfully');
+    }
+    return result;
+  };
+
+  // Refresh user data from Firestore
+  const refreshUserData = async () => {
+    if (!user) return;
+    const result = await getUserData(user.uid);
+    if (result.success) {
+      setUserData(result.data);
+    }
+    return result;
+  };
+
   const value = {
     user,
+    userData,
     loading,
     error,
     login,
@@ -237,9 +323,14 @@ export const AuthProvider = ({ children }) => {
     resendVerificationEmail,
     syncLocalProgress,
     loadProgress,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && (user.emailVerified || user.providerData?.some(p => p.providerId === 'google.com')),
     isEmailVerified: user?.emailVerified || false,
-    isGuest: false
+    isGuest: false,
+    changeUserPassword,
+    changeDisplayName,
+    updateAvatar,
+    deleteUserAccount,
+    refreshUserData
   };
 
   return (

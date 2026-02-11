@@ -594,4 +594,41 @@ export const ShareIcon = (props) => (
   </Icon>
 );
 
+// Camera Icon
+export const CameraIcon = (props) => (
+  <Icon {...props}>
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+    <circle cx="12" cy="13" r="4" />
+  </Icon>
+);
+
+// Palette Icon
+export const PaletteIcon = (props) => (
+  <Icon {...props}>
+    <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" stroke="none" />
+    <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" stroke="none" />
+    <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" stroke="none" />
+    <circle cx="6.5" cy="12" r=".5" fill="currentColor" stroke="none" />
+    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.63 1.5-1.39 0-.37-.14-.72-.38-.99-.23-.26-.37-.6-.37-.96 0-.72.55-1.3 1.23-1.3H16c3.33 0 6-2.67 6-6 0-5.52-4.48-9.96-10-9.96z" />
+  </Icon>
+);
+
+// Bar Chart Icon
+export const BarChartIcon = (props) => (
+  <Icon {...props}>
+    <line x1="12" y1="20" x2="12" y2="10" />
+    <line x1="18" y1="20" x2="18" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="16" />
+  </Icon>
+);
+
+// Image Icon
+export const ImageIcon = (props) => (
+  <Icon {...props}>
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <circle cx="8.5" cy="8.5" r="1.5" />
+    <polyline points="21 15 16 10 5 21" />
+  </Icon>
+);
+
 export default Icon;

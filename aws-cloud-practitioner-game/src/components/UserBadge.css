@@ -36,6 +36,14 @@
   font-weight: 600;
   color: white;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .user-avatar.guest {
@@ -118,32 +126,33 @@
   padding: 16px;
 }
 
-.dropdown-avatar {
+.dropdown-header .user-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FF9900 0%, #FF6B00 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 16px;
-  font-weight: 600;
-  color: white;
-  flex-shrink: 0;
 }
 
 .dropdown-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   flex: 1;
 }
 
-.dropdown-email {
+.dropdown-name {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: rgba(255, 255, 255, 0.95);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-email {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -234,7 +243,7 @@
   .user-name {
     max-width: 120px;
   }
-  
+
   .user-badge-dropdown {
     min-width: 240px;
   }
