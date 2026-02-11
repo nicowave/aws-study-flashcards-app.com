@@ -1491,6 +1491,49 @@
   color: var(--status-error);
 }
 
+/* Settings link in header (avatar + name) */
+.settings-link-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.settings-link-header:hover {
+  color: var(--text-primary);
+  background: var(--surface-hover);
+}
+
+.settings-link-header:hover .user-avatar-small {
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
+.settings-icon-btn {
+  background: none;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.settings-icon-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+  background: var(--surface-hover);
+}
+
 /* Responsive Homepage Auth */
 @media (max-width: 900px) {
   .homepage-auth-container {
@@ -1768,6 +1811,68 @@
 
 .login-modal .auth-error-box {
   margin-bottom: 16px;
+}
+
+/* Google Sign-In Button in Modal */
+.login-modal .google-sign-in-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  margin-bottom: 0;
+}
+
+.login-modal .google-sign-in-btn:hover:not(:disabled) {
+  background: #f8fafc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.login-modal .google-sign-in-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-modal .google-sign-in-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.google-icon {
+  flex-shrink: 0;
+}
+
+/* Divider with "or" text */
+.modal-divider {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+  gap: 12px;
+}
+
+.modal-divider::before,
+.modal-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-default);
+}
+
+.modal-divider span {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-transform: lowercase;
 }
 
 /* Responsive Modal */

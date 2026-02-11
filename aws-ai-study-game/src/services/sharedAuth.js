@@ -477,11 +477,24 @@ export const tryAutoLoginFromCookie = async () => {
 };
 
 /**
+ * Generate a random username like "CloudLearner_7a3f"
+ * Used for Google sign-ups when user doesn't provide one
+ */
+const generateRandomUsername = () => {
+  const adjectives = ['Cloud', 'AWS', 'Nimbus', 'Cyber', 'Data', 'Sage', 'Tech', 'Nova', 'Flux', 'Arch'];
+  const nouns = ['Learner', 'Builder', 'Pioneer', 'Explorer', 'Wizard', 'Ninja', 'Coder', 'Ace', 'Pro', 'Hero'];
+  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+  const hex = Math.floor(Math.random() * 0xffff).toString(16).padStart(4, '0');
+  return `${adj}${noun}_${hex}`;
+};
+
+/**
  * Handle the Google user after sign-in (popup or redirect)
  * Creates Firestore doc if new user, sets cookie
  */
 const handleGoogleUser = async (user) => {
-  console.log('[Auth] Google sign-in successful for:', user.email);
+  console.log('[Auth] Google sign-in successful for:', user.email || user.uid);
 
   // Check if user document exists in Firestore, create if new
   let isNewUser = false;
@@ -490,9 +503,11 @@ const handleGoogleUser = async (user) => {
 
   if (!userDoc.exists()) {
     isNewUser = true;
+    // Generate a random username for Google sign-ups
+    const randomName = generateRandomUsername();
     await setDoc(userDocRef, {
       email: user.email,
-      displayName: user.displayName || user.email.split('@')[0],
+      displayName: randomName,
       createdAt: new Date().toISOString(),
       emailVerified: true,
       authProvider: 'google',
@@ -506,11 +521,15 @@ const handleGoogleUser = async (user) => {
       },
       certProgress: {}
     });
-    console.log('[Auth] Created Firestore user document for new Google user');
+    // Also update Firebase Auth profile with the random name
+    await updateProfile(user, { displayName: randomName });
+    // Reload user to pick up the new displayName in the auth object
+    await user.reload();
+    console.log('[Auth] Created Firestore user document for new Google user with name:', randomName);
   }
 
   // Get ID token and set cookie for cross-domain auth
-  const idToken = await user.getIdToken();
+  const idToken = await user.getIdToken(true);
   setAuthCookie(idToken);
   storeUserData(user);
 

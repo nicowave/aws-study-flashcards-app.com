@@ -12,7 +12,12 @@ import {
   syncProgress,
   tryAutoLoginFromCookie,
   signInWithGoogle,
-  checkGoogleRedirectResult
+  checkGoogleRedirectResult,
+  reauthenticateUser,
+  changePassword,
+  updateUserAvatar,
+  updateDisplayName,
+  deleteAccount
 } from '../services/sharedAuth';
 
 const AuthContext = createContext(null);
@@ -222,8 +227,77 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
       console.log('[AuthContext] Cannot sync - no authenticated user');
       return { success: false, error: 'Not authenticated' };
     }
-    
+
     return await syncProgress(user.uid, localStats, certId);
+  };
+
+  // Re-authenticate user (for sensitive operations)
+  const reauthenticate = async (password) => {
+    return await reauthenticateUser(password);
+  };
+
+  // Change password
+  const changeUserPassword = async (currentPassword, newPassword) => {
+    console.log('[AuthContext] Changing password...');
+    const result = await changePassword(currentPassword, newPassword);
+    if (result.success) {
+      console.log('[AuthContext] Password changed successfully');
+    } else {
+      console.log('[AuthContext] Password change failed:', result.error);
+    }
+    return result;
+  };
+
+  // Update avatar
+  const updateAvatar = async (avatarData) => {
+    if (!user) {
+      return { success: false, error: 'Not authenticated' };
+    }
+    console.log('[AuthContext] Updating avatar...');
+    const result = await updateUserAvatar(user.uid, avatarData);
+    if (result.success) {
+      // Update local userData with new avatar
+      setUserData(prev => prev ? { ...prev, avatar: avatarData } : prev);
+      console.log('[AuthContext] Avatar updated successfully');
+    }
+    return result;
+  };
+
+  // Delete account
+  const deleteUserAccount = async (password = null) => {
+    console.log('[AuthContext] Deleting account...');
+    const result = await deleteAccount(password);
+    if (result.success) {
+      setUser(null);
+      setUserData(null);
+      console.log('[AuthContext] Account deleted successfully');
+    }
+    return result;
+  };
+
+  // Update display name
+  const changeDisplayName = async (newName) => {
+    if (!user) {
+      return { success: false, error: 'Not authenticated' };
+    }
+    console.log('[AuthContext] Updating display name...');
+    const result = await updateDisplayName(user.uid, newName);
+    if (result.success) {
+      // Update local userData with new name
+      setUserData(prev => prev ? { ...prev, displayName: newName.trim() } : prev);
+      console.log('[AuthContext] Display name updated successfully');
+    }
+    return result;
+  };
+
+  // Refresh user data from Firestore
+  const refreshUserData = async () => {
+    if (!user) return;
+    const result = await getUserData(user.uid);
+    if (result.success) {
+      setUserData(result.data);
+    }
+    return result;
   };
 
   const value = {
@@ -233,7 +307,7 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     authChecked,
     error,
     needsVerification,
-    isAuthenticated: !!user && (user.emailVerified || user.isAnonymous || isGuestUser()),
+    isAuthenticated: !!user && (user.emailVerified || user.isAnonymous || isGuestUser() || user.providerData?.some(p => p.providerId === 'google.com')),
     isGuest: isGuestUser(),
     register,
     login,
@@ -242,7 +316,13 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     loginAsGuest,
     resendVerification,
     clearError,
-    syncUserProgress
+    syncUserProgress,
+    reauthenticate,
+    changeUserPassword,
+    changeDisplayName,
+    updateAvatar,
+    deleteUserAccount,
+    refreshUserData
   };
 
   return (

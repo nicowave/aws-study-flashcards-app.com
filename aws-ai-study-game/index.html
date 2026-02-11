@@ -4,8 +4,10 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GQHQG5PP10"></script>
     <script>
+      (function(){if(localStorage.getItem('awsStudy_gaOptOut')==='true'){window['ga-disable-G-GQHQG5PP10']=true;}})();
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      gtag('consent','default',{analytics_storage:localStorage.getItem('awsStudy_gaOptOut')==='true'?'denied':'granted'});
       gtag('js', new Date());
       gtag('config', 'G-GQHQG5PP10');
     </script>

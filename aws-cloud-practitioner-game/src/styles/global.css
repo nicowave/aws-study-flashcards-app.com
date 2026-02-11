@@ -1044,6 +1044,86 @@ button {
   transform: translateY(-2px);
 }
 
+/* Share Section */
+.share-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--md-border);
+  text-align: center;
+}
+
+.share-label {
+  font-size: 14px;
+  color: var(--md-on-surface-variant);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.share-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--md-radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all var(--md-transition);
+  border: 1px solid var(--md-border);
+  color: var(--md-on-surface);
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.share-btn.linkedin {
+  background: #0a66c2;
+  color: #fff;
+  border-color: #0a66c2;
+}
+
+.share-btn.linkedin:hover {
+  background: #004182;
+}
+
+.share-btn.x-twitter {
+  background: #000000;
+  color: #fff;
+  border-color: #333;
+}
+
+.share-btn.x-twitter:hover {
+  background: #222;
+}
+
+.share-btn.facebook {
+  background: #1877f2;
+  color: #fff;
+  border-color: #1877f2;
+}
+
+.share-btn.facebook:hover {
+  background: #0d5bbf;
+}
+
+/* Mobile: stack share buttons vertically */
+@media (max-width: 480px) {
+  .share-buttons {
+    flex-direction: column;
+  }
+}
+
 /* ================================
    STATS SCREEN STYLES
    ================================ */

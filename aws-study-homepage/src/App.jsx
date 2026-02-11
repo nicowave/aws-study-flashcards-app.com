@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { certifications, categories } from './data/certifications';
+import SettingsPage from './components/SettingsPage';
+import { applyAnalyticsPreference } from './services/analytics';
 import {
   CloudIcon,
   RobotIcon,
@@ -31,6 +33,9 @@ import {
 } from './components/Icons';
 import './styles/global.css';
 import './styles/homepage.css';
+
+// Apply analytics preference before components render
+applyAnalyticsPreference();
 
 // Icon mapping for certifications
 const certIconMap = {
@@ -66,10 +71,28 @@ const EyeOffIcon = ({ size = 24 }) => (
 );
 
 // Header Component - Now handles both logged in and logged out states
-const Header = ({ onShowLogin }) => {
-  const { user, isAuthenticated, logout } = useAuth();
+const Header = ({ onShowLogin, onNavigateSettings }) => {
+  const { user, userData, isAuthenticated, logout } = useAuth();
   const displayName = user?.displayName || user?.email?.split('@')[0] || 'User';
-  const initials = displayName ? displayName.slice(0, 2).toUpperCase() : 'U';
+
+  // Avatar rendering
+  const getAvatarContent = () => {
+    const avatar = userData?.avatar;
+    if (avatar) {
+      if ((avatar.type === 'emoji') && avatar.value) {
+        return { text: avatar.value, bgColor: avatar.bgColor || '#58a6ff', isImg: false };
+      }
+      if ((avatar.type === 'pattern' || avatar.type === 'image') && avatar.value) {
+        return { imgSrc: avatar.value, bgColor: avatar.bgColor || '#58a6ff', isImg: true };
+      }
+      if (avatar.bgColor) {
+        return { text: (displayName[0] || 'U').toUpperCase(), bgColor: avatar.bgColor, isImg: false };
+      }
+    }
+    return { text: displayName ? displayName.slice(0, 2).toUpperCase() : 'U', bgColor: null, isImg: false };
+  };
+
+  const avatarInfo = getAvatarContent();
 
   const handleLogout = async () => {
     await logout();
@@ -97,11 +120,34 @@ const Header = ({ onShowLogin }) => {
             Official AWS Certs <ExternalLinkIcon size={14} style={{ marginLeft: 4, verticalAlign: 'middle' }} />
           </a>
           <div className="nav-divider" />
-          
+
           {isAuthenticated ? (
             <div className="user-menu-header">
-              <div className="user-avatar-small">{initials}</div>
-              <span className="user-name-header">{displayName}</span>
+              <button
+                className="settings-link-header"
+                onClick={onNavigateSettings}
+                title="Account Settings"
+              >
+                {avatarInfo.isImg ? (
+                  <div
+                    className="user-avatar-small"
+                    style={avatarInfo.bgColor ? { background: avatarInfo.bgColor } : {}}
+                  >
+                    <img src={avatarInfo.imgSrc} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                  </div>
+                ) : (
+                  <div
+                    className="user-avatar-small"
+                    style={avatarInfo.bgColor ? { background: avatarInfo.bgColor } : {}}
+                  >
+                    {avatarInfo.text}
+                  </div>
+                )}
+                <span className="user-name-header">{displayName}</span>
+              </button>
+              <button className="settings-icon-btn" onClick={onNavigateSettings} title="Settings">
+                <GearIcon size={16} />
+              </button>
               <button className="logout-btn-header" onClick={handleLogout}>Sign Out</button>
             </div>
           ) : (
@@ -426,6 +472,16 @@ const LoadingScreen = () => (
   </div>
 );
 
+// Google SVG icon component
+const GoogleIcon = () => (
+  <svg className="google-icon" viewBox="0 0 24 24" width="20" height="20">
+    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+  </svg>
+);
+
 // Login Modal (Optional sign-in from hub)
 const LoginModal = ({ onClose }) => {
   const [mode, setMode] = useState('login');
@@ -440,7 +496,7 @@ const LoginModal = ({ onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localError, setLocalError] = useState(null);
 
-  const { login, register, error, clearError } = useAuth();
+  const { login, register, googleSignIn, error, clearError } = useAuth();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -511,11 +567,22 @@ const LoginModal = ({ onClose }) => {
 
   const displayError = localError || error;
 
+  const handleGoogleSignIn = async () => {
+    setLocalError(null);
+    if (error) clearError();
+    setIsSubmitting(true);
+    const result = await googleSignIn();
+    setIsSubmitting(false);
+    if (result?.success) {
+      onClose();
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="login-modal" onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>×</button>
-        
+
         <div className="modal-header">
           <BookIcon size={32} />
           <h2>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
@@ -525,6 +592,21 @@ const LoginModal = ({ onClose }) => {
         {displayError && (
           <div className="auth-error-box">{displayError}</div>
         )}
+
+        {/* Google Sign-In */}
+        <button
+          type="button"
+          className="google-sign-in-btn"
+          onClick={handleGoogleSignIn}
+          disabled={isSubmitting}
+        >
+          <GoogleIcon />
+          <span>{mode === 'login' ? 'Sign in with Google' : 'Sign up with Google'}</span>
+        </button>
+
+        <div className="modal-divider">
+          <span>or</span>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div className="form-field">
@@ -631,18 +713,51 @@ const LoginModal = ({ onClose }) => {
 // Main Homepage Content (no auth required)
 function HomepageContent() {
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState('home');
+  const { isAuthenticated } = useAuth();
+
+  // Auto-redirect to home if user logs out while on settings
+  useEffect(() => {
+    if (!isAuthenticated && currentPage === 'settings') {
+      setCurrentPage('home');
+    }
+  }, [isAuthenticated, currentPage]);
+
+  const handleNavigateSettings = () => {
+    if (isAuthenticated) {
+      setCurrentPage('settings');
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const handleBackToHome = () => {
+    setCurrentPage('home');
+    window.scrollTo(0, 0);
+  };
 
   return (
     <div className="app">
-      <Header onShowLogin={() => setShowLoginModal(true)} />
-      <main>
-        <Hero />
-        <Certifications />
-        <About />
-        <Resources />
-      </main>
-      <Footer />
-      
+      <Header
+        onShowLogin={() => setShowLoginModal(true)}
+        onNavigateSettings={handleNavigateSettings}
+      />
+
+      {currentPage === 'settings' && isAuthenticated ? (
+        <main>
+          <SettingsPage onBack={handleBackToHome} />
+        </main>
+      ) : (
+        <>
+          <main>
+            <Hero />
+            <Certifications />
+            <About />
+            <Resources />
+          </main>
+          <Footer />
+        </>
+      )}
+
       {showLoginModal && (
         <LoginModal onClose={() => setShowLoginModal(false)} />
       )}
