@@ -10,7 +10,8 @@ import {
   getUserData,
   getStoredUserData,
   syncProgress,
-  tryAutoLoginFromCookie
+  tryAutoLoginFromCookie,
+  signInWithGoogle
 } from '../services/sharedAuth';
 
 const AuthContext = createContext(null);
@@ -154,6 +155,27 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     return result;
   };
 
+  // Google Sign-In
+  const googleSignIn = async () => {
+    setLoading(true);
+    setError(null);
+    setNeedsVerification(false);
+
+    console.log('[AuthContext] Attempting Google sign-in...');
+
+    const result = await signInWithGoogle();
+
+    if (result.success) {
+      console.log('[AuthContext] Google sign-in successful', result.isNewUser ? '(new user)' : '');
+    } else {
+      setError(result.error);
+      console.log('[AuthContext] Google sign-in failed:', result.error);
+    }
+
+    setLoading(false);
+    return result;
+  };
+
   // Guest login
   const loginAsGuest = async () => {
     setLoading(true);
@@ -208,6 +230,7 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     register,
     login,
     logout,
+    googleSignIn,
     loginAsGuest,
     resendVerification,
     clearError,

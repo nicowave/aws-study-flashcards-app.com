@@ -7,7 +7,8 @@ import {
   logoutUser,
   onAuthChange,
   resendVerificationEmail as resendVerification,
-  tryAutoLoginFromCookie
+  tryAutoLoginFromCookie,
+  signInWithGoogle
 } from '../services/sharedAuth';
 
 const AuthContext = createContext(null);
@@ -152,6 +153,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Google Sign-In
+  const googleSignIn = async () => {
+    setError(null);
+    setLoading(true);
+
+    console.log('[AuthContext] Attempting Google sign-in...');
+
+    try {
+      const result = await signInWithGoogle();
+
+      if (result.success) {
+        console.log('[AuthContext] Google sign-in successful', result.isNewUser ? '(new user)' : '');
+      } else {
+        setError(result.error);
+        console.log('[AuthContext] Google sign-in failed:', result.error);
+      }
+
+      setLoading(false);
+      return result;
+    } catch (err) {
+      const errorMessage = err.message || 'Google sign-in failed';
+      setError(errorMessage);
+      setLoading(false);
+      throw err;
+    }
+  };
+
   // Clear error
   const clearError = () => setError(null);
 
@@ -196,6 +224,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    googleSignIn,
     clearError,
     resendVerificationEmail,
     syncLocalProgress,

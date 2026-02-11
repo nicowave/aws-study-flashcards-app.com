@@ -8,7 +8,9 @@ import {
   setPersistence,
   browserLocalPersistence,
   signInAnonymously,
-  updateProfile
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 import {
   doc,
@@ -469,6 +471,69 @@ export const tryAutoLoginFromCookie = async () => {
     // Delete stale cookie so we don't retry endlessly
     deleteAuthCookie();
     return null;
+  }
+};
+
+/**
+ * Sign in with Google using Firebase popup
+ * Works for both new and existing users
+ */
+export const signInWithGoogle = async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    const userCredential = await signInWithPopup(auth, provider);
+    const user = userCredential.user;
+
+    console.log('[Auth] Google sign-in successful for:', user.email);
+
+    // Check if user document exists in Firestore, create if new
+    let isNewUser = false;
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      isNewUser = true;
+      await setDoc(userDocRef, {
+        email: user.email,
+        displayName: user.displayName || user.email.split('@')[0],
+        createdAt: new Date().toISOString(),
+        emailVerified: true,
+        authProvider: 'google',
+        stats: {
+          totalXp: 0,
+          level: 1,
+          totalAnswered: 0,
+          totalCorrect: 0,
+          maxStreak: 0,
+          sessionsCompleted: 0
+        },
+        certProgress: {}
+      });
+      console.log('[Auth] Created Firestore user document for new Google user');
+    }
+
+    // Get ID token and set cookie for cross-domain auth
+    const idToken = await user.getIdToken();
+    setAuthCookie(idToken);
+    storeUserData(user);
+
+    return { success: true, user, isNewUser };
+  } catch (error) {
+    console.error('[Auth] Google sign-in error:', error.code, error.message);
+
+    let errorMessage = 'Google sign-in failed';
+
+    if (error.code === 'auth/popup-closed-by-user') {
+      errorMessage = 'Sign-in cancelled';
+    } else if (error.code === 'auth/popup-blocked') {
+      errorMessage = 'Pop-up blocked by browser. Please allow pop-ups and try again.';
+    } else if (error.code === 'auth/account-exists-with-different-credential') {
+      errorMessage = 'An account already exists with this email using a different sign-in method.';
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      errorMessage = 'Sign-in cancelled';
+    }
+
+    return { success: false, error: errorMessage };
   }
 };
 

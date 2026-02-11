@@ -234,6 +234,50 @@
   cursor: not-allowed;
 }
 
+/* Google Sign-In Button */
+.google-sign-in-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Meslo LG M', 'Fira Code', monospace;
+}
+
+.google-sign-in-btn:hover:not(:disabled) {
+  background: #f8fafc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.google-sign-in-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.google-sign-in-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.google-icon {
+  flex-shrink: 0;
+}
+
+.auth-divider {
+  margin-top: 20px;
+  margin-bottom: 4px;
+}
+
 /* Guest Option */
 .guest-option {
   margin-top: 24px;
