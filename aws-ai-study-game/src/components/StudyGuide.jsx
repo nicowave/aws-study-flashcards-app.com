@@ -1,85 +1,236 @@
-import React, { useState, useEffect } from 'react';
-import { domains } from '../data';
-import { ArrowLeftIcon, ArrowRightIcon, RefreshIcon, BookOpenIcon } from './Icons';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { studyGuides } from '../data/studyGuide';
+import { ArrowLeftIcon, ChevronDownIcon } from './Icons';
+import './StudyGuide.css';
 
-const StudyGuide = ({ onBack }) => {
-  const [selectedDomain, setSelectedDomain] = useState(null);
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [cards, setCards] = useState([]);
+// Content Block Renderer
+const ContentBlock = ({ block, domainColor }) => {
+  switch (block.type) {
+    case 'paragraph':
+      return <p className="study-block-paragraph">{block.text}</p>;
 
-  // Load cards when domain is selected
+    case 'keyTerm':
+      return (
+        <div className="study-block-keyterm" style={{ borderLeftColor: domainColor }}>
+          <div className="study-keyterm-label" style={{ color: domainColor }}>{block.term}</div>
+          <div className="study-keyterm-definition">{block.definition}</div>
+        </div>
+      );
+
+    case 'bulletList':
+      return (
+        <div className="study-block-list">
+          {block.title && <div className="list-title">{block.title}</div>}
+          <ul>
+            {block.items.map((item, i) => <li key={i}>{item}</li>)}
+          </ul>
+        </div>
+      );
+
+    case 'numberedList':
+      return (
+        <div className="study-block-list">
+          {block.title && <div className="list-title">{block.title}</div>}
+          <ol>
+            {block.items.map((item, i) => <li key={i}>{item}</li>)}
+          </ol>
+        </div>
+      );
+
+    case 'awsService':
+      return (
+        <div className="study-block-service">
+          <span className="study-service-icon">☁️</span>
+          <div>
+            <div className="study-service-name">{block.name}</div>
+            <div className="study-service-description">{block.description}</div>
+          </div>
+        </div>
+      );
+
+    case 'examTip':
+      return (
+        <div className="study-block-examtip">
+          <span className="study-examtip-icon">💡</span>
+          <div className="study-examtip-text">{block.text}</div>
+        </div>
+      );
+
+    case 'comparison':
+      return (
+        <div className="study-block-comparison">
+          {block.title && <div className="comparison-title">{block.title}</div>}
+          <div className="study-comparison-grid">
+            {block.items.map((item, i) => (
+              <div key={i} className="study-comparison-item">
+                <div className="study-comparison-label" style={{ color: domainColor }}>{item.label}</div>
+                <div className="study-comparison-desc">{item.description}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+    case 'table':
+      return (
+        <div className="study-block-table">
+          <table>
+            <thead>
+              <tr>
+                {block.headers.map((h, i) => <th key={i}>{h}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {block.rows.map((row, i) => (
+                <tr key={i}>
+                  {row.map((cell, j) => <td key={j}>{cell}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+
+    default:
+      return null;
+  }
+};
+
+// Article Reader View
+const ArticleReader = ({ guide, onBack }) => {
+  const [activeSection, setActiveSection] = useState(guide.sections[0]?.id || '');
+  const [tocOpen, setTocOpen] = useState(false);
+  const sectionRefs = useRef({});
+  const contentRef = useRef(null);
+
+  // IntersectionObserver for active TOC tracking
   useEffect(() => {
-    if (selectedDomain) {
-      // Get domain and convert questions to flashcard format
-      const domain = domains.find(d => d.id === selectedDomain);
-      
-      if (domain?.questions && domain.questions.length > 0) {
-        // Convert questions to flashcard format
-        const questionCards = domain.questions.map(q => ({
-          front: q.question,
-          back: q.options[q.correct] + (q.explanation ? `\n\n${q.explanation}` : '')
-        }));
-        setCards(questionCards);
-      } else {
-        setCards([]);
-      }
-      
-      setCurrentCardIndex(0);
-      setIsFlipped(false);
+    const observers = [];
+    const sectionElements = guide.sections.map(s => sectionRefs.current[s.id]).filter(Boolean);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+            break;
+          }
+        }
+      },
+      { rootMargin: '-20px 0px -70% 0px', threshold: 0 }
+    );
+
+    sectionElements.forEach(el => {
+      observer.observe(el);
+      observers.push(observer);
+    });
+
+    return () => observer.disconnect();
+  }, [guide.sections]);
+
+  const scrollToSection = useCallback((sectionId) => {
+    const el = sectionRefs.current[sectionId];
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      setTocOpen(false);
     }
-  }, [selectedDomain]);
+  }, []);
 
-  const handleFlip = () => {
-    setIsFlipped(!isFlipped);
-  };
+  return (
+    <div>
+      {/* Header */}
+      <div className="study-article-header">
+        <button className="study-back-btn" onClick={onBack}>
+          <ArrowLeftIcon size={18} />
+          <span>Topics</span>
+        </button>
+        <div className="study-article-title">
+          <span className="domain-icon">{guide.icon}</span>
+          <h2>{guide.name}</h2>
+          <span
+            className="domain-weight-badge"
+            style={{ backgroundColor: guide.color }}
+          >
+            {guide.weight}
+          </span>
+        </div>
+      </div>
 
-  const handleNext = () => {
-    if (currentCardIndex < cards.length - 1) {
-      setCurrentCardIndex(currentCardIndex + 1);
-      setIsFlipped(false);
-    }
-  };
+      {/* Mobile TOC Toggle */}
+      <button
+        className="study-toc-toggle"
+        onClick={() => setTocOpen(!tocOpen)}
+      >
+        📑 Table of Contents
+        <span className={`study-toc-toggle-icon ${tocOpen ? 'open' : ''}`}>
+          <ChevronDownIcon size={16} />
+        </span>
+      </button>
 
-  const handlePrevious = () => {
-    if (currentCardIndex > 0) {
-      setCurrentCardIndex(currentCardIndex - 1);
-      setIsFlipped(false);
-    }
-  };
+      <div className="study-article" style={{ '--domain-color': guide.color }}>
+        {/* TOC Sidebar */}
+        <nav className={`study-toc ${tocOpen ? 'mobile-open' : ''}`}>
+          <div className="study-toc-title">Contents</div>
+          <div className="study-toc-list">
+            {guide.sections.map(section => (
+              <button
+                key={section.id}
+                className={`study-toc-item ${activeSection === section.id ? 'active' : ''}`}
+                onClick={() => scrollToSection(section.id)}
+              >
+                {section.title}
+              </button>
+            ))}
+          </div>
+        </nav>
 
-  const handleShuffle = () => {
-    const shuffled = [...cards].sort(() => Math.random() - 0.5);
-    setCards(shuffled);
-    setCurrentCardIndex(0);
-    setIsFlipped(false);
-  };
+        {/* Content */}
+        <div className="study-content" ref={contentRef}>
+          {guide.sections.map(section => (
+            <section
+              key={section.id}
+              id={section.id}
+              className="study-section"
+              ref={el => { sectionRefs.current[section.id] = el; }}
+            >
+              <h3 className="study-section-heading">{section.title}</h3>
+              {section.content.map((block, i) => (
+                <ContentBlock key={i} block={block} domainColor={guide.color} />
+              ))}
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main Study Guide Component
+const StudyGuide = ({ onBack }) => {
+  const [selectedGuide, setSelectedGuide] = useState(null);
 
   // Domain selection view
-  if (!selectedDomain) {
+  if (!selectedGuide) {
     return (
       <div className="study-guide">
         <div className="study-header">
-          <button className="back-btn" onClick={onBack}>
-            <ArrowLeftIcon size={20} />
-            <span>Back</span>
-          </button>
-          <h2>Study Guide</h2>
-          <p className="study-subtitle">Select a topic to review flashcards</p>
+          <div>
+            <h2>Deep Dive Study Guides</h2>
+            <p className="study-subtitle">Select a domain for an in-depth study guide</p>
+          </div>
         </div>
 
         <div className="study-domain-grid">
-          {domains.map((domain) => (
+          {studyGuides.map(guide => (
             <button
-              key={domain.id}
+              key={guide.id}
               className="study-domain-card"
-              onClick={() => setSelectedDomain(domain.id)}
+              onClick={() => setSelectedGuide(guide)}
             >
-              <span className="domain-icon">{domain.icon || '📚'}</span>
-              <span className="domain-name">{domain.name}</span>
-              <span className="card-count">
-                {domain.questions?.length || 0} cards
-              </span>
+              <span className="domain-icon">{guide.icon}</span>
+              <span className="domain-name">{guide.name}</span>
+              <span className="domain-weight">{guide.weight}</span>
+              <span className="domain-description">{guide.description}</span>
             </button>
           ))}
         </div>
@@ -87,91 +238,12 @@ const StudyGuide = ({ onBack }) => {
     );
   }
 
-  // Flashcard view
-  const currentCard = cards[currentCardIndex];
-  const domain = domains.find(d => d.id === selectedDomain);
-
+  // Article reader view
   return (
-    <div className="study-guide">
-      <div className="study-header">
-        <button className="back-btn" onClick={() => setSelectedDomain(null)}>
-          <ArrowLeftIcon size={20} />
-          <span>Topics</span>
-        </button>
-        <div className="study-title">
-          <span className="domain-icon">{domain?.icon || '📚'}</span>
-          <span>{domain?.name || 'Study'}</span>
-        </div>
-        <span className="card-counter">
-          {currentCardIndex + 1} / {cards.length}
-        </span>
-      </div>
-
-      {cards.length > 0 ? (
-        <>
-          {/* Flashcard */}
-          <div 
-            className={`flashcard ${isFlipped ? 'flipped' : ''}`}
-            onClick={handleFlip}
-          >
-            <div className="flashcard-inner">
-              <div className="flashcard-front">
-                <BookOpenIcon size={24} className="card-icon" />
-                <p className="card-content">{currentCard?.front}</p>
-                <span className="flip-hint">Tap to reveal answer</span>
-              </div>
-              <div className="flashcard-back">
-                <p className="card-content">{currentCard?.back}</p>
-                <span className="flip-hint">Tap to see question</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <div className="flashcard-nav">
-            <button 
-              className="nav-btn"
-              onClick={handlePrevious}
-              disabled={currentCardIndex === 0}
-            >
-              <ArrowLeftIcon size={20} />
-              <span>Previous</span>
-            </button>
-
-            <button className="shuffle-btn" onClick={handleShuffle}>
-              <RefreshIcon size={18} />
-              <span>Shuffle</span>
-            </button>
-
-            <button 
-              className="nav-btn"
-              onClick={handleNext}
-              disabled={currentCardIndex === cards.length - 1}
-            >
-              <span>Next</span>
-              <ArrowRightIcon size={20} />
-            </button>
-          </div>
-
-          {/* Progress bar */}
-          <div className="study-progress">
-            <div className="progress-bar">
-              <div 
-                className="progress-fill"
-                style={{ width: `${((currentCardIndex + 1) / cards.length) * 100}%` }}
-              />
-            </div>
-          </div>
-        </>
-      ) : (
-        <div className="no-cards">
-          <p>No flashcards available for this topic.</p>
-          <button className="back-btn" onClick={() => setSelectedDomain(null)}>
-            Choose another topic
-          </button>
-        </div>
-      )}
-    </div>
+    <ArticleReader
+      guide={selectedGuide}
+      onBack={() => setSelectedGuide(null)}
+    />
   );
 };
 
