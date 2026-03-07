@@ -10,6 +10,7 @@ import {
   signInAnonymously,
   updateProfile,
   GoogleAuthProvider,
+  OAuthProvider,
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
@@ -23,7 +24,9 @@ import {
   setDoc,
   getDoc,
   updateDoc,
-  deleteDoc
+  deleteDoc,
+  collection,
+  getDocs
 } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { auth, db, functions } from '../config/firebase.config';
@@ -360,13 +363,34 @@ export const getUserData = async (uid) => {
   try {
     const docRef = doc(db, 'users', uid);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
       return { success: true, data: docSnap.data() };
     } else {
       return { success: false, error: 'User not found' };
     }
   } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Get all game progress from the /users/{uid}/progress subcollection.
+ * Each document in the subcollection is keyed by certId (e.g. 'ai-practitioner')
+ * and contains: totalAnswered, totalCorrect, maxStreak, xp, level, totalSessions, etc.
+ * Returns a map of { certId: progressData }
+ */
+export const getUserProgress = async (uid) => {
+  try {
+    const progressRef = collection(db, 'users', uid, 'progress');
+    const snapshot = await getDocs(progressRef);
+    const progress = {};
+    snapshot.forEach((doc) => {
+      progress[doc.id] = doc.data();
+    });
+    return { success: true, data: progress };
+  } catch (error) {
+    console.error('[Auth] Failed to fetch user progress:', error.message);
     return { success: false, error: error.message };
   }
 };
@@ -542,19 +566,66 @@ const handleGoogleUser = async (user) => {
 };
 
 /**
- * Check for pending Google redirect result on page load
+ * Handle the Apple user after sign-in (popup or redirect)
+ * Creates Firestore doc if new user, sets cookie.
+ * NOTE: Apple only sends the user's name on the FIRST sign-in.
+ */
+const handleAppleUser = async (user) => {
+  console.log('[Auth] Apple sign-in successful for:', user.email || user.uid);
+
+  let isNewUser = false;
+  const userDocRef = doc(db, 'users', user.uid);
+  const userDoc = await getDoc(userDocRef);
+
+  if (!userDoc.exists()) {
+    isNewUser = true;
+    const randomName = generateRandomUsername();
+    await setDoc(userDocRef, {
+      email: user.email,
+      displayName: randomName,
+      createdAt: new Date().toISOString(),
+      emailVerified: true,
+      authProvider: 'apple',
+      stats: {
+        totalXp: 0,
+        level: 1,
+        totalAnswered: 0,
+        totalCorrect: 0,
+        maxStreak: 0,
+        sessionsCompleted: 0
+      },
+      certProgress: {}
+    });
+    await updateProfile(user, { displayName: randomName });
+    await user.reload();
+    console.log('[Auth] Created Firestore user document for new Apple user with name:', randomName);
+  }
+
+  const idToken = await user.getIdToken(true);
+  setAuthCookie(idToken);
+  storeUserData(user);
+
+  return { success: true, user, isNewUser };
+};
+
+/**
+ * Check for pending OAuth redirect result on page load (Google or Apple)
  * Must be called once when the app initializes
  */
 export const checkGoogleRedirectResult = async () => {
   try {
     const result = await getRedirectResult(auth);
     if (result && result.user) {
-      console.log('[Auth] Google redirect result found');
+      const providerId = result.providerId;
+      console.log('[Auth] OAuth redirect result found for provider:', providerId);
+      if (providerId === 'apple.com') {
+        return await handleAppleUser(result.user);
+      }
       return await handleGoogleUser(result.user);
     }
     return null;
   } catch (error) {
-    console.error('[Auth] Google redirect result error:', error.code, error.message);
+    console.error('[Auth] OAuth redirect result error:', error.code, error.message);
     return null;
   }
 };
@@ -593,6 +664,49 @@ export const signInWithGoogle = async () => {
 
     // For user-initiated cancellations, just return the message
     let errorMessage = 'Google sign-in failed';
+
+    if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+      errorMessage = 'Sign-in cancelled';
+    } else if (error.code === 'auth/account-exists-with-different-credential') {
+      errorMessage = 'An account already exists with this email using a different sign-in method.';
+    }
+
+    return { success: false, error: errorMessage };
+  }
+};
+
+/**
+ * Sign in with Apple — tries popup first, falls back to redirect
+ * Works for both new and existing users
+ */
+export const signInWithApple = async () => {
+  const provider = new OAuthProvider('apple.com');
+  provider.addScope('email');
+  provider.addScope('name');
+
+  try {
+    const userCredential = await signInWithPopup(auth, provider);
+    return await handleAppleUser(userCredential.user);
+  } catch (error) {
+    console.warn('[Auth] Apple popup failed:', error.code, error.message);
+
+    if (
+      error.code === 'auth/popup-blocked' ||
+      error.code === 'auth/unauthorized-domain' ||
+      error.code === 'auth/operation-not-supported-in-this-environment' ||
+      error.code === 'auth/internal-error'
+    ) {
+      console.log('[Auth] Falling back to redirect flow...');
+      try {
+        await signInWithRedirect(auth, provider);
+        return { success: false, error: 'Redirecting to Apple...' };
+      } catch (redirectError) {
+        console.error('[Auth] Apple redirect also failed:', redirectError.code, redirectError.message);
+        return { success: false, error: 'Apple sign-in failed. Please try again.' };
+      }
+    }
+
+    let errorMessage = 'Apple sign-in failed';
 
     if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
       errorMessage = 'Sign-in cancelled';
@@ -749,6 +863,7 @@ export const deleteAccount = async (password = null) => {
 
     // Determine auth provider
     const isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
+    const isAppleUser = user.providerData.some(p => p.providerId === 'apple.com');
 
     // Re-authenticate based on provider
     if (isGoogleUser) {
@@ -760,6 +875,16 @@ export const deleteAccount = async (password = null) => {
           return { success: false, error: 'Account deletion cancelled' };
         }
         return { success: false, error: 'Google re-authentication failed. Please try again.' };
+      }
+    } else if (isAppleUser) {
+      const provider = new OAuthProvider('apple.com');
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (popupError) {
+        if (popupError.code === 'auth/popup-closed-by-user' || popupError.code === 'auth/cancelled-popup-request') {
+          return { success: false, error: 'Account deletion cancelled' };
+        }
+        return { success: false, error: 'Apple re-authentication failed. Please try again.' };
       }
     } else {
       if (!password) {

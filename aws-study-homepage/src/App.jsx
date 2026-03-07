@@ -162,12 +162,128 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
   );
 };
 
+// Badge images for hero background banner
+const badgeImages = [
+  'cloud-practitioner', 'ai-practitioner', 'solutions-architect-associate',
+  'developer-associate', 'sysops-administrator', 'data-engineer-associate',
+  'ml-engineer-associate', 'solutions-architect-professional', 'devops-engineer-professional',
+  'security-specialty', 'ml-specialty', 'database-specialty',
+  'advanced-networking-specialty', 'sap-on-aws-specialty'
+];
+
+const BadgeBanner = () => (
+  <div className="badge-banner" aria-hidden="true">
+    <div className="badge-track">
+      {[...badgeImages, ...badgeImages].map((badge, i) => (
+        <img
+          key={i}
+          src={`/badges/${badge}.png`}
+          alt=""
+          className="badge-img"
+          loading="lazy"
+        />
+      ))}
+    </div>
+  </div>
+);
+
+// User Stats Panel (shown inside hero-welcome for signed-in users)
+// Reads from userData.progress — a map of certId -> game stats from the
+// Firestore subcollection /users/{uid}/progress/{certId}
+const UserStatsPanel = ({ userData }) => {
+  // progress is a map like { 'ai-practitioner': { xp, level, totalAnswered, ... }, ... }
+  const progress = userData?.progress || {};
+
+  // If userData is missing entirely (guest or not loaded), don't show
+  if (!userData || userData.isGuest) return null;
+
+  // Get list of certs the user has actually played
+  const certEntries = Object.entries(progress);
+  if (certEntries.length === 0) return null;
+
+  // Aggregate stats across all certs
+  let totalXp = 0, totalAnswered = 0, totalCorrect = 0, maxStreak = 0, totalSessions = 0;
+  for (const [, p] of certEntries) {
+    totalXp += (p.xp || 0);
+    totalAnswered += (p.totalAnswered || 0);
+    totalCorrect += (p.totalCorrect || 0);
+    maxStreak = Math.max(maxStreak, p.maxStreak || 0);
+    totalSessions += (p.totalSessions || 0);
+  }
+
+  const XP_PER_LEVEL = 100;
+  const level = Math.floor(totalXp / XP_PER_LEVEL) + 1;
+  const accuracy = totalAnswered > 0
+    ? Math.round((totalCorrect / totalAnswered) * 100)
+    : 0;
+
+  // Cert-specific cards
+  const certMeta = [
+    { id: 'ai-practitioner', name: 'AI Practitioner', icon: '\u{1F916}', color: '#58a6ff', url: 'https://ai.aws-study-flashcards-app.com' },
+    { id: 'cloud-practitioner', name: 'Cloud Practitioner', icon: '\u2601\uFE0F', color: '#3fb950', url: 'https://cloud.aws-study-flashcards-app.com' },
+  ];
+  const activeCerts = certMeta.filter(cert => progress[cert.id]);
+
+  return (
+    <div className="user-stats-panel">
+      <div className="user-stats-row">
+        <div className="user-stat-item">
+          <span className="user-stat-value mono">{level}</span>
+          <span className="user-stat-label">Level</span>
+        </div>
+        <div className="user-stat-divider" />
+        <div className="user-stat-item">
+          <span className="user-stat-value mono">{totalXp.toLocaleString()}</span>
+          <span className="user-stat-label">Total XP</span>
+        </div>
+        <div className="user-stat-divider" />
+        <div className="user-stat-item">
+          <span className="user-stat-value mono">{accuracy}%</span>
+          <span className="user-stat-label">Accuracy</span>
+        </div>
+        <div className="user-stat-divider" />
+        <div className="user-stat-item">
+          <span className="user-stat-value mono">{maxStreak}</span>
+          <span className="user-stat-label">Best Streak</span>
+        </div>
+        <div className="user-stat-divider" />
+        <div className="user-stat-item">
+          <span className="user-stat-value mono">{totalSessions}</span>
+          <span className="user-stat-label">Sessions</span>
+        </div>
+      </div>
+
+      {activeCerts.length > 0 && (
+        <div className="user-cert-cards">
+          {activeCerts.map(cert => {
+            const cp = progress[cert.id];
+            const certAccuracy = cp.totalAnswered > 0
+              ? Math.round((cp.totalCorrect / cp.totalAnswered) * 100)
+              : 0;
+            const certLevel = cp.xp != null ? Math.floor((cp.xp || 0) / XP_PER_LEVEL) + 1 : (cp.level || 1);
+            return (
+              <a key={cert.id} href={cert.url} className="user-cert-card" style={{ borderColor: cert.color + '40' }}>
+                <span className="cert-card-icon">{cert.icon}</span>
+                <span className="cert-card-name">{cert.name}</span>
+                <span className="cert-card-stat mono" style={{ color: cert.color }}>
+                  Lvl {certLevel} · {certAccuracy}%
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Hero Section - Works for both authenticated and unauthenticated users
 const Hero = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, userData, isAuthenticated } = useAuth();
 
   return (
     <section className="hero">
+      <BadgeBanner />
       <div className="hero-content">
         <div className="hero-badge">
           <TargetIcon size={16} className="badge-icon" />
@@ -195,6 +311,7 @@ const Hero = () => {
         {isAuthenticated && (
           <div className="hero-welcome">
             Welcome back, <strong>{user?.displayName || user?.email?.split('@')[0] || 'Learner'}</strong>! Ready to continue your AWS journey?
+            <UserStatsPanel userData={userData} />
           </div>
         )}
         <div className="hero-stats">

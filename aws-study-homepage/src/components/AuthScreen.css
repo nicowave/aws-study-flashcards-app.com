@@ -273,6 +273,46 @@
   flex-shrink: 0;
 }
 
+/* Apple Sign-In Button */
+.apple-sign-in-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Meslo LG M', 'Fira Code', monospace;
+  margin-top: 10px;
+}
+
+.apple-sign-in-btn:hover:not(:disabled) {
+  background: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.apple-sign-in-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.apple-sign-in-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.apple-icon {
+  flex-shrink: 0;
+}
+
 .auth-divider {
   margin-top: 20px;
   margin-bottom: 4px;

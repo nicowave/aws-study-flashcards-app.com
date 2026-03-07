@@ -1044,86 +1044,6 @@ button {
   transform: translateY(-2px);
 }
 
-/* Share Section */
-.share-section {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid var(--md-border);
-  text-align: center;
-}
-
-.share-label {
-  font-size: 14px;
-  color: var(--md-on-surface-variant);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.share-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-.share-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: var(--md-radius-md);
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all var(--md-transition);
-  border: 1px solid var(--md-border);
-  color: var(--md-on-surface);
-}
-
-.share-btn:hover {
-  transform: translateY(-2px);
-  text-decoration: none;
-}
-
-.share-btn.linkedin {
-  background: #0a66c2;
-  color: #fff;
-  border-color: #0a66c2;
-}
-
-.share-btn.linkedin:hover {
-  background: #004182;
-}
-
-.share-btn.x-twitter {
-  background: #000000;
-  color: #fff;
-  border-color: #333;
-}
-
-.share-btn.x-twitter:hover {
-  background: #222;
-}
-
-.share-btn.facebook {
-  background: #1877f2;
-  color: #fff;
-  border-color: #1877f2;
-}
-
-.share-btn.facebook:hover {
-  background: #0d5bbf;
-}
-
-/* Mobile: stack share buttons vertically */
-@media (max-width: 480px) {
-  .share-buttons {
-    flex-direction: column;
-  }
-}
-
 /* ================================
    STATS SCREEN STYLES
    ================================ */
@@ -1386,253 +1306,6 @@ button {
 }
 
 /* ================================
-   STUDY GUIDE STYLES
-   ================================ */
-
-.study-guide {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 20px;
-  position: relative;
-  z-index: 1;
-}
-
-.study-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.study-header h2 {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--md-on-surface);
-  margin: 0;
-}
-
-.study-subtitle {
-  color: var(--md-on-surface-variant);
-  font-size: 14px;
-  margin-top: 8px;
-}
-
-.study-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--md-on-surface);
-}
-
-.card-counter {
-  font-size: 14px;
-  color: var(--md-on-surface-variant);
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.study-domain-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.study-domain-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 24px 16px;
-  background: var(--md-surface-variant);
-  border: 2px solid var(--md-border);
-  border-radius: var(--md-radius-lg);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  --border-angle: 0deg;
-}
-
-.study-domain-card::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: calc(var(--md-radius-lg) + 2px);
-  background: conic-gradient(
-    from var(--border-angle),
-    transparent 30%,
-    var(--md-primary) 45%,
-    var(--md-secondary) 55%,
-    transparent 70%
-  );
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.study-domain-card:hover {
-  border-color: transparent;
-  transform: translateY(-4px);
-  box-shadow: var(--md-shadow-3), 0 0 25px rgba(86, 156, 214, 0.15);
-}
-
-.study-domain-card:hover::before {
-  opacity: 1;
-  animation: borderRotate 3s linear infinite;
-}
-
-.study-domain-card .domain-icon {
-  font-size: 40px;
-}
-
-.study-domain-card .domain-name {
-  font-size: 14px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.study-domain-card .card-count {
-  font-size: 12px;
-  color: var(--md-on-surface-variant);
-}
-
-/* Flashcard */
-.flashcard {
-  perspective: 1000px;
-  cursor: pointer;
-  margin-bottom: 24px;
-}
-
-.flashcard-inner {
-  position: relative;
-  width: 100%;
-  min-height: 300px;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-}
-
-.flashcard.flipped .flashcard-inner {
-  transform: rotateY(180deg);
-}
-
-.flashcard-front,
-.flashcard-back {
-  position: absolute;
-  width: 100%;
-  min-height: 300px;
-  backface-visibility: hidden;
-  background: var(--md-surface-variant);
-  border: 2px solid var(--md-border);
-  border-radius: var(--md-radius-lg);
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  box-shadow: var(--md-shadow-2);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.flashcard:hover .flashcard-front,
-.flashcard:hover .flashcard-back {
-  border-color: var(--md-primary);
-  box-shadow: 0 0 0 1px var(--md-primary), 0 0 15px rgba(86, 156, 214, 0.3);
-}
-
-.flashcard-back {
-  transform: rotateY(180deg);
-  background: var(--md-surface-elevated);
-  border-color: var(--md-secondary);
-}
-
-.flashcard:hover .flashcard-back {
-  border-color: var(--md-secondary);
-  box-shadow: 0 0 0 1px var(--md-secondary), 0 0 15px rgba(78, 201, 176, 0.3);
-}
-
-.card-icon {
-  color: var(--md-primary);
-  margin-bottom: 16px;
-}
-
-.card-content {
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--md-on-surface);
-  white-space: pre-wrap;
-}
-
-.flip-hint {
-  position: absolute;
-  bottom: 16px;
-  font-size: 12px;
-  color: var(--md-on-surface-variant);
-}
-
-.flashcard-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.nav-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
-  background: var(--md-surface-variant);
-  border: 1px solid var(--md-border);
-  border-radius: var(--md-radius-md);
-  color: var(--md-on-surface);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all var(--md-transition);
-}
-
-.nav-btn:hover:not(:disabled) {
-  border-color: var(--md-primary);
-}
-
-.nav-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.shuffle-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: transparent;
-  border: 1px solid var(--md-border);
-  border-radius: var(--md-radius-md);
-  color: var(--md-on-surface-variant);
-  font-size: 13px;
-  cursor: pointer;
-  transition: all var(--md-transition);
-}
-
-.shuffle-btn:hover {
-  border-color: var(--md-primary);
-  color: var(--md-primary);
-}
-
-.study-progress {
-  margin-top: 8px;
-}
-
-.no-cards {
-  text-align: center;
-  padding: 48px;
-  color: var(--md-on-surface-variant);
-}
-
-/* ================================
    USER HEADER STYLES
    ================================ */
 
@@ -1828,4 +1501,87 @@ button {
   height: 100%;
   pointer-events: none;
   z-index: 100;
+}
+
+/* ================================
+   SHARE SECTION (Results Screen)
+   ================================ */
+
+.share-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--md-border);
+  text-align: center;
+}
+
+.share-label {
+  font-size: 14px;
+  color: var(--md-on-surface-variant);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.share-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--md-radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all var(--md-transition);
+  border: 1px solid var(--md-border);
+  color: var(--md-on-surface);
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.share-btn.linkedin {
+  background: #0a66c2;
+  color: #fff;
+  border-color: #0a66c2;
+}
+
+.share-btn.linkedin:hover {
+  background: #004182;
+}
+
+.share-btn.x-twitter {
+  background: #000000;
+  color: #fff;
+  border-color: #333;
+}
+
+.share-btn.x-twitter:hover {
+  background: #222;
+}
+
+.share-btn.facebook {
+  background: #1877f2;
+  color: #fff;
+  border-color: #1877f2;
+}
+
+.share-btn.facebook:hover {
+  background: #0d5bbf;
+}
+
+/* Mobile: stack share buttons vertically */
+@media (max-width: 480px) {
+  .share-buttons {
+    flex-direction: column;
+  }
 }

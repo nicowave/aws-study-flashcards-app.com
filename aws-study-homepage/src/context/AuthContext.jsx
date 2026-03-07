@@ -8,10 +8,12 @@ import {
   resendVerificationEmail,
   onAuthChange,
   getUserData,
+  getUserProgress,
   getStoredUserData,
   syncProgress,
   tryAutoLoginFromCookie,
   signInWithGoogle,
+  signInWithApple,
   checkGoogleRedirectResult,
   reauthenticateUser,
   changePassword,
@@ -44,10 +46,10 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     console.log('[AuthContext] Setting up auth listener...');
     let isMounted = true;
 
-    // Check for pending Google redirect result (from signInWithRedirect fallback)
+    // Check for pending OAuth redirect result (Google or Apple signInWithRedirect fallback)
     checkGoogleRedirectResult().then((result) => {
       if (result && result.success) {
-        console.log('[AuthContext] Google redirect sign-in completed');
+        console.log('[AuthContext] OAuth redirect sign-in completed');
       }
     });
 
@@ -65,7 +67,16 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
           // Fetch user data from Firestore
           const result = await getUserData(firebaseUser.uid);
           if (result.success && isMounted) {
-            setUserData(result.data);
+            const data = result.data;
+
+            // Fetch game progress from /users/{uid}/progress subcollection
+            const progressResult = await getUserProgress(firebaseUser.uid);
+            if (progressResult.success) {
+              data.progress = progressResult.data;
+              console.log('[AuthContext] Progress loaded:', Object.keys(progressResult.data));
+            }
+
+            setUserData(data);
           }
         }
       } else {
@@ -189,6 +200,27 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     return result;
   };
 
+  // Apple Sign-In
+  const appleSignIn = async () => {
+    setLoading(true);
+    setError(null);
+    setNeedsVerification(false);
+
+    console.log('[AuthContext] Attempting Apple sign-in...');
+
+    const result = await signInWithApple();
+
+    if (result.success) {
+      console.log('[AuthContext] Apple sign-in successful', result.isNewUser ? '(new user)' : '');
+    } else {
+      setError(result.error);
+      console.log('[AuthContext] Apple sign-in failed:', result.error);
+    }
+
+    setLoading(false);
+    return result;
+  };
+
   // Guest login
   const loginAsGuest = async () => {
     setLoading(true);
@@ -290,12 +322,17 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     return result;
   };
 
-  // Refresh user data from Firestore
+  // Refresh user data from Firestore (including progress subcollection)
   const refreshUserData = async () => {
     if (!user) return;
     const result = await getUserData(user.uid);
     if (result.success) {
-      setUserData(result.data);
+      const data = result.data;
+      const progressResult = await getUserProgress(user.uid);
+      if (progressResult.success) {
+        data.progress = progressResult.data;
+      }
+      setUserData(data);
     }
     return result;
   };
@@ -307,12 +344,13 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     authChecked,
     error,
     needsVerification,
-    isAuthenticated: !!user && (user.emailVerified || user.isAnonymous || isGuestUser() || user.providerData?.some(p => p.providerId === 'google.com')),
+    isAuthenticated: !!user && (user.emailVerified || user.isAnonymous || isGuestUser() || user.providerData?.some(p => p.providerId === 'google.com' || p.providerId === 'apple.com')),
     isGuest: isGuestUser(),
     register,
     login,
     logout,
     googleSignIn,
+    appleSignIn,
     loginAsGuest,
     resendVerification,
     clearError,
