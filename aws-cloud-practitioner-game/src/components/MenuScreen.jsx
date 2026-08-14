@@ -18,7 +18,7 @@ const MenuScreen = ({
     <div className="menu-screen">
       <div className="menu-header">
         <h1 className="game-title">
-          <span className="title-icon">🤖</span>
+          <span className="title-icon">☁️</span>
           Cloud Practitioner
         </h1>
         <p className="game-subtitle">AWS Certification Quiz Game</p>

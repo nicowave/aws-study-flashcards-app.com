@@ -137,7 +137,16 @@ function GameContent() {
 
   const startDomain = useCallback((domainId) => {
     const domain = getDomainById(domainId);
-    const questions = shuffleArray(domain.questions).slice(0, QUESTIONS_PER_SESSION);
+    const questions = shuffleArray(domain.questions)
+      .slice(0, QUESTIONS_PER_SESSION)
+      .map((q) => {
+        const order = shuffleArray(q.options.map((_, i) => i));
+        return {
+          ...q,
+          options: order.map((i) => q.options[i]),
+          correct: order.indexOf(q.correct),
+        };
+      });
     setSelectedDomain(domain);
     setCurrentQuestions(questions);
     setCurrentQuestionIndex(0);

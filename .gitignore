@@ -34,20 +34,7 @@ dist-ssr
 .env.local
 .env.*.local
 
-# Config files, API keys
-./aws-cloud-practitioner-game/src/config/firebase.config.js
-./aws-study-homepage/src/config/firebase.config.js
-./aws-ai-study-game/src/config/firebase.config.js
-.config*
-
-
 # Other files and folders
 
 zip/*
 zip/
-
-data/
-data/*
-
-docs/
-docs/*
