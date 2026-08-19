@@ -13,10 +13,10 @@ export const cloudTechnology = {
       id: 'ct1',
       question: 'What is Amazon EC2?',
       options: [
-        'A database service',
+        'A managed relational database service for running SQL workloads',
         'A virtual server in the cloud that provides resizable compute capacity',
-        'A storage service',
-        'A content delivery network'
+        'A durable object storage service for storing and retrieving any amount of data',
+        'A global content delivery network that caches content close to users'
       ],
       correctAnswer: 1,
       explanation: 'Amazon EC2 (Elastic Compute Cloud) provides resizable virtual servers (instances) in the cloud. You can choose the instance type, operating system, and configure networking and storage.'
@@ -25,10 +25,10 @@ export const cloudTechnology = {
       id: 'ct2',
       question: 'What is Amazon S3?',
       options: [
-        'A compute service',
-        'A relational database',
+        'A compute service that provides resizable virtual servers in the cloud',
+        'A managed relational database service supporting multiple database engines',
         'An object storage service with virtually unlimited storage capacity',
-        'A virtual private network'
+        'A block storage service that attaches persistent volumes to instances'
       ],
       correctAnswer: 2,
       explanation: 'Amazon S3 (Simple Storage Service) is an object storage service that offers industry-leading scalability, data availability, security, and performance for virtually unlimited storage.'
@@ -49,10 +49,10 @@ export const cloudTechnology = {
       id: 'ct4',
       question: 'What is AWS Lambda?',
       options: [
-        'A virtual machine service',
+        'A service that provides resizable virtual machines you fully manage',
         'A serverless compute service that runs code without provisioning servers',
-        'A container orchestration service',
-        'A load balancing service'
+        'A managed service for orchestrating and scaling containerized applications',
+        'A service that automatically distributes incoming traffic across multiple targets'
       ],
       correctAnswer: 1,
       explanation: 'AWS Lambda is a serverless compute service that lets you run code without provisioning or managing servers. You pay only for the compute time you consume.'
@@ -62,9 +62,9 @@ export const cloudTechnology = {
       question: 'What is Amazon VPC?',
       options: [
         'A virtual private cloud that lets you launch AWS resources in a logically isolated network',
-        'A VPN service',
-        'A content delivery network',
-        'A database service'
+        'A managed service for creating encrypted VPN connections to on-premises networks',
+        'A dedicated private network connection between your data center and AWS',
+        'A scalable DNS service that routes end users to internet applications'
       ],
       correctAnswer: 0,
       explanation: 'Amazon VPC (Virtual Private Cloud) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a virtual network that you define.'
@@ -85,10 +85,10 @@ export const cloudTechnology = {
       id: 'ct7',
       question: 'What is Amazon CloudFront?',
       options: [
-        'A firewall service',
+        'A web application firewall that filters malicious traffic before it reaches your site',
         'A content delivery network (CDN) that delivers content with low latency',
-        'A DNS service',
-        'A compute service'
+        'A scalable DNS service that routes users to applications and registers domains',
+        'A networking service that improves availability by routing traffic over the AWS global network'
       ],
       correctAnswer: 1,
       explanation: 'Amazon CloudFront is a fast CDN service that securely delivers data, videos, applications, and APIs to customers globally with low latency and high transfer speeds.'
@@ -109,10 +109,10 @@ export const cloudTechnology = {
       id: 'ct9',
       question: 'What is the purpose of Amazon Route 53?',
       options: [
-        'Load balancing',
+        'Distributing incoming traffic across multiple targets',
         'DNS web service and domain registration',
-        'Content delivery',
-        'Data warehousing'
+        'Caching and delivering content at edge locations',
+        'Connecting on-premises networks privately to AWS'
       ],
       correctAnswer: 1,
       explanation: 'Amazon Route 53 is a highly available and scalable DNS web service. It routes end users to Internet applications and can also register domain names.'
@@ -122,9 +122,9 @@ export const cloudTechnology = {
       question: 'What is Elastic Load Balancing (ELB)?',
       options: [
         'A service that automatically distributes incoming traffic across multiple targets',
-        'A storage service',
-        'A database service',
-        'A monitoring service'
+        'A service that adds or removes EC2 instances automatically based on demand',
+        'A service that routes end users to applications using DNS policies',
+        'A service that monitors resource utilization and application performance metrics'
       ],
       correctAnswer: 0,
       explanation: 'Elastic Load Balancing automatically distributes incoming application traffic across multiple targets, such as EC2 instances, containers, and IP addresses, in one or more Availability Zones.'
@@ -145,10 +145,10 @@ export const cloudTechnology = {
       id: 'ct12',
       question: 'What is Amazon EBS?',
       options: [
-        'An object storage service',
+        'An object storage service that stores data as objects within buckets',
         'Block storage volumes for use with EC2 instances',
-        'A file storage service',
-        'A backup service'
+        'A shared file system that multiple EC2 instances can mount at once',
+        'A centralized service for automating backups across AWS services'
       ],
       correctAnswer: 1,
       explanation: 'Amazon EBS (Elastic Block Store) provides persistent block storage volumes for use with EC2 instances. EBS volumes persist independently from the life of an instance.'
@@ -169,10 +169,10 @@ export const cloudTechnology = {
       id: 'ct14',
       question: 'What is AWS Elastic Beanstalk?',
       options: [
-        'A container service',
+        'A managed service for running containerized applications on clusters',
         'A service for deploying and scaling web applications without managing infrastructure',
-        'A serverless compute service',
-        'A database service'
+        'A serverless compute service that runs code in response to events',
+        'An infrastructure as code service for provisioning resources from templates'
       ],
       correctAnswer: 1,
       explanation: 'AWS Elastic Beanstalk is a service for deploying and scaling web applications. You simply upload your code, and Elastic Beanstalk automatically handles deployment, capacity provisioning, and load balancing.'
@@ -181,10 +181,10 @@ export const cloudTechnology = {
       id: 'ct15',
       question: 'What is Amazon Redshift used for?',
       options: [
-        'Real-time data streaming',
+        'Ingesting and processing real-time streaming data',
         'Data warehousing and analytics',
-        'Object storage',
-        'Container orchestration'
+        'Running key-value NoSQL database workloads',
+        'Caching frequently accessed data in memory'
       ],
       correctAnswer: 1,
       explanation: 'Amazon Redshift is a fast, fully managed data warehouse that makes it simple and cost-effective to analyze all your data using standard SQL and existing business intelligence tools.'
@@ -205,10 +205,10 @@ export const cloudTechnology = {
       id: 'ct17',
       question: 'What is Amazon SNS?',
       options: [
-        'A queueing service',
+        'A message queuing service for decoupling application components',
         'A pub/sub messaging service for sending notifications',
-        'A streaming service',
-        'A database service'
+        'A service for streaming and processing real-time data at scale',
+        'A serverless workflow service that coordinates distributed applications'
       ],
       correctAnswer: 1,
       explanation: 'Amazon SNS (Simple Notification Service) is a fully managed pub/sub messaging service for sending notifications. It can send messages to email, SMS, HTTP endpoints, and other AWS services.'
@@ -229,10 +229,10 @@ export const cloudTechnology = {
       id: 'ct19',
       question: 'What is AWS CloudFormation?',
       options: [
-        'A monitoring service',
+        'A monitoring service that collects metrics and logs from AWS resources',
         'An infrastructure as code service for provisioning AWS resources',
-        'A compute service',
-        'A security service'
+        'A service for deploying web applications without managing infrastructure yourself',
+        'A service for automating software release pipelines and deployments'
       ],
       correctAnswer: 1,
       explanation: 'AWS CloudFormation is an infrastructure as code service that allows you to model and provision AWS resources using templates. It automates and standardizes resource deployment.'
@@ -241,10 +241,10 @@ export const cloudTechnology = {
       id: 'ct20',
       question: 'What is Amazon Aurora?',
       options: [
-        'A NoSQL database',
+        'A fully managed NoSQL database delivering single-digit millisecond performance',
         'A MySQL and PostgreSQL-compatible relational database with improved performance',
-        'A data warehouse',
-        'A graph database'
+        'A petabyte-scale data warehouse for analytics using standard SQL',
+        'A managed graph database service for highly connected datasets'
       ],
       correctAnswer: 1,
       explanation: 'Amazon Aurora is a MySQL and PostgreSQL-compatible relational database that combines the performance and availability of high-end commercial databases with the simplicity and cost-effectiveness of open-source databases.'

@@ -14,9 +14,9 @@ export const cloudConcepts = {
       question: 'What are the six advantages of cloud computing according to AWS?',
       options: [
         'Trade fixed expense for variable expense, benefit from massive economies of scale, stop guessing capacity, increase speed and agility, stop spending money on data centers, go global in minutes',
-        'Lower costs, better security, more features, faster deployment, easier management, better support',
-        'Free tier, pay-as-you-go, reserved instances, spot instances, savings plans, enterprise discounts',
-        'EC2, S3, RDS, Lambda, CloudFront, Route 53'
+        'Lower total cost of ownership, guaranteed application availability, automatic security compliance, unlimited compute capacity, dedicated hardware for every customer, free premium support',
+        'Pay-as-you-go pricing, reserved capacity discounts, spot pricing for spare capacity, volume-based tiering, free tier access for new customers, enterprise agreements',
+        'Operational excellence, security, reliability, performance efficiency, cost optimization, and sustainability'
       ],
       correctAnswer: 0,
       explanation: 'AWS lists six advantages: (1) Trade fixed expense for variable expense, (2) Benefit from massive economies of scale, (3) Stop guessing capacity, (4) Increase speed and agility, (5) Stop spending money running and maintaining data centers, (6) Go global in minutes.'
@@ -25,10 +25,10 @@ export const cloudConcepts = {
       id: 'cc2',
       question: 'What does "elasticity" mean in cloud computing?',
       options: [
-        'The ability to recover from failures automatically',
+        'The ability to recover automatically from infrastructure or component failures',
         'The ability to acquire resources when needed and release them when no longer needed',
-        'The ability to run applications in multiple regions',
-        'The ability to encrypt data at rest and in transit'
+        'The ability to handle long-term growth by permanently adding more capacity',
+        'The ability to distribute workloads across multiple geographic regions'
       ],
       correctAnswer: 1,
       explanation: 'Elasticity is the ability to automatically scale resources up or down based on demand. You acquire resources when you need them and release them when you don\'t, paying only for what you use.'
@@ -49,10 +49,10 @@ export const cloudConcepts = {
       id: 'cc4',
       question: 'What is the AWS Well-Architected Framework?',
       options: [
-        'A billing management tool',
+        'A managed service that automatically audits workloads and remediates configuration issues it finds',
         'A set of best practices and guidelines for building secure, high-performing, resilient, and efficient infrastructure',
-        'A migration service for moving to AWS',
-        'A certification program for AWS architects'
+        'A collection of pre-built CloudFormation templates for deploying common application architectures',
+        'A certification and training program that validates the skills of AWS solutions architects'
       ],
       correctAnswer: 1,
       explanation: 'The AWS Well-Architected Framework provides best practices across six pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability.'
@@ -61,10 +61,10 @@ export const cloudConcepts = {
       id: 'cc5',
       question: 'What is the difference between High Availability and Fault Tolerance?',
       options: [
-        'They mean the same thing',
+        'They are interchangeable terms for the same approach to minimizing downtime',
         'High Availability minimizes downtime; Fault Tolerance means zero downtime during failures',
-        'Fault Tolerance is cheaper than High Availability',
-        'High Availability requires multiple regions; Fault Tolerance requires multiple accounts'
+        'Fault Tolerance is a lower-cost architecture option than High Availability',
+        'High Availability guarantees zero downtime; Fault Tolerance only minimizes downtime during failures'
       ],
       correctAnswer: 1,
       explanation: 'High Availability (HA) means the system remains accessible with minimal downtime. Fault Tolerance (FT) means the system continues operating without any degradation even when components fail. FT typically costs more but provides zero downtime.'
@@ -85,10 +85,10 @@ export const cloudConcepts = {
       id: 'cc7',
       question: 'What is the benefit of using multiple Availability Zones?',
       options: [
-        'Lower costs',
-        'Faster network speeds',
+        'Reduced infrastructure and data transfer costs',
+        'Lower latency for end users in other countries',
         'High availability and fault tolerance',
-        'More storage capacity'
+        'Increased compute and storage capacity limits'
       ],
       correctAnswer: 2,
       explanation: 'Using multiple Availability Zones provides high availability and fault tolerance. If one AZ fails, your application can continue running in another AZ with minimal or no interruption.'
@@ -100,7 +100,7 @@ export const cloudConcepts = {
         'You pay a fixed monthly fee regardless of usage',
         'You pay only for the resources you actually use',
         'You pay upfront for a year of service',
-        'You pay based on your company size'
+        'You pay a discounted rate by committing to consistent usage'
       ],
       correctAnswer: 1,
       explanation: 'Pay-as-you-go means you only pay for the individual services you need, for as long as you use them, without requiring long-term contracts or complex licensing.'
@@ -121,10 +121,10 @@ export const cloudConcepts = {
       id: 'cc10',
       question: 'What is the main benefit of "economies of scale" in cloud computing?',
       options: [
-        'More features are available',
+        'Higher discounts as your own usage grows over time',
         'Lower variable costs due to AWS\'s massive scale',
-        'Better customer support',
-        'Faster application performance'
+        'Priority access to new AWS services and features',
+        'Faster application performance during peak demand'
       ],
       correctAnswer: 1,
       explanation: 'Because AWS aggregates usage from hundreds of thousands of customers, they can achieve higher economies of scale, which translates into lower pay-as-you-go prices for customers.'
@@ -133,10 +133,10 @@ export const cloudConcepts = {
       id: 'cc11',
       question: 'What is a Region in AWS?',
       options: [
-        'A single data center',
+        'A single data center with redundant power and networking',
         'A group of Availability Zones in a geographic area',
-        'A content delivery network edge location',
-        'A virtual private network'
+        'An edge location used to cache content closer to end users',
+        'A logically isolated virtual network that you define in AWS'
       ],
       correctAnswer: 1,
       explanation: 'An AWS Region is a physical location around the world consisting of multiple, isolated Availability Zones. Each Region is designed to be completely isolated from other Regions for fault tolerance.'
@@ -147,8 +147,8 @@ export const cloudConcepts = {
       options: [
         'A geographic area containing multiple Regions',
         'One or more data centers with redundant power, networking, and connectivity',
-        'A CDN edge location',
-        'A virtual network within a Region'
+        'An edge location where CloudFront caches content near users',
+        'A logically isolated virtual network defined within a Region'
       ],
       correctAnswer: 1,
       explanation: 'An Availability Zone is one or more discrete data centers with redundant power, networking, and connectivity in an AWS Region. AZs are physically separated and connected through low-latency links.'
@@ -169,10 +169,10 @@ export const cloudConcepts = {
       id: 'cc14',
       question: 'What is the benefit of "going global in minutes"?',
       options: [
-        'Lower costs in all regions',
+        'Pay identical low prices for services in every AWS Region',
         'Deploy applications in multiple Regions around the world with a few clicks',
-        'Automatic translation of content',
-        'Free data transfer between regions'
+        'Applications are replicated automatically to every AWS Region by default',
+        'Data transfer between AWS Regions is always free of charge'
       ],
       correctAnswer: 1,
       explanation: 'AWS\'s global infrastructure allows you to deploy your application in multiple Regions around the world with just a few clicks, providing lower latency and better experience for customers worldwide.'
@@ -183,8 +183,8 @@ export const cloudConcepts = {
       options: [
         'A cost-sharing program between AWS and customers',
         'A division of security responsibilities between AWS and the customer',
-        'A data backup partnership',
-        'A technical support agreement'
+        'An agreement in which AWS manages all security on behalf of the customer',
+        'A framework for dividing operational duties among accounts in an organization'
       ],
       correctAnswer: 1,
       explanation: 'The Shared Responsibility Model divides security: AWS is responsible for security "of" the cloud (infrastructure), while customers are responsible for security "in" the cloud (data, applications, access management).'
