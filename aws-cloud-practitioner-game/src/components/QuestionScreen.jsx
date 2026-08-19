@@ -14,7 +14,7 @@ const QuestionScreen = ({
   onQuit
 }) => {
   const question = questions[currentIndex];
-  const { streak = 0, correct = 0, answered = 0 } = sessionStats || {};
+  const { streak = 0, correct = 0, total: answered = 0 } = sessionStats || {};
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
   if (!question) {

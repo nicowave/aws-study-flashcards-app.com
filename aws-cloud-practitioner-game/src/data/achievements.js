@@ -37,7 +37,7 @@ export const achievements = [
     description: 'Complete at least one session in each domain',
     icon: '🌟',
     xpReward: 200,
-    condition: (stats) => stats.domainsCompleted >= 5
+    condition: (stats) => stats.domainsCompleted >= 4
   },
   {
     id: 'hundred_club',

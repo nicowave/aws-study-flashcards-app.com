@@ -1,13 +1,14 @@
 import React from 'react';
 import { TrophyIcon, TargetIcon, FlameIcon, VolumeIcon, VolumeOffIcon, BookOpenIcon, ChartIcon } from './Icons';
 
-const MenuScreen = ({ 
-  globalStats, 
-  onStartGame, 
+const MenuScreen = ({
+  globalStats,
+  onStartGame,
+  onStartExam,
   onViewStats,
   onStudyGuide,
-  soundEnabled, 
-  onToggleSound 
+  soundEnabled,
+  onToggleSound
 }) => {
   const { level = 1, xp = 0, totalAnswered = 0, totalCorrect = 0, maxStreak = 0 } = globalStats || {};
   const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
@@ -18,7 +19,7 @@ const MenuScreen = ({
     <div className="menu-screen">
       <div className="menu-header">
         <h1 className="game-title">
-          <span className="title-icon">🤖</span>
+          <span className="title-icon">☁️</span>
           Cloud Practitioner
         </h1>
         <p className="game-subtitle">AWS Certification Quiz Game</p>
@@ -59,6 +60,10 @@ const MenuScreen = ({
         <button className="menu-btn primary" onClick={onStartGame}>
           <span className="btn-icon">🎮</span>
           Start Quiz
+        </button>
+        <button className="menu-btn secondary" onClick={onStartExam}>
+          <span className="btn-icon">📝</span>
+          Exam Simulator
         </button>
         <button className="menu-btn secondary" onClick={onStudyGuide}>
           <span className="btn-icon">📖</span>

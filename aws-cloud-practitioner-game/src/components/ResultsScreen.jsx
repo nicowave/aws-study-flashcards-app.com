@@ -45,7 +45,7 @@ const ResultsScreen = ({
   
   if (accuracy >= 90) {
     performanceLevel = 'excellent';
-    performanceMessage = 'Outstanding! You\'re an AI expert!';
+    performanceMessage = 'Outstanding! You\'re a cloud expert!';
     performanceEmoji = '🏆';
   } else if (accuracy >= 80) {
     performanceLevel = 'great';

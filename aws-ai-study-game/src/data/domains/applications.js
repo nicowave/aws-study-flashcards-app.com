@@ -18,10 +18,10 @@ export const domain3 = {
       id: 'd3q2',
       question: 'What is Amazon Q designed for?',
       options: [
-        'Image generation',
+        'A fully managed service for training custom ML models at scale',
         'Enterprise AI assistant for business and development tasks',
-        'Database management',
-        'Network monitoring'
+        'A vector database for storing embeddings used in RAG applications',
+        'A service that converts text into lifelike speech for applications'
       ],
       correct: 1,
       explanation: 'Amazon Q is an AI-powered assistant designed to help with business tasks, answer questions about company data, and assist developers with coding tasks.'
@@ -37,10 +37,10 @@ export const domain3 = {
       id: 'd3q4',
       question: 'What is Amazon Kendra primarily used for?',
       options: [
-        'Training ML models',
+        'Building conversational chatbots with voice and text',
         'Intelligent enterprise search powered by ML',
-        'Video streaming',
-        'Data warehousing'
+        'Extracting text and data from scanned documents',
+        'Generating personalized content recommendations for users'
       ],
       correct: 1,
       explanation: 'Amazon Kendra is an intelligent search service powered by machine learning that provides accurate answers from enterprise content and documents.'
@@ -56,10 +56,10 @@ export const domain3 = {
       id: 'd3q6',
       question: 'What is the primary use case for Amazon Lex?',
       options: [
-        'Text analytics',
+        'Analyzing sentiment and entities in text',
         'Building conversational interfaces (chatbots)',
-        'Speech recognition',
-        'Document processing'
+        'Converting speech recordings into text transcripts',
+        'Extracting data from forms and documents'
       ],
       correct: 1,
       explanation: 'Amazon Lex provides the technologies for building conversational interfaces (chatbots) with voice and text capabilities.'
@@ -75,10 +75,10 @@ export const domain3 = {
       id: 'd3q8',
       question: 'What capability does Amazon Transcribe provide?',
       options: [
-        'Text-to-speech conversion',
+        'Converting written text into natural-sounding speech',
         'Automatic speech-to-text transcription',
-        'Language translation',
-        'Sentiment analysis'
+        'Translating spoken audio between different languages',
+        'Analyzing sentiment in recorded customer conversations'
       ],
       correct: 1,
       explanation: 'Amazon Transcribe is an automatic speech recognition service that converts audio to text, supporting multiple languages and custom vocabularies.'
@@ -94,10 +94,10 @@ export const domain3 = {
       id: 'd3q10',
       question: 'What is Amazon Personalize used for?',
       options: [
-        'Personal data storage',
+        'Forecasting future demand from historical time-series data',
         'Creating real-time personalized recommendations',
-        'Personal assistant features',
-        'User authentication'
+        'Segmenting customers for targeted marketing campaigns',
+        'Searching enterprise content using natural language queries'
       ],
       correct: 1,
       explanation: 'Amazon Personalize enables developers to build applications with real-time personalized recommendations, similar to those used by Amazon.com.'
@@ -106,10 +106,10 @@ export const domain3 = {
       id: 'd3q11',
       question: 'What does the "temperature" parameter control in foundation model inference?',
       options: [
-        'The GPU temperature during processing',
+        'The maximum number of tokens in the generated response',
         'The randomness/creativity of model outputs',
-        'The speed of response generation',
-        'The cost per token'
+        'The probability cutoff used when sampling candidate tokens',
+        'The penalty applied to repeated words in the output'
       ],
       correct: 1,
       explanation: 'Temperature controls output randomness. Low temperature (e.g., 0.1) produces deterministic, focused responses for factual tasks. High temperature (e.g., 0.9) produces more creative, diverse responses for brainstorming.'
@@ -120,8 +120,8 @@ export const domain3 = {
       options: [
         'A documentation repository for AWS services',
         'A fully managed RAG service that connects FMs to your data sources',
-        'A database for storing model weights',
-        'A training data management platform'
+        'A repository of pre-trained models available for deployment',
+        'A service for labeling and managing model training datasets'
       ],
       correct: 1,
       explanation: 'Amazon Bedrock Knowledge Bases is a managed RAG service that automatically handles data ingestion, chunking, embedding generation, vector store integration, and source citations — without managing infrastructure.'
@@ -142,10 +142,10 @@ export const domain3 = {
       id: 'd3q14',
       question: 'What are Amazon Bedrock Agents designed to do?',
       options: [
-        'Monitor model performance in production',
+        'Continuously monitor deployed model quality and detect drift in production',
         'Enable FMs to execute multi-step tasks by orchestrating API calls and actions',
-        'Provide human review for model predictions',
-        'Encrypt data at rest and in transit'
+        'Route low-confidence model predictions to human reviewers for validation',
+        'Filter harmful content from model inputs and outputs using configurable policies'
       ],
       correct: 1,
       explanation: 'Amazon Bedrock Agents enable FMs to break complex tasks into steps, call external APIs and Lambda functions, query knowledge bases, and maintain conversation state — automating workflows like booking travel or processing orders.'
@@ -164,7 +164,7 @@ export const domain3 = {
         'Zero-shot uses more tokens than few-shot',
         'Zero-shot provides no examples; few-shot provides multiple examples in the prompt',
         'Few-shot requires fine-tuning; zero-shot does not',
-        'There is no difference'
+        'Few-shot prompting permanently improves the model for future requests'
       ],
       correct: 1,
       explanation: 'Zero-shot prompting asks the model to perform a task without any examples. Few-shot prompting provides 2-5 examples to establish patterns, improving consistency and accuracy for complex tasks.'
@@ -173,10 +173,10 @@ export const domain3 = {
       id: 'd3q17',
       question: 'What is Reinforcement Learning from Human Feedback (RLHF)?',
       options: [
-        'A technique to speed up model training',
+        'A supervised method where humans write the ideal response to every training prompt',
         'A training technique that uses human preferences to align model outputs with human values',
-        'A method for collecting labeled training data',
-        'A deployment strategy for ML models'
+        'A crowdsourcing method for collecting labeled examples used in pre-training',
+        'An evaluation process where humans grade model outputs after deployment'
       ],
       correct: 1,
       explanation: 'RLHF uses human evaluators to rank model responses, trains a reward model on those preferences, and then uses reinforcement learning to optimize the FM — aligning it with human values and reducing harmful outputs.'
@@ -185,10 +185,10 @@ export const domain3 = {
       id: 'd3q18',
       question: 'What is model distillation?',
       options: [
-        'Compressing data for model training',
+        'Reducing the numerical precision of model weights to shrink model size',
         'Training a smaller "student" model to replicate a larger "teacher" model\'s behavior',
-        'Removing unnecessary layers from a neural network',
-        'Converting a model to run on mobile devices'
+        'Removing unnecessary layers and connections from a trained neural network',
+        'Compiling a trained model to run efficiently on edge devices'
       ],
       correct: 1,
       explanation: 'Model distillation trains a smaller student model to mimic a larger teacher model\'s outputs, achieving similar quality at lower cost, reduced latency, and smaller deployment footprint.'
@@ -197,10 +197,10 @@ export const domain3 = {
       id: 'd3q19',
       question: 'What is the primary purpose of prompt templates?',
       options: [
-        'To encrypt prompts before sending to the model',
+        'Predefined system prompts that end users are not permitted to modify at runtime',
         'Reusable, parameterized prompt structures that ensure consistency and scalability',
-        'To limit the number of tokens used',
-        'To automatically fine-tune models'
+        'Cached prompt prefixes that reduce token costs on repeated requests',
+        'Curated example prompts used to fine-tune a model for a domain'
       ],
       correct: 1,
       explanation: 'Prompt templates are reusable structures with placeholders for variable content. They ensure consistency across requests, are easier to maintain and version, and enable A/B testing of prompt variations.'
@@ -209,10 +209,10 @@ export const domain3 = {
       id: 'd3q20',
       question: 'What is the main advantage of in-context learning over fine-tuning?',
       options: [
-        'In-context learning permanently changes model behavior',
+        'In-context learning permanently updates the model weights so improvements persist across requests',
         'In-context learning provides examples in the prompt without changing model weights, requiring zero training cost',
-        'In-context learning is always more accurate',
-        'In-context learning works without a context window'
+        'In-context learning produces higher accuracy than fine-tuning on specialized domain-specific tasks',
+        'In-context learning reduces inference costs because the examples are only processed on the first request'
       ],
       correct: 1,
       explanation: 'In-context learning provides examples directly in the prompt without changing model weights. It has zero training cost, is quick to implement, and is temporary — only affecting the current request. Fine-tune only if in-context learning is insufficient.'
