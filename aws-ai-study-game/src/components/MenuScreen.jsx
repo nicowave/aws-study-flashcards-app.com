@@ -3,6 +3,7 @@ import { TrophyIcon, TargetIcon, FlameIcon, VolumeIcon, VolumeOffIcon, BookOpenI
 
 const MenuScreen = ({
   globalStats,
+  isGuest = false,
   onStartGame,
   onStartExam,
   onViewStats,
@@ -63,7 +64,7 @@ const MenuScreen = ({
         </button>
         <button className="menu-btn secondary" onClick={onStartExam}>
           <span className="btn-icon">📝</span>
-          Exam Simulator
+          Exam Simulator{isGuest ? ' 🔒' : ''}
         </button>
         <button className="menu-btn secondary" onClick={onStudyGuide}>
           <span className="btn-icon">📖</span>

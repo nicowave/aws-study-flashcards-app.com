@@ -13,6 +13,7 @@ import {
 import StudyGuide from './components/StudyGuide';
 import Flashcards from './components/Flashcards';
 import ExamMode from './components/ExamMode';
+import { GuestBanner, GuestUpsell } from './components/GuestPrompts';
 import AuthScreen from './components/AuthScreen';
 import UserBadge from './components/UserBadge';
 import SettingsPage from './components/SettingsPage';
@@ -74,7 +75,7 @@ const TabNavigation = ({ activeTab, onTabChange }) => {
 
 // Main Game Content (only rendered when authenticated)
 function GameContent() {
-  const { user, syncLocalProgress, loadProgress, logout } = useAuth();
+  const { user, syncLocalProgress, loadProgress, logout, isGuest, exitGuest } = useAuth();
   
   // Main app tab state
   const [activeTab, setActiveTab] = useState('game');
@@ -234,6 +235,9 @@ function GameContent() {
         </div>
       )}
       
+      {/* Guest preview banner */}
+      {isGuest && <GuestBanner onSignUp={exitGuest} />}
+
       {/* Tab Navigation */}
       {(gameState === 'menu' || activeTab === 'study' || activeTab === 'flashcards') && (
         <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
@@ -245,6 +249,7 @@ function GameContent() {
           {gameState === 'menu' && (
             <MenuScreen
               globalStats={globalStats}
+              isGuest={isGuest}
               onStartGame={() => setGameState('domainSelect')}
               onStartExam={() => setGameState('exam')}
               onViewStats={() => setGameState('stats')}
@@ -255,7 +260,22 @@ function GameContent() {
           )}
 
           {gameState === 'exam' && (
-            <ExamMode onExit={() => setGameState('menu')} />
+            isGuest ? (
+              <GuestUpsell
+                feature="The Exam Simulator"
+                bullets={[
+                  'Full-length 65-question timed mock exam',
+                  'Real 100–1000 scaled scoring with the 700 pass line',
+                  'Per-domain readiness breakdown and answer review',
+                  'All quiz domains and flashcard decks unlocked',
+                  'Progress synced to the cloud across devices'
+                ]}
+                onSignUp={exitGuest}
+                onBack={() => setGameState('menu')}
+              />
+            ) : (
+              <ExamMode onExit={() => setGameState('menu')} />
+            )
           )}
 
           {gameState === 'domainSelect' && (
@@ -263,6 +283,8 @@ function GameContent() {
               globalStats={globalStats}
               onSelectDomain={startDomain}
               onBack={() => setGameState('menu')}
+              isGuest={isGuest}
+              onGuestUnlock={exitGuest}
             />
           )}
 
@@ -308,7 +330,11 @@ function GameContent() {
 
       {/* Flashcards Tab Content */}
       {activeTab === 'flashcards' && (
-        <Flashcards onBack={() => setActiveTab('game')} />
+        <Flashcards
+          onBack={() => setActiveTab('game')}
+          isGuest={isGuest}
+          onGuestUnlock={exitGuest}
+        />
       )}
 
       {/* Study Guide Tab Content */}
@@ -322,19 +348,19 @@ function GameContent() {
 
 // Main App with Auth Gate
 function AppContent() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, isGuest, continueAsGuest } = useAuth();
 
   // Show loading while checking auth
   if (loading) {
     return <LoadingScreen />;
   }
 
-  // Require authentication - show auth screen if not logged in
-  if (!isAuthenticated) {
-    return <AuthScreen hubUrl={HUB_URL} />;
+  // Require authentication or guest preview - show auth screen otherwise
+  if (!isAuthenticated && !isGuest) {
+    return <AuthScreen hubUrl={HUB_URL} onGuestContinue={continueAsGuest} />;
   }
 
-  // User is authenticated, show the game
+  // User is authenticated (or previewing as guest), show the game
   return <GameContent />;
 }
 

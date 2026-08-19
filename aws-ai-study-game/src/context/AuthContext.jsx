@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isGuest, setIsGuest] = useState(isGuestUser());
   const autoLoginAttempted = useRef(false);
 
   useEffect(() => {
@@ -54,6 +55,10 @@ export const AuthProvider = ({ children }) => {
       if (firebaseUser) {
         console.log('[AuthContext] Auth state changed: User logged in -', firebaseUser.email);
         setUser(firebaseUser);
+
+        // A real sign-in supersedes guest mode
+        localStorage.removeItem('awsStudyGuest');
+        setIsGuest(false);
 
         // Fetch user data from Firestore
         const result = await getUserData(firebaseUser.uid);
@@ -146,7 +151,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout — delegates to sharedAuth
+  // Logout — delegates to sharedAuth; also exits guest mode
   const logout = async () => {
     console.log('[AuthContext] Logging out...');
     try {
@@ -160,7 +165,25 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('[AuthContext] Logout error:', err);
       throw err;
+    } finally {
+      localStorage.removeItem('awsStudyGuest');
+      setIsGuest(false);
     }
+  };
+
+  // Enter guest mode: local-only preview, no Firebase user is created.
+  // Progress stays in localStorage and carries over on later sign-up.
+  const continueAsGuest = () => {
+    console.log('[AuthContext] Continuing as guest');
+    localStorage.setItem('awsStudyGuest', 'true');
+    setIsGuest(true);
+  };
+
+  // Leave guest mode and return to the auth screen (e.g. "Create Free Account")
+  const exitGuest = () => {
+    console.log('[AuthContext] Exiting guest mode');
+    localStorage.removeItem('awsStudyGuest');
+    setIsGuest(false);
   };
 
   // Resend verification email
@@ -325,7 +348,9 @@ export const AuthProvider = ({ children }) => {
     loadProgress,
     isAuthenticated: !!user && (user.emailVerified || user.providerData?.some(p => p.providerId === 'google.com')),
     isEmailVerified: user?.emailVerified || false,
-    isGuest: false,
+    isGuest: isGuest && !user,
+    continueAsGuest,
+    exitGuest,
     changeUserPassword,
     changeDisplayName,
     updateAvatar,

@@ -302,10 +302,10 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
               onClick={onGuestContinue}
               disabled={loading}
             >
-              Continue as Guest
+              Try It Free — No Account Needed
             </button>
             <p className="guest-hint">
-              Progress won't sync across devices
+              Preview the first domain and flashcard deck. Progress saves on this device.
             </p>
           </div>
         )}

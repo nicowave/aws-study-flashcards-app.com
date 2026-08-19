@@ -2,7 +2,7 @@ import React from 'react';
 import { domains } from '../data';
 import { ArrowLeftIcon, CheckCircleIcon, LockIcon } from './Icons';
 
-const DomainSelect = ({ globalStats, onSelectDomain, onBack }) => {
+const DomainSelect = ({ globalStats, onSelectDomain, onBack, isGuest = false, onGuestUnlock }) => {
   const domainProgress = globalStats?.domainProgress || {};
 
   const getDomainProgress = (domainId) => {
@@ -26,15 +26,17 @@ const DomainSelect = ({ globalStats, onSelectDomain, onBack }) => {
       </div>
 
       <div className="domain-grid">
-        {domains.map((domain) => {
+        {domains.map((domain, index) => {
           const progress = getDomainProgress(domain.id);
           const isCompleted = progress.accuracy >= 80 && progress.sessions >= 3;
-          
+          const lockedForGuest = isGuest && index > 0;
+
           return (
             <button
               key={domain.id}
-              className={`domain-card ${isCompleted ? 'completed' : ''}`}
-              onClick={() => onSelectDomain(domain.id)}
+              className={`domain-card ${isCompleted ? 'completed' : ''} ${lockedForGuest ? 'locked-for-guest' : ''}`}
+              onClick={() => (lockedForGuest ? onGuestUnlock?.() : onSelectDomain(domain.id))}
+              title={lockedForGuest ? 'Create a free account to unlock this domain' : undefined}
             >
               <div className="domain-icon">{domain.icon || '📚'}</div>
               <div className="domain-info">
@@ -59,6 +61,13 @@ const DomainSelect = ({ globalStats, onSelectDomain, onBack }) => {
                 <div className="completed-badge">
                   <CheckCircleIcon size={16} />
                   <span>Mastered</span>
+                </div>
+              )}
+
+              {lockedForGuest && (
+                <div className="guest-lock-overlay">
+                  <LockIcon size={14} />
+                  <span>Sign in free to unlock</span>
                 </div>
               )}
             </button>
