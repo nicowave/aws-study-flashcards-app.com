@@ -8,6 +8,12 @@
       "port": 5175
     },
     {
+      "name": "hub",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "aws-study-homepage", "--", "--port", "5175", "--strictPort"],
+      "port": 5175
+    },
+    {
       "name": "ccp-game",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "aws-cloud-practitioner-game", "--", "--port", "5174"],

@@ -1,5 +1,5 @@
 // AWS Certification data
-// Status: 'available' | 'coming-soon'
+// Status: 'available' | 'coming-soon' | 'hidden' (kept in data, not rendered)
 
 export const certifications = [
   // Foundational
@@ -19,7 +19,7 @@ export const certifications = [
     questions: '65 questions',
     passingScore: '700/1000',
     officialUrl: 'https://aws.amazon.com/certification/certified-cloud-practitioner/',
-    features: ['Flashcards', 'Quiz Game', 'Study Guide']
+    features: ['Quiz Game', 'Flashcards', 'Exam Simulator', 'Study Guide']
   },
   {
     id: 'ai-practitioner',
@@ -37,7 +37,7 @@ export const certifications = [
     questions: '65 questions',
     passingScore: '700/1000',
     officialUrl: 'https://aws.amazon.com/certification/certified-ai-practitioner/',
-    features: ['Flashcards', 'Quiz Game', 'Study Guide']
+    features: ['Quiz Game', 'Flashcards', 'Exam Simulator', 'Study Guide']
   },
   
   // Associate
@@ -86,7 +86,7 @@ export const certifications = [
     description: 'Demonstrate your skills in deploying, managing, and operating workloads on AWS.',
     subdomain: 'sysops',
     url: 'https://sysops.aws-study-flashcards-app.com',
-    status: 'coming-soon',
+    status: 'hidden',
     icon: '⚙️',
     color: '#f78166',
     examLength: '180 minutes',
@@ -104,7 +104,7 @@ export const certifications = [
     description: 'Validate your ability to design and implement data pipelines, data stores, and data processing solutions.',
     subdomain: 'data-engineer',
     url: 'https://data-engineer.aws-study-flashcards-app.com',
-    status: 'coming-soon',
+    status: 'hidden',
     icon: '📊',
     color: '#56d4dd',
     examLength: '170 minutes',
@@ -122,7 +122,7 @@ export const certifications = [
     description: 'Prove your skills in building, training, tuning, and deploying ML models using AWS services.',
     subdomain: 'ml-engineer',
     url: 'https://ml-engineer.aws-study-flashcards-app.com',
-    status: 'coming-soon',
+    status: 'hidden',
     icon: '🧠',
     color: '#e85aad',
     examLength: '170 minutes',
@@ -142,7 +142,7 @@ export const certifications = [
     description: 'Validate advanced skills in designing distributed applications and systems on AWS for complex requirements.',
     subdomain: 'solutions-architect-professional',
     url: 'https://solutions-architect-professional.aws-study-flashcards-app.com',
-    status: 'coming-soon',
+    status: 'hidden',
     icon: '🏛️',
     color: '#ff9900',
     examLength: '180 minutes',
@@ -160,7 +160,7 @@ export const certifications = [
     description: 'Demonstrate expertise in provisioning, operating, and managing distributed systems on AWS.',
     subdomain: 'devops',
     url: 'https://devops.aws-study-flashcards-app.com',
-    status: 'coming-soon',
+    status: 'hidden',
     icon: '🔄',
     color: '#db61a2',
     examLength: '180 minutes',
@@ -180,7 +180,7 @@ export const certifications = [
     description: 'Validate your expertise in securing AWS workloads and architectures.',
     subdomain: 'security',
     url: 'https://security.aws-study-flashcards-app.com',
-    status: 'coming-soon',
+    status: 'hidden',
     icon: '🔒',
     color: '#f85149',
     examLength: '170 minutes',
@@ -198,7 +198,7 @@ export const certifications = [
     description: 'Prove advanced skills in building, training, tuning, and deploying ML models on AWS.',
     subdomain: 'ml-specialty',
     url: 'https://ml-specialty.aws-study-flashcards-app.com',
-    status: 'coming-soon',
+    status: 'hidden',
     icon: '🔬',
     color: '#a5d6ff',
     examLength: '180 minutes',
@@ -216,7 +216,7 @@ export const certifications = [
     description: 'Validate your expertise in recommending, designing, and maintaining optimal AWS database solutions.',
     subdomain: 'database',
     url: 'https://database.aws-study-flashcards-app.com',
-    status: 'coming-soon',
+    status: 'hidden',
     icon: '🗄️',
     color: '#7ee787',
     examLength: '180 minutes',
@@ -234,7 +234,7 @@ export const certifications = [
     description: 'Demonstrate expertise in designing and implementing AWS and hybrid IT network architectures.',
     subdomain: 'networking',
     url: 'https://networking.aws-study-flashcards-app.com',
-    status: 'coming-soon',
+    status: 'hidden',
     icon: '🌐',
     color: '#79c0ff',
     examLength: '170 minutes',
@@ -252,7 +252,7 @@ export const certifications = [
     description: 'Validate your expertise in designing, implementing, and operating SAP workloads on AWS.',
     subdomain: 'sap',
     url: 'https://sap.aws-study-flashcards-app.com',
-    status: 'coming-soon',
+    status: 'hidden',
     icon: '💼',
     color: '#ffa657',
     examLength: '170 minutes',
