@@ -38,3 +38,10 @@ dist-ssr
 
 zip/*
 zip/
+
+# Secrets — never commit service-account keys or private certificates
+*firebase-adminsdk*.json
+docs/firebase-aws-study-hub-*.json
+docs/certificates/
+docs/etag-studyhub
+*.pem

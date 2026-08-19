@@ -4,6 +4,10 @@
 import { module1 } from './module1-core-services';
 import { module2 } from './module2-security';
 import { module3 } from './module3-pricing';
+import { module4 } from './module4-cloud-concepts';
+import { module5 } from './module5-compute';
+import { module6 } from './module6-global-infra';
+import { module7 } from './module7-networking';
 
 // Storage key for localStorage
 export const FLASHCARD_STORAGE_KEY = 'aws-ccp-flashcard-progress';
@@ -21,7 +25,11 @@ export const INITIAL_FLASHCARD_PROGRESS = {
 export const flashcardDecks = {
   module1,
   module2,
-  module3
+  module3,
+  module4,
+  module5,
+  module6,
+  module7
 };
 
 export const getAllDecks = () => Object.values(flashcardDecks);
