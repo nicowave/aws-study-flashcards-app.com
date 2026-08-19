@@ -11,10 +11,12 @@ import {
   StatsScreen
 } from './components';
 import StudyGuide from './components/StudyGuide';
+import Flashcards from './components/Flashcards';
+import ExamMode from './components/ExamMode';
 import AuthScreen from './components/AuthScreen';
 import UserBadge from './components/UserBadge';
 import SettingsPage from './components/SettingsPage';
-import { PlayIcon, BookIcon } from './components/Icons';
+import { PlayIcon, BookIcon, FlashcardIcon } from './components/Icons';
 import { applyAnalyticsPreference } from './services/analytics';
 import './styles/global.css';
 import './components/AuthScreen.css';
@@ -52,7 +54,14 @@ const TabNavigation = ({ activeTab, onTabChange }) => {
         <span className="tab-icon"><PlayIcon size={18} /></span>
         <span className="tab-label">Quiz Game</span>
       </button>
-      <button 
+      <button
+        className={`tab-btn ${activeTab === 'flashcards' ? 'active' : ''}`}
+        onClick={() => onTabChange('flashcards')}
+      >
+        <span className="tab-icon"><FlashcardIcon size={18} /></span>
+        <span className="tab-label">Flashcards</span>
+      </button>
+      <button
         className={`tab-btn ${activeTab === 'study' ? 'active' : ''}`}
         onClick={() => onTabChange('study')}
       >
@@ -214,7 +223,7 @@ function GameContent() {
       <AchievementNotification achievement={newAchievement} />
       
       {/* User Header */}
-      {(gameState === 'menu' || gameState === 'settings' || activeTab === 'study') && (
+      {(gameState === 'menu' || gameState === 'settings' || activeTab === 'study' || activeTab === 'flashcards') && (
         <div className="user-header">
           <a href={HUB_URL} className="back-to-hub-link">← Study Hub</a>
           <UserBadge
@@ -226,7 +235,7 @@ function GameContent() {
       )}
       
       {/* Tab Navigation */}
-      {(gameState === 'menu' || activeTab === 'study') && (
+      {(gameState === 'menu' || activeTab === 'study' || activeTab === 'flashcards') && (
         <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       )}
 
@@ -237,11 +246,16 @@ function GameContent() {
             <MenuScreen
               globalStats={globalStats}
               onStartGame={() => setGameState('domainSelect')}
+              onStartExam={() => setGameState('exam')}
               onViewStats={() => setGameState('stats')}
               onStudyGuide={() => setActiveTab('study')}
               soundEnabled={soundEnabled}
               onToggleSound={() => setSoundEnabled(!soundEnabled)}
             />
+          )}
+
+          {gameState === 'exam' && (
+            <ExamMode onExit={() => setGameState('menu')} />
           )}
 
           {gameState === 'domainSelect' && (
@@ -290,6 +304,11 @@ function GameContent() {
             <SettingsPage onBack={() => setGameState('menu')} />
           )}
         </>
+      )}
+
+      {/* Flashcards Tab Content */}
+      {activeTab === 'flashcards' && (
+        <Flashcards onBack={() => setActiveTab('game')} />
       )}
 
       {/* Study Guide Tab Content */}
