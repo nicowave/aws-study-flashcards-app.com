@@ -41,7 +41,7 @@ const loadProgress = () => {
 
 const todayKey = () => new Date().toISOString().slice(0, 10);
 
-const Flashcards = ({ onBack }) => {
+const Flashcards = ({ onBack, isGuest = false, onGuestUnlock }) => {
   const decks = useMemo(() => getAllDecks(), []);
   const [progress, setProgress] = useState(loadProgress);
   const [activeDeckId, setActiveDeckId] = useState(null);
@@ -206,14 +206,16 @@ const Flashcards = ({ onBack }) => {
         )}
 
         <div className="deck-grid">
-          {decks.map((deck) => {
+          {decks.map((deck, index) => {
             const known = deck.cards.filter((c) => knownSet.has(c.id)).length;
             const pct = deck.cards.length > 0 ? Math.round((known / deck.cards.length) * 100) : 0;
+            const lockedForGuest = isGuest && index > 0;
             return (
               <button
                 key={deck.id}
-                className="deck-card"
-                onClick={() => openDeck(deck.id)}
+                className={`deck-card ${lockedForGuest ? 'locked-for-guest' : ''}`}
+                onClick={() => (lockedForGuest ? onGuestUnlock?.() : openDeck(deck.id))}
+                title={lockedForGuest ? 'Create a free account to unlock this deck' : undefined}
                 style={{ '--deck-color': deck.color }}
               >
                 <div className="deck-card-top">
@@ -230,6 +232,11 @@ const Flashcards = ({ onBack }) => {
                     {known}/{deck.cards.length} known
                   </span>
                 </div>
+                {lockedForGuest && (
+                  <div className="guest-lock-overlay">
+                    🔒 Sign in free to unlock
+                  </div>
+                )}
               </button>
             );
           })}

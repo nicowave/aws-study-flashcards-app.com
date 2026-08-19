@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isGuest, setIsGuest] = useState(isGuestUser());
   const autoLoginAttempted = useRef(false);
 
   useEffect(() => {
@@ -55,6 +56,10 @@ export const AuthProvider = ({ children }) => {
         console.log('[AuthContext] Auth state changed: User logged in -', firebaseUser.email);
         setUser(firebaseUser);
 
+        // A real sign-in supersedes guest mode
+        localStorage.removeItem('awsStudyGuest');
+        setIsGuest(false);
+
         // Fetch user data from Firestore
         const result = await getUserData(firebaseUser.uid);
         if (result.success && isMounted) {
@@ -69,8 +74,9 @@ export const AuthProvider = ({ children }) => {
           console.log('[AuthContext] Attempting cross-domain auto-login...');
           const cookieUser = await tryAutoLoginFromCookie();
           if (cookieUser && isMounted) {
+            // signInWithCustomToken succeeded — onAuthChange will fire again with the user
             console.log('[AuthContext] Cross-domain auto-login succeeded');
-            return;
+            return; // Don't setLoading(false) yet — wait for the next onAuthChange
           }
         }
 
@@ -91,18 +97,23 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
+  // Register — delegates to sharedAuth
   const register = async (email, password, username = '') => {
     setError(null);
     setLoading(true);
+
     console.log('[AuthContext] Registering user with email:', email);
+
     try {
       const result = await registerUser(email, password, username || null);
+
       if (result.success) {
         console.log('[AuthContext] Registration successful, verification email sent');
       } else {
         setError(result.error);
         console.log('[AuthContext] Registration failed:', result.error);
       }
+
       setLoading(false);
       return result;
     } catch (err) {
@@ -113,18 +124,23 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Login — delegates to sharedAuth
   const login = async (email, password) => {
     setError(null);
     setLoading(true);
+
     console.log('[AuthContext] Logging in user:', email);
+
     try {
       const result = await loginUser(email, password);
+
       if (result.success) {
         console.log('[AuthContext] Login successful');
       } else {
         setError(result.error);
         console.log('[AuthContext] Login failed:', result.error);
       }
+
       setLoading(false);
       return result;
     } catch (err) {
@@ -135,6 +151,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Logout — delegates to sharedAuth; also exits guest mode
   const logout = async () => {
     console.log('[AuthContext] Logging out...');
     try {
@@ -142,15 +159,34 @@ export const AuthProvider = ({ children }) => {
       if (result.success) {
         setUser(null);
         setUserData(null);
-        autoLoginAttempted.current = false;
+        autoLoginAttempted.current = false; // Reset for next session
         console.log('[AuthContext] Logout successful');
       }
     } catch (err) {
       console.error('[AuthContext] Logout error:', err);
       throw err;
+    } finally {
+      localStorage.removeItem('awsStudyGuest');
+      setIsGuest(false);
     }
   };
 
+  // Enter guest mode: local-only preview, no Firebase user is created.
+  // Progress stays in localStorage and carries over on later sign-up.
+  const continueAsGuest = () => {
+    console.log('[AuthContext] Continuing as guest');
+    localStorage.setItem('awsStudyGuest', 'true');
+    setIsGuest(true);
+  };
+
+  // Leave guest mode and return to the auth screen (e.g. "Create Free Account")
+  const exitGuest = () => {
+    console.log('[AuthContext] Exiting guest mode');
+    localStorage.removeItem('awsStudyGuest');
+    setIsGuest(false);
+  };
+
+  // Resend verification email
   const resendVerificationEmail = async () => {
     try {
       const result = await resendVerification();
@@ -165,18 +201,23 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Google Sign-In
   const googleSignIn = async () => {
     setError(null);
     setLoading(true);
+
     console.log('[AuthContext] Attempting Google sign-in...');
+
     try {
       const result = await signInWithGoogle();
+
       if (result.success) {
         console.log('[AuthContext] Google sign-in successful', result.isNewUser ? '(new user)' : '');
       } else {
         setError(result.error);
         console.log('[AuthContext] Google sign-in failed:', result.error);
       }
+
       setLoading(false);
       return result;
     } catch (err) {
@@ -187,10 +228,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Clear error
   const clearError = () => setError(null);
 
+  // Sync local progress to Firestore (game-specific)
   const syncLocalProgress = async (localStats, certId) => {
     if (!user || !localStats) return;
+
     try {
       const progressRef = doc(db, 'users', user.uid, 'progress', certId);
       await setDoc(progressRef, {
@@ -204,8 +248,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Load progress from Firestore (game-specific)
   const loadProgress = async (certId) => {
     if (!user) return null;
+
     try {
       const progressRef = doc(db, 'users', user.uid, 'progress', certId);
       const progressDoc = await getDoc(progressRef);
@@ -223,6 +269,7 @@ export const AuthProvider = ({ children }) => {
   // SETTINGS FUNCTIONS
   // ============================================
 
+  // Change password
   const changeUserPassword = async (currentPassword, newPassword) => {
     console.log('[AuthContext] Changing password...');
     const result = await changePassword(currentPassword, newPassword);
@@ -234,6 +281,7 @@ export const AuthProvider = ({ children }) => {
     return result;
   };
 
+  // Update avatar
   const updateAvatar = async (avatarData) => {
     if (!user) {
       return { success: false, error: 'Not authenticated' };
@@ -241,12 +289,14 @@ export const AuthProvider = ({ children }) => {
     console.log('[AuthContext] Updating avatar...');
     const result = await updateUserAvatar(user.uid, avatarData);
     if (result.success) {
+      // Update local userData with new avatar
       setUserData(prev => prev ? { ...prev, avatar: avatarData } : prev);
       console.log('[AuthContext] Avatar updated successfully');
     }
     return result;
   };
 
+  // Change display name
   const changeDisplayName = async (newName) => {
     if (!user) {
       return { success: false, error: 'Not authenticated' };
@@ -254,12 +304,14 @@ export const AuthProvider = ({ children }) => {
     console.log('[AuthContext] Updating display name...');
     const result = await updateDisplayName(user.uid, newName);
     if (result.success) {
+      // Update local userData with new name
       setUserData(prev => prev ? { ...prev, displayName: newName.trim() } : prev);
       console.log('[AuthContext] Display name updated successfully');
     }
     return result;
   };
 
+  // Delete account
   const deleteUserAccount = async (password = null) => {
     console.log('[AuthContext] Deleting account...');
     const result = await deleteAccount(password);
@@ -271,6 +323,7 @@ export const AuthProvider = ({ children }) => {
     return result;
   };
 
+  // Refresh user data from Firestore
   const refreshUserData = async () => {
     if (!user) return;
     const result = await getUserData(user.uid);
@@ -295,7 +348,9 @@ export const AuthProvider = ({ children }) => {
     loadProgress,
     isAuthenticated: !!user && (user.emailVerified || user.providerData?.some(p => p.providerId === 'google.com')),
     isEmailVerified: user?.emailVerified || false,
-    isGuest: false,
+    isGuest: isGuest && !user,
+    continueAsGuest,
+    exitGuest,
     changeUserPassword,
     changeDisplayName,
     updateAvatar,

@@ -1,0 +1,128 @@
+/* Guest mode banner + upsell */
+
+.guest-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: color-mix(in srgb, var(--md-primary) 14%, var(--md-surface));
+  border: 1px solid var(--md-primary);
+  border-radius: var(--md-radius-md);
+  padding: 10px 16px;
+  margin: 0 auto 16px;
+  max-width: 900px;
+}
+
+.guest-banner-text {
+  color: var(--md-on-surface);
+  font-size: 0.88rem;
+}
+
+.guest-banner-cta {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  border: none;
+  border-radius: var(--md-radius-sm);
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter var(--md-transition);
+}
+
+.guest-banner-cta:hover {
+  filter: brightness(1.15);
+}
+
+.guest-upsell {
+  max-width: 520px;
+  margin: 40px auto;
+  padding: 36px 28px;
+  text-align: center;
+  background: var(--md-surface-elevated);
+  border: 1px solid var(--md-border);
+  border-radius: var(--md-radius-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: fadeIn 0.3s ease;
+}
+
+.guest-upsell-lock {
+  color: var(--md-primary);
+}
+
+.guest-upsell h2 {
+  margin: 0;
+  color: var(--md-on-surface);
+  font-size: 1.35rem;
+}
+
+.guest-upsell-bullets {
+  text-align: left;
+  color: var(--md-on-surface-variant);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.guest-upsell-note {
+  color: var(--md-on-surface-variant);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.guest-upsell-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.guest-upsell-primary {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  border: none;
+  border-radius: var(--md-radius-md);
+  padding: 12px 26px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter var(--md-transition);
+}
+
+.guest-upsell-primary:hover {
+  filter: brightness(1.15);
+}
+
+.guest-upsell-secondary {
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  border: 1px solid var(--md-border);
+  border-radius: var(--md-radius-md);
+  padding: 12px 22px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* Locked cards (domain grid / deck grid) */
+.locked-for-guest {
+  opacity: 0.55;
+  cursor: pointer;
+  position: relative;
+}
+
+.guest-lock-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--md-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 8px;
+}
