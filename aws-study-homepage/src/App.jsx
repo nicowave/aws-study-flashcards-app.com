@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { certifications, categories } from './data/certifications';
 import SettingsPage from './components/SettingsPage';
 import { applyAnalyticsPreference } from './services/analytics';
+import { BILLING_ENABLED, PRO_PRICE_LABEL, getPlan, startCheckout, openBillingPortal } from './services/billing';
 import {
   CloudIcon,
   RobotIcon,
@@ -480,8 +481,86 @@ const About = () => (
   </section>
 );
 
+// Pro tier card: static "Coming Soon" until VITE_BILLING_ENABLED=true, then a
+// live upgrade/manage flow backed by the Stripe Cloud Functions.
+const ProPlanCard = ({ onShowLogin }) => {
+  const { isAuthenticated } = useAuth();
+  const [plan, setPlan] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [billingError, setBillingError] = useState('');
+
+  useEffect(() => {
+    if (BILLING_ENABLED && isAuthenticated) {
+      // Refresh claims when returning from checkout so the new plan shows up
+      const fromCheckout = new URLSearchParams(window.location.search).get('checkout') === 'success';
+      getPlan({ forceRefresh: fromCheckout }).then(setPlan);
+    } else {
+      setPlan(null);
+    }
+  }, [isAuthenticated]);
+
+  const handleUpgrade = async () => {
+    setBillingError('');
+    setBusy(true);
+    try {
+      await startCheckout('all-access');
+    } catch (err) {
+      console.error('[Plans] Checkout failed:', err);
+      setBillingError('Could not start checkout. Please try again.');
+      setBusy(false);
+    }
+  };
+
+  const handleManage = async () => {
+    setBillingError('');
+    setBusy(true);
+    try {
+      await openBillingPortal();
+    } catch (err) {
+      console.error('[Plans] Portal failed:', err);
+      setBillingError('Could not open billing portal. Please try again.');
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className={`plan-card ${BILLING_ENABLED ? 'plan-featured' : 'plan-dimmed'}`}>
+      {BILLING_ENABLED && plan === 'pro' && <div className="plan-badge">Your Plan</div>}
+      <div className="plan-name">Pro</div>
+      <div className="plan-price mono">
+        {BILLING_ENABLED ? (PRO_PRICE_LABEL || 'Pro') : 'Coming Soon'}
+      </div>
+      <div className="plan-tagline">For serious exam prep</div>
+      <ul className="plan-features">
+        <li>Expanded scenario-style question banks</li>
+        <li>Readiness score &amp; weak-domain drills</li>
+        <li>Every new certification as it ships</li>
+        <li>Early members get preferred pricing</li>
+      </ul>
+      {!BILLING_ENABLED ? (
+        <button className="btn btn-card-disabled plan-cta" disabled>
+          Coming Soon
+        </button>
+      ) : plan === 'pro' ? (
+        <button className="btn btn-card-primary plan-cta" onClick={handleManage} disabled={busy}>
+          {busy ? 'Opening…' : 'Manage Subscription'}
+        </button>
+      ) : isAuthenticated ? (
+        <button className="btn btn-card-primary plan-cta" onClick={handleUpgrade} disabled={busy}>
+          {busy ? 'Redirecting…' : 'Upgrade to Pro'} {!busy && <ArrowRightIcon size={16} />}
+        </button>
+      ) : (
+        <button className="btn btn-card-primary plan-cta" onClick={onShowLogin}>
+          Sign In to Upgrade
+        </button>
+      )}
+      {billingError && <p className="plan-error">{billingError}</p>}
+    </div>
+  );
+};
+
 // Plans Section — tiers without prices until checkout exists
-const Plans = () => (
+const Plans = ({ onShowLogin }) => (
   <section id="plans" className="plans-section">
     <div className="section-header">
       <h2 className="section-title">Simple Plans</h2>
@@ -519,20 +598,7 @@ const Plans = () => (
           Create Free Account <ArrowRightIcon size={16} />
         </a>
       </div>
-      <div className="plan-card plan-dimmed">
-        <div className="plan-name">Pro</div>
-        <div className="plan-price mono">Coming Soon</div>
-        <div className="plan-tagline">For serious exam prep</div>
-        <ul className="plan-features">
-          <li>Expanded scenario-style question banks</li>
-          <li>Readiness score &amp; weak-domain drills</li>
-          <li>Every new certification as it ships</li>
-          <li>Early members get preferred pricing</li>
-        </ul>
-        <button className="btn btn-card-disabled plan-cta" disabled>
-          Coming Soon
-        </button>
-      </div>
+      <ProPlanCard onShowLogin={onShowLogin} />
     </div>
   </section>
 );
@@ -930,7 +996,7 @@ function HomepageContent() {
             <Hero />
             <Certifications />
             <About />
-            <Plans />
+            <Plans onShowLogin={() => setShowLoginModal(true)} />
             <Resources />
           </main>
           <Footer />
