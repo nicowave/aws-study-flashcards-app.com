@@ -110,6 +110,7 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
         <nav className="nav">
           <a href="#certifications" className="nav-link">Certifications</a>
           <a href="#about" className="nav-link">About</a>
+          <a href="#plans" className="nav-link">Plans</a>
           <a href="#resources" className="nav-link">Resources</a>
           <a
             href="https://aws.amazon.com/certification/"
@@ -287,25 +288,26 @@ const Hero = () => {
       <div className="hero-content">
         <div className="hero-badge">
           <TargetIcon size={16} className="badge-icon" />
-          <span className="badge-text mono">Free Study Materials - Beta Version 1.0</span>
+          <span className="badge-text mono">Early Access — Free While in Beta</span>
         </div>
         <h1 className="hero-title">
-          Master Your <span className="highlight">AWS Certification</span>
+          Pass Your <span className="highlight">AWS Certification</span> First Try
         </h1>
         <p className="hero-subtitle">
-          Interactive flashcards, quiz games, and study guides for every AWS certification path.
-          Built by developers, for developers.
+          Exam-style practice questions, flashcards, and full-length timed exam simulators
+          for AWS Cloud Practitioner and AI Practitioner. Know you&apos;re ready before you
+          book the real $100 exam.
         </p>
         <div className="hero-actions">
-          <a href="#certifications" className="btn btn-primary">
-            Browse Certifications
-          </a>
           <a
             href="https://cloud.aws-study-flashcards-app.com"
-            className="btn btn-secondary"
+            className="btn btn-primary"
           >
             <CloudIcon size={20} />
-            Start Cloud Practitioner
+            Try It Free — No Account Needed
+          </a>
+          <a href="#certifications" className="btn btn-secondary">
+            Browse Certifications
           </a>
         </div>
         {isAuthenticated && (
@@ -316,18 +318,18 @@ const Hero = () => {
         )}
         <div className="hero-stats">
           <div className="stat">
-            <span className="stat-value mono">14</span>
-            <span className="stat-label">Certifications</span>
+            <span className="stat-value mono">2</span>
+            <span className="stat-label">Certifications Live</span>
           </div>
           <div className="stat-divider"></div>
           <div className="stat">
-            <span className="stat-value mono">500+</span>
-            <span className="stat-label">Flashcards</span>
+            <span className="stat-value mono">430+</span>
+            <span className="stat-label">Questions & Flashcards</span>
           </div>
           <div className="stat-divider"></div>
           <div className="stat">
-            <span className="stat-value mono">100%</span>
-            <span className="stat-label">Free</span>
+            <span className="stat-value mono">65-Q</span>
+            <span className="stat-label">Timed Exam Simulators</span>
           </div>
         </div>
       </div>
@@ -374,7 +376,7 @@ const CertCard = ({ cert }) => {
       <div className="cert-actions">
         {isAvailable ? (
           <a href={cert.url} className="btn btn-card-primary">
-            Start Studying <ArrowRightIcon size={16} />
+            Start Free <ArrowRightIcon size={16} />
           </a>
         ) : (
           <button className="btn btn-card-disabled" disabled>
@@ -400,12 +402,14 @@ const Certifications = () => (
     <div className="section-header">
       <h2 className="section-title">AWS Certifications</h2>
       <p className="section-subtitle">
-        Choose your certification path and start preparing with our interactive study tools
+        Two certifications live today, with the Associate path up next.
+        Every live cert has a free preview — no account needed.
       </p>
     </div>
 
     {categories.map(category => {
-      const certs = certifications.filter(c => c.category === category.id);
+      const certs = certifications.filter(c => c.category === category.id && c.status !== 'hidden');
+      if (certs.length === 0) return null;
       return (
         <div key={category.id} className="category-group">
           <div className="category-header">
@@ -431,24 +435,31 @@ const About = () => (
       <div className="features-grid">
         <div className="feature-card">
           <div className="feature-icon">
-            <FlashcardIcon size={32} />
+            <TargetIcon size={32} />
           </div>
-          <h3>Interactive Flashcards</h3>
-          <p>Spaced repetition learning with progress tracking. Mark cards as "Know It" or "Still Learning" to focus your study time.</p>
+          <h3>Timed Exam Simulator</h3>
+          <p>Full-length 65-question mocks with a 90-minute countdown, scored on the real 100–1000 scale against the 700 pass line, with a per-domain readiness breakdown.</p>
         </div>
         <div className="feature-card">
           <div className="feature-icon">
             <GameIcon size={32} />
           </div>
           <h3>Quiz Games</h3>
-          <p>Gamified quizzes with XP, levels, and achievements. Make studying fun while testing your knowledge across all exam domains.</p>
+          <p>Gamified quizzes with XP, levels, streaks, and achievements. Every question comes with an explanation so wrong answers teach you something.</p>
+        </div>
+        <div className="feature-card">
+          <div className="feature-icon">
+            <FlashcardIcon size={32} />
+          </div>
+          <h3>Interactive Flashcards</h3>
+          <p>Nearly 300 cards mapped to the official exam guides. Mark cards "Know It" or "Still Learning" and review your weak spots in one queue.</p>
         </div>
         <div className="feature-card">
           <div className="feature-icon">
             <BookIcon size={32} />
           </div>
           <h3>Study Guides</h3>
-          <p>Comprehensive guides covering key concepts, AWS services, and exam tips extracted from official AWS Skill Builder content.</p>
+          <p>In-depth guides covering key concepts, AWS services, comparison tables, and exam tips for every domain on the exam blueprint.</p>
         </div>
         <div className="feature-card">
           <div className="feature-icon">
@@ -459,18 +470,68 @@ const About = () => (
         </div>
         <div className="feature-card">
           <div className="feature-icon">
-            <MobileIcon size={32} />
-          </div>
-          <h3>Mobile Friendly</h3>
-          <p>Study anywhere with a fully responsive design. Perfect for quick review sessions during your commute or coffee break.</p>
-        </div>
-        <div className="feature-card">
-          <div className="feature-icon">
             <GiftIcon size={32} />
           </div>
-          <h3>100% Free</h3>
-          <p>All study materials are completely free. No subscriptions, no paywalls, no hidden costs. Ever.</p>
+          <h3>Free Early Access</h3>
+          <p>Everything is free while we&apos;re in beta. Early members will be grandfathered with generous free access when paid plans launch — signing up now locks that in.</p>
         </div>
+      </div>
+    </div>
+  </section>
+);
+
+// Plans Section — tiers without prices until checkout exists
+const Plans = () => (
+  <section id="plans" className="plans-section">
+    <div className="section-header">
+      <h2 className="section-title">Simple Plans</h2>
+      <p className="section-subtitle">
+        Start free in seconds. Paid plans are coming — early members lock in grandfathered perks.
+      </p>
+    </div>
+    <div className="plans-grid">
+      <div className="plan-card">
+        <div className="plan-name">Guest Preview</div>
+        <div className="plan-price mono">Free</div>
+        <div className="plan-tagline">No account needed</div>
+        <ul className="plan-features">
+          <li>First quiz domain of every live cert</li>
+          <li>First flashcard deck</li>
+          <li>Full study guides</li>
+          <li>Progress saved on this device</li>
+        </ul>
+        <a href="https://cloud.aws-study-flashcards-app.com" className="btn btn-card-primary plan-cta">
+          Try It Now <ArrowRightIcon size={16} />
+        </a>
+      </div>
+      <div className="plan-card plan-featured">
+        <div className="plan-badge">Early Access</div>
+        <div className="plan-name">Free Account</div>
+        <div className="plan-price mono">Free</div>
+        <div className="plan-tagline">Everything, while in beta</div>
+        <ul className="plan-features">
+          <li>All quiz domains &amp; flashcard decks</li>
+          <li>Full-length timed exam simulator</li>
+          <li>Cloud sync across devices</li>
+          <li>Grandfathered perks when paid plans launch</li>
+        </ul>
+        <a href="https://cloud.aws-study-flashcards-app.com" className="btn btn-card-primary plan-cta">
+          Create Free Account <ArrowRightIcon size={16} />
+        </a>
+      </div>
+      <div className="plan-card plan-dimmed">
+        <div className="plan-name">Pro</div>
+        <div className="plan-price mono">Coming Soon</div>
+        <div className="plan-tagline">For serious exam prep</div>
+        <ul className="plan-features">
+          <li>Expanded scenario-style question banks</li>
+          <li>Readiness score &amp; weak-domain drills</li>
+          <li>Every new certification as it ships</li>
+          <li>Early members get preferred pricing</li>
+        </ul>
+        <button className="btn btn-card-disabled plan-cta" disabled>
+          Coming Soon
+        </button>
       </div>
     </div>
   </section>
@@ -552,7 +613,7 @@ const Footer = () => (
           </span>
         </div>
         <p className="footer-tagline">
-          Free study materials for AWS certification exams
+          Game-based study tools for AWS certification exams
         </p>
       </div>
       <div className="footer-links">
@@ -869,6 +930,7 @@ function HomepageContent() {
             <Hero />
             <Certifications />
             <About />
+            <Plans />
             <Resources />
           </main>
           <Footer />
