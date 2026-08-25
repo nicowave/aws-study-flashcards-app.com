@@ -2133,3 +2133,10 @@
 .plan-cta {
   justify-content: center;
 }
+
+.plan-error {
+  color: #f85149;
+  font-size: 13px;
+  margin: 8px 0 0;
+  text-align: center;
+}

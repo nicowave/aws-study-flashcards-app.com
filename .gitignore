@@ -45,3 +45,5 @@ docs/firebase-aws-study-hub-*.json
 docs/certificates/
 docs/etag-studyhub
 *.pem
+api.stripe
+*.stripe
