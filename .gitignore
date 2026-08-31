@@ -47,3 +47,6 @@ docs/etag-studyhub
 *.pem
 api.stripe
 *.stripe
+
+# CDK
+cdk.out/

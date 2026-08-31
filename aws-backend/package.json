@@ -1,0 +1,21 @@
+{
+  "name": "aws-study-hub-backend",
+  "private": true,
+  "description": "CDK app: Cognito + DynamoDB + HTTP API backend for AWS Study Hub (Phase 1)",
+  "scripts": {
+    "build": "tsc --noEmit && cdk synth --quiet",
+    "synth": "cdk synth",
+    "diff": "cdk diff",
+    "deploy": "cdk deploy"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.160.0",
+    "constructs": "^10.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "aws-cdk": "^2.160.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
