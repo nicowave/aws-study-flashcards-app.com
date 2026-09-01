@@ -17,6 +17,8 @@ initializeApp();
 const stripeApiKey = defineSecret("STRIPE_API_KEY");
 const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
 const priceAllAccess = defineString("STRIPE_PRICE_ALL_ACCESS", { default: "" });
+const priceCloudPractitioner = defineString("STRIPE_PRICE_CLOUD_PRACTITIONER", { default: "" });
+const priceAiPractitioner = defineString("STRIPE_PRICE_AI_PRACTITIONER", { default: "" });
 
 const SITE_URL = "https://aws-study-flashcards-app.com";
 const ALLOWED_ORIGINS = [
@@ -38,9 +40,19 @@ const getStripe = () => {
 };
 
 // Plans a checkout can be started for. Maps plan id -> Stripe price ID param.
+// Per-cert plans ($10.99/mo each) plus an all-access bundle.
 const PLAN_PRICES = () => ({
   "all-access": priceAllAccess.value(),
+  "cloud-practitioner": priceCloudPractitioner.value(),
+  "ai-practitioner": priceAiPractitioner.value(),
 });
+
+// Reverse lookup: Stripe price ID -> plan id
+const planForPrice = (priceId) => {
+  const entries = Object.entries(PLAN_PRICES());
+  const hit = entries.find(([, p]) => p && p === priceId);
+  return hit ? hit[0] : null;
+};
 
 // A subscription in one of these Stripe statuses grants the "pro" plan.
 const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
@@ -113,26 +125,53 @@ exports.exchangeToken = onCall(
 // ===========================================================================
 
 /**
- * Writes the subscription state to Firestore and mirrors the entitlement into
- * Firebase custom claims. Claims are the enforcement surface (tamper-proof,
- * survive SSO via exchangeToken); the Firestore field is for display only.
+ * Recomputes a user's entitlements from ALL of their Stripe subscriptions
+ * (a user may hold one subscription per certification), writes a display
+ * summary to Firestore, and mirrors entitlements into Firebase custom
+ * claims. Claims are the enforcement surface (tamper-proof, survive SSO via
+ * exchangeToken); the Firestore field is for display only.
+ *
+ * Claims shape: { plan: 'pro' }            for an active all-access sub
+ *               { certs: 'ccp-id,aif-id' } for active per-cert subs
  */
-async function syncSubscriptionState(uid, subscription) {
-  const isActive = ACTIVE_STATUSES.includes(subscription.status);
-  const item = subscription.items?.data?.[0];
+async function syncCustomerEntitlements(uid, customerId) {
+  const stripe = getStripe();
+  const subs = await stripe.subscriptions.list({
+    customer: customerId,
+    status: "all",
+    limit: 20,
+  });
+
+  let allAccess = false;
+  const certs = new Set();
+  const active = [];
+  for (const sub of subs.data) {
+    if (!ACTIVE_STATUSES.includes(sub.status)) continue;
+    const priceId = sub.items?.data?.[0]?.price?.id || null;
+    const plan = sub.metadata?.plan || planForPrice(priceId);
+    if (!plan) continue;
+    if (plan === "all-access") allAccess = true;
+    else certs.add(plan);
+    active.push({
+      plan,
+      status: sub.status,
+      priceId,
+      stripeSubscriptionId: sub.id,
+      cancelAtPeriodEnd: sub.cancel_at_period_end || false,
+      currentPeriodEnd: sub.current_period_end
+        ? Timestamp.fromMillis(sub.current_period_end * 1000)
+        : null,
+    });
+  }
 
   await getFirestore().doc(`users/${uid}`).set(
     {
       subscription: {
         provider: "stripe",
-        status: subscription.status,
-        plan: isActive ? "pro" : null,
-        priceId: item?.price?.id || null,
-        stripeSubscriptionId: subscription.id,
-        cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
-        currentPeriodEnd: subscription.current_period_end
-          ? Timestamp.fromMillis(subscription.current_period_end * 1000)
-          : null,
+        allAccess,
+        certs: [...certs],
+        active,
+        updatedAt: Timestamp.now(),
       },
     },
     { merge: true }
@@ -141,13 +180,14 @@ async function syncSubscriptionState(uid, subscription) {
   const auth = getAuth();
   const userRecord = await auth.getUser(uid);
   const claims = { ...(userRecord.customClaims || {}) };
-  if (isActive) {
-    claims.plan = "pro";
-  } else {
-    delete claims.plan;
-  }
+  if (allAccess) claims.plan = "pro";
+  else delete claims.plan;
+  if (certs.size > 0) claims.certs = [...certs].join(",");
+  else delete claims.certs;
   await auth.setCustomUserClaims(uid, claims);
-  console.log(`[billing] Synced uid=${uid} status=${subscription.status} plan=${claims.plan || "none"}`);
+  console.log(
+    `[billing] Synced uid=${uid} allAccess=${allAccess} certs=${claims.certs || "none"}`
+  );
 }
 
 /** Resolve a Firebase UID from a Stripe subscription (metadata, then customer lookup). */
@@ -192,15 +232,22 @@ exports.createCheckoutSession = onCall(
       await userRef.set({ stripeCustomerId: customerId }, { merge: true });
     }
 
+    // Return the buyer to the site they started from (e.g. a game subdomain),
+    // but only if it's one of ours.
+    const requestedReturn = typeof request.data?.returnUrl === "string" ? request.data.returnUrl : "";
+    const returnBase = ALLOWED_ORIGINS.find((o) => requestedReturn === o || requestedReturn.startsWith(`${o}/`))
+      ? requestedReturn.replace(/\/$/, "")
+      : SITE_URL;
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
-      subscription_data: { metadata: { firebaseUID: uid } },
-      metadata: { firebaseUID: uid },
+      subscription_data: { metadata: { firebaseUID: uid, plan } },
+      metadata: { firebaseUID: uid, plan },
       allow_promotion_codes: true,
-      success_url: `${SITE_URL}/?checkout=success`,
-      cancel_url: `${SITE_URL}/?checkout=cancelled`,
+      success_url: `${returnBase}/?checkout=success`,
+      cancel_url: `${returnBase}/?checkout=cancelled`,
     });
 
     return { url: session.url };
@@ -256,10 +303,11 @@ exports.stripeWebhook = onRequest(
       switch (event.type) {
         case "checkout.session.completed": {
           const session = event.data.object;
-          if (session.mode === "subscription" && session.subscription) {
-            const subscription = await getStripe().subscriptions.retrieve(session.subscription);
-            const uid = session.metadata?.firebaseUID || (await uidForSubscription(subscription));
-            if (uid) await syncSubscriptionState(uid, subscription);
+          if (session.mode === "subscription" && session.customer) {
+            const uid =
+              session.metadata?.firebaseUID ||
+              (await uidForSubscription({ metadata: {}, customer: session.customer }));
+            if (uid) await syncCustomerEntitlements(uid, session.customer);
             else console.error("[billing] No UID for checkout session", session.id);
           }
           break;
@@ -268,7 +316,7 @@ exports.stripeWebhook = onRequest(
         case "customer.subscription.deleted": {
           const subscription = event.data.object;
           const uid = await uidForSubscription(subscription);
-          if (uid) await syncSubscriptionState(uid, subscription);
+          if (uid) await syncCustomerEntitlements(uid, subscription.customer);
           else console.error("[billing] No UID for subscription", subscription.id);
           break;
         }

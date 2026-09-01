@@ -35,22 +35,30 @@ Paste the `rk_test_...` value when prompted. (Firebase Secret Manager is the
 "secrets vault" here; the functions declare the secret and never see it in
 code or env files.)
 
-## 3. Create the product and price
+## 3. Create the products and prices
 
-Dashboard → Product catalog → Add product:
+Dashboard → Product catalog → Add product. The chosen model is **$10.99/mo
+per certification** (first quiz free), with an optional all-access bundle:
 
-- **Product**: "AWS Study Hub Pro" (or "All-Access")
-- **Price**: recurring, **yearly** — recommended anchor: **$29/year**
-  (fits between Quizlet Plus $35.99/yr and Tutorials Dojo ~$15/exam;
-  annual billing sidesteps pass-and-churn)
+| Product | Price | Plan id in code |
+|---|---|---|
+| AWS Cloud Practitioner Prep | $10.99/mo recurring | `cloud-practitioner` |
+| AWS AI Practitioner Prep | $10.99/mo recurring | `ai-practitioner` |
+| All-Access (optional bundle) | e.g. $16.99/mo or $49/yr | `all-access` |
 
-Copy the price ID (`price_...`) into `functions/.env` (this file is
-committed-safe — price IDs are not secrets, but keep the live/test split in
-mind):
+Copy each price ID (`price_...`) into `functions/.env` (price IDs are not
+secrets):
 
 ```bash
-echo 'STRIPE_PRICE_ALL_ACCESS=price_XXXXXXXX' >> functions/.env
+cat >> functions/.env <<'ENV'
+STRIPE_PRICE_CLOUD_PRACTITIONER=price_XXXXXXXX
+STRIPE_PRICE_AI_PRACTITIONER=price_XXXXXXXX
+STRIPE_PRICE_ALL_ACCESS=price_XXXXXXXX
+ENV
 ```
+
+(Leave any plan you don't sell as an empty value — checkout for it is
+rejected server-side.)
 
 ## 4. Deploy functions, then create the webhook
 
@@ -105,24 +113,27 @@ match /users/{userId}/progress/{certId} {
 
 ## 7. Turn the UI on and test end-to-end (sandbox)
 
-In `aws-study-homepage/.env`:
+In `aws-study-homepage/.env` AND each game's `.env`
+(`aws-cloud-practitioner-game/.env`, `aws-ai-study-game/.env`):
 
 ```
 VITE_BILLING_ENABLED=true
-VITE_PRO_PRICE_LABEL=$29/yr
+VITE_CERT_PRICE_LABEL=$10.99/mo
+VITE_PRO_PRICE_LABEL=$16.99/mo
 ```
 
-Run the homepage locally, sign in, click **Upgrade to Pro**, and pay with
-test card `4242 4242 4242 4242` (any future expiry/CVC). Verify:
+Then test the first-quiz-free funnel in a game (local or deployed):
 
-1. Redirected back to the homepage with `?checkout=success` and the Pro
-   card shows **Your Plan / Manage Subscription**.
-2. `/users/{uid}` in Firestore has a `subscription` map with
-   `status: "active"`.
-3. Visiting a game subdomain keeps the entitlement (the `plan: "pro"` claim
-   rides through `exchangeToken`).
-4. **Manage Subscription** opens the Stripe portal; cancel there and check
-   the webhook flips `status` and removes the claim at period end.
+1. Sign in with a fresh account, play one full 5-question quiz — free.
+2. Start a second quiz → the **paywall screen** appears ($10.99/mo for
+   this cert). The Exam Simulator paywalls immediately.
+3. Subscribe with test card `4242 4242 4242 4242` → redirected back to the
+   game with `?checkout=success` → quizzes and exam unlock.
+4. Check Firestore `/users/{uid}.subscription` shows the cert under
+   `certs`, and the other game is still paywalled (per-cert isolation) —
+   unless the sub is all-access, which unlocks both.
+5. Cancel via the homepage Pro card → Manage Subscription (Stripe portal);
+   the webhook clears the claim at period end.
 
 ## 8. Go live (later, when ready)
 
