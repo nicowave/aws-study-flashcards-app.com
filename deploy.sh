@@ -68,6 +68,14 @@ deploy_hub() {
     
     cd "$site_path"
     print_info "Working in: $site_path"
+
+    # Guard: an untracked .env is required — building without it bakes undefined
+    # Firebase config into the bundle (auth/invalid-api-key on load)
+    if [ ! -f .env ]; then
+        print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
     
     # Install dependencies if needed
     print_step "Checking dependencies..."
@@ -121,6 +129,14 @@ deploy_cloud() {
     
     cd "$site_path"
     print_info "Working in: $site_path"
+
+    # Guard: an untracked .env is required — building without it bakes undefined
+    # Firebase config into the bundle (auth/invalid-api-key on load)
+    if [ ! -f .env ]; then
+        print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
     
     # Install dependencies if needed
     print_step "Checking dependencies..."
@@ -174,6 +190,14 @@ deploy_ai() {
     
     cd "$site_path"
     print_info "Working in: $site_path"
+
+    # Guard: an untracked .env is required — building without it bakes undefined
+    # Firebase config into the bundle (auth/invalid-api-key on load)
+    if [ ! -f .env ]; then
+        print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
     
     # Install dependencies if needed
     print_step "Checking dependencies..."
