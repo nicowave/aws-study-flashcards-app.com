@@ -1,0 +1,407 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { getDomainById } from './data';
+import { useSound, useGameStats } from './hooks';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import {
+  AchievementNotification,
+  MenuScreen,
+  DomainSelect,
+  QuestionScreen,
+  ResultsScreen,
+  StatsScreen
+} from './components';
+import StudyGuide from './components/StudyGuide';
+import Flashcards from './components/Flashcards';
+import ExamMode from './components/ExamMode';
+import { GuestBanner, GuestUpsell } from './components/GuestPrompts';
+import PaywallScreen from './components/PaywallScreen';
+import { BILLING_ENABLED, hasCertEntitlement } from './services/billing';
+import AuthScreen from './components/AuthScreen';
+import UserBadge from './components/UserBadge';
+import SettingsPage from './components/SettingsPage';
+import { PlayIcon, BookIcon, FlashcardIcon } from './components/Icons';
+import { applyAnalyticsPreference } from './services/analytics';
+import './styles/global.css';
+import './components/AuthScreen.css';
+
+const HUB_URL = 'https://aws-study-flashcards-app.com';
+const CERT_ID = 'solutions-architect-associate';
+
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+const QUESTIONS_PER_SESSION = 5;
+
+// Loading Screen
+const LoadingScreen = () => (
+  <div className="loading-screen">
+    <div className="loading-spinner"></div>
+    <p>Loading...</p>
+  </div>
+);
+
+// Tab Navigation Component
+const TabNavigation = ({ activeTab, onTabChange }) => {
+  return (
+    <div className="tab-navigation">
+      <button 
+        className={`tab-btn ${activeTab === 'game' ? 'active' : ''}`}
+        onClick={() => onTabChange('game')}
+      >
+        <span className="tab-icon"><PlayIcon size={18} /></span>
+        <span className="tab-label">Quiz Game</span>
+      </button>
+      <button
+        className={`tab-btn ${activeTab === 'flashcards' ? 'active' : ''}`}
+        onClick={() => onTabChange('flashcards')}
+      >
+        <span className="tab-icon"><FlashcardIcon size={18} /></span>
+        <span className="tab-label">Flashcards</span>
+      </button>
+      <button
+        className={`tab-btn ${activeTab === 'study' ? 'active' : ''}`}
+        onClick={() => onTabChange('study')}
+      >
+        <span className="tab-icon"><BookIcon size={18} /></span>
+        <span className="tab-label">Study Guide</span>
+      </button>
+    </div>
+  );
+};
+
+// Main Game Content (only rendered when authenticated)
+function GameContent() {
+  const { user, syncLocalProgress, loadProgress, logout, isGuest, exitGuest } = useAuth();
+
+  // Entitlement for this cert (always true while billing is disabled).
+  // The first quiz session is free; afterwards quizzes and the exam
+  // simulator require a subscription. Study guide stays free.
+  const [entitled, setEntitled] = useState(!BILLING_ENABLED);
+  useEffect(() => {
+    if (!BILLING_ENABLED) return;
+    if (!user) {
+      setEntitled(false);
+      return;
+    }
+    const fromCheckout = new URLSearchParams(window.location.search).get('checkout') === 'success';
+    hasCertEntitlement(CERT_ID, { forceRefresh: fromCheckout }).then(setEntitled);
+  }, [user]);
+  
+  // Main app tab state
+  const [activeTab, setActiveTab] = useState('game');
+  
+  // Game state
+  const [gameState, setGameState] = useState('menu');
+  const [selectedDomain, setSelectedDomain] = useState(null);
+  const [currentQuestions, setCurrentQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [sessionStats, setSessionStats] = useState({
+    correct: 0, total: 0, streak: 0, xpEarned: 0, startTime: null
+  });
+  const [showParticles, setShowParticles] = useState(false);
+  const [newAchievement, setNewAchievement] = useState(null);
+  const [questionStartTime, setQuestionStartTime] = useState(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+
+  const { playSound } = useSound(soundEnabled);
+  const {
+    globalStats,
+    recordCorrectAnswer,
+    recordIncorrectAnswer,
+    completeSession,
+    unlockAchievement,
+    getNewAchievements,
+    resetStats,
+    mergeCloudStats
+  } = useGameStats();
+
+  // Apply analytics opt-out preference on mount
+  useEffect(() => { applyAnalyticsPreference(); }, []);
+
+  // Load progress from Firestore on login (merge with local)
+  const hasLoadedProgress = useRef(false);
+  useEffect(() => {
+    if (user && !hasLoadedProgress.current) {
+      hasLoadedProgress.current = true;
+      loadProgress(CERT_ID).then((cloudData) => {
+        if (cloudData) {
+          console.log('[App] Loaded cloud progress, merging with local stats');
+          mergeCloudStats(cloudData);
+        }
+      });
+    }
+    if (!user) {
+      hasLoadedProgress.current = false;
+    }
+  }, [user, loadProgress, mergeCloudStats]);
+
+  // Sync progress to Firestore whenever totalSessions changes (after quiz completion)
+  useEffect(() => {
+    if (user && globalStats && globalStats.totalSessions > 0) {
+      syncLocalProgress(globalStats, CERT_ID);
+    }
+  }, [user, globalStats.totalSessions]);
+
+  useEffect(() => {
+    const newAchievements = getNewAchievements();
+    if (newAchievements.length > 0) {
+      const achievement = newAchievements[0];
+      unlockAchievement(achievement.id, achievement.xpReward);
+      setNewAchievement(achievement);
+      playSound('levelup');
+      setTimeout(() => setNewAchievement(null), 3000);
+    }
+  }, [globalStats.totalAnswered, globalStats.maxStreak, globalStats.domainsCompleted]);
+
+  const startDomain = useCallback((domainId) => {
+    const domain = getDomainById(domainId);
+    const questions = shuffleArray(domain.questions)
+      .slice(0, QUESTIONS_PER_SESSION)
+      .map((q) => {
+        const order = shuffleArray(q.options.map((_, i) => i));
+        return {
+          ...q,
+          options: order.map((i) => q.options[i]),
+          correctAnswer: order.indexOf(q.correctAnswer),
+        };
+      });
+    setSelectedDomain(domain);
+    setCurrentQuestions(questions);
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setShowExplanation(false);
+    setSessionStats({ correct: 0, total: 0, streak: 0, xpEarned: 0, startTime: Date.now() });
+    setQuestionStartTime(Date.now());
+    setGameState('playing');
+  }, []);
+
+  const handleAnswer = useCallback((answerIndex) => {
+    if (selectedAnswer !== null) return;
+    const isCorrect = answerIndex === currentQuestions[currentQuestionIndex].correctAnswer;
+    const responseTime = (Date.now() - questionStartTime) / 1000;
+    setSelectedAnswer(answerIndex);
+    setShowExplanation(true);
+
+    if (isCorrect) {
+      playSound('correct');
+      setShowParticles(true);
+      setTimeout(() => setShowParticles(false), 600);
+      const xpGained = recordCorrectAnswer(responseTime);
+      setSessionStats(prev => ({
+        ...prev, correct: prev.correct + 1, total: prev.total + 1,
+        streak: prev.streak + 1, xpEarned: prev.xpEarned + (xpGained || 0)
+      }));
+    } else {
+      playSound('incorrect');
+      recordIncorrectAnswer();
+      setSessionStats(prev => ({
+        ...prev, total: prev.total + 1, streak: 0, xpEarned: prev.xpEarned + 2
+      }));
+    }
+  }, [selectedAnswer, currentQuestions, currentQuestionIndex, questionStartTime, playSound, recordCorrectAnswer, recordIncorrectAnswer]);
+
+  const nextQuestion = useCallback(() => {
+    if (currentQuestionIndex < currentQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      setSelectedAnswer(null);
+      setShowExplanation(false);
+      setQuestionStartTime(Date.now());
+    } else {
+      completeSession(selectedDomain.id, sessionStats.correct, currentQuestions.length);
+      // Firestore sync is handled by useEffect on globalStats.totalSessions
+      setGameState('results');
+    }
+  }, [currentQuestionIndex, currentQuestions.length, completeSession, selectedDomain, sessionStats.correct]);
+
+  const handleTabChange = useCallback((tab) => {
+    setActiveTab(tab);
+    if (tab === 'game') {
+      setGameState('menu');
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    // Redirect to hub after logout
+    window.location.href = HUB_URL;
+  };
+
+  return (
+    <div className="game-container">
+      <AchievementNotification achievement={newAchievement} />
+      
+      {/* User Header */}
+      {(gameState === 'menu' || gameState === 'settings' || activeTab === 'study' || activeTab === 'flashcards') && (
+        <div className="user-header">
+          <a href={HUB_URL} className="back-to-hub-link">← Study Hub</a>
+          <UserBadge
+            onLogout={handleLogout}
+            onOpenSettings={() => { setActiveTab('game'); setGameState('settings'); }}
+            onViewStats={() => { setActiveTab('game'); setGameState('stats'); }}
+          />
+        </div>
+      )}
+      
+      {/* Guest preview banner */}
+      {isGuest && <GuestBanner onSignUp={exitGuest} />}
+
+      {/* Tab Navigation */}
+      {(gameState === 'menu' || activeTab === 'study' || activeTab === 'flashcards') && (
+        <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
+      )}
+
+      {/* Game Tab Content */}
+      {activeTab === 'game' && (
+        <>
+          {gameState === 'menu' && (
+            <MenuScreen
+              globalStats={globalStats}
+              isGuest={isGuest}
+              onStartGame={() => {
+                // First quiz session is free for signed-in users; after that
+                // (with billing on) quizzes require a subscription.
+                const needsSub = BILLING_ENABLED && !isGuest && !entitled && globalStats.totalSessions >= 1;
+                setGameState(needsSub ? 'paywall' : 'domainSelect');
+              }}
+              onStartExam={() => {
+                // Exam simulator is premium from the start when billing is on
+                // (guests get the guest upsell instead).
+                const needsSub = BILLING_ENABLED && !isGuest && !entitled;
+                setGameState(needsSub ? 'paywall' : 'exam');
+              }}
+              onViewStats={() => setGameState('stats')}
+              onStudyGuide={() => setActiveTab('study')}
+              soundEnabled={soundEnabled}
+              onToggleSound={() => setSoundEnabled(!soundEnabled)}
+            />
+          )}
+
+          {gameState === 'paywall' && (
+            <PaywallScreen
+              certId={CERT_ID}
+              certName="AWS Certified Solutions Architect – Associate"
+              onBack={() => setGameState('menu')}
+            />
+          )}
+
+          {gameState === 'exam' && (
+            isGuest ? (
+              <GuestUpsell
+                feature="The Exam Simulator"
+                bullets={[
+                  'Full-length 65-question timed mock exam',
+                  'Real 100–1000 scaled scoring with the 700 pass line',
+                  'Per-domain readiness breakdown and answer review',
+                  'All quiz domains and flashcard decks unlocked',
+                  'Progress synced to the cloud across devices'
+                ]}
+                onSignUp={exitGuest}
+                onBack={() => setGameState('menu')}
+              />
+            ) : (
+              <ExamMode onExit={() => setGameState('menu')} />
+            )
+          )}
+
+          {gameState === 'domainSelect' && (
+            <DomainSelect
+              globalStats={globalStats}
+              onSelectDomain={startDomain}
+              onBack={() => setGameState('menu')}
+              isGuest={isGuest}
+              onGuestUnlock={exitGuest}
+            />
+          )}
+
+          {gameState === 'playing' && currentQuestions.length > 0 && (
+            <QuestionScreen
+              domain={selectedDomain}
+              questions={currentQuestions}
+              currentIndex={currentQuestionIndex}
+              selectedAnswer={selectedAnswer}
+              showExplanation={showExplanation}
+              sessionStats={sessionStats}
+              showParticles={showParticles}
+              onAnswer={handleAnswer}
+              onNext={nextQuestion}
+              onQuit={() => setGameState('menu')}
+            />
+          )}
+
+          {gameState === 'results' && (
+            <ResultsScreen
+              domain={selectedDomain}
+              sessionStats={sessionStats}
+              totalQuestions={currentQuestions.length}
+              onRetry={() => startDomain(selectedDomain.id)}
+              onSelectDomain={() => setGameState('domainSelect')}
+              onMainMenu={() => setGameState('menu')}
+            />
+          )}
+
+          {gameState === 'stats' && (
+            <StatsScreen
+              globalStats={globalStats}
+              onBack={() => setGameState('menu')}
+              onReset={resetStats}
+            />
+          )}
+
+          {gameState === 'settings' && (
+            <SettingsPage onBack={() => setGameState('menu')} />
+          )}
+        </>
+      )}
+
+      {/* Study Guide Tab Content */}
+      {activeTab === 'flashcards' && (
+        <Flashcards
+          onBack={() => setActiveTab('game')}
+          isGuest={isGuest}
+          onGuestUnlock={exitGuest}
+        />
+      )}
+
+      {activeTab === 'study' && (
+        <StudyGuide onBack={() => setActiveTab('game')} />
+      )}
+    </div>
+  );
+}
+
+// Main App with Auth Gate
+function AppContent() {
+  const { isAuthenticated, loading, isGuest, continueAsGuest } = useAuth();
+
+  // Show loading while checking auth
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  // Require authentication or guest preview - show auth screen otherwise
+  if (!isAuthenticated && !isGuest) {
+    return <AuthScreen hubUrl={HUB_URL} onGuestContinue={continueAsGuest} />;
+  }
+
+  // User is authenticated, show the game
+  return <GameContent />;
+}
+
+// App wrapper with AuthProvider
+function App() {
+  return (
+    <AuthProvider requireAuth={true}>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+
+export default App;
