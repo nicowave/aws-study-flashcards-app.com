@@ -11,243 +11,243 @@ export const cloudTechnology = {
   questions: [
     {
       id: 'ct1',
-      question: 'What is Amazon EC2?',
+      question: 'A team is migrating a legacy application that requires full control over the operating system, installed software, and instance sizing. Which AWS service provides resizable virtual servers for this?',
       options: [
-        'A managed relational database service for running SQL workloads',
-        'A virtual server in the cloud that provides resizable compute capacity',
-        'A durable object storage service for storing and retrieving any amount of data',
-        'A global content delivery network that caches content close to users'
+        'AWS Lambda',
+        'AWS Elastic Beanstalk',
+        'Amazon EC2',
+        'Amazon WorkSpaces'
       ],
-      correctAnswer: 1,
-      explanation: 'Amazon EC2 (Elastic Compute Cloud) provides resizable virtual servers (instances) in the cloud. You can choose the instance type, operating system, and configure networking and storage.'
+      correctAnswer: 2,
+      explanation: 'Amazon EC2 provides virtual servers (instances) where you choose the operating system, instance type, and software — exactly the control a legacy migration needs. Lambda runs short-lived functions with no OS access, Elastic Beanstalk abstracts away much of the environment management, and WorkSpaces provides virtual desktops for end users, not application servers.'
     },
     {
       id: 'ct2',
-      question: 'What is Amazon S3?',
+      question: 'A mobile app must durably store millions of user-uploaded photos and retrieve any of them on demand over HTTPS, with no capacity planning. Which service is designed for this?',
       options: [
-        'A compute service that provides resizable virtual servers in the cloud',
-        'A managed relational database service supporting multiple database engines',
-        'An object storage service with virtually unlimited storage capacity',
-        'A block storage service that attaches persistent volumes to instances'
+        'Amazon S3',
+        'Amazon EBS',
+        'Amazon RDS',
+        'AWS Snowball'
       ],
-      correctAnswer: 2,
-      explanation: 'Amazon S3 (Simple Storage Service) is an object storage service that offers industry-leading scalability, data availability, security, and performance for virtually unlimited storage.'
+      correctAnswer: 0,
+      explanation: 'Amazon S3 stores objects with very high durability and virtually unlimited capacity, and each photo can be retrieved directly over HTTPS. EBS is block storage that must be attached to EC2 instances, RDS is a relational database rather than a media store, and Snowball is a physical device for bulk data transfer, not ongoing storage.'
     },
     {
       id: 'ct3',
-      question: 'Which AWS service provides a managed relational database?',
+      question: 'An e-commerce team wants to run a MySQL database with automated backups, patching, and easy scaling — without administering database servers themselves. Which service should they choose?',
       options: [
         'Amazon DynamoDB',
-        'Amazon RDS',
-        'Amazon S3',
-        'Amazon ElastiCache'
+        'Amazon ElastiCache',
+        'Amazon Redshift',
+        'Amazon RDS'
       ],
-      correctAnswer: 1,
-      explanation: 'Amazon RDS (Relational Database Service) is a managed service that makes it easy to set up, operate, and scale relational databases. It supports MySQL, PostgreSQL, Oracle, SQL Server, and more.'
+      correctAnswer: 3,
+      explanation: 'Amazon RDS runs managed relational engines including MySQL, PostgreSQL, MariaDB, Oracle, and SQL Server, handling backups, patching, and scaling for you. DynamoDB is a NoSQL key-value database and cannot run MySQL, ElastiCache is an in-memory cache, and Redshift is a data warehouse for analytics rather than transactional workloads.'
     },
     {
       id: 'ct4',
-      question: 'What is AWS Lambda?',
+      question: 'Whenever a photo lands in an S3 bucket, a team needs code to run for a few seconds to generate a thumbnail — with no servers to manage and no charge while idle. Which compute service fits?',
       options: [
-        'A service that provides resizable virtual machines you fully manage',
-        'A serverless compute service that runs code without provisioning servers',
-        'A managed service for orchestrating and scaling containerized applications',
-        'A service that automatically distributes incoming traffic across multiple targets'
-      ],
-      correctAnswer: 1,
-      explanation: 'AWS Lambda is a serverless compute service that lets you run code without provisioning or managing servers. You pay only for the compute time you consume.'
-    },
-    {
-      id: 'ct5',
-      question: 'What is Amazon VPC?',
-      options: [
-        'A virtual private cloud that lets you launch AWS resources in a logically isolated network',
-        'A managed service for creating encrypted VPN connections to on-premises networks',
-        'A dedicated private network connection between your data center and AWS',
-        'A scalable DNS service that routes end users to internet applications'
-      ],
-      correctAnswer: 0,
-      explanation: 'Amazon VPC (Virtual Private Cloud) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a virtual network that you define.'
-    },
-    {
-      id: 'ct6',
-      question: 'Which AWS service is a fast, fully managed NoSQL database?',
-      options: [
-        'Amazon RDS',
-        'Amazon DynamoDB',
-        'Amazon Redshift',
-        'Amazon Aurora'
-      ],
-      correctAnswer: 1,
-      explanation: 'Amazon DynamoDB is a fully managed NoSQL database service that provides fast and predictable performance with seamless scalability. It\'s great for applications needing single-digit millisecond latency.'
-    },
-    {
-      id: 'ct7',
-      question: 'What is Amazon CloudFront?',
-      options: [
-        'A web application firewall that filters malicious traffic before it reaches your site',
-        'A content delivery network (CDN) that delivers content with low latency',
-        'A scalable DNS service that routes users to applications and registers domains',
-        'A networking service that improves availability by routing traffic over the AWS global network'
-      ],
-      correctAnswer: 1,
-      explanation: 'Amazon CloudFront is a fast CDN service that securely delivers data, videos, applications, and APIs to customers globally with low latency and high transfer speeds.'
-    },
-    {
-      id: 'ct8',
-      question: 'Which service provides managed container orchestration?',
-      options: [
-        'AWS Lambda',
-        'Amazon ECS and Amazon EKS',
         'Amazon EC2',
+        'AWS Lambda',
+        'Amazon Lightsail',
         'AWS Elastic Beanstalk'
       ],
       correctAnswer: 1,
-      explanation: 'Amazon ECS (Elastic Container Service) and Amazon EKS (Elastic Kubernetes Service) are managed container orchestration services. ECS is AWS-native, while EKS is managed Kubernetes.'
+      explanation: 'Lambda runs code in response to events like S3 uploads, with no servers to provision and billing only for the time the code actually runs. EC2 and Lightsail instances keep running (and billing) even when idle, and Elastic Beanstalk deploys long-running web application environments rather than short event-driven functions.'
+    },
+    {
+      id: 'ct5',
+      question: 'Before launching its first workloads, a company needs a logically isolated network on AWS where it defines its own IP address ranges, subnets, and route tables. Which service provides this foundation?',
+      options: [
+        'AWS Direct Connect',
+        'Amazon Route 53',
+        'Amazon VPC',
+        'AWS Site-to-Site VPN'
+      ],
+      correctAnswer: 2,
+      explanation: 'Amazon VPC lets you carve out an isolated virtual network in AWS, choosing your own IP ranges, subnets, route tables, and gateways — the networking foundation other resources launch into. Direct Connect and Site-to-Site VPN connect on-premises networks to AWS, and Route 53 is a DNS service, not a network container.'
+    },
+    {
+      id: 'ct6',
+      question: 'A mobile game must store player session state and leaderboard scores for millions of concurrent players, with consistently fast key-value reads and writes at any scale. Which fully managed NoSQL database fits?',
+      options: [
+        'Amazon DynamoDB',
+        'Amazon RDS for MySQL',
+        'Amazon Redshift',
+        'Amazon Neptune'
+      ],
+      correctAnswer: 0,
+      explanation: 'DynamoDB is a fully managed NoSQL key-value database that delivers single-digit millisecond performance and scales automatically — a classic fit for gaming session state and leaderboards. RDS for MySQL is relational and would need capacity management at this scale, Redshift is an analytics warehouse, and Neptune is a graph database for connected-relationship queries.'
+    },
+    {
+      id: 'ct7',
+      question: 'A media company streams video files to viewers on several continents and wants copies cached at locations near each viewer to reduce latency. Which service delivers this?',
+      options: [
+        'AWS Global Accelerator',
+        'Amazon Route 53',
+        'Amazon S3 Transfer Acceleration',
+        'Amazon CloudFront'
+      ],
+      correctAnswer: 3,
+      explanation: 'CloudFront is a content delivery network that caches content at edge locations worldwide, so each viewer is served from a nearby point of presence. Global Accelerator routes traffic onto the AWS backbone but does not cache content, S3 Transfer Acceleration speeds uploads into S3 rather than deliveries to viewers, and Route 53 resolves DNS names without caching content.'
+    },
+    {
+      id: 'ct8',
+      question: 'A company has packaged its microservices as Docker containers and needs a managed service to schedule, deploy, and scale those containers across a cluster. Which pair of services provides this orchestration?',
+      options: [
+        'AWS CodeDeploy and AWS CodePipeline',
+        'Amazon ECS and Amazon EKS',
+        'Amazon EC2 and Amazon EBS',
+        'AWS CloudFormation and AWS Config'
+      ],
+      correctAnswer: 1,
+      explanation: 'Amazon ECS is the AWS-native container orchestrator, and Amazon EKS is managed Kubernetes — both schedule and scale containers across clusters. CodeDeploy and CodePipeline automate software releases rather than run containers, EC2 and EBS are raw compute and block storage, and CloudFormation and Config handle infrastructure templates and configuration tracking.'
     },
     {
       id: 'ct9',
-      question: 'What is the purpose of Amazon Route 53?',
+      question: 'A startup needs to register a new domain name and then route users to its application with DNS records, including health-check-based failover routing. Which service handles both tasks?',
       options: [
-        'Distributing incoming traffic across multiple targets',
-        'DNS web service and domain registration',
-        'Caching and delivering content at edge locations',
-        'Connecting on-premises networks privately to AWS'
+        'Amazon Route 53',
+        'Amazon CloudFront',
+        'Elastic Load Balancing',
+        'AWS Global Accelerator'
       ],
-      correctAnswer: 1,
-      explanation: 'Amazon Route 53 is a highly available and scalable DNS web service. It routes end users to Internet applications and can also register domain names.'
+      correctAnswer: 0,
+      explanation: 'Route 53 is both a domain registrar and a scalable DNS service, offering routing policies such as failover, latency-based, and weighted routing with health checks. CloudFront caches content at edge locations, ELB balances traffic that has already reached your application, and Global Accelerator optimizes network paths — none of them register domains or serve DNS records.'
     },
     {
       id: 'ct10',
-      question: 'What is Elastic Load Balancing (ELB)?',
+      question: 'A web application runs on six EC2 instances across two Availability Zones. The team wants a single endpoint that spreads incoming requests across only the healthy instances. Which service provides this?',
       options: [
-        'A service that automatically distributes incoming traffic across multiple targets',
-        'A service that adds or removes EC2 instances automatically based on demand',
-        'A service that routes end users to applications using DNS policies',
-        'A service that monitors resource utilization and application performance metrics'
+        'Amazon Route 53',
+        'AWS Auto Scaling',
+        'Elastic Load Balancing',
+        'Amazon API Gateway'
       ],
-      correctAnswer: 0,
-      explanation: 'Elastic Load Balancing automatically distributes incoming application traffic across multiple targets, such as EC2 instances, containers, and IP addresses, in one or more Availability Zones.'
+      correctAnswer: 2,
+      explanation: 'Elastic Load Balancing gives the application one endpoint, health-checks each registered target, and distributes requests across healthy instances in multiple Availability Zones. Auto Scaling changes how many instances exist rather than routing individual requests, Route 53 resolves DNS names, and API Gateway publishes and manages APIs rather than balancing traffic to an instance fleet.'
     },
     {
       id: 'ct11',
-      question: 'Which AWS storage service is best for frequently accessed data?',
+      question: 'A photo-sharing app serves images that are downloaded thousands of times a day, and the team wants millisecond access with no per-retrieval fees. Which S3 storage class fits this hot data?',
       options: [
-        'Amazon S3 Glacier',
-        'Amazon S3 Standard',
-        'Amazon S3 Glacier Deep Archive',
-        'AWS Storage Gateway'
+        'S3 Glacier Flexible Retrieval',
+        'S3 Standard',
+        'S3 One Zone-Infrequent Access',
+        'S3 Glacier Deep Archive'
       ],
       correctAnswer: 1,
-      explanation: 'Amazon S3 Standard is designed for frequently accessed data. It offers high durability, availability, and performance for general-purpose storage.'
+      explanation: 'S3 Standard is built for frequently accessed data: millisecond latency, high availability, and no retrieval fees, so heavy read traffic costs nothing extra per download. The Infrequent Access class charges a fee on every retrieval, which adds up fast for hot data, and the Glacier classes are archival tiers with retrieval costs and, in most cases, retrieval delays.'
     },
     {
       id: 'ct12',
-      question: 'What is Amazon EBS?',
+      question: 'A database running on a single EC2 instance needs storage that survives instance stops, supports point-in-time snapshots, and can grow in size as the data grows. Which storage service fits?',
       options: [
-        'An object storage service that stores data as objects within buckets',
-        'Block storage volumes for use with EC2 instances',
-        'A shared file system that multiple EC2 instances can mount at once',
-        'A centralized service for automating backups across AWS services'
+        'Amazon S3',
+        'EC2 instance store',
+        'Amazon EFS',
+        'Amazon EBS'
       ],
-      correctAnswer: 1,
-      explanation: 'Amazon EBS (Elastic Block Store) provides persistent block storage volumes for use with EC2 instances. EBS volumes persist independently from the life of an instance.'
+      correctAnswer: 3,
+      explanation: 'EBS provides persistent block storage volumes that live independently of the instance, can be snapshotted for point-in-time backups, and can be increased in size as needs grow. Instance store is ephemeral and loses data when the instance stops, S3 is object storage that cannot be mounted as a database disk, and EFS is a shared file system rather than the block volume a database engine expects.'
     },
     {
       id: 'ct13',
-      question: 'Which AWS service provides a fully managed message queuing service?',
+      question: 'A checkout service produces orders faster than the fulfillment backend can process them. The team wants a buffer that holds each order until the backend is ready, so spikes never overwhelm it. Which service decouples these components?',
+      options: [
+        'Amazon SQS',
+        'Amazon SNS',
+        'Amazon Kinesis Data Firehose',
+        'AWS Step Functions'
+      ],
+      correctAnswer: 0,
+      explanation: 'SQS is a managed message queue: producers enqueue orders at any rate, messages wait durably, and the consumer pulls them at its own pace — the standard pattern for absorbing traffic spikes. SNS pushes messages to subscribers immediately rather than buffering for a slow consumer, Firehose delivers streaming data into storage and analytics destinations, and Step Functions orchestrates workflow steps rather than queuing work.'
+    },
+    {
+      id: 'ct14',
+      question: 'Developers want to upload their Node.js web application and have AWS automatically handle capacity provisioning, load balancing, and scaling — while keeping full access to the underlying EC2 resources. Which service does this?',
+      options: [
+        'AWS Lambda',
+        'Amazon Lightsail',
+        'AWS Elastic Beanstalk',
+        'AWS CloudFormation'
+      ],
+      correctAnswer: 2,
+      explanation: 'Elastic Beanstalk takes uploaded application code and automatically provisions the environment — instances, load balancer, and scaling — while leaving the underlying resources visible and controllable. Lambda runs event-driven functions rather than a full web environment, Lightsail is a simplified fixed-price VPS you manage yourself, and CloudFormation provisions resources from templates you author instead of from application code.'
+    },
+    {
+      id: 'ct15',
+      question: 'Analysts need to run complex SQL queries that join years of sales history — hundreds of terabytes — to power recurring business reports. Which service is a purpose-built data warehouse for this?',
+      options: [
+        'Amazon DynamoDB',
+        'Amazon ElastiCache',
+        'Amazon Kinesis',
+        'Amazon Redshift'
+      ],
+      correctAnswer: 3,
+      explanation: 'Redshift is a fully managed, petabyte-scale data warehouse optimized for complex analytical SQL across huge historical datasets, and it integrates with standard BI tools. DynamoDB is a key-value database that does not run analytical SQL joins, ElastiCache is an in-memory cache, and Kinesis ingests streaming data rather than storing and querying a warehouse.'
+    },
+    {
+      id: 'ct16',
+      question: 'A rendering farm of many EC2 instances must read and write the same set of project files simultaneously through a standard file system interface. Which storage service fits?',
+      options: [
+        'Amazon EBS',
+        'Amazon EFS',
+        'S3 Glacier Deep Archive',
+        'EC2 instance store'
+      ],
+      correctAnswer: 1,
+      explanation: 'EFS is a managed, elastic NFS file system that many EC2 instances can mount and access concurrently. An EBS volume attaches to a single instance at a time (outside niche multi-attach cases), Glacier Deep Archive is archival object storage with hours-long retrieval, and instance store is ephemeral per-host storage.'
+    },
+    {
+      id: 'ct17',
+      question: 'When a deployment finishes, a platform team wants a single event pushed simultaneously to an email list, an SMS group, and several webhook endpoints. Which service does this?',
       options: [
         'Amazon SNS',
         'Amazon SQS',
         'AWS Step Functions',
-        'Amazon EventBridge'
+        'Amazon Kinesis'
       ],
-      correctAnswer: 1,
-      explanation: 'Amazon SQS (Simple Queue Service) is a fully managed message queuing service that enables you to decouple and scale microservices, distributed systems, and serverless applications.'
-    },
-    {
-      id: 'ct14',
-      question: 'What is AWS Elastic Beanstalk?',
-      options: [
-        'A managed service for running containerized applications on clusters',
-        'A service for deploying and scaling web applications without managing infrastructure',
-        'A serverless compute service that runs code in response to events',
-        'An infrastructure as code service for provisioning resources from templates'
-      ],
-      correctAnswer: 1,
-      explanation: 'AWS Elastic Beanstalk is a service for deploying and scaling web applications. You simply upload your code, and Elastic Beanstalk automatically handles deployment, capacity provisioning, and load balancing.'
-    },
-    {
-      id: 'ct15',
-      question: 'What is Amazon Redshift used for?',
-      options: [
-        'Ingesting and processing real-time streaming data',
-        'Data warehousing and analytics',
-        'Running key-value NoSQL database workloads',
-        'Caching frequently accessed data in memory'
-      ],
-      correctAnswer: 1,
-      explanation: 'Amazon Redshift is a fast, fully managed data warehouse that makes it simple and cost-effective to analyze all your data using standard SQL and existing business intelligence tools.'
-    },
-    {
-      id: 'ct16',
-      question: 'Which service provides managed file storage for EC2?',
-      options: [
-        'Amazon S3',
-        'Amazon EFS',
-        'Amazon EBS',
-        'AWS Storage Gateway'
-      ],
-      correctAnswer: 1,
-      explanation: 'Amazon EFS (Elastic File System) provides simple, scalable, elastic file storage for use with EC2 instances. Multiple instances can access an EFS file system simultaneously.'
-    },
-    {
-      id: 'ct17',
-      question: 'What is Amazon SNS?',
-      options: [
-        'A message queuing service for decoupling application components',
-        'A pub/sub messaging service for sending notifications',
-        'A service for streaming and processing real-time data at scale',
-        'A serverless workflow service that coordinates distributed applications'
-      ],
-      correctAnswer: 1,
-      explanation: 'Amazon SNS (Simple Notification Service) is a fully managed pub/sub messaging service for sending notifications. It can send messages to email, SMS, HTTP endpoints, and other AWS services.'
+      correctAnswer: 0,
+      explanation: 'SNS is pub/sub: one published message fans out to every subscribed endpoint — email, SMS, HTTP webhooks, Lambda, and SQS queues. SQS delivers each message to a polling consumer rather than pushing to many subscribers, Step Functions orchestrates workflows, and Kinesis is for high-volume stream processing.'
     },
     {
       id: 'ct18',
-      question: 'Which AWS service can automatically scale EC2 capacity?',
+      question: 'A web application needs EC2 instances added automatically when CPU stays high and removed when traffic drops, so capacity always tracks demand. Which service provides this?',
       options: [
-        'AWS Auto Scaling',
         'Elastic Load Balancing',
-        'Amazon CloudWatch',
-        'AWS CloudFormation'
+        'AWS CloudFormation',
+        'Amazon EC2 Auto Scaling',
+        'Amazon CloudWatch on its own'
       ],
-      correctAnswer: 0,
-      explanation: 'AWS Auto Scaling monitors your applications and automatically adjusts capacity to maintain steady, predictable performance. It can scale EC2 instances, ECS tasks, DynamoDB tables, and more.'
+      correctAnswer: 2,
+      explanation: 'Auto Scaling adds and removes instances based on policies tied to metrics like CPU, keeping capacity matched to demand. ELB distributes traffic across whatever instances exist but doesn\'t change their number, CloudFormation provisions infrastructure from templates, and CloudWatch supplies the metrics and alarms that trigger scaling but doesn\'t scale anything by itself.'
     },
     {
       id: 'ct19',
-      question: 'What is AWS CloudFormation?',
+      question: 'A team must stand up identical dev, staging, and production environments repeatedly, with every AWS resource defined in reviewable template files. Which service is built for this?',
       options: [
-        'A monitoring service that collects metrics and logs from AWS resources',
-        'An infrastructure as code service for provisioning AWS resources',
-        'A service for deploying web applications without managing infrastructure yourself',
-        'A service for automating software release pipelines and deployments'
+        'AWS CloudFormation',
+        'AWS Elastic Beanstalk',
+        'Amazon CloudWatch',
+        'AWS Trusted Advisor'
       ],
-      correctAnswer: 1,
-      explanation: 'AWS CloudFormation is an infrastructure as code service that allows you to model and provision AWS resources using templates. It automates and standardizes resource deployment.'
+      correctAnswer: 0,
+      explanation: 'CloudFormation is infrastructure as code: templates declare resources, and identical stacks can be created, updated, and deleted repeatably across environments. Beanstalk manages an application environment without template-level control of arbitrary resources, CloudWatch is monitoring, and Trusted Advisor offers best-practice recommendations.'
     },
     {
       id: 'ct20',
-      question: 'What is Amazon Aurora?',
+      question: 'A company wants to migrate its self-managed MySQL database to a managed AWS engine that keeps MySQL compatibility while offering substantially higher throughput and storage replicated across Availability Zones. Which service fits?',
       options: [
-        'A fully managed NoSQL database delivering single-digit millisecond performance',
-        'A MySQL and PostgreSQL-compatible relational database with improved performance',
-        'A petabyte-scale data warehouse for analytics using standard SQL',
-        'A managed graph database service for highly connected datasets'
+        'Amazon DynamoDB',
+        'Amazon Redshift',
+        'Amazon Neptune',
+        'Amazon Aurora'
       ],
-      correctAnswer: 1,
-      explanation: 'Amazon Aurora is a MySQL and PostgreSQL-compatible relational database that combines the performance and availability of high-end commercial databases with the simplicity and cost-effectiveness of open-source databases.'
+      correctAnswer: 3,
+      explanation: 'Aurora is MySQL- and PostgreSQL-compatible, delivering several times the throughput of standard MySQL with storage automatically replicated across three AZs. DynamoDB is NoSQL with no MySQL compatibility, Redshift is an analytics warehouse, and Neptune is a graph database.'
     },
     {
       id: 'ct21',

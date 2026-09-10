@@ -11,183 +11,183 @@ export const billingSupport = {
   questions: [
     {
       id: 'bs1',
-      question: 'Which AWS tool provides cost estimates for AWS services before you use them?',
+      question: 'A solutions architect is planning a migration and must present leadership with an estimate of monthly AWS costs before any resources are deployed. Which tool should the architect use?',
       options: [
         'AWS Cost Explorer',
-        'AWS Pricing Calculator',
         'AWS Budgets',
+        'AWS Pricing Calculator',
         'AWS Cost and Usage Report'
       ],
-      correctAnswer: 1,
-      explanation: 'AWS Pricing Calculator helps you estimate the cost of AWS services before you use them. You can model your solutions and explore price points for your use case.'
+      correctAnswer: 2,
+      explanation: 'The AWS Pricing Calculator models the cost of a planned architecture before anything is deployed, producing shareable estimates for services you have not used yet. Cost Explorer and the Cost and Usage Report only analyze spend that has already occurred, and Budgets tracks actual or forecasted spend against thresholds rather than estimating new workloads.'
     },
     {
       id: 'bs2',
-      question: 'Which AWS support plan provides access to a Technical Account Manager (TAM)?',
+      question: 'A large enterprise wants a designated AWS employee who proactively reviews its architecture, coordinates access to AWS experts, and provides ongoing operational guidance. Which support plan includes this Technical Account Manager (TAM)?',
       options: [
-        'Basic',
-        'Developer',
+        'Enterprise',
         'Business',
-        'Enterprise'
+        'Developer',
+        'Basic'
       ],
-      correctAnswer: 3,
-      explanation: 'Only the Enterprise support plan provides a designated Technical Account Manager (TAM) who provides consultative architectural and operational guidance.'
+      correctAnswer: 0,
+      explanation: 'A designated Technical Account Manager is an Enterprise support plan feature, providing consultative architectural and operational guidance tailored to the customer. Business support offers 24/7 technical support and full Trusted Advisor checks but no TAM, while Developer and Basic offer no designated contact at all.'
     },
     {
       id: 'bs3',
-      question: 'What is AWS Free Tier?',
+      question: 'A startup has just created its first AWS account and wants to experiment with services such as EC2 and S3 without incurring charges. Which statement accurately describes the AWS Free Tier the startup can use?',
       options: [
-        'A permanent free version of all AWS services',
-        'A trial period offering free usage of certain AWS services for new customers',
-        'A discount program offering reduced rates to students and educators',
-        'A credit program that reimburses new customers for their first month of usage'
+        'It makes every AWS service permanently free as long as usage stays low',
+        'It refunds new customers for whatever they spend during their first month',
+        'It applies discounted academic pricing to accounts owned by students',
+        'It offers limited free usage of certain services, including 12-month, always-free, and trial offers'
       ],
-      correctAnswer: 1,
-      explanation: 'AWS Free Tier offers free usage of certain AWS services. It includes: Always Free (never expire), 12 Months Free (for new customers), and Trials (short-term free trials).'
+      correctAnswer: 3,
+      explanation: 'The Free Tier provides limited free usage of specific services in three forms: 12 Months Free for new accounts, Always Free offers that never expire, and short-term trials. It does not cover every service or unlimited usage, it is not a refund program, and it is unrelated to academic discounts.'
     },
     {
       id: 'bs4',
-      question: 'What is the difference between Reserved Instances and On-Demand Instances?',
+      question: 'A company runs a database server with steady, predictable usage 24/7 and expects the workload to continue unchanged for the next three years. Compared with On-Demand, why would Reserved Instances be the better choice?',
       options: [
-        'Reserved Instances run on hardware dedicated to a single customer',
-        'Reserved require a 1 or 3-year commitment but offer significant discounts (up to 72%)',
-        'Reserved Instances can be interrupted at any time while On-Demand cannot',
-        'Reserved Instances are billed per second while On-Demand is billed monthly'
+        'Reserved Instances run on physical hardware dedicated to one customer',
+        'Reserved Instances trade a 1- or 3-year commitment for discounts of up to 72%',
+        'Reserved Instances can scale automatically while On-Demand cannot',
+        'Reserved Instances are exempt from data transfer and storage charges'
       ],
       correctAnswer: 1,
-      explanation: 'Reserved Instances require a 1 or 3-year commitment but offer up to 72% discount compared to On-Demand pricing. They\'re ideal for steady-state workloads with predictable usage.'
+      explanation: 'Reserved Instances offer up to 72% savings over On-Demand in exchange for a 1- or 3-year commitment, which fits steady, predictable workloads perfectly. Dedicated hardware describes Dedicated Hosts, not RIs, auto scaling is a separate feature available to any purchasing option, and no purchasing option waives data transfer or storage charges.'
     },
     {
       id: 'bs5',
-      question: 'What is AWS Organizations?',
+      question: 'A company has grown to 40 AWS accounts across several business units and wants to apply governance policies centrally and receive one combined bill. Which service should it use?',
       options: [
-        'A service for grouping IAM users and roles within a single account',
-        'A service for centrally managing multiple AWS accounts',
-        'A directory service that federates workforce identities into AWS',
-        'A tagging service for organizing AWS resources into logical groups'
+        'AWS IAM Identity Center',
+        'AWS Resource Groups',
+        'AWS Organizations',
+        'AWS Config'
       ],
-      correctAnswer: 1,
-      explanation: 'AWS Organizations lets you centrally manage multiple AWS accounts, apply policies across accounts, and consolidate billing. It helps with governance and cost management at scale.'
+      correctAnswer: 2,
+      explanation: 'AWS Organizations centrally manages multiple AWS accounts, letting you apply service control policies across them and consolidate billing into a single invoice. IAM Identity Center manages workforce sign-in rather than accounts themselves, Resource Groups only organizes resources within accounts, and AWS Config records resource configuration changes.'
     },
     {
       id: 'bs6',
-      question: 'Which tool allows you to set custom cost and usage budgets?',
+      question: 'A finance manager wants an automatic email alert when the company\'s monthly AWS spend is forecasted to exceed $5,000, before the overage actually happens. Which tool provides this?',
       options: [
-        'AWS Cost Explorer',
         'AWS Budgets',
+        'AWS Cost Explorer',
         'AWS Pricing Calculator',
-        'AWS Trusted Advisor'
+        'AWS CloudTrail'
       ],
-      correctAnswer: 1,
-      explanation: 'AWS Budgets allows you to set custom budgets and receive alerts when your costs or usage exceed (or are forecasted to exceed) your budgeted amount.'
+      correctAnswer: 0,
+      explanation: 'AWS Budgets lets you set custom cost or usage thresholds and sends alerts when actual or forecasted spend crosses them, so it can warn before the $5,000 mark is reached. Cost Explorer visualizes and forecasts spend but does not send threshold alerts, the Pricing Calculator only estimates costs pre-deployment, and CloudTrail logs API activity, not spending.'
     },
     {
       id: 'bs7',
-      question: 'What are Spot Instances?',
+      question: 'A media company runs a nightly batch job that renders video thumbnails. The job is fault-tolerant and can resume after a failure, and the company wants the lowest possible EC2 cost. Which purchasing option is the best fit?',
       options: [
-        'EC2 capacity reserved in a specific Availability Zone for immediate use',
-        'Unused EC2 capacity available at up to 90% discount that can be interrupted',
-        'Instances that run on physical servers dedicated to a single customer',
-        'Discounted instances that require a 1 or 3-year commitment paid upfront'
+        'On-Demand Instances',
+        'Reserved Instances',
+        'Dedicated Hosts',
+        'Spot Instances'
       ],
-      correctAnswer: 1,
-      explanation: 'Spot Instances let you use unused EC2 capacity at up to 90% discount. However, they can be interrupted with a 2-minute warning when AWS needs the capacity back.'
+      correctAnswer: 3,
+      explanation: 'Spot Instances sell unused EC2 capacity at discounts of up to 90%, and the trade-off — interruption with a two-minute warning — is acceptable because the batch job can resume. On-Demand carries no discount, Reserved Instances suit steady 24/7 workloads rather than interruptible batches, and Dedicated Hosts are the most expensive option, used for licensing or compliance needs.'
     },
     {
       id: 'bs8',
-      question: 'Which AWS support plan is free and available to all customers?',
+      question: 'A student is learning AWS on a personal account and does not want to pay anything for support. Which support plan is included at no charge for every AWS customer?',
       options: [
         'Developer',
-        'Business',
         'Basic',
+        'Business',
         'Enterprise'
       ],
-      correctAnswer: 2,
-      explanation: 'Basic support is free and available to all AWS customers. It includes 24/7 access to customer service, documentation, whitepapers, and AWS Trusted Advisor core checks.'
+      correctAnswer: 1,
+      explanation: 'Basic support is free and automatically included with every AWS account, providing 24/7 customer service for account and billing questions, documentation, and the core Trusted Advisor checks. Developer, Business, and Enterprise are paid tiers that add technical support cases and faster response times.'
     },
     {
       id: 'bs9',
-      question: 'What does Consolidated Billing in AWS Organizations provide?',
+      question: 'A company with 25 AWS accounts in an organization enables Consolidated Billing. What benefit should the company expect?',
       options: [
-        'Separate invoices generated individually for each member account',
-        'A single bill for all accounts with potential volume discounts',
-        'Free Tier benefits multiplied across every account in the organization',
-        'Automatic identification and termination of unused resources to cut costs'
+        'Each account continues to receive and pay its own separate invoice',
+        'Free Tier allowances are multiplied by the number of member accounts',
+        'One combined bill, with aggregated usage that can reach volume discount tiers sooner',
+        'Idle resources across all accounts are automatically terminated to reduce spend'
       ],
-      correctAnswer: 1,
-      explanation: 'Consolidated Billing combines usage from all accounts in an organization into a single bill. This can result in volume discounts as aggregated usage may reach pricing tiers sooner.'
+      correctAnswer: 2,
+      explanation: 'Consolidated Billing rolls all member accounts into a single invoice paid by the management account, and because usage is aggregated across accounts, tiered volume discounts can kick in sooner. It does not multiply Free Tier benefits across accounts, and no billing feature terminates resources on its own.'
     },
     {
       id: 'bs10',
-      question: 'What is AWS Cost Explorer?',
+      question: 'A cloud analyst is asked why the company\'s AWS bill jumped 40% last month and to project spending for the next quarter. Which tool lets the analyst visualize historical costs and generate forecasts?',
       options: [
-        'A tool to estimate the cost of AWS services before you deploy them',
-        'A tool to visualize and analyze your AWS costs and usage over time',
-        'A tool that sets custom spending thresholds and alerts when they are exceeded',
-        'A dashboard that consolidates invoices from every account into a single bill'
+        'AWS Cost Explorer',
+        'AWS Pricing Calculator',
+        'AWS Budgets',
+        'AWS Trusted Advisor'
       ],
-      correctAnswer: 1,
-      explanation: 'AWS Cost Explorer lets you visualize, understand, and manage your AWS costs and usage over time. It provides interactive charts and forecasting capabilities.'
+      correctAnswer: 0,
+      explanation: 'Cost Explorer provides interactive charts of historical cost and usage, filters by service or tag to find what drove the increase, and forecasts future spend. The Pricing Calculator only estimates costs before deployment, Budgets alerts on thresholds rather than analyzing history, and Trusted Advisor gives best-practice recommendations, not spend visualizations.'
     },
     {
       id: 'bs11',
-      question: 'Which pricing model offers the highest discount for EC2?',
+      question: 'A research team\'s simulation workload can tolerate interruptions and restarts. The team wants the EC2 purchasing option with the deepest possible discount off On-Demand pricing. Which option offers it?',
       options: [
-        'On-Demand',
-        'Reserved Instances',
+        'Savings Plans',
         'Spot Instances',
+        'Reserved Instances',
         'Dedicated Hosts'
       ],
-      correctAnswer: 2,
-      explanation: 'Spot Instances offer the highest discount (up to 90% off On-Demand prices) because they use spare EC2 capacity. However, they can be interrupted, making them suitable for fault-tolerant workloads.'
+      correctAnswer: 1,
+      explanation: 'Spot Instances offer the largest discount of any EC2 purchasing option — up to 90% off On-Demand — because they use spare capacity that AWS can reclaim with a two-minute warning. Savings Plans and Reserved Instances top out around 72% and require a 1- or 3-year commitment, and Dedicated Hosts carry a premium rather than a discount.'
     },
     {
       id: 'bs12',
-      question: 'What is AWS Trusted Advisor?',
+      question: 'An operations team wants automated checks that flag idle EC2 instances, overly permissive security groups, low fault tolerance, and approaching service limits in its account. Which AWS tool provides these recommendations?',
       options: [
-        'A designated engineer who provides consultative architectural guidance',
-        'A service providing recommendations for cost optimization, security, and performance',
-        'A service that aggregates security findings from across your accounts',
-        'A tool that estimates the monthly cost of planned AWS workloads'
+        'Amazon Inspector',
+        'AWS Config',
+        'AWS CloudTrail',
+        'AWS Trusted Advisor'
       ],
-      correctAnswer: 1,
-      explanation: 'AWS Trusted Advisor is an online tool that provides real-time recommendations across five categories: cost optimization, performance, security, fault tolerance, and service limits.'
+      correctAnswer: 3,
+      explanation: 'Trusted Advisor runs automated best-practice checks across five categories — cost optimization, performance, security, fault tolerance, and service limits — which covers all the items the team listed. Inspector focuses on workload vulnerability scanning, Config records and evaluates resource configuration changes, and CloudTrail logs API activity.'
     },
     {
       id: 'bs13',
-      question: 'What is the AWS Partner Network (APN)?',
+      question: 'A consulting firm wants to formally partner with AWS, earn competency designations, and be recognized for delivering customer solutions on AWS. Which program should the firm join?',
       options: [
-        'A private network service that connects AWS accounts across organizations',
-        'A global partner program for companies that build or sell AWS solutions',
-        'A marketplace where customers buy and sell third-party software solutions',
-        'A premium support tier that pairs customers with AWS solutions architects'
+        'AWS Professional Services',
+        'AWS Managed Services',
+        'The AWS Partner Network (APN)',
+        'AWS Activate'
       ],
-      correctAnswer: 1,
-      explanation: 'The AWS Partner Network (APN) is a global partner program for technology and consulting businesses that build solutions or provide services using AWS.'
+      correctAnswer: 2,
+      explanation: 'The AWS Partner Network is the global program for consulting and technology companies that build or deliver solutions on AWS, offering training, competencies, and go-to-market benefits. Professional Services and Managed Services are teams AWS itself provides to customers, and Activate is a credits program for startups, not a partner program.'
     },
     {
       id: 'bs14',
-      question: 'What are Savings Plans?',
+      question: 'A company wants compute discounts but expects to switch instance families, sizes, and Regions as its workloads evolve. It is willing to commit to a consistent spend of $10/hour for three years. Which pricing option fits best?',
       options: [
-        'A commitment to a consistent amount of compute usage ($/hour) for 1 or 3 years for discounts',
-        'A discount automatically applied when usage stays within Free Tier limits',
-        'A billing feature that consolidates invoices across accounts in an organization',
-        'A capacity reservation for EC2 instances in a specific Availability Zone'
+        'Compute Savings Plans',
+        'On-Demand Capacity Reservations',
+        'Standard Reserved Instances for a specific instance type',
+        'Spot Instances'
       ],
       correctAnswer: 0,
-      explanation: 'Savings Plans offer significant savings (up to 72%) over On-Demand in exchange for a commitment to a consistent amount of usage (measured in $/hour) for a 1 or 3-year term.'
+      explanation: 'Compute Savings Plans exchange a 1- or 3-year commitment to a consistent amount of compute usage, measured in dollars per hour, for savings of up to 72% — while automatically applying across instance families, sizes, and Regions. Standard Reserved Instances lock you to specific attributes, Capacity Reservations guarantee capacity without a discount, and Spot provides no guarantee the instances will keep running.'
     },
     {
       id: 'bs15',
-      question: 'Which support plan offers a response time of less than 15 minutes for business-critical system down?',
+      question: 'A financial services company runs a business-critical trading platform and requires AWS to respond in under 15 minutes if that system goes down. Which support plan is the minimum that guarantees this response time?',
       options: [
-        'Basic',
-        'Developer',
         'Business',
-        'Enterprise'
+        'Enterprise',
+        'Developer',
+        'Basic'
       ],
-      correctAnswer: 3,
-      explanation: 'Enterprise support offers less than 15-minute response time for business-critical system down cases. Business support offers less than 1 hour for production system down.'
+      correctAnswer: 1,
+      explanation: 'Only Enterprise support provides a response time of under 15 minutes for business-critical system down cases. Business support\'s fastest target is under 1 hour for a production system down, Developer offers business-hours support with slower targets, and Basic includes no technical support cases at all.'
     },
     {
       id: 'bs16',
