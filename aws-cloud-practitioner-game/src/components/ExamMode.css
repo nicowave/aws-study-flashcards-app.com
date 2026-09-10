@@ -599,3 +599,80 @@
     gap: 4px;
   }
 }
+
+/* Readiness score */
+.exam-readiness {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+  background: var(--md-surface-elevated);
+  border: 1px solid var(--md-border);
+  border-radius: var(--md-radius-lg);
+  padding: 16px 20px;
+  margin: 16px auto;
+  max-width: 560px;
+}
+
+.readiness-score {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid var(--md-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--md-on-surface);
+}
+
+.readiness-score span {
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-left: 1px;
+  color: var(--md-on-surface-variant);
+}
+
+.exam-readiness.ready .readiness-score {
+  border-color: var(--md-success);
+  color: var(--md-success);
+}
+
+.exam-readiness.almost .readiness-score {
+  border-color: var(--md-warning);
+  color: var(--md-warning);
+}
+
+.exam-readiness.low .readiness-score {
+  border-color: var(--md-error);
+  color: var(--md-error);
+}
+
+.readiness-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.readiness-text strong {
+  color: var(--md-on-surface);
+}
+
+.readiness-text span {
+  color: var(--md-on-surface-variant);
+  font-size: 0.9rem;
+}
+
+.readiness-text .readiness-basis {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+@media (max-width: 480px) {
+  .exam-readiness {
+    flex-direction: column;
+    text-align: center;
+  }
+}
