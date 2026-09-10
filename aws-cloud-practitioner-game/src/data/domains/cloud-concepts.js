@@ -11,183 +11,183 @@ export const cloudConcepts = {
   questions: [
     {
       id: 'cc1',
-      question: 'What are the six advantages of cloud computing according to AWS?',
+      question: 'A consultant preparing a cloud business case wants to cite the six advantages of cloud computing exactly as AWS publishes them. Which list is correct?',
       options: [
-        'Trade fixed expense for variable expense, benefit from massive economies of scale, stop guessing capacity, increase speed and agility, stop spending money on data centers, go global in minutes',
-        'Lower total cost of ownership, guaranteed application availability, automatic security compliance, unlimited compute capacity, dedicated hardware for every customer, free premium support',
-        'Pay-as-you-go pricing, reserved capacity discounts, spot pricing for spare capacity, volume-based tiering, free tier access for new customers, enterprise agreements',
-        'Operational excellence, security, reliability, performance efficiency, cost optimization, and sustainability'
+        'Operational excellence, security, reliability, performance efficiency, cost optimization, and sustainability',
+        'Business, people, governance, platform, security, and operations',
+        'Trade fixed expense for variable expense, benefit from massive economies of scale, stop guessing capacity, increase speed and agility, stop spending money running data centers, and go global in minutes',
+        'Rehost, replatform, repurchase, refactor, retire, and retain'
       ],
-      correctAnswer: 0,
-      explanation: 'AWS lists six advantages: (1) Trade fixed expense for variable expense, (2) Benefit from massive economies of scale, (3) Stop guessing capacity, (4) Increase speed and agility, (5) Stop spending money running and maintaining data centers, (6) Go global in minutes.'
+      correctAnswer: 2,
+      explanation: 'AWS\'s six advantages of cloud computing are: trade fixed expense for variable expense, benefit from massive economies of scale, stop guessing capacity, increase speed and agility, stop spending money running and maintaining data centers, and go global in minutes. The other lists are real AWS six-item frameworks but answer different questions: the Well-Architected Framework pillars, the Cloud Adoption Framework perspectives, and the six common migration strategies (the "6 Rs").'
     },
     {
       id: 'cc2',
-      question: 'What does "elasticity" mean in cloud computing?',
+      question: 'A solutions architect keeps using the term "elasticity" while presenting a proposed AWS design. What does elasticity mean in cloud computing?',
       options: [
-        'The ability to recover automatically from infrastructure or component failures',
-        'The ability to acquire resources when needed and release them when no longer needed',
-        'The ability to handle long-term growth by permanently adding more capacity',
-        'The ability to distribute workloads across multiple geographic regions'
+        'Recovering automatically when infrastructure components fail',
+        'Adding permanent capacity to accommodate long-term growth',
+        'Distributing copies of data across multiple geographic Regions',
+        'Acquiring resources as demand increases and releasing them when demand drops'
       ],
-      correctAnswer: 1,
-      explanation: 'Elasticity is the ability to automatically scale resources up or down based on demand. You acquire resources when you need them and release them when you don\'t, paying only for what you use.'
+      correctAnswer: 3,
+      explanation: 'Elasticity means resources expand and contract with actual demand, so you pay only for what you use at any moment. Automatic recovery from failure describes fault tolerance, permanently adding capacity is traditional fixed scaling rather than elasticity, and cross-Region data copies describe replication.'
     },
     {
       id: 'cc3',
-      question: 'Which cloud computing model provides the MOST control over the underlying infrastructure?',
+      question: 'A systems team migrating a legacy workload must choose its own operating system, install custom kernel-level agents, and control the patching schedule. Which cloud service model gives them this level of control?',
       options: [
+        'Infrastructure as a Service (IaaS)',
         'Software as a Service (SaaS)',
         'Platform as a Service (PaaS)',
-        'Infrastructure as a Service (IaaS)',
         'Function as a Service (FaaS)'
       ],
-      correctAnswer: 2,
-      explanation: 'IaaS provides the most control over IT resources. You manage the OS, applications, and data while AWS manages the hardware, networking, and virtualization. Examples include EC2 and EBS.'
+      correctAnswer: 0,
+      explanation: 'IaaS (such as Amazon EC2) provides the most control: the customer manages the operating system, installed software, and patching while AWS manages the physical hardware and virtualization. PaaS abstracts away the OS, FaaS abstracts away servers entirely, and SaaS delivers a finished application with no infrastructure access at all.'
     },
     {
       id: 'cc4',
-      question: 'What is the AWS Well-Architected Framework?',
+      question: 'Before a major product launch, a CTO wants AWS\'s published guidance for judging whether the team\'s architecture is secure, reliable, performant, and cost-effective. What is the AWS Well-Architected Framework?',
       options: [
-        'A managed service that automatically audits workloads and remediates configuration issues it finds',
-        'A set of best practices and guidelines for building secure, high-performing, resilient, and efficient infrastructure',
-        'A collection of pre-built CloudFormation templates for deploying common application architectures',
-        'A certification and training program that validates the skills of AWS solutions architects'
+        'A managed service that continuously scans AWS accounts and automatically remediates misconfigurations',
+        'A library of prebuilt CloudFormation templates for deploying common reference architectures',
+        'A consulting engagement in which AWS Professional Services redesigns customer workloads',
+        'A set of best practices, organized into six pillars, for designing and operating cloud workloads'
       ],
-      correctAnswer: 1,
-      explanation: 'The AWS Well-Architected Framework provides best practices across six pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability.'
+      correctAnswer: 3,
+      explanation: 'The Well-Architected Framework is documented guidance — design principles and best practices across the Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability pillars. It is not a service that fixes issues automatically (the Well-Architected Tool only reviews and reports), not a template library, and not a paid consulting engagement.'
     },
     {
       id: 'cc5',
-      question: 'What is the difference between High Availability and Fault Tolerance?',
+      question: 'A payments platform must continue processing transactions with zero interruption even while a component is actively failing, not merely recover quickly afterward. How do high availability and fault tolerance differ?',
       options: [
-        'They are interchangeable terms for the same approach to minimizing downtime',
-        'High Availability minimizes downtime; Fault Tolerance means zero downtime during failures',
-        'Fault Tolerance is a lower-cost architecture option than High Availability',
-        'High Availability guarantees zero downtime; Fault Tolerance only minimizes downtime during failures'
+        'High availability minimizes downtime during failures; fault tolerance means operations continue with no downtime at all',
+        'High availability guarantees zero downtime; fault tolerance only shortens the recovery period after an outage',
+        'Fault tolerance is a lower-cost simplification of a highly available architecture',
+        'The two terms describe the same architecture sold at different support tiers'
       ],
-      correctAnswer: 1,
-      explanation: 'High Availability (HA) means the system remains accessible with minimal downtime. Fault Tolerance (FT) means the system continues operating without any degradation even when components fail. FT typically costs more but provides zero downtime.'
+      correctAnswer: 0,
+      explanation: 'High availability keeps downtime minimal but accepts brief interruptions during failover; fault tolerance keeps the system fully operational through a component failure, typically by running redundant components simultaneously. This zero-downtime requirement calls for fault tolerance, which generally costs more than high availability — not less — and the terms are not interchangeable.'
     },
     {
       id: 'cc6',
-      question: 'Which pricing model allows you to pay for compute capacity by the hour or second with no long-term commitments?',
+      question: 'A research team needs EC2 capacity for a two-week experiment that cannot tolerate interruptions, and the company refuses any one- or three-year commitment. Which purchasing option fits best?',
       options: [
-        'Reserved Instances',
-        'Savings Plans',
+        'Spot Instances',
         'On-Demand Instances',
-        'Spot Instances'
+        'Reserved Instances',
+        'Savings Plans'
       ],
-      correctAnswer: 2,
-      explanation: 'On-Demand Instances let you pay for compute capacity by the hour or second with no long-term commitments. This is ideal for unpredictable workloads that cannot be interrupted.'
+      correctAnswer: 1,
+      explanation: 'On-Demand Instances charge by the hour or second with no long-term commitment, making them right for short-term, uninterruptible workloads. Spot Instances are cheaper but can be reclaimed by AWS with a two-minute warning, while Reserved Instances and Savings Plans both require a one- or three-year commitment.'
     },
     {
       id: 'cc7',
-      question: 'What is the benefit of using multiple Availability Zones?',
+      question: 'An e-commerce company runs its web tier on EC2 instances spread across three Availability Zones behind a load balancer. What is the primary benefit of this design?',
       options: [
-        'Reduced infrastructure and data transfer costs',
-        'Lower latency for end users in other countries',
-        'High availability and fault tolerance',
-        'Increased compute and storage capacity limits'
+        'Lower data transfer costs between the instances',
+        'Reduced latency for shoppers on other continents',
+        'A larger default EC2 service quota in the Region',
+        'The application keeps serving traffic if one Availability Zone fails'
       ],
-      correctAnswer: 2,
-      explanation: 'Using multiple Availability Zones provides high availability and fault tolerance. If one AZ fails, your application can continue running in another AZ with minimal or no interruption.'
+      correctAnswer: 3,
+      explanation: 'Spreading instances across multiple AZs provides high availability: if one AZ suffers an outage, the load balancer routes traffic to healthy instances in the others. Cross-AZ data transfer actually incurs a charge rather than saving money, serving distant continents is addressed by additional Regions or edge locations, and service quotas are unrelated to AZ placement.'
     },
     {
       id: 'cc8',
-      question: 'What does "pay-as-you-go" pricing mean?',
+      question: 'A finance director used to fixed annual IT budgets asks how the company will be charged for AWS services under pay-as-you-go pricing. What should the cloud team explain?',
       options: [
-        'You pay a fixed monthly fee regardless of usage',
-        'You pay only for the resources you actually use',
-        'You pay upfront for a year of service',
-        'You pay a discounted rate by committing to consistent usage'
+        'Charges accrue only for the resources actually consumed, with no long-term contracts required',
+        'A flat monthly fee covers unlimited usage of every AWS service',
+        'A full year of estimated usage must be paid for in advance',
+        'A minimum monthly spend must be met before resources can be launched'
       ],
-      correctAnswer: 1,
-      explanation: 'Pay-as-you-go means you only pay for the individual services you need, for as long as you use them, without requiring long-term contracts or complex licensing.'
+      correctAnswer: 0,
+      explanation: 'Pay-as-you-go means paying only for the individual services used, for as long as they are used, with no long-term contracts or complex licensing. There is no flat unlimited-use fee, no required annual prepayment (upfront payment is an optional feature of Reserved Instances), and no minimum spend to start using AWS.'
     },
     {
       id: 'cc9',
-      question: 'Which type of cloud deployment model runs infrastructure in a customer\'s own data center using AWS tools?',
+      question: 'A government agency is required to keep every workload and all data physically inside its own facility, while still using virtualization and cloud-style management tooling there. Which cloud deployment model describes this?',
       options: [
         'Public cloud',
-        'Private cloud (on-premises)',
         'Hybrid cloud',
+        'Private cloud (on-premises)',
         'Multi-cloud'
       ],
-      correctAnswer: 1,
-      explanation: 'Private cloud (on-premises) deployment runs infrastructure in your own data center. AWS provides tools like AWS Outposts to bring AWS services to your on-premises environment.'
+      correctAnswer: 2,
+      explanation: 'A private cloud (on-premises) deployment keeps all infrastructure in the organization\'s own data center while applying cloud-like virtualization and management. Hybrid would require connecting that facility to resources running in a public cloud, which the mandate forbids, and public cloud or multi-cloud would place the workloads on provider-owned infrastructure.'
     },
     {
       id: 'cc10',
-      question: 'What is the main benefit of "economies of scale" in cloud computing?',
+      question: 'AWS aggregates the usage of hundreds of thousands of customers into its data centers. What benefit does this "economies of scale" advantage pass on to an individual customer?',
       options: [
-        'Higher discounts as your own usage grows over time',
-        'Lower variable costs due to AWS\'s massive scale',
-        'Priority access to new AWS services and features',
-        'Faster application performance during peak demand'
+        'Guaranteed capacity reservations during global demand spikes',
+        'Lower pay-as-you-go prices than the customer could achieve running its own hardware',
+        'Automatic architectural reviews performed on every account',
+        'Dedicated physical servers included at no additional charge'
       ],
       correctAnswer: 1,
-      explanation: 'Because AWS aggregates usage from hundreds of thousands of customers, they can achieve higher economies of scale, which translates into lower pay-as-you-go prices for customers.'
+      explanation: 'Because AWS buys and operates infrastructure at massive scale, its unit costs are lower, and that translates into lower pay-as-you-go prices for customers than most could achieve on their own. Economies of scale does not guarantee capacity, trigger architecture reviews, or provide free dedicated hardware — Dedicated Hosts are a separately billed option.'
     },
     {
       id: 'cc11',
-      question: 'What is a Region in AWS?',
+      question: 'A new engineer sees company resources deployed in "us-east-1" and "eu-west-2" and asks what these identifiers represent. What is an AWS Region?',
       options: [
-        'A single data center with redundant power and networking',
-        'A group of Availability Zones in a geographic area',
-        'An edge location used to cache content closer to end users',
-        'A logically isolated virtual network that you define in AWS'
+        'A geographic area containing multiple physically separated Availability Zones',
+        'A single data center building with redundant power and networking',
+        'A cache site where CloudFront serves content close to end users',
+        'A logically isolated virtual network defined inside an AWS account'
       ],
-      correctAnswer: 1,
-      explanation: 'An AWS Region is a physical location around the world consisting of multiple, isolated Availability Zones. Each Region is designed to be completely isolated from other Regions for fault tolerance.'
+      correctAnswer: 0,
+      explanation: 'A Region is a physical geographic area that contains multiple isolated Availability Zones, and each Region is isolated from the others. A single data center is smaller than an AZ, a cache site describes an edge location, and an isolated virtual network describes a VPC.'
     },
     {
       id: 'cc12',
-      question: 'What is an Availability Zone (AZ)?',
+      question: 'An architect designing for high availability asks what physically sits behind each Availability Zone within a Region. What is an Availability Zone?',
       options: [
-        'A geographic area containing multiple Regions',
-        'One or more data centers with redundant power, networking, and connectivity',
-        'An edge location where CloudFront caches content near users',
-        'A logically isolated virtual network defined within a Region'
+        'A geographic area made up of several independent Regions',
+        'A CloudFront edge site that caches content near end users',
+        'One or more discrete data centers with redundant power, networking, and connectivity',
+        'A virtual network segment reserved for a single customer\'s resources'
       ],
-      correctAnswer: 1,
-      explanation: 'An Availability Zone is one or more discrete data centers with redundant power, networking, and connectivity in an AWS Region. AZs are physically separated and connected through low-latency links.'
+      correctAnswer: 2,
+      explanation: 'An Availability Zone consists of one or more discrete data centers with redundant power, networking, and connectivity, physically separated from other AZs in the Region and linked by low-latency networking. The hierarchy runs the other way — Regions contain AZs — and edge sites and virtual network segments describe edge locations and subnets, respectively.'
     },
     {
       id: 'cc13',
-      question: 'Which pillar of the Well-Architected Framework focuses on protecting information and systems?',
+      question: 'An architecture review finds unencrypted data at rest and IAM users granted far broader permissions than their jobs require. Under which Well-Architected Framework pillar do these findings fall?',
       options: [
         'Operational Excellence',
-        'Security',
         'Reliability',
-        'Performance Efficiency'
+        'Performance Efficiency',
+        'Security'
       ],
-      correctAnswer: 1,
-      explanation: 'The Security pillar focuses on protecting information, systems, and assets while delivering business value through risk assessments and mitigation strategies.'
+      correctAnswer: 3,
+      explanation: 'Encryption at rest and least-privilege access control are core practices of the Security pillar, which covers protecting data, systems, and assets. Operational Excellence concerns running and improving operations, Reliability concerns recovery from failure, and Performance Efficiency concerns using resources effectively — none of them addresses these access and encryption gaps.'
     },
     {
       id: 'cc14',
-      question: 'What is the benefit of "going global in minutes"?',
+      question: 'A streaming service with customers only in North America decides to expand, and within days it launches full application stacks in Frankfurt and Singapore without building any facilities. Which cloud advantage does this illustrate?',
       options: [
-        'Pay identical low prices for services in every AWS Region',
-        'Deploy applications in multiple Regions around the world with a few clicks',
-        'Applications are replicated automatically to every AWS Region by default',
-        'Data transfer between AWS Regions is always free of charge'
+        'Benefit from massive economies of scale',
+        'Go global in minutes',
+        'Stop guessing about capacity',
+        'Trade fixed expense for variable expense'
       ],
       correctAnswer: 1,
-      explanation: 'AWS\'s global infrastructure allows you to deploy your application in multiple Regions around the world with just a few clicks, providing lower latency and better experience for customers worldwide.'
+      explanation: '"Go global in minutes" means deploying an application into AWS Regions around the world with a few clicks, putting it closer to international users without building data centers abroad. Economies of scale is about AWS\'s buying power lowering prices, capacity guessing is about matching resource levels to demand, and the expense trade-off describes the CapEx-to-OpEx shift rather than geographic reach.'
     },
     {
       id: 'cc15',
-      question: 'What is the AWS Shared Responsibility Model?',
+      question: 'After migrating to EC2, a security lead asks who is responsible for patching the underlying hypervisor versus configuring security groups and encrypting application data. What does the AWS Shared Responsibility Model establish?',
       options: [
-        'A cost-sharing program between AWS and customers',
-        'A division of security responsibilities between AWS and the customer',
-        'An agreement in which AWS manages all security on behalf of the customer',
-        'A framework for dividing operational duties among accounts in an organization'
+        'AWS assumes every security task once workloads are running on its infrastructure',
+        'Customers take over physical security for the data centers hosting their instances',
+        'AWS secures the cloud infrastructure itself, while customers secure what they run in the cloud',
+        'Security duties are negotiated individually in each customer\'s support agreement'
       ],
-      correctAnswer: 1,
-      explanation: 'The Shared Responsibility Model divides security: AWS is responsible for security "of" the cloud (infrastructure), while customers are responsible for security "in" the cloud (data, applications, access management).'
+      correctAnswer: 2,
+      explanation: 'The Shared Responsibility Model makes AWS responsible for security "of" the cloud — facilities, hardware, and the virtualization layer including the hypervisor — while customers handle security "in" the cloud, such as security group rules, data encryption, and access management. AWS never takes over customer-side controls, customers never manage AWS\'s physical data centers, and the split is a standard model, not a per-contract negotiation.'
     },
     {
       id: 'cc16',

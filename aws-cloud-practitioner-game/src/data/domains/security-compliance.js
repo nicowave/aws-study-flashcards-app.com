@@ -11,183 +11,183 @@ export const securityCompliance = {
   questions: [
     {
       id: 'sc1',
-      question: 'In the AWS Shared Responsibility Model, what is AWS responsible for?',
+      question: 'A newly hired cloud engineer asks which security tasks the company can hand off entirely to AWS after moving its workloads onto EC2. Under the Shared Responsibility Model, which task is AWS\'s responsibility?',
       options: [
-        'Security IN the cloud (customer data, applications, access management)',
-        'Security OF the cloud (hardware, software, networking, facilities)',
-        'Encrypting customer data and managing IAM users and policies',
-        'Patching guest operating systems and configuring security groups'
+        'Configuring the security group rules attached to each EC2 instance',
+        'Choosing to enable encryption for the data stored on EBS volumes',
+        'Securing the physical data centers and replacing failed host hardware',
+        'Managing IAM permissions for the engineers who operate the workloads'
       ],
-      correctAnswer: 1,
-      explanation: 'AWS is responsible for security OF the cloud, including the physical infrastructure, hardware, software, networking, and facilities that run AWS Cloud services.'
+      correctAnswer: 2,
+      explanation: 'AWS owns security OF the cloud: physical facilities, host hardware, and the infrastructure software that runs AWS services. Security group rules, encryption choices, and IAM permissions are all customer-controlled settings — security IN the cloud — so they cannot be handed off to AWS.'
     },
     {
       id: 'sc2',
-      question: 'Which AWS service enables you to manage access to AWS services and resources securely?',
+      question: 'A startup\'s five engineers all sign in to AWS with the same shared credentials and can access every service. The CTO wants each engineer to have an individual identity with fine-grained permissions controlling exactly which AWS services and resources they can use. Which service provides this?',
       options: [
-        'Amazon GuardDuty',
-        'AWS Shield',
         'AWS Identity and Access Management (IAM)',
-        'Amazon Inspector'
+        'Amazon GuardDuty',
+        'AWS Systems Manager',
+        'Amazon Cognito'
       ],
-      correctAnswer: 2,
-      explanation: 'AWS IAM enables you to manage access to AWS services and resources securely. You can create and manage users, groups, and roles, and use permissions to allow or deny access.'
+      correctAnswer: 0,
+      explanation: 'IAM lets you create individual users, organize them with groups and roles, and attach policies that allow or deny specific actions on specific resources. Cognito manages identity for an application\'s end customers rather than for people accessing AWS itself, GuardDuty detects threats, and Systems Manager handles operational tasks like patching and run commands.'
     },
     {
       id: 'sc3',
-      question: 'What is Multi-Factor Authentication (MFA)?',
+      question: 'An IAM user\'s password was stolen in a phishing attack, yet the attacker still failed to sign in to the AWS Management Console with it. Which control most likely blocked the sign-in?',
       options: [
-        'Using multiple passwords for the same account',
-        'An additional layer of security requiring multiple verification methods',
-        'A federation service that lets users sign in through external identity providers',
-        'A policy that forces users to rotate their passwords at regular intervals'
+        'A password policy requiring rotation every 90 days',
+        'An IAM permissions boundary attached to the user',
+        'CloudTrail logging of all console sign-in events',
+        'Multi-factor authentication requiring a code from the user\'s device'
       ],
-      correctAnswer: 1,
-      explanation: 'MFA adds an extra layer of protection by requiring users to provide multiple verification factors (something you know + something you have) to access AWS resources.'
+      correctAnswer: 3,
+      explanation: 'MFA requires something the user has (a device-generated code or security key) in addition to something they know, so a stolen password alone is not enough to sign in. Password rotation does not stop a currently valid stolen password, a permissions boundary only limits what a user can do after signing in, and CloudTrail records events without blocking anything.'
     },
     {
       id: 'sc4',
-      question: 'Which AWS service provides DDoS protection?',
+      question: 'An e-commerce site running behind an Application Load Balancer is hit by a massive SYN flood that threatens to take it offline. Which AWS service is purpose-built to detect and mitigate this kind of DDoS attack?',
       options: [
-        'AWS WAF',
+        'AWS Config',
         'AWS Shield',
-        'Amazon GuardDuty',
-        'AWS Config'
+        'Amazon Macie',
+        'AWS Secrets Manager'
       ],
       correctAnswer: 1,
-      explanation: 'AWS Shield provides DDoS protection. Shield Standard is automatically enabled for all AWS customers at no cost. Shield Advanced provides enhanced DDoS protection for an additional fee.'
+      explanation: 'AWS Shield is the DDoS protection service: Shield Standard automatically defends all customers against common network- and transport-layer attacks like SYN floods at no cost, and Shield Advanced adds enhanced protections for a fee. Config tracks resource configurations, Macie discovers sensitive data in S3, and Secrets Manager stores credentials — none of them mitigate DDoS traffic.'
     },
     {
       id: 'sc5',
-      question: 'What is the principle of least privilege?',
+      question: 'A new data analyst joins a company and only needs to run read-only queries against one specific database. Applying the principle of least privilege, what access should the analyst be granted?',
       options: [
-        'Giving users the maximum permissions possible',
-        'Giving users only the permissions they need to perform their job',
-        'Removing all permissions from users by default',
-        'Requiring administrator approval each time a user accesses a resource'
+        'The AdministratorAccess managed policy, to avoid repeated permission requests',
+        'Full access to every analytics service in case their duties expand later',
+        'Read-only permissions scoped to the specific database the job requires',
+        'No permissions at all until the analyst passes an annual security review'
       ],
-      correctAnswer: 1,
-      explanation: 'The principle of least privilege means granting only the minimum permissions necessary for users to perform their required tasks. This reduces the risk of accidental or malicious actions.'
+      correctAnswer: 2,
+      explanation: 'Least privilege means granting only the minimum permissions needed to perform the task at hand — here, read-only access to one database — and expanding deliberately if duties change. Broad "just in case" grants enlarge the blast radius of mistakes or compromised credentials, while granting nothing at all blocks legitimate work; the principle is minimum necessary, not zero.'
     },
     {
       id: 'sc6',
-      question: 'Which service provides intelligent threat detection for your AWS account?',
+      question: 'Overnight, an EC2 instance begins contacting domains associated with cryptocurrency mining, and API calls appear from an IP address in an unusual location. Which service continuously analyzes CloudTrail events, VPC Flow Logs, and DNS logs to automatically flag this kind of behavior?',
       options: [
-        'AWS WAF',
         'Amazon GuardDuty',
-        'AWS Shield',
-        'AWS Firewall Manager'
+        'AWS WAF',
+        'AWS Artifact',
+        'AWS Config'
       ],
-      correctAnswer: 1,
-      explanation: 'Amazon GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior to protect your AWS accounts, workloads, and data.'
+      correctAnswer: 0,
+      explanation: 'GuardDuty is AWS\'s intelligent threat detection service: it continuously analyzes CloudTrail, VPC Flow Logs, and DNS query logs and raises findings for behavior like crypto-mining activity or anomalous API calls. WAF filters incoming web requests rather than detecting compromise, Config tracks configuration changes, and Artifact provides compliance documents.'
     },
     {
       id: 'sc7',
-      question: 'What is AWS Artifact?',
+      question: 'During a vendor assessment, a company\'s auditors request AWS\'s latest SOC and ISO certification reports as evidence of AWS\'s own security controls. Where can the company download these documents on demand?',
       options: [
-        'A managed repository for storing and sharing software packages',
-        'A service that provides access to AWS compliance reports and agreements',
-        'A registry for storing, managing, and deploying container images',
-        'A service that stores build outputs generated by CI/CD pipelines'
+        'The AWS Health Dashboard',
+        'AWS Trusted Advisor',
+        'The AWS Marketplace',
+        'AWS Artifact'
       ],
-      correctAnswer: 1,
-      explanation: 'AWS Artifact provides on-demand access to AWS security and compliance documents, such as SOC reports, PCI reports, and other certifications, as well as AWS agreements.'
+      correctAnswer: 3,
+      explanation: 'AWS Artifact is the self-service portal for downloading AWS\'s compliance reports (SOC, ISO, PCI, and others) and reviewing agreements. The Health Dashboard reports service events and account impact, Trusted Advisor gives best-practice recommendations, and the Marketplace sells third-party software — none of them distribute AWS\'s audit reports.'
     },
     {
       id: 'sc8',
-      question: 'Which AWS service helps you assess the security and compliance of your AWS resources?',
+      question: 'After a security incident, a team must reconstruct exactly how a security group\'s rules changed over the past month and review the configuration history of related resources. Which service records this information?',
       options: [
-        'AWS Trusted Advisor',
-        'Amazon Inspector',
+        'Amazon CloudWatch',
         'AWS Config',
-        'All of the above'
+        'AWS CloudTrail',
+        'AWS Trusted Advisor'
       ],
-      correctAnswer: 3,
-      explanation: 'All three services help with security assessment: Trusted Advisor provides best practice recommendations, Inspector assesses applications for vulnerabilities, and Config tracks resource configurations.'
+      correctAnswer: 1,
+      explanation: 'AWS Config records the configuration state of resources over time, letting you see what a security group looked like at any point and how it changed. CloudTrail is the closest distractor — it logs the API calls that made changes but does not assemble a resource\'s configuration timeline. CloudWatch handles metrics and logs, and Trusted Advisor offers best-practice checks.'
     },
     {
       id: 'sc9',
-      question: 'What is an IAM Role?',
+      question: 'An external auditing firm needs temporary access to review resources in a company\'s AWS account, and the security team refuses to create long-term credentials for the auditors. Which IAM feature best fits this requirement?',
       options: [
-        'A permanent identity with long-term credentials for a specific person',
-        'An identity with permissions that can be assumed by trusted entities',
-        'A collection of IAM users that share a common set of permissions',
-        'A policy document that defines password requirements for an account'
+        'An IAM group with a shared password issued to the auditing firm',
+        'An IAM user whose access keys are emailed to the audit team',
+        'An IAM role the auditors\' own account can assume for temporary credentials',
+        'A service control policy applied to the auditors\' organization'
       ],
-      correctAnswer: 1,
-      explanation: 'An IAM Role is an identity with specific permissions that can be assumed by users, applications, or AWS services. Roles provide temporary security credentials instead of long-term credentials.'
+      correctAnswer: 2,
+      explanation: 'An IAM role is an identity that trusted entities — including users in another AWS account — can assume to receive temporary, automatically expiring credentials, which is exactly what cross-account auditor access calls for. IAM groups have no sign-in credentials of their own, emailed long-term access keys are the risk the team is avoiding, and service control policies restrict permissions in an organization rather than granting access.'
     },
     {
       id: 'sc10',
-      question: 'Which AWS service allows you to create and manage encryption keys?',
+      question: 'A compliance team requires that the encryption keys protecting data in S3 and on EBS volumes be created and controlled by the company, with every use of each key logged for auditors. Which service meets this requirement?',
       options: [
-        'AWS Secrets Manager',
         'AWS Key Management Service (KMS)',
+        'AWS Secrets Manager',
         'AWS Certificate Manager',
         'Amazon Macie'
       ],
-      correctAnswer: 1,
-      explanation: 'AWS KMS allows you to create and manage cryptographic keys and control their use across AWS services and applications. It integrates with most AWS services for encryption.'
+      correctAnswer: 0,
+      explanation: 'KMS lets you create and manage customer managed keys, integrates with services like S3 and EBS for encryption, and records every key usage in CloudTrail for auditing. Secrets Manager stores and rotates credentials rather than encryption keys, Certificate Manager handles TLS certificates, and Macie discovers sensitive data instead of encrypting it.'
     },
     {
       id: 'sc11',
-      question: 'In the Shared Responsibility Model, who is responsible for patching the guest operating system on an EC2 instance?',
+      question: 'A critical kernel vulnerability is announced affecting the Linux distribution running on a company\'s fleet of EC2 instances. Under the Shared Responsibility Model, who must ensure the operating systems on those instances get patched?',
       options: [
-        'AWS',
-        'The customer',
-        'Shared between AWS and customer',
-        'It depends on the instance type'
+        'AWS, which applies the patch automatically to every EC2 instance',
+        'AWS Support, once the company opens a support case requesting it',
+        'No one — the hypervisor isolation makes guest OS patching unnecessary',
+        'The customer, for example by automating updates with Systems Manager Patch Manager'
       ],
-      correctAnswer: 1,
-      explanation: 'The customer is responsible for patching the guest operating system and any applications running on EC2 instances. AWS is responsible for patching the underlying infrastructure.'
+      correctAnswer: 3,
+      explanation: 'On EC2 the customer controls the guest operating system, so patching it — and everything installed on it — is the customer\'s responsibility; AWS patches only the underlying host infrastructure. AWS never reaches inside customer instances to apply updates, with or without a support case, and hypervisor isolation does not fix vulnerabilities inside the guest OS.'
     },
     {
       id: 'sc12',
-      question: 'What is AWS WAF?',
+      question: 'A media site delivered through CloudFront must block requests originating from specific countries and throttle any IP address that exceeds a request-rate threshold. Which service applies these rules at the web request level?',
       options: [
-        'A managed firewall that filters network traffic at the VPC level',
-        'A web application firewall that protects web applications from common exploits',
-        'A managed service that protects applications against DDoS attacks',
-        'A tool that monitors and logs all network traffic within your VPC'
+        'AWS Shield Standard',
+        'AWS WAF',
+        'Amazon GuardDuty',
+        'AWS Network Firewall'
       ],
       correctAnswer: 1,
-      explanation: 'AWS WAF (Web Application Firewall) helps protect web applications from common web exploits like SQL injection and cross-site scripting (XSS) that could affect availability or security.'
+      explanation: 'AWS WAF inspects individual HTTP(S) requests on CloudFront, Application Load Balancers, and API Gateway, and supports geographic match rules and rate-based rules that do exactly this. Shield Standard mitigates network-layer DDoS automatically but offers no configurable request rules, GuardDuty detects threats rather than blocking traffic, and Network Firewall filters VPC network traffic, not CloudFront web requests.'
     },
     {
       id: 'sc13',
-      question: 'What is the AWS root user?',
+      question: 'A cloud administrator\'s IAM user has the AdministratorAccess managed policy attached, yet one task still cannot be completed with it. Which task requires signing in as the account root user?',
       options: [
-        'The default administrative account on an Amazon EC2 Linux instance',
-        'The first identity created when you create an AWS account with complete access',
-        'An IAM role with the AdministratorAccess managed policy attached',
-        'A special IAM user that AWS creates automatically for support access'
+        'Closing the AWS account or changing the root user\'s email address',
+        'Launching EC2 instances in a Region the company has not used before',
+        'Creating additional IAM users and attaching policies to them',
+        'Viewing the account\'s charges in the Billing and Cost Management console'
       ],
-      correctAnswer: 1,
-      explanation: 'The root user is the identity created when you first create an AWS account. It has complete access to all AWS services and resources. Best practice is to lock away root user credentials and use IAM users instead.'
+      correctAnswer: 0,
+      explanation: 'A small set of account-level tasks — such as closing the account and changing the root user\'s email or password — can only be performed by the root user, which is why its credentials should be locked away and protected with MFA. Launching instances and managing IAM are ordinary admin actions, and billing information can be viewed by IAM identities once IAM access to billing is activated.'
     },
     {
       id: 'sc14',
-      question: 'Which service helps you centrally manage security policies across multiple AWS accounts?',
+      question: 'A security administrator manages dozens of AWS accounts in one organization and must ensure consistent WAF rules and security group policies are applied to every account automatically — including accounts created in the future. Which service is designed for this?',
       options: [
-        'AWS Organizations',
         'AWS Security Hub',
+        'Amazon Detective',
         'AWS Firewall Manager',
-        'All of the above'
+        'AWS Resource Access Manager'
       ],
-      correctAnswer: 3,
-      explanation: 'All three help with centralized management: Organizations for account management and SCPs, Security Hub for aggregating security findings, and Firewall Manager for managing firewall rules across accounts.'
+      correctAnswer: 2,
+      explanation: 'AWS Firewall Manager centrally defines and enforces firewall policies — WAF rules, Shield Advanced protections, security group policies, and Network Firewall rules — across all accounts in an AWS Organization, automatically covering new accounts and resources as they appear. Security Hub aggregates security findings but does not push firewall rules, Detective helps investigate findings, and Resource Access Manager shares resources between accounts.'
     },
     {
       id: 'sc15',
-      question: 'What are Security Groups in AWS?',
+      question: 'A web server on an EC2 instance must accept HTTPS traffic from anywhere but allow SSH only from the office\'s IP address, and return traffic for allowed connections should be permitted automatically. Where should these rules be configured?',
       options: [
-        'Collections of IAM users that share the same access permissions',
-        'Virtual firewalls that control inbound and outbound traffic for EC2 instances',
-        'Stateless firewall rules that control traffic at the subnet level',
-        'Policies that define which AWS services users in an account may access'
+        'In a network ACL attached to the subnets of the VPC',
+        'In an AWS WAF web ACL associated with the instance',
+        'In an IAM policy attached to the instance\'s role',
+        'In the security group attached to the instance'
       ],
-      correctAnswer: 1,
-      explanation: 'Security Groups act as virtual firewalls for EC2 instances, controlling inbound and outbound traffic at the instance level. They are stateful, meaning return traffic is automatically allowed.'
+      correctAnswer: 3,
+      explanation: 'Security groups are stateful virtual firewalls at the instance level: you allow inbound HTTPS from 0.0.0.0/0 and SSH from the office IP, and response traffic is permitted automatically. Network ACLs work at the subnet level and are stateless, so return traffic would need explicit rules; WAF associates with resources like CloudFront and load balancers, not directly with instances; and IAM policies govern API permissions, not network traffic.'
     },
     {
       id: 'sc16',

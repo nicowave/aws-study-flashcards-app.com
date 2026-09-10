@@ -9,155 +9,135 @@ export const domain1 = {
   questions: [
     {
       id: 'd1q1',
-      question: 'Which type of machine learning is best suited for spam email detection where you have labeled examples of spam and non-spam emails?',
-      options: ['Unsupervised Learning', 'Supervised Learning', 'Reinforcement Learning', 'Self-supervised Learning'],
-      correct: 1,
-      explanation: 'Supervised learning is ideal when you have labeled training data. Spam detection uses historical emails labeled as spam/not-spam to train the model.'
+      question: 'An email provider has millions of historical messages, each labeled by users as "spam" or "not spam," and wants to train a model to classify incoming mail. Which ML approach fits this scenario?',
+      options: ['Unsupervised learning', 'Reinforcement learning', 'Supervised learning', 'Self-supervised learning'],
+      correct: 2,
+      explanation: 'Supervised learning trains a model on examples that already carry the correct answer — here, the spam/not-spam labels. Unsupervised learning applies when no labels exist, and reinforcement learning trains an agent through rewards for sequential decisions, not from a labeled dataset.'
     },
     {
       id: 'd1q2',
-      question: 'What is the primary difference between Artificial Intelligence (AI) and Machine Learning (ML)?',
+      question: 'Which statement correctly describes the relationship between artificial intelligence (AI), machine learning (ML), and deep learning?',
       options: [
-        'AI is a subset of ML that focuses on automation',
-        'ML is a subset of AI that learns from data',
-        'AI and ML are interchangeable terms for the same technology',
-        'AI learns from data while ML relies on predefined rules'
+        'ML is a subset of AI, and deep learning is a subset of ML that uses multi-layer neural networks',
+        'AI is a subset of ML, and deep learning is the broadest category containing both',
+        'AI and ML are interchangeable terms, while deep learning is an unrelated field',
+        'Deep learning is a subset of AI but sits entirely outside of machine learning'
       ],
-      correct: 1,
-      explanation: 'Machine Learning is a subset of AI. AI is the broader concept of machines being able to carry out tasks intelligently, while ML specifically refers to systems that learn from data.'
+      correct: 0,
+      explanation: 'AI is the broad discipline of machines performing tasks that require intelligence; ML is the subset of AI where systems learn patterns from data instead of following explicit rules; deep learning is the subset of ML built on multi-layer neural networks. The other options invert or break this nesting.'
     },
     {
       id: 'd1q3',
-      question: 'Which AWS service provides pre-trained models for common ML tasks without requiring ML expertise?',
-      options: ['Amazon SageMaker', 'Amazon AI Services', 'AWS Deep Learning AMIs', 'Amazon EMR'],
-      correct: 1,
-      explanation: 'Amazon AI Services (like Rekognition, Comprehend, Polly) provide pre-trained models that developers can use via APIs without ML expertise.'
+      question: 'A small development team with no ML expertise wants to add image moderation and sentiment analysis to its app as quickly as possible. Which approach best meets this requirement?',
+      options: [
+        'Train and deploy custom models with Amazon SageMaker',
+        'Provision EC2 instances with AWS Deep Learning AMIs and build models there',
+        'Develop a distributed Spark ML pipeline on Amazon EMR',
+        'Call pre-trained AWS AI services such as Amazon Rekognition and Amazon Comprehend'
+      ],
+      correct: 3,
+      explanation: 'AWS AI services like Rekognition (image analysis) and Comprehend (sentiment and text analysis) expose pre-trained models through simple APIs, so teams without ML expertise get results immediately. SageMaker, Deep Learning AMIs, and EMR all require the team to build, train, and manage models themselves — slower and demanding skills they lack.'
     },
     {
       id: 'd1q4',
-      question: 'What does "inference" mean in the context of machine learning?',
-      options: [
-        'Training a model on new data',
-        'Using a trained model to make predictions',
-        'Cleaning and preparing data',
-        'Selecting features for a model'
-      ],
+      question: 'A trained model is deployed behind an API and returns predictions for new transactions it has never seen before. In ML terminology, what is this prediction phase called?',
+      options: ['Training', 'Inference', 'Feature engineering', 'Hyperparameter tuning'],
       correct: 1,
-      explanation: 'Inference is the process of using a trained machine learning model to make predictions on new, unseen data.'
+      explanation: 'Inference is using an already-trained model to generate predictions on new, unseen data. Training is the earlier phase where the model learns from data, feature engineering prepares input data, and hyperparameter tuning adjusts settings that control how training runs.'
     },
     {
       id: 'd1q5',
-      question: 'Which type of neural network is most commonly used for image recognition tasks?',
-      options: ['Recurrent Neural Networks (RNN)', 'Convolutional Neural Networks (CNN)', 'Generative Adversarial Networks (GAN)', 'Feed-forward Neural Networks'],
-      correct: 1,
-      explanation: 'CNNs are specifically designed for processing grid-like data such as images. They use convolutional layers to automatically learn spatial hierarchies of features.'
+      question: 'A manufacturer wants to automatically detect visual defects in photos of products on an assembly line. Which neural network architecture is the standard choice for this image-analysis task?',
+      options: ['Convolutional neural network (CNN)', 'Recurrent neural network (RNN)', 'Generative adversarial network (GAN)', 'Single-layer feed-forward network'],
+      correct: 0,
+      explanation: 'CNNs use convolutional layers to learn spatial hierarchies of features (edges, textures, shapes), making them the standard architecture for image classification and defect detection. RNNs are built for sequential data like text or time series, GANs are a training setup for generating data rather than classifying it, and a single-layer network cannot learn the complex visual features required.'
     },
     {
       id: 'd1q6',
-      question: 'What is "overfitting" in machine learning?',
-      options: [
-        'When a model is too simple to capture the patterns in the data',
-        'When a model performs well on training data but poorly on new data',
-        'When a model performs poorly on both training data and new data',
-        'When training data accidentally includes information from the test set'
-      ],
-      correct: 1,
-      explanation: 'Overfitting occurs when a model learns the training data too well, including noise and outliers, resulting in poor generalization to new data.'
+      question: 'During training, a model fits the noise and outliers in its training set so closely that it fails to generalize to examples it has not seen. Which term describes this condition?',
+      options: ['Underfitting', 'Data leakage', 'Overfitting', 'Concept drift'],
+      correct: 2,
+      explanation: 'Overfitting is when a model memorizes training data — including its noise — instead of learning generalizable patterns, so performance on new data suffers. Underfitting is the opposite (too simple to capture patterns at all), data leakage means test information contaminated training, and concept drift is when real-world data changes after deployment.'
     },
     {
       id: 'd1q7',
-      question: 'In the context of generative AI, what is a "foundation model"?',
+      question: 'In generative AI, what distinguishes a foundation model from a traditional task-specific ML model?',
       options: [
-        'The baseline model trained at the start of an ML project',
-        'A large pre-trained model that can be adapted for various tasks',
-        'A model trained from scratch on a single labeled dataset for one task',
-        'A small task-specific model distilled from a larger network'
+        'It is trained from scratch on a small labeled dataset to solve one narrow task',
+        'It is pre-trained on broad data at massive scale and can be adapted to many downstream tasks',
+        'It requires no training data because its behavior is defined by hand-written rules',
+        'It is a compressed version of a larger model optimized to run on edge devices'
       ],
       correct: 1,
-      explanation: 'Foundation models are large AI models trained on broad data that can be adapted to a wide range of downstream tasks through fine-tuning or prompting.'
+      explanation: 'Foundation models are pre-trained on vast, broad datasets and then adapted to many different tasks through prompting or fine-tuning — the opposite of a model built for a single task. Rules-based systems don\'t learn from data at all, and compressed edge models describe distillation or quantization, not foundation models.'
     },
     {
       id: 'd1q8',
-      question: 'What is the primary purpose of feature engineering in ML?',
-      options: [
-        'To automatically select the best algorithm for a given dataset',
-        'To transform raw data into features that better represent the problem',
-        'To label raw data so it can be used for supervised learning',
-        'To tune the hyperparameters that control how a model learns'
-      ],
-      correct: 1,
-      explanation: 'Feature engineering transforms raw data into features that better represent the underlying problem to predictive models, improving model accuracy.'
+      question: 'Before training a model, a data scientist converts raw timestamps into "day of week" and "hour of day" columns and combines two fields into a spending ratio. Which ML process does this describe?',
+      options: ['Hyperparameter tuning', 'Data labeling', 'Model evaluation', 'Feature engineering'],
+      correct: 3,
+      explanation: 'Feature engineering transforms raw data into input features that better represent the underlying problem, which often improves model accuracy more than algorithm changes. Data labeling assigns target answers to examples, hyperparameter tuning adjusts training settings, and model evaluation measures performance after training.'
     },
     {
       id: 'd1q9',
-      question: 'Which AWS service allows you to build conversational chatbots using voice and text?',
-      options: ['Amazon Polly', 'Amazon Lex', 'Amazon Comprehend', 'Amazon Transcribe'],
-      correct: 1,
-      explanation: 'Amazon Lex is a fully managed service for building conversational interfaces (chatbots) using automatic speech recognition (ASR) and natural language understanding (NLU).'
+      question: 'A telecom company wants a customer-service bot that can understand both spoken and typed requests, such as "check my bill balance," and respond conversationally. Which AWS service is designed for building this?',
+      options: ['Amazon Lex', 'Amazon Polly', 'Amazon Transcribe', 'Amazon Comprehend'],
+      correct: 0,
+      explanation: 'Amazon Lex is the managed service for building conversational interfaces, combining automatic speech recognition with natural language understanding to handle both voice and text — it powers the same technology as Alexa. Polly only converts text to speech, Transcribe only converts speech to text, and Comprehend analyzes text but cannot manage a conversation.'
     },
     {
       id: 'd1q10',
-      question: 'What is Amazon Polly primarily used for?',
-      options: [
-        'Speech-to-text transcription',
-        'Text-to-speech conversion',
-        'Language translation',
-        'Sentiment analysis'
-      ],
-      correct: 1,
-      explanation: 'Amazon Polly converts text into lifelike speech using neural TTS technology, supporting dozens of voices across many languages.'
+      question: 'A news app wants to read its articles aloud to users in natural-sounding voices across multiple languages. Which AWS service should it use?',
+      options: ['Amazon Transcribe', 'Amazon Translate', 'Amazon Polly', 'Amazon Lex'],
+      correct: 2,
+      explanation: 'Amazon Polly converts text into lifelike speech using neural text-to-speech, with many voices and languages available. Transcribe does the reverse (speech to text), Translate converts text between languages but produces no audio, and Lex builds conversational bots rather than narrating content.'
     },
     {
       id: 'd1q11',
-      question: 'Which AWS service provides an end-to-end platform for building, training, and deploying ML models?',
-      options: ['Amazon Bedrock', 'Amazon SageMaker', 'Amazon Comprehend', 'Amazon EMR'],
+      question: 'A data science team needs a single managed platform to prepare data, train and tune custom models, deploy them to endpoints, and monitor them in production. Which AWS service provides this end-to-end ML lifecycle?',
+      options: ['Amazon Bedrock', 'Amazon SageMaker', 'Amazon Comprehend', 'AWS Glue'],
       correct: 1,
-      explanation: 'Amazon SageMaker is a fully managed platform covering the entire ML lifecycle — from data preparation and model training to deployment and monitoring.'
+      explanation: 'Amazon SageMaker is the fully managed platform covering the entire custom ML lifecycle — data preparation, training, tuning, deployment, and monitoring. Bedrock provides API access to pre-built foundation models rather than a custom-model training platform, Comprehend is a pre-trained NLP service, and Glue handles data integration and ETL, not model building.'
     },
     {
       id: 'd1q12',
-      question: 'What is the key difference between batch inference and real-time inference?',
+      question: 'An insurer scores its entire five-million-customer database once each night, with results needed by morning and no requirement for per-record response speed. Which inference approach is most cost-effective?',
       options: [
-        'Batch inference produces more accurate predictions because it can compare each record against the full dataset',
-        'Real-time inference processes individual requests on demand with low latency, while batch processes large datasets at once',
-        'Batch inference requires dedicated GPU instances, while real-time inference runs only on CPU-based endpoints',
-        'Real-time inference retrains the model with each request, while batch inference uses a fixed model version'
+        'Real-time inference on an endpoint provisioned around the clock',
+        'Serverless real-time inference invoked once per individual record',
+        'Deploying the model to edge devices at each branch office location',
+        'Batch inference that processes the full dataset in one scheduled job'
       ],
-      correct: 1,
-      explanation: 'Real-time inference handles individual requests with millisecond latency (e.g., fraud detection), while batch inference processes large datasets at once with higher throughput but higher latency (e.g., nightly recommendations).'
+      correct: 3,
+      explanation: 'Batch inference is designed for scoring large datasets on a schedule: compute spins up for the job, processes everything with high throughput, and shuts down, so nothing is paid for idle time. An always-on real-time endpoint bills 24/7 for a job that runs once nightly, and invoking millions of individual real-time requests adds cost and overhead with no benefit when latency doesn\'t matter.'
     },
     {
       id: 'd1q13',
-      question: 'Which SageMaker component detects data drift and model quality degradation in production?',
-      options: ['SageMaker Data Wrangler', 'SageMaker Feature Store', 'SageMaker Model Monitor', 'SageMaker Autopilot'],
-      correct: 2,
-      explanation: 'SageMaker Model Monitor continuously monitors models in production, detecting data drift, model quality degradation, bias drift, and feature attribution changes.'
+      question: 'Months after deployment, a model\'s predictions become less accurate as customer behavior shifts away from the patterns in its training data. Which SageMaker capability detects this kind of data drift and quality degradation in production?',
+      options: ['SageMaker Model Monitor', 'SageMaker Data Wrangler', 'SageMaker Feature Store', 'SageMaker Autopilot'],
+      correct: 0,
+      explanation: 'SageMaker Model Monitor continuously watches deployed models, detecting data drift, model quality degradation, bias drift, and feature attribution changes, and can alert the team to retrain. Data Wrangler prepares data before training, Feature Store manages and serves features, and Autopilot builds models automatically — none of them monitor production behavior.'
     },
     {
       id: 'd1q14',
-      question: 'What does the F1 Score measure in model evaluation?',
-      options: [
-        'The ratio of true positives to all positive predictions',
-        'The harmonic mean of Precision and Recall',
-        'The total number of correct predictions',
-        'The area under the ROC curve'
-      ],
-      correct: 1,
-      explanation: 'The F1 Score is the harmonic mean of Precision and Recall, balancing false positives and false negatives. It is ideal when both precision and recall matter equally.'
+      question: 'A resume-screening model must balance two errors: advancing unqualified candidates (false positives) and rejecting qualified ones (false negatives). The team wants a single metric that accounts for both. Which should they use?',
+      options: ['Accuracy', 'Recall', 'F1 score', 'Precision'],
+      correct: 2,
+      explanation: 'The F1 score is the harmonic mean of precision and recall, so it penalizes a model that is weak on either false positives or false negatives — exactly the single balanced metric the team wants. Precision alone ignores missed qualified candidates, recall alone ignores false alarms, and accuracy can look strong while hiding poor performance on the smaller class.'
     },
     {
       id: 'd1q15',
-      question: 'Which AWS service provides real-time personalized product recommendations?',
-      options: ['Amazon Kendra', 'Amazon Personalize', 'Amazon Comprehend', 'Amazon Forecast'],
+      question: 'A video-streaming service wants to show each user a "Recommended for You" row that updates in real time based on viewing behavior, without building a recommendation engine from scratch. Which AWS service is purpose-built for this?',
+      options: ['Amazon Kendra', 'Amazon Personalize', 'Amazon Forecast', 'Amazon Comprehend'],
       correct: 1,
-      explanation: 'Amazon Personalize enables developers to build applications with real-time personalized recommendations using the same technology as Amazon.com.'
+      explanation: 'Amazon Personalize is the managed service for real-time personalized recommendations, using the same technology developed for Amazon.com and requiring no ML expertise. Kendra is intelligent enterprise search, Forecast predicts future time-series values like demand, and Comprehend analyzes text — none of them generate per-user recommendations.'
     },
     {
       id: 'd1q16',
-      question: 'Which AWS service uses ML to detect fraudulent activity in real-time?',
-      options: ['Amazon Macie', 'Amazon GuardDuty', 'Amazon Fraud Detector', 'Amazon Inspector'],
-      correct: 2,
-      explanation: 'Amazon Fraud Detector uses ML to identify potentially fraudulent online activity such as payment fraud and fake account creation, adapting to new fraud patterns faster than rule-based systems.'
+      question: 'An e-commerce company wants a managed ML service to score online activities such as new account signups and payments for fraud risk in real time. Which AWS service is purpose-built for this?',
+      options: ['Amazon Macie', 'Amazon GuardDuty', 'Amazon Inspector', 'Amazon Fraud Detector'],
+      correct: 3,
+      explanation: 'Amazon Fraud Detector uses ML to score online activities like payments and account creation for fraud risk in real time, adapting to new fraud patterns faster than static rules. Macie discovers sensitive data in S3, GuardDuty detects threats against AWS accounts and workloads, and Inspector scans workloads for software vulnerabilities — all security services, but none score business transactions for fraud.'
     },
     {
       id: 'd1q17',
@@ -321,163 +301,118 @@ export const domain2 = {
   questions: [
     {
       id: 'd2q1',
-      question: 'What is Amazon Bedrock?',
-      options: [
-        'A fully managed service for labeling training data with human workforces',
-        'A fully managed service for building generative AI applications with foundation models',
-        'A fully managed platform for building, training, and deploying custom ML models',
-        'A managed vector database service for storing and querying embeddings'
-      ],
-      correct: 1,
-      explanation: 'Amazon Bedrock is a fully managed service that offers foundation models from leading AI companies through a single API, making it easy to build generative AI applications.'
+      question: 'A startup wants to add a generative AI chat feature using foundation models from providers such as Anthropic, Meta, and Amazon, accessed through one managed API without provisioning any infrastructure. Which AWS service should it use?',
+      options: ['Amazon Bedrock', 'Amazon SageMaker Ground Truth', 'Amazon Comprehend', 'Amazon Kendra'],
+      correct: 0,
+      explanation: 'Amazon Bedrock is the fully managed, serverless service that exposes foundation models from multiple providers through a single API for building generative AI applications. Ground Truth is a data-labeling service, Comprehend is pre-trained NLP analysis (sentiment, entities), and Kendra is intelligent enterprise search — none of them provide foundation model access.'
     },
     {
       id: 'd2q2',
-      question: 'What is "prompt engineering" in the context of generative AI?',
-      options: [
-        'The process of fine-tuning a model on domain-specific example prompts',
-        'The practice of designing effective inputs to guide AI model outputs',
-        'Training a new model from scratch using curated question-answer pairs',
-        'Optimizing a model\'s architecture to reduce inference latency'
-      ],
-      correct: 1,
-      explanation: 'Prompt engineering is the practice of crafting effective prompts to guide generative AI models to produce desired outputs without changing the underlying model.'
+      question: 'To improve a chatbot\'s answers, an analyst rewrites the instructions, adds example inputs and outputs, and specifies the desired response format — all without running any training job. What is this practice called?',
+      options: ['Fine-tuning', 'Continued pre-training', 'Prompt engineering', 'Feature engineering'],
+      correct: 2,
+      explanation: 'Prompt engineering is the practice of crafting the model\'s input — instructions, examples, and format constraints — to steer its output without changing the model itself. Fine-tuning and continued pre-training both run training jobs that modify model weights, and feature engineering is a traditional-ML data-preparation step, not a prompting technique.'
     },
     {
       id: 'd2q3',
-      question: 'What is RAG (Retrieval Augmented Generation)?',
-      options: [
-        'A fine-tuning method that retrains the model on newly collected data',
-        'A technique that enhances LLM responses by retrieving relevant external knowledge',
-        'A technique that compresses model weights to speed up text generation',
-        'A training approach that augments datasets with synthetically generated examples'
-      ],
+      question: 'An HR chatbot answers employee questions by first searching a knowledge base of company policies for relevant passages, then inserting those passages into the model\'s prompt before generating a response. What is this architecture called?',
+      options: ['Parameter-efficient fine-tuning', 'Retrieval Augmented Generation (RAG)', 'Chain-of-thought prompting', 'Continued pre-training'],
       correct: 1,
-      explanation: 'RAG combines the power of LLMs with external knowledge retrieval, allowing models to access up-to-date or domain-specific information not in their training data.'
+      explanation: 'RAG augments the model\'s prompt with relevant documents retrieved at query time, letting it answer from knowledge outside its training data without any retraining. Fine-tuning and continued pre-training modify model weights through training, and chain-of-thought prompting elicits step-by-step reasoning but retrieves nothing.'
     },
     {
       id: 'd2q4',
-      question: 'Which Amazon service provides vector database capabilities for building RAG applications?',
-      options: ['Amazon Athena', 'Amazon OpenSearch Service', 'Amazon DynamoDB', 'Amazon Redshift'],
-      correct: 1,
-      explanation: 'Amazon OpenSearch Service supports vector search capabilities, making it suitable for storing and querying embeddings in RAG applications.'
+      question: 'A team building a RAG application needs an AWS service that can store document embeddings and run vector similarity (k-NN) searches over them. Which service fits this requirement?',
+      options: ['Amazon Athena', 'Amazon DynamoDB', 'Amazon Redshift', 'Amazon OpenSearch Service'],
+      correct: 3,
+      explanation: 'Amazon OpenSearch Service supports k-NN vector search, making it a common choice for storing and querying embeddings in RAG architectures (and it backs Bedrock Knowledge Bases via OpenSearch Serverless). Athena runs SQL over data in S3, DynamoDB is a key-value/document store, and Redshift is a data warehouse — none is designed around vector similarity search.'
     },
     {
       id: 'd2q5',
-      question: 'What is "hallucination" in the context of large language models?',
-      options: [
-        'Visual artifacts produced by image generation models',
-        'When a model generates plausible but factually incorrect information',
-        'When a model refuses to answer questions outside its training data',
-        'When a model memorizes and repeats noisy examples from training data'
-      ],
-      correct: 1,
-      explanation: 'Hallucination refers to when LLMs generate content that sounds plausible but is factually incorrect, made up, or not grounded in the input or reality.'
+      question: 'A coding assistant confidently describes an SDK function that does not actually exist in the library. Which term describes this LLM behavior?',
+      options: ['Hallucination', 'Model drift', 'Underfitting', 'Prompt injection'],
+      correct: 0,
+      explanation: 'Hallucination is when a model generates fluent, plausible-sounding content that is factually wrong or invented — like a nonexistent function. Model drift is performance degradation as real-world data changes, underfitting is a model too simple to learn its training data, and prompt injection is an attack where malicious input overrides the model\'s instructions.'
     },
     {
       id: 'd2q6',
-      question: 'What is the purpose of fine-tuning a foundation model?',
-      options: [
-        'To compress a model so it can run on smaller hardware',
-        'To adapt a pre-trained model to a specific task or domain',
-        'To retrain a model from scratch using a larger dataset',
-        'To provide examples in the prompt without changing model weights'
-      ],
-      correct: 1,
-      explanation: 'Fine-tuning adapts a pre-trained foundation model to specific tasks or domains by training it further on domain-specific data, improving performance for that use case.'
+      question: 'A healthcare company has thousands of labeled prompt-and-response pairs from its specialty and wants a foundation model\'s weights permanently adapted so it excels at this domain. Which customization approach does this describe?',
+      options: ['Prompt engineering with templates', 'Retrieval Augmented Generation', 'Fine-tuning the foundation model', 'Zero-shot prompting'],
+      correct: 2,
+      explanation: 'Fine-tuning continues training a pre-trained model on labeled domain examples, updating its weights so the specialization is built into the model itself. Prompt engineering and zero-shot prompting only shape the input and change nothing permanently, while RAG supplies external knowledge at query time and deliberately leaves the weights untouched.'
     },
     {
       id: 'd2q7',
-      question: 'What is a "token" in the context of large language models?',
+      question: 'A developer reads that a model supports a 200,000-token input limit and is billed per 1,000 tokens. What does a "token" represent here?',
       options: [
-        'A security credential used to authenticate API requests to the model',
-        'A unit of text that the model processes (word, subword, or character)',
-        'A unit of compute time consumed during each model invocation',
-        'A saved model checkpoint created during the training process'
+        'A temporary security credential attached to each API request',
+        'A unit of text, such as a word or piece of a word, that the model processes',
+        'One second of accelerated compute time consumed by the invocation',
+        'A checkpoint of the model\'s weights saved during the training run'
       ],
       correct: 1,
-      explanation: 'Tokens are the basic units that LLMs process - they can be words, parts of words, or characters. Models have limits on input/output tokens they can handle.'
+      explanation: 'LLMs split text into tokens — words, subwords, or characters — and both context limits and usage-based pricing are measured in these units. Tokens are unrelated to authentication credentials, compute-time billing, or training checkpoints.'
     },
     {
       id: 'd2q8',
-      question: 'Which technique allows you to customize a foundation model\'s behavior without modifying its weights?',
-      options: ['Transfer learning', 'In-context learning / prompting', 'Gradient descent', 'Backpropagation'],
-      correct: 1,
-      explanation: 'In-context learning or prompting allows customization of model behavior through carefully crafted prompts and examples, without changing the model weights.'
+      question: 'A team steers a foundation model\'s output style by including a handful of worked examples directly in each request, with no training job and no change to the model\'s weights. Which technique is this?',
+      options: ['Full fine-tuning', 'Continued pre-training', 'Model distillation', 'In-context learning with few-shot examples'],
+      correct: 3,
+      explanation: 'In-context (few-shot) learning conditions the model on examples supplied in the prompt itself, adapting its behavior for that request without touching its weights. Fine-tuning and continued pre-training are training jobs that do update weights, and distillation trains a smaller model to imitate a larger one.'
     },
     {
       id: 'd2q9',
-      question: 'What is "chunking" in the context of generative AI?',
-      options: [
-        'Batching multiple user requests into a single model invocation',
-        'Breaking large documents into smaller pieces for processing',
-        'Splitting a model across multiple GPUs for parallel inference',
-        'Compressing embeddings to reduce vector storage requirements'
-      ],
-      correct: 1,
-      explanation: 'Chunking breaks large documents into smaller, manageable pieces for processing. This is essential for RAG systems since models have limited context windows.'
+      question: 'Before indexing a 500-page manual for a RAG system, a team splits it into passages of a few hundred tokens each so they can be embedded and retrieved individually. What is this preprocessing step called?',
+      options: ['Chunking', 'Tokenization', 'Quantization', 'Normalization'],
+      correct: 0,
+      explanation: 'Chunking breaks large documents into smaller pieces that embed well, retrieve precisely, and fit within the model\'s context window — a core step in RAG pipelines. Tokenization is the model\'s own splitting of text into tokens, quantization compresses model weights to lower precision, and normalization standardizes data values.'
     },
     {
       id: 'd2q10',
-      question: 'What are "embeddings" in generative AI?',
-      options: [
-        'Compressed copies of training documents stored inside the model',
-        'Numerical vector representations of data that capture semantic meaning',
-        'Keywords extracted from text to build a traditional search index',
-        'Model parameters that are updated during the fine-tuning process'
-      ],
-      correct: 1,
-      explanation: 'Embeddings are numerical (vector) representations that capture semantic meaning. Similar concepts have similar embeddings, enabling semantic search and comparison.'
+      question: 'A retail app represents every product description as a list of numbers so that items with similar meaning end up numerically close together, even when they share no keywords. What are these numerical representations called?',
+      options: ['Tokens', 'Hyperparameters', 'Embeddings', 'Checkpoints'],
+      correct: 2,
+      explanation: 'Embeddings are vector representations of data that capture semantic meaning, so similar concepts land close together in vector space — the basis for semantic search and recommendations. Tokens are the text units a model processes, hyperparameters are training configuration settings, and checkpoints are saved model states.'
     },
     {
       id: 'd2q11',
-      question: 'What type of generative AI model creates images by learning to reverse a noise-adding process?',
-      options: ['Transformer models', 'Recurrent Neural Networks', 'Diffusion models', 'Autoencoder models'],
-      correct: 2,
-      explanation: 'Diffusion models generate images by learning to reverse a noise-adding process — starting from random noise and gradually removing it to create high-quality images. Examples include Stable Diffusion and Amazon Titan Image Generator.'
+      question: 'A design team generates marketing images with a model that starts from pure random noise and progressively removes it until a coherent image emerges. Which type of generative model works this way?',
+      options: ['Generative adversarial network (GAN)', 'Diffusion model', 'Recurrent neural network (RNN)', 'Variational autoencoder (VAE)'],
+      correct: 1,
+      explanation: 'Diffusion models learn to reverse a gradual noise-adding process, generating images by iterative denoising — the approach behind Stable Diffusion and Amazon Titan Image Generator. GANs generate through a generator-discriminator competition, VAEs decode from a learned latent space, and RNNs are sequence models, not image generators.'
     },
     {
       id: 'd2q12',
-      question: 'What is the correct order of the Foundation Model Lifecycle stages?',
+      question: 'Which sequence correctly orders the stages of the foundation model lifecycle?',
       options: [
-        'Model Selection → Data Selection → Fine-tuning → Pre-training → Deployment → Evaluation → Feedback',
-        'Data Selection → Model Selection → Pre-training → Fine-tuning → Evaluation → Deployment → Feedback',
-        'Data Selection → Pre-training → Model Selection → Deployment → Fine-tuning → Feedback → Evaluation',
-        'Pre-training → Data Selection → Model Selection → Evaluation → Fine-tuning → Deployment → Feedback'
+        'Model selection → Data selection → Fine-tuning → Pre-training → Deployment → Evaluation → Feedback',
+        'Data selection → Pre-training → Model selection → Deployment → Fine-tuning → Feedback → Evaluation',
+        'Pre-training → Data selection → Model selection → Evaluation → Fine-tuning → Deployment → Feedback',
+        'Data selection → Model selection → Pre-training → Fine-tuning → Evaluation → Deployment → Feedback'
       ],
-      correct: 1,
-      explanation: 'The FM lifecycle follows: Data Selection → Model Selection → Pre-training → Fine-tuning → Evaluation → Deployment → Feedback. This is an iterative cycle where feedback drives continuous improvement.'
+      correct: 3,
+      explanation: 'The lifecycle starts with selecting data and a model architecture, then pre-training on broad data, fine-tuning for the target use, evaluating, deploying, and gathering feedback that drives further iteration. The other orders are wrong because pre-training cannot precede data selection, and evaluation must happen before deployment, not after.'
     },
     {
       id: 'd2q13',
-      question: 'What are "multimodal models" in generative AI?',
-      options: [
-        'Models that can translate text between many different human languages in real time',
-        'Models trained in multiple sequential stages on progressively larger datasets',
-        'AI models that can process and generate multiple types of data such as text, images, and audio',
-        'Ensembles that combine the predictions of multiple separately trained models into one output'
-      ],
-      correct: 2,
-      explanation: 'Multimodal models can process and generate multiple data types (modalities) such as text, images, audio, and video. Examples include Anthropic Claude (text + image) and Amazon Titan Multimodal Embeddings.'
+      question: 'A support app lets customers upload a photo of a broken part and type a question about it, and the model interprets both the image and the text to produce an answer. Which type of model enables this?',
+      options: ['A multimodal model', 'An embedding model', 'A diffusion model', 'A text-only large language model'],
+      correct: 0,
+      explanation: 'Multimodal models process (and can generate) more than one type of data — here, image plus text input. An embedding model outputs vectors rather than answers, a diffusion model generates images from noise, and a text-only LLM cannot interpret the uploaded photo at all.'
     },
     {
       id: 'd2q14',
-      question: 'Which fine-tuning method updates only a small subset of model parameters to reduce cost?',
-      options: ['Full fine-tuning', 'Pre-training from scratch', 'Parameter-Efficient Fine-Tuning (PEFT/LoRA)', 'Reinforcement Learning'],
+      question: 'A team wants to adapt a large foundation model to its domain but cannot afford the compute to update all of the model\'s billions of weights. Which approach trains only a small number of parameters while freezing the rest?',
+      options: ['Full fine-tuning', 'Pre-training from scratch', 'Parameter-Efficient Fine-Tuning (PEFT), such as LoRA', 'Reinforcement learning from human feedback (RLHF)'],
       correct: 2,
-      explanation: 'Parameter-Efficient Fine-Tuning (PEFT) methods like LoRA update only a small subset of model weights, making fine-tuning much cheaper and faster than updating all parameters.'
+      explanation: 'PEFT techniques like LoRA freeze the original weights and train only a small set of added or selected parameters, achieving domain adaptation at a fraction of the cost of full fine-tuning. Full fine-tuning updates every weight, pre-training from scratch is the most expensive option of all, and RLHF is an alignment technique, not a cost-reduction method.'
     },
     {
       id: 'd2q15',
-      question: 'What is the primary advantage of using Amazon Q Developer for code generation?',
-      options: [
-        'It provisions and manages the cloud infrastructure that runs your application code',
-        'It auto-completes code, generates code from natural language, detects bugs, and creates tests',
-        'It trains a private foundation model on your entire codebase automatically',
-        'It requires fine-tuning on your source code before it can generate suggestions'
-      ],
+      question: 'A development team wants an AI assistant inside their IDE that suggests code completions, generates functions from natural-language comments, and scans code for security vulnerabilities. Which AWS service provides this?',
+      options: ['Amazon SageMaker Canvas', 'Amazon Q Developer', 'AWS CodeDeploy', 'Amazon Kendra'],
       correct: 1,
-      explanation: 'Amazon Q Developer assists developers by auto-completing code, generating code from natural language descriptions, reviewing code for bugs, generating test cases, and creating documentation.'
+      explanation: 'Amazon Q Developer is the generative AI coding assistant that provides inline code suggestions, generates code from natural-language prompts, and scans for security issues directly in the IDE. SageMaker Canvas is a no-code ML model builder, CodeDeploy automates application deployments, and Kendra is enterprise document search.'
     },
     {
       id: 'd2q16',
