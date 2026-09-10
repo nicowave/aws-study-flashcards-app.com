@@ -701,6 +701,11 @@ const Footer = () => (
       <p className="mono">
         Not affiliated with Amazon Web Services. AWS and all related marks are trademarks of Amazon.com, Inc.
       </p>
+      <p className="footer-legal-links">
+        <a href="/terms.html">Terms of Service</a>
+        <span aria-hidden="true"> · </span>
+        <a href="/privacy.html">Privacy Policy</a>
+      </p>
     </div>
   </footer>
 );

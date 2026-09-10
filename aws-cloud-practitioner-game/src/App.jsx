@@ -14,6 +14,8 @@ import StudyGuide from './components/StudyGuide';
 import Flashcards from './components/Flashcards';
 import ExamMode from './components/ExamMode';
 import { GuestBanner, GuestUpsell } from './components/GuestPrompts';
+import PaywallScreen from './components/PaywallScreen';
+import { BILLING_ENABLED, hasCertEntitlement } from './services/billing';
 import AuthScreen from './components/AuthScreen';
 import UserBadge from './components/UserBadge';
 import SettingsPage from './components/SettingsPage';
@@ -76,6 +78,20 @@ const TabNavigation = ({ activeTab, onTabChange }) => {
 // Main Game Content (only rendered when authenticated)
 function GameContent() {
   const { user, syncLocalProgress, loadProgress, logout, isGuest, exitGuest } = useAuth();
+
+  // Entitlement for this cert (always true while billing is disabled).
+  // The first quiz session is free; afterwards quizzes and the exam
+  // simulator require a subscription. Study guide stays free.
+  const [entitled, setEntitled] = useState(!BILLING_ENABLED);
+  useEffect(() => {
+    if (!BILLING_ENABLED) return;
+    if (!user) {
+      setEntitled(false);
+      return;
+    }
+    const fromCheckout = new URLSearchParams(window.location.search).get('checkout') === 'success';
+    hasCertEntitlement(CERT_ID, { forceRefresh: fromCheckout }).then(setEntitled);
+  }, [user]);
   
   // Main app tab state
   const [activeTab, setActiveTab] = useState('game');
@@ -249,12 +265,30 @@ function GameContent() {
             <MenuScreen
               globalStats={globalStats}
               isGuest={isGuest}
-              onStartGame={() => setGameState('domainSelect')}
-              onStartExam={() => setGameState('exam')}
+              onStartGame={() => {
+                // First quiz session is free for signed-in users; after that
+                // (with billing on) quizzes require a subscription.
+                const needsSub = BILLING_ENABLED && !isGuest && !entitled && globalStats.totalSessions >= 1;
+                setGameState(needsSub ? 'paywall' : 'domainSelect');
+              }}
+              onStartExam={() => {
+                // Exam simulator is premium from the start when billing is on
+                // (guests get the guest upsell instead).
+                const needsSub = BILLING_ENABLED && !isGuest && !entitled;
+                setGameState(needsSub ? 'paywall' : 'exam');
+              }}
               onViewStats={() => setGameState('stats')}
               onStudyGuide={() => setActiveTab('study')}
               soundEnabled={soundEnabled}
               onToggleSound={() => setSoundEnabled(!soundEnabled)}
+            />
+          )}
+
+          {gameState === 'paywall' && (
+            <PaywallScreen
+              certId={CERT_ID}
+              certName="AWS Certified Cloud Practitioner"
+              onBack={() => setGameState('menu')}
             />
           )}
 

@@ -76,7 +76,8 @@ export class StudyHubBackendStack extends cdk.Stack {
     // Hosted UI domain (Cognito-managed). A custom domain such as
     // auth.aws-study-flashcards-app.com can replace this in Phase 2
     // (requires an ACM cert in us-east-1 + a Route53 alias).
-    const domainPrefix = this.node.tryGetContext('cognitoDomainPrefix') ?? 'aws-study-hub-auth';
+    // NOTE: Cognito domain prefixes may not contain "aws", "amazon", or "cognito".
+    const domainPrefix = this.node.tryGetContext('cognitoDomainPrefix') ?? 'study-hub-auth-418272768335';
     const userPoolDomain = userPool.addDomain('HostedUiDomain', {
       cognitoDomain: { domainPrefix },
     });
