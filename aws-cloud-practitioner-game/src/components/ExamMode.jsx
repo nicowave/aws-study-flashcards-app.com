@@ -93,6 +93,51 @@ const formatTime = (seconds) => {
   return `${m}:${String(s).padStart(2, '0')}`;
 };
 
+// ---- Readiness score ----
+// Blends the average of the last three scaled scores (70%) with the weakest
+// domain from the latest attempt (30%), so one lucky pass carried by strong
+// domains doesn't read as exam-ready while another domain is failing.
+const computeReadiness = (history) => {
+  if (history.length === 0) return null;
+  const recent = history.slice(-3);
+  const avgScaled = recent.reduce((sum, h) => sum + h.scaled, 0) / recent.length;
+  const scorePct = Math.max(0, Math.min(100, ((avgScaled - 100) / 900) * 100));
+  const latest = history[history.length - 1];
+  const domainPcts = (latest.domains || [])
+    .filter((d) => d.total > 0)
+    .map((d) => (d.correct / d.total) * 100);
+  const weakest = domainPcts.length > 0 ? Math.min(...domainPcts) : scorePct;
+  const score = Math.round(0.7 * scorePct + 0.3 * weakest);
+  let tone; let label; let note;
+  if (score >= 80) {
+    tone = 'ready';
+    label = 'Ready';
+    note = 'Consistent passing scores with no weak domain — you\'re in shape to book the real exam.';
+  } else if (score >= 65) {
+    tone = 'almost';
+    label = 'Almost ready';
+    note = 'Close the weakest domain in your breakdown, then retake to confirm.';
+  } else {
+    tone = 'low';
+    label = 'Keep practicing';
+    note = 'Drill your weakest domains in Practice mode before your next attempt.';
+  }
+  return { score, tone, label, note, attempts: recent.length, weakest: Math.round(weakest) };
+};
+
+const ReadinessCard = ({ r }) => (
+  <div className={`exam-readiness ${r.tone}`}>
+    <div className="readiness-score">{r.score}<span>%</span></div>
+    <div className="readiness-text">
+      <strong>Readiness: {r.label}</strong>
+      <span>{r.note}</span>
+      <span className="readiness-basis">
+        Based on your last {r.attempts} attempt{r.attempts > 1 ? 's' : ''} · weakest domain {r.weakest}%
+      </span>
+    </div>
+  </div>
+);
+
 const ExamMode = ({ onExit }) => {
   const [view, setView] = useState('intro'); // intro | exam | results | review
   const [questions, setQuestions] = useState([]);
@@ -211,6 +256,8 @@ const ExamMode = ({ onExit }) => {
     [history]
   );
 
+  const readiness = useMemo(() => computeReadiness(history), [history]);
+
   // ---------- Intro ----------
   if (view === 'intro') {
     return (
@@ -241,6 +288,7 @@ const ExamMode = ({ onExit }) => {
             No hints, no instant feedback — just like the real exam. You can flag
             questions and change answers until you submit.
           </p>
+          {readiness && <ReadinessCard r={readiness} />}
           {history.length > 0 && (
             <p className="exam-intro-history">
               Attempts: {history.length} · Best score: <strong>{bestScaled}</strong>
@@ -380,6 +428,8 @@ const ExamMode = ({ onExit }) => {
             Aim for consistent 80%+ across every domain before booking the real exam.
           </p>
         </div>
+
+        {readiness && <ReadinessCard r={readiness} />}
 
         <div className="exam-result-actions">
           <button className="exam-primary-btn" onClick={() => setView('review')}>
