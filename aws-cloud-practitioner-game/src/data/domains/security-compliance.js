@@ -188,6 +188,294 @@ export const securityCompliance = {
       ],
       correctAnswer: 1,
       explanation: 'Security Groups act as virtual firewalls for EC2 instances, controlling inbound and outbound traffic at the instance level. They are stateful, meaning return traffic is automatically allowed.'
+    },
+    {
+      id: 'sc16',
+      question: 'How do Network ACLs differ from Security Groups?',
+      options: [
+        'Network ACLs are stateful and apply per instance; Security Groups are stateless and apply per subnet',
+        'Network ACLs are stateless and filter traffic at the subnet level; Security Groups are stateful and filter at the instance level',
+        'Network ACLs encrypt traffic; Security Groups compress it',
+        'They are identical features with different names'
+      ],
+      correctAnswer: 1,
+      explanation: 'NACLs operate at the subnet boundary, are stateless (return traffic needs explicit rules), and support allow and deny rules. Security Groups attach to instances, are stateful, and only have allow rules. Neither encrypts or compresses traffic.'
+    },
+    {
+      id: 'sc17',
+      question: 'An application on an EC2 instance needs to read from an S3 bucket. What is the recommended way to grant this access?',
+      options: [
+        'Store an IAM user\'s access keys in the application\'s config file',
+        'Attach an IAM role to the EC2 instance with a policy allowing S3 read access',
+        'Make the S3 bucket public so no credentials are needed',
+        'Share the root user\'s credentials with the application'
+      ],
+      correctAnswer: 1,
+      explanation: 'IAM roles provide temporary, automatically rotated credentials to the instance — no secrets stored in code or config. Hard-coded access keys leak, public buckets expose data to everyone, and root credentials should never be used by applications.'
+    },
+    {
+      id: 'sc18',
+      question: 'Twelve developers all need identical permissions to the same AWS services. What is the recommended way to manage this?',
+      options: [
+        'Attach the policy to an IAM group and add the twelve users to the group',
+        'Attach twelve copies of the policy, one to each user individually',
+        'Have all twelve developers share one IAM user',
+        'Give all twelve the root user password'
+      ],
+      correctAnswer: 0,
+      explanation: 'IAM groups apply a policy once to many users — changing team permissions means editing one group, not twelve users. Per-user policy copies drift out of sync, shared IAM users destroy accountability, and sharing root credentials is the gravest IAM anti-pattern.'
+    },
+    {
+      id: 'sc19',
+      question: 'What are IAM access keys used for?',
+      options: [
+        'Signing in to the AWS Management Console in a browser',
+        'Programmatic access to AWS via the CLI, SDKs, or APIs',
+        'Encrypting EBS volumes',
+        'Physically unlocking AWS data centers'
+      ],
+      correctAnswer: 1,
+      explanation: 'Access keys (an access key ID plus secret) authenticate programmatic calls from the CLI, SDKs, and direct API requests. Console sign-in uses a password (ideally with MFA), volume encryption uses KMS keys, and data-center physical security is AWS\'s responsibility.'
+    },
+    {
+      id: 'sc20',
+      question: 'Which set of practices should be applied to the AWS account root user?',
+      options: [
+        'Enable MFA, use a strong unique password, avoid daily use, and create IAM identities for routine work',
+        'Share it with the operations team for convenience',
+        'Embed its credentials in deployment scripts for reliability',
+        'Delete the root user entirely once IAM users exist'
+      ],
+      correctAnswer: 0,
+      explanation: 'The root user has unrestricted power, so it gets MFA and a strong password, is reserved for the few tasks that require it, and daily work happens through IAM identities. It cannot be deleted, and sharing or embedding its credentials creates catastrophic risk.'
+    },
+    {
+      id: 'sc21',
+      question: 'A security team must determine which user deleted a production S3 bucket last Tuesday. Which service holds this record?',
+      options: ['Amazon CloudWatch', 'AWS CloudTrail', 'AWS Cost Explorer', 'Amazon Inspector'],
+      correctAnswer: 1,
+      explanation: 'CloudTrail records API activity — who called what action, when, and from where — making it the source for "who did this" investigations. CloudWatch tracks metrics and logs for monitoring, Cost Explorer analyzes spending, and Inspector scans for vulnerabilities.'
+    },
+    {
+      id: 'sc22',
+      question: 'A compliance rule requires that all EBS volumes be encrypted, and the team needs continuous detection of any resource that drifts out of compliance. Which service does this?',
+      options: ['AWS Config with compliance rules', 'Amazon Route 53', 'AWS Batch', 'Amazon Polly'],
+      correctAnswer: 0,
+      explanation: 'AWS Config continuously records resource configurations and evaluates them against rules, flagging noncompliant resources (like unencrypted volumes) as they appear. Route 53 is DNS, Batch runs compute jobs, and Polly is text-to-speech.'
+    },
+    {
+      id: 'sc23',
+      question: 'Which service automatically scans EC2 instances and container images for software vulnerabilities and unintended network exposure?',
+      options: ['Amazon Macie', 'AWS Shield', 'Amazon Inspector', 'AWS Artifact'],
+      correctAnswer: 2,
+      explanation: 'Amazon Inspector continually scans workloads (EC2, ECR images, Lambda) for known vulnerabilities and network reachability issues. Macie discovers sensitive data in S3, Shield mitigates DDoS attacks, and Artifact serves compliance documents.'
+    },
+    {
+      id: 'sc24',
+      question: 'A company suspects some S3 buckets contain unprotected personally identifiable information (PII). Which service uses ML to discover and classify such sensitive data?',
+      options: ['Amazon Macie', 'AWS WAF', 'Amazon GuardDuty', 'AWS KMS'],
+      correctAnswer: 0,
+      explanation: 'Macie applies machine learning and pattern matching to find sensitive data (PII, credentials, financial data) in S3 and reports exposure risks. WAF filters web traffic, GuardDuty detects threats from activity logs, and KMS manages encryption keys.'
+    },
+    {
+      id: 'sc25',
+      question: 'A database password is hard-coded in application source code, and policy now requires automatic rotation. Which service solves both problems?',
+      options: ['AWS Secrets Manager', 'Amazon SNS', 'AWS CloudFormation', 'S3 Versioning'],
+      correctAnswer: 0,
+      explanation: 'Secrets Manager stores credentials centrally, applications retrieve them at runtime via API, and built-in rotation updates passwords on a schedule (with native RDS integration). SNS sends notifications, CloudFormation provisions infrastructure, and versioning preserves S3 object history.'
+    },
+    {
+      id: 'sc26',
+      question: 'A team needs free public SSL/TLS certificates for its load-balanced website, with automatic renewal. Which service provides this?',
+      options: ['AWS Certificate Manager (ACM)', 'AWS KMS', 'Amazon Cognito', 'AWS IAM'],
+      correctAnswer: 0,
+      explanation: 'ACM issues and automatically renews public TLS certificates at no cost for use with AWS services like ELB and CloudFront. KMS manages encryption keys (not certificates), Cognito handles app user identity, and IAM manages AWS access.'
+    },
+    {
+      id: 'sc27',
+      question: 'What is the standard way to protect data in transit between users and an AWS-hosted application?',
+      options: [
+        'TLS/SSL encryption (HTTPS) for all connections',
+        'Storing the data in a private subnet',
+        'Enabling S3 versioning',
+        'Using larger EC2 instances'
+      ],
+      correctAnswer: 0,
+      explanation: 'Data in transit is protected by encrypting the connection itself with TLS (HTTPS). Private subnets control network placement, versioning protects stored object history, and instance size has nothing to do with transport security.'
+    },
+    {
+      id: 'sc28',
+      question: 'What is the difference between AWS Shield Standard and Shield Advanced?',
+      options: [
+        'Standard is automatic and free for all customers; Advanced is a paid tier with enhanced DDoS protections, visibility, and response support',
+        'Standard protects EC2 only; Advanced protects S3 only',
+        'Standard is for on-premises servers; Advanced is for cloud servers',
+        'They differ only in name'
+      ],
+      correctAnswer: 0,
+      explanation: 'Shield Standard defends all AWS customers against common network-layer DDoS attacks automatically and free. Shield Advanced adds enhanced detection, application-layer protections, cost protection during attacks, and access to the Shield Response Team — for a subscription fee.'
+    },
+    {
+      id: 'sc29',
+      question: 'A security team is overwhelmed checking findings separately in GuardDuty, Inspector, and Macie. Which service aggregates security findings into a single consolidated view?',
+      options: ['AWS Security Hub', 'AWS Budgets', 'Amazon EventBridge', 'AWS Snowball'],
+      correctAnswer: 0,
+      explanation: 'Security Hub collects and prioritizes findings from AWS security services (and partner tools) in one dashboard and scores your posture against standards like CIS. Budgets tracks spending, EventBridge routes events, and Snowball transfers data.'
+    },
+    {
+      id: 'sc30',
+      question: 'A mobile app needs user sign-up, sign-in, and social login (Google/Apple) for its own customers. Which service is designed for this?',
+      options: ['AWS IAM', 'Amazon Cognito', 'AWS Directory Service', 'AWS Organizations'],
+      correctAnswer: 1,
+      explanation: 'Cognito manages application end-user identity: registration, authentication, social and enterprise federation, and token issuance. IAM governs access to AWS resources for builders and workloads — not app customers; Directory Service hosts Microsoft AD, and Organizations manages AWS accounts.'
+    },
+    {
+      id: 'sc31',
+      question: 'A company wants its employees to sign in once and access all of its AWS accounts and business applications with centrally managed permissions. Which service provides this?',
+      options: ['AWS IAM Identity Center (successor to AWS SSO)', 'Amazon GuardDuty', 'AWS WAF', 'Amazon Detective'],
+      correctAnswer: 0,
+      explanation: 'IAM Identity Center provides workforce single sign-on across multiple AWS accounts and SAML applications, with centralized permission sets. GuardDuty detects threats, WAF filters web requests, and Detective investigates security findings.'
+    },
+    {
+      id: 'sc32',
+      question: 'A customer wants to run penetration tests against their own EC2-hosted applications. What is AWS\'s policy?',
+      options: [
+        'Penetration testing is never allowed on AWS',
+        'Customers may test a defined list of their own services (including EC2) without prior approval, within AWS\'s rules',
+        'All testing requires a written contract signed by AWS legal',
+        'Testing is allowed only in the us-east-1 Region'
+      ],
+      correctAnswer: 1,
+      explanation: 'AWS permits security testing of your own workloads on a list of permitted services (EC2, RDS, Lambda, and others) without pre-approval, provided the rules of engagement are followed — no DoS-style testing, for example. It is neither banned, contract-gated, nor Region-restricted.'
+    },
+    {
+      id: 'sc33',
+      question: 'A healthcare company must confirm which AWS services are HIPAA-eligible and download AWS\'s compliance attestations for auditors. Where does it find these?',
+      options: [
+        'AWS Artifact and the AWS services-in-scope compliance pages',
+        'The EC2 spot pricing history',
+        'Amazon CloudWatch dashboards',
+        'The AWS Marketplace seller guide'
+      ],
+      correctAnswer: 0,
+      explanation: 'AWS Artifact provides on-demand compliance reports (SOC, ISO, PCI) and agreements like the BAA, while AWS\'s compliance pages list which services are in scope for each program. Pricing history, monitoring dashboards, and Marketplace documentation contain no compliance attestations.'
+    },
+    {
+      id: 'sc34',
+      question: 'A company\'s S3 bucket was left publicly readable and customer data leaked. Under the Shared Responsibility Model, who is responsible?',
+      options: [
+        'AWS, because S3 is a managed service',
+        'The customer, because configuring bucket access controls is security "in" the cloud',
+        'Both equally, splitting any penalties',
+        'No one — public buckets are unavoidable'
+      ],
+      correctAnswer: 1,
+      explanation: 'Access configuration of customer data is squarely the customer\'s side of the model — AWS secures the S3 infrastructure, but bucket policies, Block Public Access, and ACLs are customer-controlled settings. AWS even provides guardrails (Block Public Access) to prevent exactly this.'
+    },
+    {
+      id: 'sc35',
+      question: 'For which setup does AWS take over operating system patching as part of its responsibility?',
+      options: [
+        'An EC2 instance running a customer-managed Linux AMI',
+        'A managed service like Amazon RDS, where AWS patches the underlying OS and database engine',
+        'A customer\'s on-premises servers connected via VPN',
+        'Any server, as long as the customer files a support ticket'
+      ],
+      correctAnswer: 1,
+      explanation: 'Responsibility shifts with the service model: on EC2 the customer patches the guest OS, but for managed services like RDS, AWS handles OS and engine patching (the customer manages data, credentials, and settings). On-premises hardware is entirely the customer\'s, ticket or not.'
+    },
+    {
+      id: 'sc36',
+      question: 'A German customer stores data in the eu-central-1 (Frankfurt) Region. What does AWS commit regarding that data\'s location?',
+      options: [
+        'AWS may relocate it to any Region for load balancing',
+        'Customer content stays in the chosen Region unless the customer moves it or enables cross-Region features',
+        'Data is automatically copied to us-east-1 for backup',
+        'Data location depends on which support plan is purchased'
+      ],
+      correctAnswer: 1,
+      explanation: 'Customers choose the Region their content resides in, and AWS does not move or replicate it elsewhere without the customer taking action (such as enabling cross-Region replication). This underpins data-residency compliance; support plans have no effect on data location.'
+    },
+    {
+      id: 'sc37',
+      question: 'A bank requires a dedicated, private network connection from its data center to AWS that never traverses the public internet. Which option meets this?',
+      options: ['AWS Direct Connect', 'AWS Site-to-Site VPN over the internet', 'Amazon CloudFront', 'A public Elastic IP address'],
+      correctAnswer: 0,
+      explanation: 'Direct Connect is a dedicated physical link between the customer\'s network and AWS, bypassing the internet for consistent latency and private connectivity. Site-to-Site VPN encrypts traffic but still rides the public internet; CloudFront and Elastic IPs are unrelated to private connectivity.'
+    },
+    {
+      id: 'sc38',
+      question: 'Which tasks are examples of the CUSTOMER\'s responsibility "in" the cloud?',
+      options: [
+        'Maintaining data-center power, cooling, and physical access controls',
+        'Replacing failed host hardware and network switches',
+        'Classifying data, configuring IAM permissions, and enabling encryption for their content',
+        'Global infrastructure design of Regions and Availability Zones'
+      ],
+      correctAnswer: 2,
+      explanation: 'Customers own what they put in the cloud and how it\'s configured: data classification, identity and access management, encryption choices, and application security. Facilities, hardware, and global infrastructure are AWS\'s security "of" the cloud.'
+    },
+    {
+      id: 'sc39',
+      question: 'What is the difference between Amazon GuardDuty and Amazon Inspector?',
+      options: [
+        'GuardDuty detects active threats by analyzing account activity and network logs; Inspector finds software vulnerabilities in workloads before they are exploited',
+        'GuardDuty scans code repositories; Inspector reviews AWS bills',
+        'GuardDuty is for on-premises only; Inspector is for cloud only',
+        'They are identical services sold at different prices'
+      ],
+      correctAnswer: 0,
+      explanation: 'GuardDuty is threat detection — it continuously analyzes CloudTrail, VPC Flow Logs, and DNS logs for signs of compromise. Inspector is vulnerability management — it scans instances and images for known CVEs and exposure. They complement each other rather than overlap.'
+    },
+    {
+      id: 'sc40',
+      question: 'Why should encryption keys be rotated periodically, and how does AWS KMS help?',
+      options: [
+        'Rotation limits how much data any single key version protects, and KMS can rotate keys automatically on a schedule',
+        'Rotation makes data permanently unreadable, which improves privacy',
+        'Rotation is required to keep the AWS Free Tier active',
+        'KMS requires customers to manually re-encrypt all data monthly'
+      ],
+      correctAnswer: 0,
+      explanation: 'Regular rotation reduces the blast radius if a key version is ever compromised. KMS supports automatic annual rotation for customer-managed keys and transparently uses the right version to decrypt older data — no manual re-encryption of existing data and no connection to Free Tier status.'
+    },
+    {
+      id: 'sc41',
+      question: 'A new compliance policy requires that every EBS volume created in the account be encrypted by default. What is the simplest way to achieve this?',
+      options: [
+        'Enable EBS encryption by default at the account/Region level, using a KMS key',
+        'Email developers a reminder to tick the encryption box',
+        'Encrypt volumes by placing them in a private subnet',
+        'Buy a Business support plan, which encrypts volumes automatically'
+      ],
+      correctAnswer: 0,
+      explanation: 'EC2 offers an account-level "encryption by default" setting per Region so every new EBS volume is encrypted with the chosen KMS key automatically — no reliance on human memory. Subnet placement affects network access, not storage encryption, and support plans don\'t change encryption behavior.'
+    },
+    {
+      id: 'sc42',
+      question: 'An auditor wants a report showing all IAM users and the status of their passwords, access keys, and MFA devices. Which IAM feature produces this?',
+      options: ['The IAM credential report', 'AWS Pricing Calculator', 'S3 Transfer Acceleration', 'EC2 launch templates'],
+      correctAnswer: 0,
+      explanation: 'IAM generates a downloadable credential report listing every user and the age/status of their credentials and MFA — a standard audit artifact. The other options concern cost estimation, upload speed, and instance provisioning.'
+    },
+    {
+      id: 'sc43',
+      question: 'A junior admin\'s IAM policy allows every action on every service, though they only manage EC2 in one Region. Which security principle does this violate, and what is the fix?',
+      options: [
+        'Least privilege — scope the policy to only the EC2 actions and resources the role actually needs',
+        'Elasticity — move the admin to an Auto Scaling group',
+        'Durability — replicate the policy across Regions',
+        'Consolidated billing — merge the accounts'
+      ],
+      correctAnswer: 0,
+      explanation: 'Granting broad permissions "just in case" violates least privilege; the policy should permit only required actions on required resources, expanding deliberately when needs grow. Elasticity, durability, and billing consolidation are unrelated concepts.'
+    },
+    {
+      id: 'sc44',
+      question: 'Which service protects a web application specifically against exploits like SQL injection and cross-site scripting?',
+      options: ['AWS WAF with managed or custom rules', 'AWS Shield Standard alone', 'Amazon Macie', 'AWS Direct Connect'],
+      correctAnswer: 0,
+      explanation: 'WAF inspects HTTP(S) requests and blocks application-layer attack patterns like SQL injection and XSS using rule sets. Shield Standard mitigates network-layer DDoS (not request-content attacks), Macie finds sensitive data, and Direct Connect is private connectivity.'
     }
   ]
 };
