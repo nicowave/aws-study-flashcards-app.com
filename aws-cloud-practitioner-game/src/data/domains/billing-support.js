@@ -188,6 +188,56 @@ export const billingSupport = {
       ],
       correctAnswer: 3,
       explanation: 'Enterprise support offers less than 15-minute response time for business-critical system down cases. Business support offers less than 1 hour for production system down.'
+    },
+    {
+      id: 'bs16',
+      question: 'Finance wants the monthly AWS bill broken down by project and department. What must be set up to enable this?',
+      options: [
+        'Cost allocation tags applied to resources and activated in the Billing console',
+        'A separate AWS account for every employee',
+        'An Enterprise support plan, which includes per-project billing',
+        'CloudFront distributions for each department'
+      ],
+      correctAnswer: 0,
+      explanation: 'Tagging resources (e.g., project:alpha, department:marketing) and activating those tags as cost allocation tags lets Cost Explorer and reports slice spending by tag. Per-employee accounts is impractical for this goal, and support plans and CDNs don\'t affect billing breakdowns.'
+    },
+    {
+      id: 'bs17',
+      question: 'An analytics team needs the most detailed, line-item-level data about AWS usage and costs, delivered to S3 for querying. Which tool provides this?',
+      options: [
+        'The AWS Cost and Usage Report (CUR)',
+        'The monthly PDF invoice',
+        'AWS Trusted Advisor',
+        'Amazon Inspector findings'
+      ],
+      correctAnswer: 0,
+      explanation: 'The Cost and Usage Report is the most granular billing dataset AWS offers — hourly line items per resource and tag, delivered to S3 where Athena or QuickSight can query it. Invoices summarize, Trusted Advisor gives recommendations, and Inspector is security scanning.'
+    },
+    {
+      id: 'bs18',
+      question: 'A company runs production workloads and needs 24/7 phone support with a response under one hour for production system impairment, at the lowest cost. Which support plan fits?',
+      options: ['Basic', 'Developer', 'Business', 'Enterprise'],
+      correctAnswer: 2,
+      explanation: 'Business support is the entry point for production workloads: 24/7 phone/chat, full Trusted Advisor checks, and <1 hour response for production system impairment. Developer offers business-hours email only, Basic has no technical support cases, and Enterprise costs far more (adding a TAM and 15-minute critical response).'
+    },
+    {
+      id: 'bs19',
+      question: 'Which statement correctly describes AWS data transfer pricing?',
+      options: [
+        'Data transferred IN to AWS from the internet is generally free; data transferred OUT to the internet is charged',
+        'Inbound and outbound transfer are both always free',
+        'Inbound transfer is charged; outbound is free',
+        'Data transfer pricing depends on the support plan'
+      ],
+      correctAnswer: 0,
+      explanation: 'The general rule: inbound from the internet is free, outbound to the internet is billed per GB (with tiering), and inter-Region or inter-AZ transfers carry their own rates. The reversed version is a common trap, and support plans never change transfer rates.'
+    },
+    {
+      id: 'bs20',
+      question: 'A company wants to buy third-party software (like a firewall appliance or SaaS tool) with billing consolidated into its existing AWS invoice. Where does it purchase this?',
+      options: ['AWS Marketplace', 'The AWS Partner Network directory', 'AWS Artifact', 'The AWS Pricing Calculator'],
+      correctAnswer: 0,
+      explanation: 'AWS Marketplace is the curated catalog where third-party software is subscribed to and billed through your AWS account. The Partner Network lists consulting/technology partners but sells nothing directly, Artifact serves compliance reports, and the Pricing Calculator only estimates costs.'
     }
   ]
 };
