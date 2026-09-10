@@ -159,6 +159,90 @@ export const domain4 = {
       options: ['LIME (Local Interpretable Model-agnostic Explanations)', 'SHAP (SHapley Additive exPlanations) values', 'Principal Component Analysis', 'K-means clustering'],
       correct: 1,
       explanation: 'SageMaker Clarify uses SHAP-based feature importance to explain predictions, helping understand which features contributed most to each decision and enabling bias detection across demographic groups.'
+    },
+    {
+      id: 'd4q15',
+      question: 'A loan-approval model was trained on historical data in which one demographic group was rarely approved. The model now rejects that group at unusually high rates. What should the team do FIRST?',
+      options: [
+        'Deploy the model but add a disclaimer to rejection letters',
+        'Measure bias metrics across groups (e.g., with SageMaker Clarify) and rebalance or augment the training data',
+        'Remove the demographic column and assume the bias is gone',
+        'Lower the approval threshold for all applicants equally'
+      ],
+      correct: 1,
+      explanation: 'The first step is to quantify the bias with pre- and post-training metrics, then address the skewed data through rebalancing or augmentation. Simply dropping the demographic column fails because other features act as proxies for it, and disclaimers or global threshold changes don\'t fix discriminatory behavior.'
+    },
+    {
+      id: 'd4q16',
+      question: 'A model shows 94% overall accuracy, but a review reveals only 71% accuracy for one user subgroup. What responsible AI practice does this highlight?',
+      options: [
+        'Evaluating performance per subgroup, not just in aggregate, before deployment',
+        'Reporting only the overall accuracy to avoid confusion',
+        'Increasing overall accuracy until subgroup accuracy no longer matters',
+        'Retraining with a higher learning rate'
+      ],
+      correct: 0,
+      explanation: 'Aggregate metrics hide disparate performance across subgroups — fairness assessment requires disaggregated evaluation and closing the gaps found. Hiding the breakdown or chasing overall accuracy leaves the affected group underserved, and learning rate is unrelated.'
+    },
+    {
+      id: 'd4q17',
+      question: 'A vision model performs well in testing but fails badly on slightly blurred or rotated images in production. Which responsible AI dimension does this failure reflect?',
+      options: [
+        'Robustness — the model should tolerate realistic input variation',
+        'Explainability — the model\'s decisions should be interpretable',
+        'Privacy — the model should protect user data',
+        'Sustainability — the model should minimize energy use'
+      ],
+      correct: 0,
+      explanation: 'Robustness (veracity) is a system\'s ability to remain reliable under noisy, shifted, or adversarial inputs; testing should include realistic variations like blur and rotation. Explainability, privacy, and sustainability are separate responsible AI dimensions not implicated by this failure.'
+    },
+    {
+      id: 'd4q18',
+      question: 'Before adopting Amazon Rekognition, a compliance officer wants AWS\'s own documentation of the service\'s intended use cases, limitations, and responsible design considerations. Where is this published?',
+      options: [
+        'AWS AI Service Cards',
+        'The EC2 pricing page',
+        'AWS CloudTrail logs',
+        'The service\'s IAM policy reference'
+      ],
+      correct: 0,
+      explanation: 'AWS AI Service Cards are transparency documents describing an AI service\'s intended use cases, limitations, design choices, and deployment best practices. Pricing pages, audit logs, and IAM references don\'t cover responsible-use guidance.'
+    },
+    {
+      id: 'd4q19',
+      question: 'A public-facing chatbot must not discuss violent content, must mask any customer phone numbers in responses, and must block a list of competitor names. Which single Bedrock Guardrails configuration covers all three?',
+      options: [
+        'Content filters for violence, PII redaction for phone numbers, and word filters for the competitor names',
+        'A system prompt asking the model to be careful',
+        'Fine-tuning the model to forget phone numbers',
+        'Lowering max tokens so harmful content is cut off'
+      ],
+      correct: 0,
+      explanation: 'Guardrails composes multiple policy types in one configuration: content filters (harmful categories like violence), sensitive-information filters (PII masking), and word/phrase filters (custom blocklists). Prompt requests are bypassable, models can\'t be fine-tuned to "forget" data patterns reliably, and truncation doesn\'t prevent harmful content.'
+    },
+    {
+      id: 'd4q20',
+      question: 'When curating a dataset for a hiring-assistant model, which practice best supports fair outcomes?',
+      options: [
+        'Sourcing data that is inclusive and representative of all groups the model will affect, and documenting its provenance',
+        'Using whatever data is fastest to collect since volume matters most',
+        'Excluding all records from minority groups to simplify the data',
+        'Using only data from the single best-performing office'
+      ],
+      correct: 0,
+      explanation: 'Responsible dataset curation means representative, inclusive, balanced data with documented provenance so gaps and skews are visible. Convenience sampling, excluding groups, or drawing from one narrow source all bake in the exact biases a hiring model must avoid.'
+    },
+    {
+      id: 'd4q21',
+      question: 'A news site uses generative AI to draft some articles. Which practice best supports transparency with its readers?',
+      options: [
+        'Clearly labeling AI-generated content so readers know its origin',
+        'Publishing AI drafts under randomly chosen human bylines',
+        'Keeping AI use confidential to protect the brand',
+        'Using AI only on weekends'
+      ],
+      correct: 0,
+      explanation: 'Transparency means disclosing when content is AI-generated — via labels, disclosures, or provenance techniques like watermarking — so audiences can calibrate trust. Hiding AI involvement or attributing it to fake human authors is deceptive, and the timing of use is irrelevant.'
     }
   ]
 };
@@ -333,6 +417,97 @@ export const domain5 = {
       options: ['Amazon CloudWatch', 'AWS CloudTrail', 'AWS Config', 'Amazon Inspector'],
       correct: 1,
       explanation: 'AWS CloudTrail logs all API calls and user activities, providing a comprehensive audit trail essential for compliance. S3 access logging and model invocation logging complement CloudTrail for full data lifecycle visibility.'
+    },
+    {
+      id: 'd5q17',
+      question: 'A company wants its customer-support application to invoke exactly one approved Bedrock model and nothing else. How should this be enforced?',
+      options: [
+        'An IAM policy that allows bedrock:InvokeModel only on the approved model\'s ARN',
+        'A system prompt telling the model to refuse other models\' requests',
+        'Naming the application after the approved model',
+        'Provisioned Throughput, which locks an account to one model'
+      ],
+      correct: 0,
+      explanation: 'Least privilege is enforced with IAM: scope the application role\'s bedrock:InvokeModel permission to the specific model ARN. Prompts can\'t control authorization, naming is cosmetic, and Provisioned Throughput is a capacity purchase, not an access control.'
+    },
+    {
+      id: 'd5q18',
+      question: 'A European bank requires that customer data sent to a foundation model never leave the EU. What is the primary control for meeting this requirement on AWS?',
+      options: [
+        'Run the AI workload in an EU Region — Bedrock processes inference in-Region, and prompts are not sent elsewhere',
+        'Enable encryption, which removes data-residency obligations',
+        'Use a VPN so the data\'s location no longer matters',
+        'Ask the model politely not to store the data abroad'
+      ],
+      correct: 0,
+      explanation: 'Data residency is achieved by Region selection: deploying Bedrock in an EU Region keeps inference processing in that Region. Encryption protects confidentiality but doesn\'t change where data is processed, and VPNs or prompt instructions have no bearing on residency compliance.'
+    },
+    {
+      id: 'd5q19',
+      question: 'A developer hard-coded a third-party API key into the prompt template of a Bedrock agent. What is the correct remediation?',
+      options: [
+        'Store the key in AWS Secrets Manager and have the action\'s Lambda retrieve it at runtime',
+        'Base64-encode the key inside the prompt so it is hidden',
+        'Move the key into a code comment instead',
+        'Rotate the key monthly but keep it in the prompt'
+      ],
+      correct: 0,
+      explanation: 'Credentials never belong in prompts — prompt content can be logged, echoed in outputs, or extracted via injection. Secrets Manager stores and rotates secrets, and the tool\'s backing Lambda fetches them at runtime with IAM-scoped access. Encoding or commenting a secret is not protection, and rotating a still-exposed key leaves the exposure.'
+    },
+    {
+      id: 'd5q20',
+      question: 'A governance team must retain a record of every prompt sent to Bedrock and every response returned, for later review. Which feature provides this?',
+      options: [
+        'Bedrock model invocation logging to S3 and/or CloudWatch Logs',
+        'AWS CloudTrail alone, which records full prompt and response bodies',
+        'Amazon Inspector scanning',
+        'S3 Transfer Acceleration'
+      ],
+      correct: 0,
+      explanation: 'Bedrock\'s model invocation logging captures full request and response payloads (including prompts and completions) to S3 or CloudWatch Logs. CloudTrail records that an invocation API call happened but not the full model input/output bodies; Inspector finds vulnerabilities, and Transfer Acceleration speeds uploads.'
+    },
+    {
+      id: 'd5q21',
+      question: 'An auditor asks for AWS\'s SOC 2 and ISO 27001 compliance reports to include in the company\'s AI compliance package. Where does the team download these?',
+      options: ['AWS Artifact', 'AWS Marketplace', 'Amazon S3 public buckets', 'The AWS status page'],
+      correct: 0,
+      explanation: 'AWS Artifact is the self-service portal for AWS\'s own compliance reports (SOC, ISO, PCI attestations) and agreements. Marketplace sells software, and neither public buckets nor the status page hosts compliance documentation.'
+    },
+    {
+      id: 'd5q22',
+      question: 'Company policy requires that raw training datasets be automatically deleted from storage 90 days after model training completes. Which mechanism implements this?',
+      options: [
+        'S3 Lifecycle policies that expire the objects after 90 days',
+        'Asking data scientists to remember to delete files',
+        'Model invocation logging',
+        'Provisioned Throughput expiry'
+      ],
+      correct: 0,
+      explanation: 'S3 Lifecycle rules automate retention by expiring or transitioning objects on a schedule, making the 90-day deletion policy enforceable rather than aspirational. Manual deletion is unreliable and unauditable; invocation logging and throughput commitments are unrelated to data retention.'
+    },
+    {
+      id: 'd5q23',
+      question: 'What is "data poisoning" in AI security?',
+      options: [
+        'An attacker manipulates training data so the resulting model learns harmful or attacker-chosen behavior',
+        'A model producing toxic language at inference time',
+        'Corruption of data in transit due to network errors',
+        'Overwriting a database with too many writes'
+      ],
+      correct: 0,
+      explanation: 'Data poisoning is the deliberate injection or manipulation of training data to corrupt what a model learns — mitigated by controlling data provenance, validating sources, and monitoring model behavior. Toxic inference output, transmission errors, and database overload are different problems.'
+    },
+    {
+      id: 'd5q24',
+      question: 'A security review of a fine-tuned model deployment asks how model artifacts and data are protected "at rest and in transit." Which pairing answers this on AWS?',
+      options: [
+        'KMS-managed encryption for stored artifacts and data, and TLS for all data in transit',
+        'IAM for data at rest and CloudWatch for data in transit',
+        'S3 versioning for data at rest and Route 53 for data in transit',
+        'Encryption is unnecessary because models contain no customer data'
+      ],
+      correct: 0,
+      explanation: 'The standard pattern is encryption at rest with AWS KMS keys (S3, EBS, SageMaker, and Bedrock artifacts all support it) plus TLS encrypting every connection in transit. IAM governs access rather than encrypting, versioning and DNS aren\'t encryption, and fine-tuned models can embed sensitive training data — so protection absolutely matters.'
     }
   ]
 };
