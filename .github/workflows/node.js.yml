@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        app: [aws-study-homepage, aws-cloud-practitioner-game, aws-ai-study-game, aws-backend]
+        app: [aws-study-homepage, aws-cloud-practitioner-game, aws-ai-study-game, aws-saa-study-game, aws-backend]
 
     defaults:
       run:
