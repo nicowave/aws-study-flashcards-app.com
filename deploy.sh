@@ -235,6 +235,67 @@ deploy_ai() {
     echo "  🤖 https://ai.aws-study-flashcards-app.com"
 }
 
+deploy_saa() {
+    local site_name="Solutions Architect Study Game"
+    local folder="aws-saa-study-game"
+    local bucket="saa.aws-study-flashcards-app.com"
+    local dist_id="EBOXWN6EUZHKF"
+    local site_path="${SCRIPT_DIR}/${folder}"
+
+    print_header "Deploying: ${site_name}"
+
+    if [ ! -d "$site_path" ]; then
+        print_error "Directory not found: $site_path"
+        return 1
+    fi
+
+    cd "$site_path"
+    print_info "Working in: $site_path"
+
+    # Guard: an untracked .env is required — building without it bakes undefined
+    # Firebase config into the bundle (auth/invalid-api-key on load)
+    if [ ! -f .env ]; then
+        print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
+
+    # Install dependencies if needed
+    print_step "Checking dependencies..."
+    if [ ! -d "node_modules" ]; then
+        print_step "Installing dependencies..."
+        npm install
+    fi
+    print_success "Dependencies ready"
+
+    # Build
+    print_step "Building ${site_name}..."
+    npm run build
+    print_success "Build complete"
+
+    # Sync to S3
+    print_step "Uploading to S3: s3://${bucket}/"
+    aws s3 sync dist/ "s3://${bucket}/" \
+        --delete \
+        --exclude "index.html" \
+        --cache-control "max-age=31536000,public"
+
+    aws s3 cp dist/index.html "s3://${bucket}/index.html" \
+        --cache-control "no-cache,no-store,must-revalidate"
+    print_success "Files uploaded to S3"
+
+    # Invalidate CloudFront
+    print_step "Invalidating CloudFront cache..."
+    aws cloudfront create-invalidation \
+        --distribution-id "$dist_id" \
+        --paths "/*" > /dev/null
+    print_success "CloudFront invalidation created"
+
+    cd "$SCRIPT_DIR"
+    print_success "${site_name} deployed!"
+    echo "  🏗️  https://saa.aws-study-flashcards-app.com"
+}
+
 deploy_all() {
     print_header "Deploying ALL Sites"
     
@@ -246,14 +307,16 @@ deploy_all() {
     deploy_cloud || ((failed++))
     echo ""
     deploy_ai || ((failed++))
-    
+    echo ""
+    deploy_saa || ((failed++))
+
     local end_time=$(date +%s)
     local duration=$((end_time - start_time))
-    
+
     print_header "Deployment Complete!"
     echo ""
     if [ $failed -eq 0 ]; then
-        print_success "All 3 sites deployed successfully in ${duration} seconds"
+        print_success "All 4 sites deployed successfully in ${duration} seconds"
     else
         print_error "$failed deployment(s) failed"
     fi
@@ -261,6 +324,7 @@ deploy_all() {
     echo "  🌐 Hub:   https://aws-study-flashcards-app.com"
     echo "  ☁️  Cloud: https://cloud.aws-study-flashcards-app.com"
     echo "  🤖 AI:    https://ai.aws-study-flashcards-app.com"
+    echo "  🏗️  SAA:   https://saa.aws-study-flashcards-app.com"
     echo ""
     print_info "CloudFront invalidations may take 1-2 minutes to propagate"
     echo ""
@@ -290,14 +354,18 @@ case "${1:-}" in
     ai)
         deploy_ai
         ;;
+    saa)
+        deploy_saa
+        ;;
     -h|--help)
-        echo "Usage: $0 [all|hub|cloud|ai]"
+        echo "Usage: $0 [all|hub|cloud|ai|saa]"
         echo ""
         echo "Options:"
-        echo "  all    Deploy all three sites"
+        echo "  all    Deploy all four sites"
         echo "  hub    Deploy Study Hub Homepage only"
         echo "  cloud  Deploy Cloud Practitioner Game only"
         echo "  ai     Deploy AI Study Game only"
+        echo "  saa    Deploy Solutions Architect Study Game only"
         echo ""
         ;;
     "")
@@ -317,6 +385,7 @@ case "${1:-}" in
             2|hub) deploy_hub ;;
             3|cloud) deploy_cloud ;;
             4|ai) deploy_ai ;;
+            5|saa) deploy_saa ;;
             *) print_error "Invalid choice" ;;
         esac
         ;;
