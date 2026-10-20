@@ -22,7 +22,7 @@ const DomainSelect = ({ globalStats, onSelectDomain, onBack, isGuest = false, on
           <span>Back</span>
         </button>
         <h2>Select a Domain</h2>
-        <p className="domain-subtitle">Choose an AWS AI topic to study</p>
+        <p className="domain-subtitle">Choose an exam domain to study</p>
       </div>
 
       <div className="domain-grid">
