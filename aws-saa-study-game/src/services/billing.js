@@ -6,8 +6,8 @@ import { functions, auth } from '../config/firebase.config';
 
 export const BILLING_ENABLED = import.meta.env.VITE_BILLING_ENABLED === 'true';
 
-// Display label for the per-cert subscription price
-export const CERT_PRICE_LABEL = import.meta.env.VITE_CERT_PRICE_LABEL || '$10.99/mo';
+// Display label for this cert's one-time price (set per app at build time)
+export const CERT_PRICE_LABEL = import.meta.env.VITE_CERT_PRICE_LABEL || 'one-time purchase';
 
 /**
  * True when the signed-in user may access this cert's premium content:
@@ -26,7 +26,7 @@ export const hasCertEntitlement = async (certId, { forceRefresh = false } = {}) 
   }
 };
 
-/** Starts Stripe Checkout for this cert's subscription and redirects. */
+/** Starts Stripe Checkout for this plan (one-time or subscription) and redirects. */
 export const startCheckout = async (plan) => {
   const call = httpsCallable(functions, 'createCheckoutSession');
   const { data } = await call({ plan, returnUrl: window.location.origin });

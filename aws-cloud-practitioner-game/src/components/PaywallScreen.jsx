@@ -34,10 +34,10 @@ const PaywallScreen = ({ certId, certName, onBack }) => {
       </p>
       <ul className="paywall-features">
         <li><CheckCircleIcon size={16} /> Every quiz domain, exam-weighted</li>
-        <li><CheckCircleIcon size={16} /> Full-length timed exam simulator with the 700/1000 pass line</li>
+        <li><CheckCircleIcon size={16} /> Full-length timed exam simulator with a personalized readiness score</li>
         <li><CheckCircleIcon size={16} /> All flashcard decks with review queue</li>
         <li><CheckCircleIcon size={16} /> Progress synced across devices</li>
-        <li><CheckCircleIcon size={16} /> Cancel anytime</li>
+        <li><CheckCircleIcon size={16} /> One-time payment â lifetime access for this cert</li>
       </ul>
       <div className="paywall-price">
         <span className="paywall-price-value mono">{CERT_PRICE_LABEL}</span>
@@ -45,7 +45,7 @@ const PaywallScreen = ({ certId, certName, onBack }) => {
       </div>
       <div className="paywall-actions">
         <button className="paywall-subscribe-btn" onClick={handleSubscribe} disabled={busy}>
-          {busy ? 'Redirecting to secure checkout…' : 'Subscribe & Continue'}
+          {busy ? 'Redirecting to secure checkout…' : 'Unlock & Continue'}
         </button>
         <button className="paywall-back-btn" onClick={onBack} disabled={busy}>
           Back to Menu
