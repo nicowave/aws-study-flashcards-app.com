@@ -19,12 +19,14 @@ const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
 const priceAllAccess = defineString("STRIPE_PRICE_ALL_ACCESS", { default: "" });
 const priceCloudPractitioner = defineString("STRIPE_PRICE_CLOUD_PRACTITIONER", { default: "" });
 const priceAiPractitioner = defineString("STRIPE_PRICE_AI_PRACTITIONER", { default: "" });
+const priceSolutionsArchitect = defineString("STRIPE_PRICE_SOLUTIONS_ARCHITECT", { default: "" });
 
 const SITE_URL = "https://aws-study-flashcards-app.com";
 const ALLOWED_ORIGINS = [
   "https://aws-study-flashcards-app.com",
   "https://cloud.aws-study-flashcards-app.com",
   "https://ai.aws-study-flashcards-app.com",
+  "https://saa.aws-study-flashcards-app.com",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
@@ -40,11 +42,13 @@ const getStripe = () => {
 };
 
 // Plans a checkout can be started for. Maps plan id -> Stripe price ID param.
-// Per-cert plans ($10.99/mo each) plus an all-access bundle.
+// Per-cert plans are ONE-TIME prices; all-access is a yearly subscription.
+// Checkout mode is derived from the price's type, so either works per plan.
 const PLAN_PRICES = () => ({
   "all-access": priceAllAccess.value(),
   "cloud-practitioner": priceCloudPractitioner.value(),
   "ai-practitioner": priceAiPractitioner.value(),
+  "solutions-architect-associate": priceSolutionsArchitect.value(),
 });
 
 // Reverse lookup: Stripe price ID -> plan id
@@ -125,26 +129,38 @@ exports.exchangeToken = onCall(
 // ===========================================================================
 
 /**
- * Recomputes a user's entitlements from ALL of their Stripe subscriptions
- * (a user may hold one subscription per certification), writes a display
- * summary to Firestore, and mirrors entitlements into Firebase custom
- * claims. Claims are the enforcement surface (tamper-proof, survive SSO via
- * exchangeToken); the Firestore field is for display only.
+ * Recomputes a user's entitlements from their Stripe subscriptions (the
+ * all-access yearly bundle) AND their recorded one-time cert purchases
+ * (users/{uid}.purchases, written by the payment-mode webhook handler),
+ * writes a display summary to Firestore, and mirrors entitlements into
+ * Firebase custom claims. Claims are the enforcement surface (tamper-proof,
+ * survive SSO via exchangeToken); the Firestore fields are for display only.
  *
  * Claims shape: { plan: 'pro' }            for an active all-access sub
- *               { certs: 'ccp-id,aif-id' } for active per-cert subs
+ *               { certs: 'ccp-id,aif-id' } for purchased/subscribed certs
  */
 async function syncCustomerEntitlements(uid, customerId) {
   const stripe = getStripe();
-  const subs = await stripe.subscriptions.list({
-    customer: customerId,
-    status: "all",
-    limit: 20,
-  });
+  const subs = customerId
+    ? await stripe.subscriptions.list({
+        customer: customerId,
+        status: "all",
+        limit: 20,
+      })
+    : { data: [] };
 
   let allAccess = false;
   const certs = new Set();
   const active = [];
+
+  // One-time cert purchases are permanent entitlements, recorded on the user
+  // doc by the checkout.session.completed (payment mode) webhook handler.
+  const userSnap = await getFirestore().doc(`users/${uid}`).get();
+  const purchases = userSnap.get("purchases") || {};
+  for (const plan of Object.keys(purchases)) {
+    if (plan === "all-access") allAccess = true;
+    else certs.add(plan);
+  }
   for (const sub of subs.data) {
     if (!ACTIVE_STATUSES.includes(sub.status)) continue;
     const priceId = sub.items?.data?.[0]?.price?.id || null;
@@ -239,11 +255,18 @@ exports.createCheckoutSession = onCall(
       ? requestedReturn.replace(/\/$/, "")
       : SITE_URL;
 
+    // One-time prices check out in payment mode; recurring prices (the
+    // all-access yearly plan) in subscription mode.
+    const price = await stripe.prices.retrieve(priceId);
+    const mode = price.type === "recurring" ? "subscription" : "payment";
+
     const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
+      mode,
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
-      subscription_data: { metadata: { firebaseUID: uid, plan } },
+      ...(mode === "subscription"
+        ? { subscription_data: { metadata: { firebaseUID: uid, plan } } }
+        : { invoice_creation: { enabled: true } }),
       metadata: { firebaseUID: uid, plan },
       allow_promotion_codes: true,
       success_url: `${returnBase}/?checkout=success`,
@@ -309,6 +332,28 @@ exports.stripeWebhook = onRequest(
               (await uidForSubscription({ metadata: {}, customer: session.customer }));
             if (uid) await syncCustomerEntitlements(uid, session.customer);
             else console.error("[billing] No UID for checkout session", session.id);
+          } else if (session.mode === "payment" && session.payment_status === "paid") {
+            // One-time cert purchase: record it permanently, keyed by plan so
+            // webhook retries stay idempotent, then resync claims.
+            const uid = session.metadata?.firebaseUID;
+            const plan = session.metadata?.plan;
+            if (uid && plan) {
+              await getFirestore().doc(`users/${uid}`).set(
+                {
+                  purchases: {
+                    [plan]: {
+                      sessionId: session.id,
+                      amountTotal: session.amount_total ?? null,
+                      purchasedAt: Timestamp.now(),
+                    },
+                  },
+                },
+                { merge: true }
+              );
+              await syncCustomerEntitlements(uid, session.customer);
+            } else {
+              console.error("[billing] Paid session missing uid/plan metadata", session.id);
+            }
           }
           break;
         }

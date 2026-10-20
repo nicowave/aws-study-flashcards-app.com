@@ -37,14 +37,17 @@ code or env files.)
 
 ## 3. Create the products and prices
 
-Dashboard → Product catalog → Add product. The chosen model is **$10.99/mo
-per certification** (first quiz free), with an optional all-access bundle:
+Dashboard → Product catalog → Add product. The chosen model is **one-time
+purchase per certification** (first quiz free) plus a **yearly all-access
+bundle**. Checkout mode is derived from the price type, so the per-cert
+prices MUST be one-time and all-access MUST be recurring/yearly:
 
 | Product | Price | Plan id in code |
 |---|---|---|
-| AWS Cloud Practitioner Prep | $10.99/mo recurring | `cloud-practitioner` |
-| AWS AI Practitioner Prep | $10.99/mo recurring | `ai-practitioner` |
-| All-Access (optional bundle) | e.g. $16.99/mo or $49/yr | `all-access` |
+| AWS Cloud Practitioner Prep | $9.99 one-time | `cloud-practitioner` |
+| AWS AI Practitioner Prep | $9.99 one-time | `ai-practitioner` |
+| AWS Solutions Architect Prep | $14.99 one-time | `solutions-architect-associate` |
+| All-Access Bundle | $39/year recurring | `all-access` |
 
 Copy each price ID (`price_...`) into `functions/.env` (price IDs are not
 secrets):
@@ -53,6 +56,7 @@ secrets):
 cat >> functions/.env <<'ENV'
 STRIPE_PRICE_CLOUD_PRACTITIONER=price_XXXXXXXX
 STRIPE_PRICE_AI_PRACTITIONER=price_XXXXXXXX
+STRIPE_PRICE_SOLUTIONS_ARCHITECT=price_XXXXXXXX
 STRIPE_PRICE_ALL_ACCESS=price_XXXXXXXX
 ENV
 ```
