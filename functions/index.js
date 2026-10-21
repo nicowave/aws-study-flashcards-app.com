@@ -255,10 +255,10 @@ exports.createCheckoutSession = onCall(
       ? requestedReturn.replace(/\/$/, "")
       : SITE_URL;
 
-    // One-time prices check out in payment mode; recurring prices (the
-    // all-access yearly plan) in subscription mode.
-    const price = await stripe.prices.retrieve(priceId);
-    const mode = price.type === "recurring" ? "subscription" : "payment";
+    // One-time cert prices check out in payment mode; the all-access yearly
+    // plan in subscription mode. Derived from the plan (not a Stripe price
+    // lookup) so the restricted API key needs no Prices read permission.
+    const mode = plan === "all-access" ? "subscription" : "payment";
 
     const session = await stripe.checkout.sessions.create({
       mode,
