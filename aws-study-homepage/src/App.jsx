@@ -289,15 +289,15 @@ const Hero = () => {
       <div className="hero-content">
         <div className="hero-badge">
           <TargetIcon size={16} className="badge-icon" />
-          <span className="badge-text mono">Early Access — Free While in Beta</span>
+          <span className="badge-text mono">New — Solutions Architect Associate Now Live</span>
         </div>
         <h1 className="hero-title">
           Pass Your <span className="highlight">AWS Certification</span> First Try
         </h1>
         <p className="hero-subtitle">
           Exam-style practice questions, flashcards, and full-length timed exam simulators
-          for AWS Cloud Practitioner and AI Practitioner. Know you&apos;re ready before you
-          book the real $100 exam.
+          for AWS Cloud Practitioner, AI Practitioner, and Solutions Architect – Associate.
+          Know you&apos;re ready before you book the real exam.
         </p>
         <div className="hero-actions">
           <a
@@ -319,17 +319,17 @@ const Hero = () => {
         )}
         <div className="hero-stats">
           <div className="stat">
-            <span className="stat-value mono">2</span>
+            <span className="stat-value mono">3</span>
             <span className="stat-label">Certifications Live</span>
           </div>
           <div className="stat-divider"></div>
           <div className="stat">
-            <span className="stat-value mono">430+</span>
+            <span className="stat-value mono">800+</span>
             <span className="stat-label">Questions & Flashcards</span>
           </div>
           <div className="stat-divider"></div>
           <div className="stat">
-            <span className="stat-value mono">65-Q</span>
+            <span className="stat-value mono">3</span>
             <span className="stat-label">Timed Exam Simulators</span>
           </div>
         </div>
@@ -403,7 +403,7 @@ const Certifications = () => (
     <div className="section-header">
       <h2 className="section-title">AWS Certifications</h2>
       <p className="section-subtitle">
-        Two certifications live today, with the Associate path up next.
+        Three certifications live today, from foundational to Associate level.
         Every live cert has a free preview — no account needed.
       </p>
     </div>
