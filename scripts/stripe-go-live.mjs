@@ -134,10 +134,23 @@ async function ensurePortal() {
   log("✓ Customer portal configuration created (subscription cancel enabled)");
 }
 
-const prices = [];
-for (const p of PLANS) prices.push(await ensurePrice(p));
-const whsec = await ensureWebhook();
-await ensurePortal();
+let prices = [];
+let whsec = null;
+try {
+  for (const p of PLANS) prices.push(await ensurePrice(p));
+  whsec = await ensureWebhook();
+  await ensurePortal();
+} catch (err) {
+  if (err?.type === "StripeAuthenticationError") {
+    console.error("\nStripe rejected the key (StripeAuthenticationError). Check STRIPE_SECRET_KEY and try again.");
+    process.exit(1);
+  }
+  if (err?.type === "StripePermissionError") {
+    console.error(`\nThe key lacks a permission this script needs: ${err.message}\nUse the account's standard secret key for setup (the runtime key stays restricted).`);
+    process.exit(1);
+  }
+  throw err;
+}
 
 // functions/.env
 const envPath = "functions/.env";
