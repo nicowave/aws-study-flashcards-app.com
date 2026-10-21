@@ -37,7 +37,7 @@ const PaywallScreen = ({ certId, certName, onBack }) => {
         <li><CheckCircleIcon size={16} /> Full-length timed exam simulator with a personalized readiness score</li>
         <li><CheckCircleIcon size={16} /> All flashcard decks with review queue</li>
         <li><CheckCircleIcon size={16} /> Progress synced across devices</li>
-        <li><CheckCircleIcon size={16} /> One-time payment â lifetime access for this cert</li>
+        <li><CheckCircleIcon size={16} /> One-time payment - lifetime access for this cert</li>
       </ul>
       <div className="paywall-price">
         <span className="paywall-price-value mono">{CERT_PRICE_LABEL}</span>
