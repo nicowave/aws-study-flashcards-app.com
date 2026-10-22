@@ -5,6 +5,9 @@ import DnsLab from './labs/DnsLab.jsx'
 import IdempotencyLab from './labs/IdempotencyLab.jsx'
 import { ProtocolPickerLab, TileMathLab } from './labs/PickerAndTiles.jsx'
 import { getAllDecks, getAllCards, getExamTrapCards } from './data/devTrackCards.js'
+import StudyGuide from './features/StudyGuide.jsx'
+import QuizGame from './features/QuizGame.jsx'
+import PracticeExam from './features/PracticeExam.jsx'
 
 const HUB_URL = 'https://aws-study-flashcards-app.com'
 
@@ -97,6 +100,9 @@ brew install mosquitto ; mosquitto_sub -t '#'  # MQTT broker`}</pre>
 }
 
 const TABS = [
+  ['study', 'Study guide', StudyGuide],
+  ['quiz', 'Quiz game', QuizGame],
+  ['exam', 'Practice exam', PracticeExam],
   ['handshake', 'TCP vs UDP', HandshakeLab],
   ['tls', 'TLS', TlsLab],
   ['dns', 'DNS', DnsLab],
@@ -108,7 +114,7 @@ const TABS = [
 ]
 
 export default function App() {
-  const [tab, setTab] = useState('handshake')
+  const [tab, setTab] = useState('study')
   const Active = TABS.find(t => t[0] === tab)[2]
   return (
     <div className="shell">
@@ -116,7 +122,7 @@ export default function App() {
         <div><h1>Dev Track: protocols and backend</h1><p className="lead" style={{ margin: 0 }}>Hands-on labs for the stuff behind every cloud API and IoT fleet.</p></div>
         <div className="brand"><a href={HUB_URL}>AWS Study Hub</a></div>
       </div>
-      <nav className="tabs" aria-label="Labs">
+      <nav className="tabs" aria-label="Sections">
         {TABS.map(([id, label]) => <button key={id} onClick={() => setTab(id)} aria-current={tab === id ? 'page' : undefined}>{label}</button>)}
       </nav>
       <Active />
