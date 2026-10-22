@@ -335,7 +335,11 @@ exports.stripeWebhook = onRequest(
               (await uidForSubscription({ metadata: {}, customer: session.customer }));
             if (uid) await syncCustomerEntitlements(uid, session.customer);
             else console.error("[billing] No UID for checkout session", session.id);
-          } else if (session.mode === "payment" && session.payment_status === "paid") {
+          } else if (
+            session.mode === "payment" &&
+            // A 100%-off promotion code completes with "no_payment_required"
+            ["paid", "no_payment_required"].includes(session.payment_status)
+          ) {
             // One-time cert purchase: record it permanently, keyed by plan so
             // webhook retries stay idempotent, then resync claims.
             const uid = session.metadata?.firebaseUID;
