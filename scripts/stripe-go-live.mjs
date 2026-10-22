@@ -3,7 +3,7 @@
  * One-shot Stripe LIVE-mode setup for AWS Study Hub.
  *
  * Automates everything the dashboard clicking did in sandbox:
- *   1. Creates the 4 products + prices (idempotent — finds existing by
+ *   1. Creates the 5 products + prices (idempotent — finds existing by
  *      plan metadata before creating).
  *   2. Creates the webhook endpoint (idempotent by URL) and captures its
  *      signing secret from the creation response.

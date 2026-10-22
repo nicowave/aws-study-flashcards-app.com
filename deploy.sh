@@ -2,9 +2,9 @@
 # =============================================================================
 # AWS Study Hub - Universal Deployment Script (ZSH Compatible)
 # =============================================================================
-# Deploys Study Hub Homepage, Cloud Practitioner Game, and AI Study Game
+# Deploys the Study Hub Homepage, the certification study games, and Tutorials
 # Run from: ~/dev/sites/aws-study-flashcards.com/
-# Usage: ./deploy.sh [all|hub|cloud|ai|saa|tutorials]
+# Usage: ./deploy.sh [all|hub|cloud|ai|saa|dva|tutorials]
 # =============================================================================
 
 set -e  # Exit on any error
@@ -296,6 +296,67 @@ deploy_saa() {
     echo "  🏗️  https://saa.aws-study-flashcards-app.com"
 }
 
+deploy_dva() {
+    local site_name="Developer Associate Study Game"
+    local folder="aws-dva-study-game"
+    local bucket="dva.aws-study-flashcards-app.com"
+    local dist_id="E2UB744W5YUCTW"
+    local site_path="${SCRIPT_DIR}/${folder}"
+
+    print_header "Deploying: ${site_name}"
+
+    if [ ! -d "$site_path" ]; then
+        print_error "Directory not found: $site_path"
+        return 1
+    fi
+
+    cd "$site_path"
+    print_info "Working in: $site_path"
+
+    # Guard: an untracked .env is required — building without it bakes undefined
+    # Firebase config into the bundle (auth/invalid-api-key on load)
+    if [ ! -f .env ]; then
+        print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
+        cd "$SCRIPT_DIR"
+        return 1
+    fi
+
+    # Install dependencies if needed
+    print_step "Checking dependencies..."
+    if [ ! -d "node_modules" ]; then
+        print_step "Installing dependencies..."
+        npm install
+    fi
+    print_success "Dependencies ready"
+
+    # Build
+    print_step "Building ${site_name}..."
+    npm run build
+    print_success "Build complete"
+
+    # Sync to S3
+    print_step "Uploading to S3: s3://${bucket}/"
+    aws s3 sync dist/ "s3://${bucket}/" \
+        --delete \
+        --exclude "index.html" \
+        --cache-control "max-age=31536000,public"
+
+    aws s3 cp dist/index.html "s3://${bucket}/index.html" \
+        --cache-control "no-cache,no-store,must-revalidate"
+    print_success "Files uploaded to S3"
+
+    # Invalidate CloudFront
+    print_step "Invalidating CloudFront cache..."
+    aws cloudfront create-invalidation \
+        --distribution-id "$dist_id" \
+        --paths "/*" > /dev/null
+    print_success "CloudFront invalidation created"
+
+    cd "$SCRIPT_DIR"
+    print_success "${site_name} deployed!"
+    echo "  👨‍💻 https://dva.aws-study-flashcards-app.com"
+}
+
 deploy_tutorials() {
     local site_name="Tutorials (Cognito-gated, static)"
     local site_path="${HOME}/dev/aws/tutorials-site/site"
@@ -341,6 +402,8 @@ deploy_all() {
     echo ""
     deploy_saa || ((failed++))
     echo ""
+    deploy_dva || ((failed++))
+    echo ""
     deploy_tutorials || ((failed++))
 
     local end_time=$(date +%s)
@@ -349,7 +412,7 @@ deploy_all() {
     print_header "Deployment Complete!"
     echo ""
     if [ $failed -eq 0 ]; then
-        print_success "All 5 sites deployed successfully in ${duration} seconds"
+        print_success "All 6 sites deployed successfully in ${duration} seconds"
     else
         print_error "$failed deployment(s) failed"
     fi
@@ -358,6 +421,7 @@ deploy_all() {
     echo "  ☁️  Cloud: https://cloud.aws-study-flashcards-app.com"
     echo "  🤖 AI:    https://ai.aws-study-flashcards-app.com"
     echo "  🏗️  SAA:   https://saa.aws-study-flashcards-app.com"
+    echo "  👨‍💻 DVA:   https://dva.aws-study-flashcards-app.com"
     echo "  📚 Tuts:  https://tutorials.aws-study-flashcards-app.com"
     echo ""
     print_info "CloudFront invalidations may take 1-2 minutes to propagate"
@@ -391,18 +455,22 @@ case "${1:-}" in
     saa)
         deploy_saa
         ;;
+    dva)
+        deploy_dva
+        ;;
     tutorials|tuts)
         deploy_tutorials
         ;;
     -h|--help)
-        echo "Usage: $0 [all|hub|cloud|ai|saa|tutorials]"
+        echo "Usage: $0 [all|hub|cloud|ai|saa|dva|tutorials]"
         echo ""
         echo "Options:"
-        echo "  all    Deploy all five sites"
+        echo "  all    Deploy all six sites"
         echo "  hub    Deploy Study Hub Homepage only"
         echo "  cloud  Deploy Cloud Practitioner Game only"
         echo "  ai     Deploy AI Study Game only"
         echo "  saa    Deploy Solutions Architect Study Game only"
+        echo "  dva    Deploy Developer Associate Study Game only"
         echo "  tutorials  Deploy Tutorials site only (static, no build)"
         echo ""
         ;;
@@ -416,9 +484,10 @@ case "${1:-}" in
         echo "  3) cloud  - Cloud Practitioner Game"
         echo "  4) ai     - AI Study Game"
         echo "  5) saa    - Solutions Architect Study Game"
-        echo "  6) tutorials - Tutorials site"
+        echo "  6) dva    - Developer Associate Study Game"
+        echo "  7) tutorials - Tutorials site"
         echo ""
-        read "choice?Enter choice [all/hub/cloud/ai/saa/tutorials]: "
+        read "choice?Enter choice [all/hub/cloud/ai/saa/dva/tutorials]: "
         
         case $choice in
             1|all) deploy_all ;;
@@ -426,7 +495,8 @@ case "${1:-}" in
             3|cloud) deploy_cloud ;;
             4|ai) deploy_ai ;;
             5|saa) deploy_saa ;;
-            6|tutorials|tuts) deploy_tutorials ;;
+            6|dva) deploy_dva ;;
+            7|tutorials|tuts) deploy_tutorials ;;
             *) print_error "Invalid choice" ;;
         esac
         ;;
