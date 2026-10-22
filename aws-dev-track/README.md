@@ -1,6 +1,6 @@
 # Dev Track: Protocols & Backend — AWS Study Hub module
 
-Interactive labs + flashcards for the networking/backend vocabulary in Sr. Software Engineer postings
+Interactive labs, a study guide, a quiz game, a practice exam and flashcards for the networking and backend fundamentals
 (TCP/UDP handshake, TLS, DNS, HTTP/REST idempotency, ASP.NET Core vocabulary, MQTT, WMTS).
 
 Same shape as the other Study Hub apps: Vite + React, static build, S3 + CloudFront.

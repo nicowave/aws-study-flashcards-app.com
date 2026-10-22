@@ -93,7 +93,7 @@ export default function HandshakeLab() {
       <div className="explain">
         <strong>SYN</strong> = synchronize, <strong>ACK</strong> = acknowledge. Three messages let both sides agree on sequence numbers, so from then on every byte can be counted, acknowledged and resent. That is what "reliable" means. <strong>UDP</strong> skips all of it: no setup latency, no connection state on the server, no head-of-line blocking, and no promises. Sensors use UDP for heartbeats and high-rate telemetry, TCP (or MQTT over TCP) when every message must land.
       </div>
-      <pre>{`# see it for real on your Mac while the MiniTing simulator runs
+      <pre>{`# see it for real on your Mac while the sensor simulator runs
 sudo tcpdump -i any port 5001      # [S] SYN   [S.] SYN-ACK   [.] ACK
 sudo tcpdump -i any udp port 5000  # no flags, just datagrams`}</pre>
     </section>

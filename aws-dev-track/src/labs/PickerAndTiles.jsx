@@ -55,7 +55,7 @@ export function TileMathLab() {
     <section className="lab">
       <header>
         <h2>WMTS tile math: lon/lat to z/x/y</h2>
-        <p className="lead">Every tile server, including the one you automated at Esri, is this function. Move the sliders.</p>
+        <p className="lead">Every tile server is this function. Move the sliders.</p>
       </header>
       <div className="row">
         <label className="toggle">lon <input type="number" step="0.01" value={lon} onChange={e => setLon(+e.target.value)} style={{ width: 110 }} /></label>

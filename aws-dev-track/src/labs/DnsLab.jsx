@@ -11,7 +11,7 @@ const RECORDS = {
 }
 
 export default function DnsLab() {
-  const [name, setName] = useState('miniting.nicolasroldos.com')
+  const [name, setName] = useState('sensors.example.com')
   const [ttl, setTtl] = useState(300)
   const [step, setStep] = useState(-1)
   const [cached, setCached] = useState(false)
