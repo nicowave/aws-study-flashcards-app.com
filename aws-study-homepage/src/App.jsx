@@ -289,15 +289,15 @@ const Hero = () => {
       <div className="hero-content">
         <div className="hero-badge">
           <TargetIcon size={16} className="badge-icon" />
-          <span className="badge-text mono">Early Access — Free While in Beta</span>
+          <span className="badge-text mono">New — Solutions Architect Associate Now Live</span>
         </div>
         <h1 className="hero-title">
           Pass Your <span className="highlight">AWS Certification</span> First Try
         </h1>
         <p className="hero-subtitle">
           Exam-style practice questions, flashcards, and full-length timed exam simulators
-          for AWS Cloud Practitioner and AI Practitioner. Know you&apos;re ready before you
-          book the real $100 exam.
+          for AWS Cloud Practitioner, AI Practitioner, and Solutions Architect – Associate.
+          Know you&apos;re ready before you book the real exam.
         </p>
         <div className="hero-actions">
           <a
@@ -319,17 +319,17 @@ const Hero = () => {
         )}
         <div className="hero-stats">
           <div className="stat">
-            <span className="stat-value mono">2</span>
+            <span className="stat-value mono">3</span>
             <span className="stat-label">Certifications Live</span>
           </div>
           <div className="stat-divider"></div>
           <div className="stat">
-            <span className="stat-value mono">430+</span>
+            <span className="stat-value mono">800+</span>
             <span className="stat-label">Questions & Flashcards</span>
           </div>
           <div className="stat-divider"></div>
           <div className="stat">
-            <span className="stat-value mono">65-Q</span>
+            <span className="stat-value mono">3</span>
             <span className="stat-label">Timed Exam Simulators</span>
           </div>
         </div>
@@ -403,7 +403,7 @@ const Certifications = () => (
     <div className="section-header">
       <h2 className="section-title">AWS Certifications</h2>
       <p className="section-subtitle">
-        Two certifications live today, with the Associate path up next.
+        Three certifications live today, from foundational to Associate level.
         Every live cert has a free preview — no account needed.
       </p>
     </div>
@@ -473,8 +473,8 @@ const About = () => (
           <div className="feature-icon">
             <GiftIcon size={32} />
           </div>
-          <h3>Free Early Access</h3>
-          <p>Everything is free while we&apos;re in beta. Early members will be grandfathered with generous free access when paid plans launch — signing up now locks that in.</p>
+          <h3>Free to Start</h3>
+          <p>Study guides are free for everyone. Try the first quiz domain and flashcard deck with no account, then unlock a certification once, with no subscription, for every quiz domain and the full-length exam simulator.</p>
         </div>
       </div>
     </div>
@@ -532,10 +532,10 @@ const ProPlanCard = ({ onShowLogin }) => {
       </div>
       <div className="plan-tagline">For serious exam prep</div>
       <ul className="plan-features">
-        <li>Expanded scenario-style question banks</li>
-        <li>Readiness score &amp; weak-domain drills</li>
-        <li>Every new certification as it ships</li>
-        <li>Early members get preferred pricing</li>
+        <li>Every live certification unlocked</li>
+        <li>All quiz domains &amp; flashcard decks</li>
+        <li>Full-length timed exam simulators with readiness scores</li>
+        <li>New certifications as they ship</li>
       </ul>
       {!BILLING_ENABLED ? (
         <button className="btn btn-card-disabled plan-cta" disabled>
@@ -559,13 +559,13 @@ const ProPlanCard = ({ onShowLogin }) => {
   );
 };
 
-// Plans Section — tiers without prices until checkout exists
+// Plans Section — guest preview, free account, All-Access (per-cert one-time unlocks happen inside each app)
 const Plans = ({ onShowLogin }) => (
   <section id="plans" className="plans-section">
     <div className="section-header">
       <h2 className="section-title">Simple Plans</h2>
       <p className="section-subtitle">
-        Start free in seconds. Paid plans are coming — early members lock in grandfathered perks.
+        Start free in seconds. Unlock one certification for a one-time price, or every certification with All-Access.
       </p>
     </div>
     <div className="plans-grid">
@@ -583,16 +583,15 @@ const Plans = ({ onShowLogin }) => (
           Try It Now <ArrowRightIcon size={16} />
         </a>
       </div>
-      <div className="plan-card plan-featured">
-        <div className="plan-badge">Early Access</div>
+      <div className="plan-card">
         <div className="plan-name">Free Account</div>
         <div className="plan-price mono">Free</div>
-        <div className="plan-tagline">Everything, while in beta</div>
+        <div className="plan-tagline">Save your progress</div>
         <ul className="plan-features">
-          <li>All quiz domains &amp; flashcard decks</li>
-          <li>Full-length timed exam simulator</li>
+          <li>Every flashcard deck</li>
+          <li>Your first full quiz, any domain</li>
+          <li>Full study guides</li>
           <li>Cloud sync across devices</li>
-          <li>Grandfathered perks when paid plans launch</li>
         </ul>
         <a href="https://cloud.aws-study-flashcards-app.com" className="btn btn-card-primary plan-cta">
           Create Free Account <ArrowRightIcon size={16} />
