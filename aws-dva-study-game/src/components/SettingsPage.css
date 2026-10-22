@@ -1,0 +1,725 @@
+/* ============================================
+   SETTINGS PAGE
+   ============================================ */
+
+.settings-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+  animation: settingsFadeIn 0.3s ease;
+}
+
+@keyframes settingsFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.settings-back-btn {
+  background: var(--md-surface-variant);
+  border: 1px solid var(--md-border);
+  color: var(--md-on-surface-variant);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--md-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--md-transition);
+  flex-shrink: 0;
+}
+
+.settings-back-btn:hover {
+  background: var(--md-surface-hover);
+  color: var(--md-on-surface);
+  border-color: var(--md-primary);
+}
+
+.settings-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--md-on-surface);
+}
+
+/* Sections */
+.settings-section {
+  background: var(--md-surface-variant);
+  border: 1px solid var(--md-border);
+  border-radius: var(--md-radius-lg);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.settings-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--md-on-surface);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-section h2 svg {
+  color: var(--md-primary);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   SECTION 1: ACCOUNT INFO
+   ============================================ */
+.account-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.account-info-item {
+  padding: 12px;
+  background: var(--md-surface-elevated);
+  border-radius: var(--md-radius-md);
+}
+
+.account-info-item .info-label {
+  font-size: 0.75rem;
+  color: var(--md-on-surface-disabled);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.account-info-item .info-value {
+  font-size: 0.95rem;
+  color: var(--md-on-surface);
+  word-break: break-all;
+}
+
+.account-info-item .info-value.verified {
+  color: var(--md-success);
+}
+
+.account-info-item .info-value.unverified {
+  color: var(--md-warning);
+}
+
+/* Editable info item */
+.account-info-editable {
+  grid-column: 1 / -1;
+}
+
+.info-value-editable {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color var(--md-transition);
+}
+
+.info-value-editable:hover {
+  color: var(--md-primary);
+}
+
+.info-value-editable .edit-hint {
+  font-size: 0.7rem;
+  color: var(--md-on-surface-disabled);
+  opacity: 0;
+  transition: opacity var(--md-transition);
+}
+
+.info-value-editable:hover .edit-hint {
+  opacity: 1;
+}
+
+.inline-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inline-edit-input {
+  flex: 1;
+  padding: 6px 10px !important;
+  font-size: 0.9rem !important;
+}
+
+.inline-edit-save {
+  background: var(--md-primary);
+  color: #fff;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--md-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--md-transition);
+  flex-shrink: 0;
+}
+
+.inline-edit-save:hover {
+  background: #4080b0;
+}
+
+.inline-edit-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.inline-edit-cancel {
+  background: none;
+  border: 1px solid var(--md-border);
+  color: var(--md-on-surface-disabled);
+  width: 30px;
+  height: 30px;
+  border-radius: var(--md-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all var(--md-transition);
+  flex-shrink: 0;
+}
+
+.inline-edit-cancel:hover {
+  color: #f85149;
+  border-color: #f85149;
+}
+
+/* ============================================
+   SECTION 2: AVATAR
+   ============================================ */
+.avatar-section-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.avatar-preview-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  border: 3px solid var(--md-border);
+  overflow: hidden;
+  position: relative;
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-preview canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-preview-label {
+  font-size: 0.8rem;
+  color: var(--md-on-surface-disabled);
+}
+
+/* Avatar Tabs */
+.avatar-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--md-surface-elevated);
+  border-radius: var(--md-radius-md);
+  padding: 4px;
+  width: 100%;
+}
+
+.avatar-tab {
+  flex: 1;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  color: var(--md-on-surface-variant);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--md-radius-sm);
+  transition: all var(--md-transition);
+  text-align: center;
+}
+
+.avatar-tab:hover {
+  color: var(--md-on-surface);
+  background: var(--md-surface-hover);
+}
+
+.avatar-tab.active {
+  background: var(--md-primary);
+  color: #fff;
+}
+
+/* Avatar Tab Content */
+.avatar-tab-content {
+  width: 100%;
+}
+
+/* Emoji Grid */
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+}
+
+.emoji-option {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--md-surface-elevated);
+  border: 2px solid transparent;
+  border-radius: var(--md-radius-md);
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--md-transition);
+}
+
+.emoji-option:hover {
+  background: var(--md-surface-hover);
+  border-color: var(--md-primary);
+  transform: scale(1.1);
+}
+
+.emoji-option.selected {
+  border-color: var(--md-primary);
+  background: rgba(86, 156, 214, 0.1);
+}
+
+/* Color Swatches */
+.color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.color-swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all var(--md-transition);
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+}
+
+.color-swatch.selected {
+  border-color: #fff;
+  box-shadow: 0 0 0 2px var(--md-primary);
+}
+
+/* Pattern */
+.pattern-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.regenerate-btn {
+  background: var(--md-surface-elevated);
+  border: 1px solid var(--md-border);
+  color: var(--md-on-surface-variant);
+  padding: 8px 16px;
+  border-radius: var(--md-radius-md);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--md-transition);
+}
+
+.regenerate-btn:hover {
+  background: var(--md-surface-hover);
+  color: var(--md-on-surface);
+  border-color: var(--md-primary);
+}
+
+/* Image Upload */
+.upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.upload-dropzone {
+  width: 100%;
+  padding: 24px;
+  border: 2px dashed var(--md-border);
+  border-radius: var(--md-radius-md);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--md-transition);
+  color: var(--md-on-surface-variant);
+}
+
+.upload-dropzone:hover {
+  border-color: var(--md-primary);
+  background: rgba(86, 156, 214, 0.1);
+}
+
+.upload-dropzone svg {
+  margin-bottom: 8px;
+}
+
+.upload-dropzone p {
+  font-size: 0.85rem;
+}
+
+.upload-dropzone .upload-hint {
+  font-size: 0.75rem;
+  color: var(--md-on-surface-disabled);
+  margin-top: 4px;
+}
+
+/* Save Avatar Button */
+.save-avatar-btn {
+  background: var(--md-primary);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: var(--md-radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--md-transition);
+}
+
+.save-avatar-btn:hover {
+  background: #4080b0;
+  transform: translateY(-1px);
+}
+
+.save-avatar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============================================
+   SECTION 3: CHANGE PASSWORD
+   ============================================ */
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-input-group label {
+  font-size: 0.8rem;
+  color: var(--md-on-surface-variant);
+  font-weight: 500;
+}
+
+.settings-input {
+  background: var(--md-surface-elevated);
+  border: 1px solid var(--md-border);
+  color: var(--md-on-surface);
+  padding: 10px 12px;
+  border-radius: var(--md-radius-md);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color var(--md-transition);
+}
+
+.settings-input:focus {
+  outline: none;
+  border-color: var(--md-primary);
+  box-shadow: 0 0 0 2px rgba(86, 156, 214, 0.1);
+}
+
+.settings-input::placeholder {
+  color: var(--md-on-surface-disabled);
+}
+
+.password-submit-btn {
+  align-self: flex-start;
+  background: var(--md-primary);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--md-radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--md-transition);
+  margin-top: 4px;
+}
+
+.password-submit-btn:hover {
+  background: #4080b0;
+}
+
+.password-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   SECTION 4: ANALYTICS
+   ============================================ */
+.analytics-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.analytics-toggle-info {
+  flex: 1;
+}
+
+.analytics-toggle-info p {
+  font-size: 0.9rem;
+  color: var(--md-on-surface);
+  margin-bottom: 4px;
+}
+
+.analytics-toggle-info .toggle-description {
+  font-size: 0.8rem;
+  color: var(--md-on-surface-disabled);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--md-surface-active);
+  transition: var(--md-transition);
+  border-radius: 26px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--md-on-surface-variant);
+  transition: var(--md-transition);
+  border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: var(--md-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(22px);
+  background-color: #fff;
+}
+
+/* ============================================
+   SECTION 5: DANGER ZONE
+   ============================================ */
+.settings-section.danger-zone {
+  border-color: #f8514966;
+  background: linear-gradient(135deg, var(--md-surface-variant), rgba(248, 81, 73, 0.05));
+}
+
+.settings-section.danger-zone h2 {
+  color: #f85149;
+}
+
+.settings-section.danger-zone h2 svg {
+  color: #f85149;
+}
+
+.danger-warning {
+  font-size: 0.85rem;
+  color: var(--md-on-surface-variant);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.danger-warning strong {
+  color: #f85149;
+}
+
+.delete-confirm-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.delete-type-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.delete-type-confirm label {
+  font-size: 0.8rem;
+  color: var(--md-on-surface-variant);
+}
+
+.delete-type-confirm label code {
+  color: #f85149;
+  font-weight: 600;
+}
+
+.delete-btn {
+  align-self: flex-start;
+  background: #f85149;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--md-radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--md-transition);
+}
+
+.delete-btn:hover {
+  background: #da3633;
+}
+
+.delete-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f85149;
+}
+
+/* ============================================
+   STATUS MESSAGES
+   ============================================ */
+.settings-success {
+  background: rgba(63, 185, 80, 0.1);
+  border: 1px solid rgba(63, 185, 80, 0.3);
+  color: var(--md-success);
+  padding: 10px 14px;
+  border-radius: var(--md-radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.settings-error {
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  color: #f85149;
+  padding: 10px 14px;
+  border-radius: var(--md-radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 16px 16px 60px;
+  }
+
+  .settings-section {
+    padding: 20px 16px;
+  }
+
+  .account-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .emoji-grid {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+  }
+
+  .emoji-option {
+    font-size: 1.2rem;
+  }
+
+  .avatar-tabs {
+    flex-wrap: wrap;
+  }
+
+  .avatar-tab {
+    flex: 1 1 45%;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .emoji-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .emoji-option {
+    font-size: 1.4rem;
+  }
+
+  .color-swatches {
+    gap: 8px;
+  }
+
+  .color-swatch {
+    width: 34px;
+    height: 34px;
+  }
+
+  .analytics-toggle-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
