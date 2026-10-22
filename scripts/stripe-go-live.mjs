@@ -3,7 +3,7 @@
  * One-shot Stripe LIVE-mode setup for AWS Study Hub.
  *
  * Automates everything the dashboard clicking did in sandbox:
- *   1. Creates the 4 products + prices (idempotent — finds existing by
+ *   1. Creates the 5 products + prices (idempotent — finds existing by
  *      plan metadata before creating).
  *   2. Creates the webhook endpoint (idempotent by URL) and captures its
  *      signing secret from the creation response.
@@ -46,6 +46,7 @@ const PLANS = [
   { plan: "cloud-practitioner", name: "AWS Cloud Practitioner Prep", cents: 999, recurring: null, env: "STRIPE_PRICE_CLOUD_PRACTITIONER" },
   { plan: "ai-practitioner", name: "AWS AI Practitioner Prep", cents: 999, recurring: null, env: "STRIPE_PRICE_AI_PRACTITIONER" },
   { plan: "solutions-architect-associate", name: "AWS Solutions Architect Prep", cents: 1499, recurring: null, env: "STRIPE_PRICE_SOLUTIONS_ARCHITECT" },
+  { plan: "developer-associate", name: "AWS Developer Associate Prep", cents: 1499, recurring: null, env: "STRIPE_PRICE_DEVELOPER_ASSOCIATE" },
   { plan: "all-access", name: "All-Access Bundle", cents: 3900, recurring: { interval: "year" }, env: "STRIPE_PRICE_ALL_ACCESS" },
 ];
 

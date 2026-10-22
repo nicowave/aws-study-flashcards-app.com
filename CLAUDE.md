@@ -16,12 +16,13 @@ Keep answers direct, no fluff.
 | Cloud Practitioner (CLF-C02) | `aws-cloud-practitioner-game/` | cloud.aws-study-flashcards-app.com | `cloud.aws-study-flashcards-app.com` | `E6NUXKK8FTCR1` |
 | AI Practitioner (AIF-C01) | `aws-ai-study-game/` | ai.aws-study-flashcards-app.com | `ai.aws-study-flashcards-app.com` | `E23TPCWLVKFC65` |
 | Solutions Architect (SAA-C03) | `aws-saa-study-game/` | saa.aws-study-flashcards-app.com | `saa.aws-study-flashcards-app.com` | `EBOXWN6EUZHKF` |
+| Developer Associate (DVA-C02) | `aws-dva-study-game/` | dva.aws-study-flashcards-app.com | `dva.aws-study-flashcards-app.com` | `E2UB744W5YUCTW` |
 | Tutorials (static, Cognito-gated) | `~/dev/aws/tutorials-site/site/` | tutorials.aws-study-flashcards-app.com | `tutorials-aws-study-flashcards-app-418272768335` | `E24YKUY1M23PV0` |
 
-Stack: Vite + React for the four apps, Firebase for auth/db, S3 + CloudFront hosting. AWS account `418272768335`, region `us-east-1`.
+Stack: Vite + React for the five apps, Firebase for auth/db, S3 + CloudFront hosting. AWS account `418272768335`, region `us-east-1`.
 
 ## Deploying
-`./deploy.sh [all|hub|cloud|ai|saa|tutorials]` from repo root.
+`./deploy.sh [all|hub|cloud|ai|saa|dva|tutorials]` from repo root.
 - React apps: `npm run build`, sync `dist/` (long cache), `index.html` no-cache, invalidate `/*`.
 - Tutorials: no build. Uploads `site/index.html` plus every `site/<slug>/index.html`.
 - Verify a deploy: `curl` the page and check the bundle hash changed. Tutorials returns a 302 to Cognito for unauthenticated requests — that's expected, not a failure.

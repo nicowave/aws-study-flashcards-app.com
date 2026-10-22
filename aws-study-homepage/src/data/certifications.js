@@ -66,16 +66,16 @@ export const certifications = [
     level: 'Associate',
     category: 'associate',
     description: 'Prove your proficiency in developing, deploying, and debugging cloud-based applications using AWS services.',
-    subdomain: 'developer',
-    url: 'https://developer.aws-study-flashcards-app.com',
-    status: 'coming-soon',
+    subdomain: 'dva',
+    url: 'https://dva.aws-study-flashcards-app.com',
+    status: 'available',
     icon: '👨‍💻',
     color: '#a371f7',
     examLength: '130 minutes',
     questions: '65 questions',
     passingScore: '720/1000',
     officialUrl: 'https://aws.amazon.com/certification/certified-developer-associate/',
-    features: ['Flashcards', 'Quiz Game', 'Study Guide']
+    features: ['Quiz Game', 'Flashcards', 'Exam Simulator', 'Study Guide']
   },
   {
     id: 'sysops-administrator',
