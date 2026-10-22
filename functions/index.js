@@ -20,6 +20,7 @@ const priceAllAccess = defineString("STRIPE_PRICE_ALL_ACCESS", { default: "" });
 const priceCloudPractitioner = defineString("STRIPE_PRICE_CLOUD_PRACTITIONER", { default: "" });
 const priceAiPractitioner = defineString("STRIPE_PRICE_AI_PRACTITIONER", { default: "" });
 const priceSolutionsArchitect = defineString("STRIPE_PRICE_SOLUTIONS_ARCHITECT", { default: "" });
+const priceDeveloperAssociate = defineString("STRIPE_PRICE_DEVELOPER_ASSOCIATE", { default: "" });
 
 const SITE_URL = "https://aws-study-flashcards-app.com";
 const ALLOWED_ORIGINS = [
@@ -27,6 +28,7 @@ const ALLOWED_ORIGINS = [
   "https://cloud.aws-study-flashcards-app.com",
   "https://ai.aws-study-flashcards-app.com",
   "https://saa.aws-study-flashcards-app.com",
+  "https://dva.aws-study-flashcards-app.com",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
@@ -49,6 +51,7 @@ const PLAN_PRICES = () => ({
   "cloud-practitioner": priceCloudPractitioner.value(),
   "ai-practitioner": priceAiPractitioner.value(),
   "solutions-architect-associate": priceSolutionsArchitect.value(),
+  "developer-associate": priceDeveloperAssociate.value(),
 });
 
 // Reverse lookup: Stripe price ID -> plan id

@@ -1,0 +1,122 @@
+/* Paywall shown after the free first quiz */
+
+.paywall-screen {
+  max-width: 520px;
+  margin: 40px auto;
+  padding: 36px 28px;
+  text-align: center;
+  background: var(--md-surface-elevated);
+  border: 1px solid var(--md-primary);
+  border-radius: var(--md-radius-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: fadeIn 0.3s ease;
+}
+
+.paywall-lock {
+  color: var(--md-primary);
+}
+
+.paywall-screen h2 {
+  margin: 0;
+  color: var(--md-on-surface);
+  font-size: 1.3rem;
+}
+
+.paywall-sub {
+  color: var(--md-on-surface-variant);
+  margin: 0;
+}
+
+.paywall-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.paywall-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--md-on-surface);
+  font-size: 0.92rem;
+}
+
+.paywall-features li svg {
+  color: var(--md-success);
+  flex-shrink: 0;
+}
+
+.paywall-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.paywall-price-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--md-primary);
+}
+
+.paywall-price-note {
+  color: var(--md-on-surface-variant);
+  font-size: 0.85rem;
+}
+
+.paywall-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.paywall-subscribe-btn {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  border: none;
+  border-radius: var(--md-radius-md);
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter var(--md-transition);
+}
+
+.paywall-subscribe-btn:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.paywall-subscribe-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.paywall-back-btn {
+  background: transparent;
+  color: var(--md-on-surface-variant);
+  border: 1px solid var(--md-border);
+  border-radius: var(--md-radius-md);
+  padding: 10px 24px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.paywall-error {
+  color: var(--md-error);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.paywall-fine-print {
+  color: var(--md-on-surface-disabled);
+  font-size: 0.75rem;
+  margin: 0;
+}
