@@ -47,6 +47,7 @@ prices MUST be one-time and all-access MUST be recurring/yearly:
 | AWS Cloud Practitioner Prep | $9.99 one-time | `cloud-practitioner` |
 | AWS AI Practitioner Prep | $9.99 one-time | `ai-practitioner` |
 | AWS Solutions Architect Prep | $14.99 one-time | `solutions-architect-associate` |
+| AWS Developer Associate Prep | $14.99 one-time | `developer-associate` |
 | All-Access Bundle | $39/year recurring | `all-access` |
 
 Copy each price ID (`price_...`) into `functions/.env` (price IDs are not
@@ -57,6 +58,7 @@ cat >> functions/.env <<'ENV'
 STRIPE_PRICE_CLOUD_PRACTITIONER=price_XXXXXXXX
 STRIPE_PRICE_AI_PRACTITIONER=price_XXXXXXXX
 STRIPE_PRICE_SOLUTIONS_ARCHITECT=price_XXXXXXXX
+STRIPE_PRICE_DEVELOPER_ASSOCIATE=price_XXXXXXXX
 STRIPE_PRICE_ALL_ACCESS=price_XXXXXXXX
 ENV
 ```
