@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 const CHAIN = [
-  { role: 'Leaf (server) cert', subject: 'api.tingfire.com', issuer: "Let's Encrypt R11", proves: 'This server holds the private key for api.tingfire.com.' },
+  { role: 'Leaf (server) cert', subject: 'api.example.com', issuer: "Let's Encrypt R11", proves: 'This server holds the private key for api.example.com.' },
   { role: 'Intermediate CA', subject: "Let's Encrypt R11", issuer: 'ISRG Root X1', proves: "Let's Encrypt is allowed to issue certs, vouched for by the root." },
   { role: 'Root CA', subject: 'ISRG Root X1', issuer: 'ISRG Root X1 (self-signed)', proves: 'Shipped inside your OS/browser trust store. Trust starts here, by fiat.' },
 ]
@@ -24,7 +24,7 @@ export default function TlsLab() {
     good: { cls: 'ok', text: 'Chain verified. Padlock. The CA vouched that this server controls this hostname.' },
     selfsigned: { cls: 'bad', text: 'No trusted issuer. Encryption would still work, but nobody vouched for who this is. Browser warns.' },
     expired: { cls: 'bad', text: 'Leaf cert expired. Even a valid chain fails if the dates are wrong. This is the #1 production outage caused by certs.' },
-    hostname: { cls: 'bad', text: 'Cert is for www.tingfire.com but you asked for api.tingfire.com. Valid cert, wrong name. Fails.' },
+    hostname: { cls: 'bad', text: 'Cert is for www.example.com but you asked for api.example.com. Valid cert, wrong name. Fails.' },
   }[scenario]
 
   return (
@@ -47,8 +47,8 @@ export default function TlsLab() {
         {CHAIN.map((c, i) => {
           const isBroken = broken === i && step >= 2
           const isVerified = step >= 2 && scenario === 'good'
-          const subj = scenario === 'hostname' && i === 0 ? 'www.tingfire.com' : c.subject
-          const issuer = scenario === 'selfsigned' && i === 0 ? 'api.tingfire.com (self-signed)' : c.issuer
+          const subj = scenario === 'hostname' && i === 0 ? 'www.example.com' : c.subject
+          const issuer = scenario === 'selfsigned' && i === 0 ? 'api.example.com (self-signed)' : c.issuer
           return (
             <div key={c.role} className={`cert ${isBroken ? 'broken' : ''} ${isVerified ? 'verified' : ''}`} style={{ opacity: scenario === 'selfsigned' && i > 0 ? 0.35 : 1 }}>
               <h3>{c.role}</h3>
@@ -64,7 +64,7 @@ export default function TlsLab() {
         {mtls && (
           <div className="cert" style={{ borderStyle: 'dashed' }}>
             <h3>Client (device) cert</h3>
-            <dl><dt>subject</dt><dd>sensor-00A1F3</dd><dt>issuer</dt><dd>Ting Device CA</dd></dl>
+            <dl><dt>subject</dt><dd>sensor-00A1F3</dd><dt>issuer</dt><dd>Fleet Device CA</dd></dl>
             <p style={{ fontSize: 13, marginTop: 8, color: 'var(--ink-soft)' }}>With mTLS the server verifies the device too. A cloned sensor without a valid device cert is refused before any API code runs. This is how IoT fleets authenticate.</p>
           </div>
         )}

@@ -68,14 +68,14 @@ function Guide() {
     ['ASP.NET Core', 'Microsoft\'s cross-platform web framework for C#. Learn Minimal APIs first, then Controllers, DI, middleware, EF Core.'],
     ['DI', 'Dependency Injection. Register services in Program.cs; constructors receive them. Decouples and makes testing easy.'],
     ['EF Core', 'Entity Framework Core. The ORM: C# classes to tables, LINQ to SQL, migrations for schema.'],
-    ['IoT', 'Internet of Things. Cheap connected devices streaming to a backend. Ting: hundreds of thousands of sensors.'],
+    ['IoT', 'Internet of Things. Cheap connected devices streaming to a backend; a fleet can mean hundreds of thousands of sensors.'],
     ['MQTT / QoS', 'Lightweight pub/sub protocol for devices. QoS 0 at most once, 1 at least once (dedupe!), 2 exactly once. AWS IoT Core is a broker.'],
     ['WMTS / OGC', 'Web Map Tile Service, an Open Geospatial Consortium standard. Tiles at /z/x/y.png, static, CDN-friendly.'],
     ['RMS / Hz', 'Root Mean Square, the effective value of an AC waveform (120 V is RMS). Hertz, cycles per second; US mains is 60 Hz.'],
   ]
   return (
     <section className="lab guide">
-      <header><h2>Reference: every acronym in the Ting Labs posting</h2><p className="lead">What it is, what it costs, when you pick the alternative. Same content as the PDF, for when you are at the keyboard.</p></header>
+      <header><h2>Reference: the acronyms behind cloud APIs and device fleets</h2><p className="lead">What it is, what it costs, when you pick the alternative. A one-page cheat sheet for when you are at the keyboard.</p></header>
       <dl>{G.map(([k, v]) => <><dt key={k}>{k}</dt><dd key={k + 'd'}>{v}</dd></>)}</dl>
       <h2>Commands that make each one visible</h2>
       <pre>{`sudo tcpdump -i any port 5001                 # TCP handshake flags
@@ -85,7 +85,7 @@ curl -v https://host/api                       # HTTP headers
 ssh -v user@host ; ssh -L 5432:db:5432 bastion # SSH negotiation, tunnel
 brew install dotnet ; dotnet new webapi        # ASP.NET Core
 brew install mosquitto ; mosquitto_sub -t '#'  # MQTT broker`}</pre>
-      <h2>The MiniTing project (build order)</h2>
+      <h2>Practice project: a sensor fleet backend (build order)</h2>
       <ol style={{ maxWidth: '80ch' }}>
         <li>Python sensor simulator: N sensors, 1 reading/sec, deliberate duplicate seq numbers.</li>
         <li>ASP.NET Core BackgroundService: UDP heartbeats on 5000, length-prefixed TCP frames on 5001. Run tcpdump.</li>
