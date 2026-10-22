@@ -29,6 +29,8 @@ const ALLOWED_ORIGINS = [
   "https://ai.aws-study-flashcards-app.com",
   "https://saa.aws-study-flashcards-app.com",
   "https://dva.aws-study-flashcards-app.com",
+  "https://architect.aws-study-flashcards-app.com",
+  "https://developer.aws-study-flashcards-app.com",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",

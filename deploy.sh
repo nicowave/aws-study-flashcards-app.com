@@ -293,7 +293,7 @@ deploy_saa() {
 
     cd "$SCRIPT_DIR"
     print_success "${site_name} deployed!"
-    echo "  🏗️  https://saa.aws-study-flashcards-app.com"
+    echo "  🏗️  https://architect.aws-study-flashcards-app.com"
 }
 
 deploy_dva() {
@@ -354,7 +354,7 @@ deploy_dva() {
 
     cd "$SCRIPT_DIR"
     print_success "${site_name} deployed!"
-    echo "  👨‍💻 https://dva.aws-study-flashcards-app.com"
+    echo "  👨‍💻 https://developer.aws-study-flashcards-app.com"
 }
 
 deploy_tutorials() {
@@ -420,8 +420,8 @@ deploy_all() {
     echo "  🌐 Hub:   https://aws-study-flashcards-app.com"
     echo "  ☁️  Cloud: https://cloud.aws-study-flashcards-app.com"
     echo "  🤖 AI:    https://ai.aws-study-flashcards-app.com"
-    echo "  🏗️  SAA:   https://saa.aws-study-flashcards-app.com"
-    echo "  👨‍💻 DVA:   https://dva.aws-study-flashcards-app.com"
+    echo "  🏗️  Architect: https://architect.aws-study-flashcards-app.com"
+    echo "  👨‍💻 Developer: https://developer.aws-study-flashcards-app.com"
     echo "  📚 Tuts:  https://tutorials.aws-study-flashcards-app.com"
     echo ""
     print_info "CloudFront invalidations may take 1-2 minutes to propagate"
