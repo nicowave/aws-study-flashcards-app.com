@@ -15,8 +15,8 @@ Keep answers direct, no fluff.
 | Hub homepage | `aws-study-homepage/` | aws-study-flashcards-app.com | `aws-study-flashcards-app-home` | `E3D126UT3L72OL` |
 | Cloud Practitioner (CLF-C02) | `aws-cloud-practitioner-game/` | cloud.aws-study-flashcards-app.com | `cloud.aws-study-flashcards-app.com` | `E6NUXKK8FTCR1` |
 | AI Practitioner (AIF-C01) | `aws-ai-study-game/` | ai.aws-study-flashcards-app.com | `ai.aws-study-flashcards-app.com` | `E23TPCWLVKFC65` |
-| Solutions Architect (SAA-C03) | `aws-saa-study-game/` | saa.aws-study-flashcards-app.com | `saa.aws-study-flashcards-app.com` | `EBOXWN6EUZHKF` |
-| Developer Associate (DVA-C02) | `aws-dva-study-game/` | dva.aws-study-flashcards-app.com | `dva.aws-study-flashcards-app.com` | `E2UB744W5YUCTW` |
+| Solutions Architect (SAA-C03) | `aws-saa-study-game/` | architect.aws-study-flashcards-app.com (old: saa.) | `saa.aws-study-flashcards-app.com` | `EBOXWN6EUZHKF` |
+| Developer Associate (DVA-C02) | `aws-dva-study-game/` | developer.aws-study-flashcards-app.com (old: dva.) | `dva.aws-study-flashcards-app.com` | `E2UB744W5YUCTW` |
 | Tutorials (static, Cognito-gated) | `~/dev/aws/tutorials-site/site/` | tutorials.aws-study-flashcards-app.com | `tutorials-aws-study-flashcards-app-418272768335` | `E24YKUY1M23PV0` |
 
 Stack: Vite + React for the five apps, Firebase for auth/db, S3 + CloudFront hosting. AWS account `418272768335`, region `us-east-1`.

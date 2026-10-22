@@ -20,8 +20,8 @@ export const SITES = {
   },
   solutionsArchitect: {
     name: 'Solutions Architect',
-    url: 'https://saa.aws-study-flashcards-app.com',
-    domain: 'saa.aws-study-flashcards-app.com'
+    url: 'https://architect.aws-study-flashcards-app.com',
+    domain: 'architect.aws-study-flashcards-app.com'
   }
 };
 

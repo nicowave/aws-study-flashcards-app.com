@@ -35,6 +35,6 @@ aws cloudfront create-invalidation --distribution-id E6NUXKK8FTCR1 --paths "/*"
 
 ## 🔗 Links
 
-- **Live Site**: https://saa.aws-study-flashcards-app.com
+- **Live Site**: https://architect.aws-study-flashcards-app.com
 - **Homepage**: https://aws-study-flashcards-app.com
 - **AI Practitioner**: https://ai.aws-study-flashcards-app.com
