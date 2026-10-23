@@ -1,8 +1,8 @@
 // Billing service — thin client over the Stripe Cloud Functions.
 // Enabled via VITE_BILLING_ENABLED=true. Entitlements come from Firebase
 // custom claims set by the Stripe webhook — never client-writable state.
-import { httpsCallable } from 'firebase/functions';
-import { functions, auth } from '../config/firebase.config';
+import { httpsCallableFromURL } from 'firebase/functions';
+import { functions, auth, CALLABLE_BASE_URL } from '../config/firebase.config';
 
 export const BILLING_ENABLED = import.meta.env.VITE_BILLING_ENABLED === 'true';
 
@@ -28,7 +28,7 @@ export const hasCertEntitlement = async (certId, { forceRefresh = false } = {}) 
 
 /** Starts Stripe Checkout for this plan (one-time or subscription) and redirects. */
 export const startCheckout = async (plan) => {
-  const call = httpsCallable(functions, 'createCheckoutSession');
+  const call = httpsCallableFromURL(functions, `${CALLABLE_BASE_URL}/createCheckoutSession`);
   const { data } = await call({ plan, returnUrl: window.location.origin });
   if (data?.url) {
     window.location.assign(data.url);
@@ -39,7 +39,7 @@ export const startCheckout = async (plan) => {
 
 /** Opens the Stripe customer portal (manage / cancel / invoices). */
 export const openBillingPortal = async () => {
-  const call = httpsCallable(functions, 'createPortalSession');
+  const call = httpsCallableFromURL(functions, `${CALLABLE_BASE_URL}/createPortalSession`);
   const { data } = await call();
   if (data?.url) {
     window.location.assign(data.url);

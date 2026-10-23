@@ -25,8 +25,8 @@ import {
   updateDoc,
   deleteDoc
 } from 'firebase/firestore';
-import { httpsCallable } from 'firebase/functions';
-import { auth, db, functions } from '../config/firebase.config';
+import { httpsCallableFromURL } from 'firebase/functions';
+import { auth, db, functions, CALLABLE_BASE_URL } from '../config/firebase.config';
 
 // Set persistence to local
 setPersistence(auth, browserLocalPersistence).catch(console.error);
@@ -451,8 +451,8 @@ export const tryAutoLoginFromCookie = async () => {
   console.log('[Auth] Found auth cookie, attempting cross-domain login...');
 
   try {
-    // Call Cloud Function to exchange ID token for a Custom Token
-    const exchangeTokenFn = httpsCallable(functions, 'exchangeToken');
+    // Exchange the ID token for a Custom Token (AWS Lambda)
+    const exchangeTokenFn = httpsCallableFromURL(functions, `${CALLABLE_BASE_URL}/exchangeToken`);
     const result = await exchangeTokenFn({ idToken });
     const { customToken } = result.data;
 

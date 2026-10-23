@@ -1,0 +1,14 @@
+{
+  "name": "study-hub-callables",
+  "private": true,
+  "description": "Payment + cross-site sign-in functions (moved from Firebase Cloud Functions)",
+  "main": "index.js",
+  "engines": {
+    "node": "22"
+  },
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.1156.0",
+    "firebase-admin": "^13.0.0",
+    "stripe": "^18.0.0"
+  }
+}
