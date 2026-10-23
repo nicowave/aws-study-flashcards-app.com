@@ -21,6 +21,11 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const functions = getFunctions(app);
 
+// Payment and cross-site sign-in functions run on AWS Lambda (Firebase
+// callable protocol), called with httpsCallableFromURL.
+export const CALLABLE_BASE_URL =
+  import.meta.env.VITE_CALLABLE_BASE_URL || 'https://vaj7alg0f6.execute-api.us-east-1.amazonaws.com/callable';
+
 export default app;
 
 /*

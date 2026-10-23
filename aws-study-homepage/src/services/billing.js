@@ -3,8 +3,8 @@
 // (see docs/stripe-setup.md). Entitlements are read from Firebase custom
 // claims, which the server sets from Stripe webhooks — never from
 // client-writable state.
-import { httpsCallable } from 'firebase/functions';
-import { functions, auth } from '../config/firebase.config';
+import { httpsCallableFromURL } from 'firebase/functions';
+import { functions, auth, CALLABLE_BASE_URL } from '../config/firebase.config';
 
 export const BILLING_ENABLED = import.meta.env.VITE_BILLING_ENABLED === 'true';
 
@@ -30,7 +30,7 @@ export const getPlan = async ({ forceRefresh = false } = {}) => {
 
 /** Starts Stripe Checkout for the given plan and redirects the browser. */
 export const startCheckout = async (plan = 'all-access') => {
-  const call = httpsCallable(functions, 'createCheckoutSession');
+  const call = httpsCallableFromURL(functions, `${CALLABLE_BASE_URL}/createCheckoutSession`);
   const { data } = await call({ plan });
   if (data?.url) {
     window.location.assign(data.url);
@@ -41,7 +41,7 @@ export const startCheckout = async (plan = 'all-access') => {
 
 /** Opens the Stripe customer portal (manage / cancel / invoices). */
 export const openBillingPortal = async () => {
-  const call = httpsCallable(functions, 'createPortalSession');
+  const call = httpsCallableFromURL(functions, `${CALLABLE_BASE_URL}/createPortalSession`);
   const { data } = await call();
   if (data?.url) {
     window.location.assign(data.url);

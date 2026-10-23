@@ -6,16 +6,35 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigwv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import { HttpJwtAuthorizer } from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import * as fs from 'fs';
 import * as path from 'path';
 
 const SITE_ORIGINS = [
   'https://aws-study-flashcards-app.com',
   'https://cloud.aws-study-flashcards-app.com',
   'https://ai.aws-study-flashcards-app.com',
+  'https://saa.aws-study-flashcards-app.com',
+  'https://dva.aws-study-flashcards-app.com',
+  'https://architect.aws-study-flashcards-app.com',
+  'https://developer.aws-study-flashcards-app.com',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',
 ];
+
+// Stripe price IDs aren't secret. They live in the (untracked) functions/.env
+// so the Firebase and AWS deployments read the same values.
+function loadPriceEnv(): Record<string, string> {
+  const envPath = path.join(__dirname, '../../functions/.env');
+  const out: Record<string, string> = {};
+  if (!fs.existsSync(envPath)) return out;
+  for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
+    const m = line.match(/^(STRIPE_PRICE_[A-Z_]+)=(.*)$/);
+    if (m) out[m[1]] = m[2].trim();
+  }
+  return out;
+}
 
 export class StudyHubBackendStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -122,7 +141,7 @@ export class StudyHubBackendStack extends cdk.Stack {
           apigwv2.CorsHttpMethod.POST,
           apigwv2.CorsHttpMethod.OPTIONS,
         ],
-        allowHeaders: ['Authorization', 'Content-Type'],
+        allowHeaders: ['Authorization', 'Content-Type', 'X-Firebase-AppCheck', 'Firebase-Instance-ID-Token'],
         maxAge: cdk.Duration.hours(1),
       },
     });
@@ -148,6 +167,36 @@ export class StudyHubBackendStack extends cdk.Stack {
     }
 
     // -----------------------------------------------------------------
+    // Payments + cross-site sign-in (migration step 1). Called by the apps
+    // with Firebase's httpsCallableFromURL(); still verifies Firebase ID
+    // tokens and mirrors purchases into Firebase until sign-in moves.
+    // Secret "study-hub/billing" = { stripeApiKey, stripeWebhookSecret,
+    // firebaseServiceAccount } — populated by the owner, never in git.
+    // -----------------------------------------------------------------
+    const billingSecret = secretsmanager.Secret.fromSecretNameV2(this, 'BillingSecret', 'study-hub/billing');
+    const callablesFn = new lambda.Function(this, 'CallablesFn', {
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/callables')),
+      environment: { SECRET_ID: 'study-hub/billing', ...loadPriceEnv() },
+      timeout: cdk.Duration.seconds(20),
+      memorySize: 512,
+    });
+    billingSecret.grantRead(callablesFn);
+
+    const callablesIntegration = new HttpLambdaIntegration('CallablesIntegration', callablesFn);
+    httpApi.addRoutes({
+      path: '/callable/{name}',
+      methods: [apigwv2.HttpMethod.POST],
+      integration: callablesIntegration,
+    });
+    httpApi.addRoutes({
+      path: '/stripe/webhook',
+      methods: [apigwv2.HttpMethod.POST],
+      integration: callablesIntegration,
+    });
+
+    // -----------------------------------------------------------------
     // Outputs — the frontends consume these in Phase 2
     // -----------------------------------------------------------------
     new cdk.CfnOutput(this, 'UserPoolId', { value: userPool.userPoolId });
@@ -155,5 +204,7 @@ export class StudyHubBackendStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'HostedUiBaseUrl', { value: userPoolDomain.baseUrl() });
     new cdk.CfnOutput(this, 'ApiUrl', { value: httpApi.apiEndpoint });
     new cdk.CfnOutput(this, 'TableName', { value: table.tableName });
+    new cdk.CfnOutput(this, 'CallableBaseUrl', { value: `${httpApi.apiEndpoint}/callable` });
+    new cdk.CfnOutput(this, 'StripeWebhookUrl', { value: `${httpApi.apiEndpoint}/stripe/webhook` });
   }
 }

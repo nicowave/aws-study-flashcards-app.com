@@ -11,6 +11,7 @@ lerna-debug.log*
 package-lock.json
 # Functions deploys run `npm ci` against this lockfile, so it must be tracked
 !functions/package-lock.json
+!aws-backend/lambda/callables/package-lock.json
 node_modules
 dist
 dist-ssr
