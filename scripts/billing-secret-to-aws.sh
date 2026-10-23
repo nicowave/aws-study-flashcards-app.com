@@ -2,8 +2,9 @@
 # Copies the payment secrets into AWS Secrets Manager (migration step 1).
 #
 # Builds the "study-hub/billing" secret from:
-#   - STRIPE_API_KEY and STRIPE_WEBHOOK_SECRET, read from Firebase's secret
-#     store with your existing `firebase` login
+#   - the live restricted Stripe key, pasted at a hidden prompt
+#   - STRIPE_WEBHOOK_SECRET, read from Firebase's secret store with your
+#     existing `firebase` login
 #   - a Firebase service account key file you download from the Firebase
 #     console (Project settings > Service accounts > Generate new private key)
 #
@@ -21,13 +22,22 @@ if [[ -z "$KEY_FILE" || ! -f "$KEY_FILE" ]]; then
   exit 1
 fi
 
-echo "Reading the Stripe secrets from Firebase (values stay hidden)..."
-export STRIPE_API_KEY_VALUE="$(firebase functions:secrets:access STRIPE_API_KEY)"
+# The live Stripe key is pasted at a hidden prompt (the copy stored in
+# Firebase was truncated). Nothing is shown while you paste.
+echo "Paste the live restricted Stripe key (starts with rk_live_), then press Enter."
+echo "Nothing will appear while you paste; that's expected."
+read -rs "STRIPE_API_KEY_VALUE?Stripe key: "
+echo
+export STRIPE_API_KEY_VALUE
+if [[ ( "$STRIPE_API_KEY_VALUE" != rk_live_* && "$STRIPE_API_KEY_VALUE" != sk_live_* ) || ${#STRIPE_API_KEY_VALUE} -lt 60 ]]; then
+  echo "That doesn't look like a complete live key (got ${#STRIPE_API_KEY_VALUE} characters). Nothing was saved."
+  exit 1
+fi
+echo "Got a ${#STRIPE_API_KEY_VALUE}-character key starting with ${STRIPE_API_KEY_VALUE[1,8]}."
+
+echo "Reading the Stripe webhook signing secret from Firebase (value stays hidden)..."
 export STRIPE_WEBHOOK_SECRET_VALUE="$(firebase functions:secrets:access STRIPE_WEBHOOK_SECRET)"
 export SA_FILE="$KEY_FILE"
-
-[[ "$STRIPE_API_KEY_VALUE" == rk_live_* || "$STRIPE_API_KEY_VALUE" == sk_live_* ]] \
-  || { echo "The Stripe key from Firebase isn't a live key. Stopping."; exit 1; }
 [[ "$STRIPE_WEBHOOK_SECRET_VALUE" == whsec_* ]] \
   || { echo "The webhook secret from Firebase looks wrong. Stopping."; exit 1; }
 
