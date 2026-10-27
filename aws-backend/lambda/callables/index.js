@@ -211,6 +211,17 @@ async function uidForSubscription(subscription) {
   return snap.empty ? null : snap.docs[0].id;
 }
 
+/** False when Stripe has no such customer (or it was deleted). */
+async function customerExists(stripe, customerId) {
+  try {
+    const customer = await stripe.customers.retrieve(customerId);
+    return !customer.deleted;
+  } catch (err) {
+    if (err.code === "resource_missing") return false;
+    throw err;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // createCheckoutSession — { plan, returnUrl } -> { url }
 // ---------------------------------------------------------------------------
@@ -224,6 +235,12 @@ async function createCheckoutSession(data, user, stripe) {
   const userRef = getFirestore().doc(`users/${uid}`);
   const userDoc = await userRef.get();
   let customerId = userDoc.get("stripeCustomerId");
+  if (customerId && !(await customerExists(stripe, customerId))) {
+    // Saved while Stripe was in test mode (or deleted since): the live key
+    // can't see it, so checkout would fail with "No such customer".
+    console.warn(`[billing] Replacing missing Stripe customer ${customerId} for uid=${uid}`);
+    customerId = null;
+  }
   if (!customerId) {
     const customer = await stripe.customers.create({
       email: user.email || undefined,
