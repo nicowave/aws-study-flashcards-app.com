@@ -7,6 +7,9 @@ import * as apigwv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import { HttpJwtAuthorizer } from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
+import * as route53 from 'aws-cdk-lib/aws-route53';
+import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -99,6 +102,29 @@ export class StudyHubBackendStack extends cdk.Stack {
     const domainPrefix = this.node.tryGetContext('cognitoDomainPrefix') ?? 'study-hub-auth-418272768335';
     const userPoolDomain = userPool.addDomain('HostedUiDomain', {
       cognitoDomain: { domainPrefix },
+    });
+
+    // Branded sign-in address, so Google's consent screen shows our domain.
+    // Uses the existing *.aws-study-flashcards-app.com certificate (us-east-1).
+    const authDomainName = 'auth.aws-study-flashcards-app.com';
+    const authDomain = userPool.addDomain('AuthCustomDomain', {
+      customDomain: {
+        domainName: authDomainName,
+        certificate: acm.Certificate.fromCertificateArn(
+          this,
+          'WildcardCert',
+          'arn:aws:acm:us-east-1:418272768335:certificate/9c5abd7d-76d2-4506-9f2b-1f067e761abc',
+        ),
+      },
+    });
+    const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, 'SiteZone', {
+      hostedZoneId: 'Z03018293W2CBVCSFY7I2',
+      zoneName: 'aws-study-flashcards-app.com',
+    });
+    new route53.ARecord(this, 'AuthDomainAlias', {
+      zone: hostedZone,
+      recordName: 'auth',
+      target: route53.RecordTarget.fromAlias(new route53Targets.UserPoolDomainTarget(authDomain)),
     });
 
     // SPA client: no secret, SRP + hosted-UI code flow.
@@ -202,6 +228,8 @@ export class StudyHubBackendStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'UserPoolId', { value: userPool.userPoolId });
     new cdk.CfnOutput(this, 'UserPoolClientId', { value: webClient.userPoolClientId });
     new cdk.CfnOutput(this, 'HostedUiBaseUrl', { value: userPoolDomain.baseUrl() });
+    new cdk.CfnOutput(this, 'AuthBaseUrl', { value: `https://${authDomainName}` });
+    new cdk.CfnOutput(this, 'GoogleRedirectUri', { value: `https://${authDomainName}/oauth2/idpresponse` });
     new cdk.CfnOutput(this, 'ApiUrl', { value: httpApi.apiEndpoint });
     new cdk.CfnOutput(this, 'TableName', { value: table.tableName });
     new cdk.CfnOutput(this, 'CallableBaseUrl', { value: `${httpApi.apiEndpoint}/callable` });
