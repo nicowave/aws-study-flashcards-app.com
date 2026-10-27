@@ -357,6 +357,10 @@ const CertCard = ({ cert }) => {
       <p className="cert-code mono">{cert.code}</p>
       <p className="cert-description">{cert.description}</p>
 
+      {isAvailable && cert.price && (
+        <p className="cert-price">One-time unlock <strong className="mono">{cert.price}</strong></p>
+      )}
+
       <div className="cert-details">
         <span className="cert-detail">
           <ClockIcon size={14} />
@@ -559,13 +563,13 @@ const ProPlanCard = ({ onShowLogin }) => {
   );
 };
 
-// Plans Section — guest preview, free account, All-Access (per-cert one-time unlocks happen inside each app)
+// Plans Section — guest preview, free account, one-certification unlock (bought inside each app), Pro (all-access yearly)
 const Plans = ({ onShowLogin }) => (
   <section id="plans" className="plans-section">
     <div className="section-header">
       <h2 className="section-title">Simple Plans</h2>
       <p className="section-subtitle">
-        Start free in seconds. Unlock one certification for a one-time price, or every certification with All-Access.
+        Start free in seconds. Unlock one certification for a one-time price, or every certification with Pro.
       </p>
     </div>
     <div className="plans-grid">
@@ -597,8 +601,27 @@ const Plans = ({ onShowLogin }) => (
           Create Free Account <ArrowRightIcon size={16} />
         </a>
       </div>
+      <div className="plan-card">
+        <div className="plan-name">One Certification</div>
+        <div className="plan-price plan-price-range mono">$9.99–$14.99</div>
+        <div className="plan-tagline">One-time payment, no subscription</div>
+        <ul className="plan-features">
+          <li>Every quiz domain &amp; flashcard deck for that certification</li>
+          <li>Its full-length timed exam simulator</li>
+          <li>Foundational $9.99 &middot; Associate $14.99</li>
+          <li>Pay once and keep it</li>
+        </ul>
+        <a href="#certifications" className="btn btn-card-primary plan-cta">
+          Choose a Certification <ArrowRightIcon size={16} />
+        </a>
+      </div>
       <ProPlanCard onShowLogin={onShowLogin} />
     </div>
+    <p className="plans-fine-print">
+      Prices are in US dollars. Applicable sales tax and any card processing fee are shown at checkout
+      before you pay. Payments are processed securely by Stripe for Nico Tek Solutions.{' '}
+      <a href="/terms.html">Terms of Service</a>
+    </p>
   </section>
 );
 
@@ -684,9 +707,10 @@ const Footer = () => (
       <div className="footer-links">
         <div className="footer-column">
           <h4>Certifications</h4>
-          <a href="https://ai.aws-study-flashcards-app.com">AI Practitioner</a>
           <a href="https://cloud.aws-study-flashcards-app.com">Cloud Practitioner</a>
-          <span className="muted">Solutions Architect (Soon)</span>
+          <a href="https://ai.aws-study-flashcards-app.com">AI Practitioner</a>
+          <a href="https://architect.aws-study-flashcards-app.com">Solutions Architect</a>
+          <a href="https://developer.aws-study-flashcards-app.com">Developer</a>
         </div>
         <div className="footer-column">
           <h4>Resources</h4>
