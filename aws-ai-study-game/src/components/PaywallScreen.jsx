@@ -53,7 +53,8 @@ const PaywallScreen = ({ certId, certName, onBack }) => {
       </div>
       {error && <p className="paywall-error">{error}</p>}
       <p className="paywall-fine-print">
-        Secure payment by Stripe. The study guide stays free forever.{' '}
+        Secure payment by Stripe. Applicable sales tax and any card processing fee are shown
+        at checkout before you pay. The study guide stays free forever.{' '}
         <a href="https://aws-study-flashcards-app.com/terms.html" target="_blank" rel="noopener noreferrer">Terms</a>
         {' · '}
         <a href="https://aws-study-flashcards-app.com/privacy.html" target="_blank" rel="noopener noreferrer">Privacy</a>
