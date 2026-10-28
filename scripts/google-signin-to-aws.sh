@@ -43,5 +43,5 @@ else
 fi
 unset SECRET_JSON
 
-rm -P "$FILE" 2>/dev/null || rm -f "$FILE"
+rm -f "$FILE"
 echo "Done. Google sign-in client ($CLIENT_ID_SHOWN) is stored in AWS, and the downloaded file has been deleted."
