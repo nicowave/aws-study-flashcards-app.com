@@ -1,104 +1,22 @@
+// Account functions for the Study Hub apps, on AWS (Cognito + StudyHub API).
+// Same function names and { success, error } results the screens used with
+// Firebase, so AuthContext and the components didn't have to change shape.
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithCustomToken,
-  signOut,
-  onAuthStateChanged,
-  sendEmailVerification,
-  setPersistence,
-  browserLocalPersistence,
-  signInAnonymously,
-  updateProfile,
-  GoogleAuthProvider,
-  OAuthProvider,
-  signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
-  updatePassword as firebaseUpdatePassword,
-  deleteUser as firebaseDeleteUser
-} from 'firebase/auth';
-import {
-  doc,
-  setDoc,
-  getDoc,
-  updateDoc,
-  deleteDoc,
-  collection,
-  getDocs
-} from 'firebase/firestore';
-import { httpsCallableFromURL } from 'firebase/functions';
-import { auth, db, functions, CALLABLE_BASE_URL } from '../config/firebase.config';
+  signInWithPassword,
+  signUp,
+  resendSignUpLink,
+  changeAccountPassword,
+  startGoogleSignIn,
+  completeGoogleSignIn,
+  signOutEverywhere,
+  forgetSession,
+  getTokens,
+  userFromTokens,
+  onSessionChange,
+  apiFetch,
+} from './awsAuth';
 
-// Set persistence to local
-setPersistence(auth, browserLocalPersistence).catch(console.error);
-
-// ============================================
-// COOKIE CONFIGURATION - CRITICAL FOR CROSS-DOMAIN AUTH
-// ============================================
-const COOKIE_NAME = 'awsStudyAuth';
-// IMPORTANT: This must match your ROOT domain with a leading dot
-// Your sites: aws-study-flashcards-app.com, cloud.aws-study-flashcards-app.com, ai.aws-study-flashcards-app.com
-const COOKIE_DOMAIN = '.aws-study-flashcards-app.com';
-const COOKIE_EXPIRY_DAYS = 7;
-
-/**
- * Set auth cookie for cross-domain persistence
- */
-const setAuthCookie = (token, expirationDays = COOKIE_EXPIRY_DAYS) => {
-  const expires = new Date();
-  expires.setDate(expires.getDate() + expirationDays);
-  
-  // Check if we're on localhost (for development)
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  
-  if (isLocalhost) {
-    // For localhost development - no domain restriction
-    document.cookie = `${COOKIE_NAME}=${token}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
-  } else {
-    // For production (HTTPS required for Secure flag)
-    document.cookie = `${COOKIE_NAME}=${token}; expires=${expires.toUTCString()}; domain=${COOKIE_DOMAIN}; path=/; Secure; SameSite=Lax`;
-  }
-  
-  console.log('[Auth] Cookie set for domain:', isLocalhost ? 'localhost' : COOKIE_DOMAIN);
-};
-
-/**
- * Get auth cookie value
- */
-const getAuthCookie = () => {
-  const name = COOKIE_NAME + '=';
-  const decodedCookie = decodeURIComponent(document.cookie);
-  const cookieArray = decodedCookie.split(';');
-  
-  for (let i = 0; i < cookieArray.length; i++) {
-    let cookie = cookieArray[i].trim();
-    if (cookie.indexOf(name) === 0) {
-      return cookie.substring(name.length);
-    }
-  }
-  return null;
-};
-
-/**
- * Delete auth cookie
- */
-const deleteAuthCookie = () => {
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  
-  // Delete production cookie (with domain)
-  document.cookie = `${COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=${COOKIE_DOMAIN}; path=/; Secure; SameSite=Lax`;
-  
-  // Also delete without domain (catches any mismatched cookies)
-  document.cookie = `${COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
-  
-  if (isLocalhost) {
-    document.cookie = `${COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
-  }
-  
-  console.log('[Auth] Cookies cleared');
-};
+const PENDING_EMAIL_KEY = 'awsStudyPendingEmail';
 
 /**
  * Store user data in localStorage for quick access
@@ -119,84 +37,55 @@ const storeUserData = (user) => {
 /**
  * Get stored user data from localStorage
  */
-const getStoredUserData = () => {
+export const getStoredUserData = () => {
   const data = localStorage.getItem('awsStudyUser');
   return data ? JSON.parse(data) : null;
 };
 
+// Email waiting for its verification link (so "resend" knows where to send it)
+const setPendingEmail = (email) => sessionStorage.setItem(PENDING_EMAIL_KEY, String(email || '').trim().toLowerCase());
+const getPendingEmail = () => sessionStorage.getItem(PENDING_EMAIL_KEY);
+
+const tooManyAttempts = (code) => code === 'TooManyRequestsException' || code === 'LimitExceededException';
+
 /**
  * Register new user with REAL email and password
- * Email verification will be sent to this address
+ * Cognito emails a verification link; the user signs in after clicking it
  */
 export const registerUser = async (email, password, displayName = null) => {
+  if (!email || !email.includes('@') || email.endsWith('@studyhub.local')) {
+    return {
+      success: false,
+      error: 'Please use a real email address for verification'
+    };
+  }
+
   try {
-    // Validate email is a real email address
-    if (!email || !email.includes('@') || email.endsWith('@studyhub.local')) {
-      return { 
-        success: false, 
-        error: 'Please use a real email address for verification' 
-      };
-    }
-    
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    
-    // Update display name if provided
-    if (displayName) {
-      await updateProfile(user, { displayName });
-    }
-    
-    // Send verification email
-    await sendEmailVerification(user, {
-      url: 'https://aws-study-flashcards-app.com', // Redirect after verification
-      handleCodeInApp: false
-    });
-    
-    console.log('[Auth] Verification email sent to:', email);
-    
-    // Create user document in Firestore
-    await setDoc(doc(db, 'users', user.uid), {
-      email,
-      displayName: displayName || email.split('@')[0],
-      createdAt: new Date().toISOString(),
-      emailVerified: false,
-      stats: {
-        totalXp: 0,
-        level: 1,
-        totalAnswered: 0,
-        totalCorrect: 0,
-        maxStreak: 0,
-        sessionsCompleted: 0
-      },
-      certProgress: {}
-    });
-    
-    // Get ID token and set cookie
-    const idToken = await user.getIdToken();
-    setAuthCookie(idToken);
-    storeUserData(user);
-    
-    return { 
-      success: true, 
-      user,
-      message: 'Account created! Please check your email to verify your account.',
+    await signUp(email, password, displayName);
+    setPendingEmail(email);
+    console.log('[Auth] Verification link sent');
+    return {
+      success: true,
+      user: null,
+      message: 'Account created! Check your email for a verification link, then sign in.',
       needsVerification: true
     };
   } catch (error) {
     console.error('[Auth] Registration error:', error.code, error.message);
-    
+
     let errorMessage = 'Failed to create account';
-    
-    if (error.code === 'auth/email-already-in-use') {
+    if (error.code === 'UsernameExistsException') {
       errorMessage = 'An account with this email already exists';
-    } else if (error.code === 'auth/invalid-email') {
-      errorMessage = 'Please enter a valid email address';
-    } else if (error.code === 'auth/weak-password') {
+    } else if (error.code === 'UserLambdaValidationException' && /ACCOUNT_EXISTS/.test(error.message)) {
+      errorMessage = 'You already have an account with this email. Sign in with your existing password.';
+    } else if (error.code === 'InvalidPasswordException') {
       errorMessage = 'Password must be at least 6 characters';
-    } else if (error.code === 'auth/operation-not-allowed') {
-      errorMessage = 'Email/password accounts are not enabled. Please contact support.';
+    } else if (error.code === 'InvalidParameterException') {
+      errorMessage = 'Please enter a valid email address';
+    } else if (tooManyAttempts(error.code)) {
+      errorMessage = 'Too many attempts. Please try again later.';
     }
-    
+
     return { success: false, error: errorMessage };
   }
 };
@@ -206,45 +95,34 @@ export const registerUser = async (email, password, displayName = null) => {
  */
 export const loginUser = async (email, password) => {
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    
-    // Check if email is verified
-    if (!user.emailVerified) {
-      console.log('[Auth] User email not verified:', email);
-      return { 
-        success: false, 
-        error: 'Please verify your email before signing in. Check your inbox for a verification link.',
-        needsVerification: true,
-        user 
-      };
-    }
-    
-    // Get ID token and set cookie for cross-domain auth
-    const idToken = await user.getIdToken();
-    setAuthCookie(idToken);
+    const user = await signInWithPassword(email, password);
     storeUserData(user);
-    
-    console.log('[Auth] Login successful for:', email);
-    
+    console.log('[Auth] Login successful');
     return { success: true, user };
   } catch (error) {
     console.error('[Auth] Login error:', error.code, error.message);
-    
-    let errorMessage = 'Invalid email or password';
-    
-    if (error.code === 'auth/user-not-found') {
-      errorMessage = 'No account found with this email';
-    } else if (error.code === 'auth/wrong-password') {
-      errorMessage = 'Incorrect password';
-    } else if (error.code === 'auth/invalid-email') {
-      errorMessage = 'Please enter a valid email address';
-    } else if (error.code === 'auth/too-many-requests') {
-      errorMessage = 'Too many failed attempts. Please try again later.';
-    } else if (error.code === 'auth/user-disabled') {
-      errorMessage = 'This account has been disabled';
+
+    if (error.code === 'UserNotConfirmedException') {
+      setPendingEmail(email);
+      return {
+        success: false,
+        error: 'Please verify your email before signing in. Check your inbox for a verification link.',
+        needsVerification: true,
+        user: { email, emailVerified: false }
+      };
     }
-    
+
+    let errorMessage = 'Incorrect email or password';
+    if (error.code === 'NotAuthorizedException') {
+      errorMessage = 'Incorrect email or password. Never verified your email? Create an account with the same address.';
+    } else if (tooManyAttempts(error.code)) {
+      errorMessage = 'Too many failed attempts. Please try again later.';
+    } else if (error.code === 'PasswordResetRequiredException') {
+      errorMessage = 'Your password needs to be reset. Please contact support.';
+    } else if (error instanceof TypeError) {
+      errorMessage = 'Network error. Check your connection and try again.';
+    }
+
     return { success: false, error: errorMessage };
   }
 };
@@ -254,8 +132,7 @@ export const loginUser = async (email, password) => {
  */
 export const logoutUser = async () => {
   try {
-    await signOut(auth);
-    deleteAuthCookie();
+    await signOutEverywhere();
     storeUserData(null);
     localStorage.removeItem('awsStudyGuest');
     console.log('[Auth] User signed out');
@@ -267,25 +144,6 @@ export const logoutUser = async () => {
 };
 
 /**
- * Sign in as guest (anonymous) - progress NOT synced across devices
- */
-export const signInAsGuest = async () => {
-  try {
-    const userCredential = await signInAnonymously(auth);
-    const user = userCredential.user;
-    
-    // Store guest indicator in localStorage (don't set cookie - guests don't persist across domains)
-    localStorage.setItem('awsStudyGuest', 'true');
-    
-    console.log('[Auth] Guest sign-in successful');
-    return { success: true, user, isGuest: true };
-  } catch (error) {
-    console.error('[Auth] Guest sign-in error:', error);
-    return { success: false, error: 'Failed to sign in as guest' };
-  }
-};
-
-/**
  * Check if current user is a guest
  */
 export const isGuestUser = () => {
@@ -293,428 +151,114 @@ export const isGuestUser = () => {
 };
 
 /**
- * Resend verification email
+ * Resend the verification link to the email that just signed up or tried to sign in
  */
 export const resendVerificationEmail = async () => {
+  const email = getPendingEmail();
+  if (!email) {
+    return { success: false, error: 'Sign in again, then request a new link' };
+  }
   try {
-    const user = auth.currentUser;
-    if (!user) {
-      return { success: false, error: 'No user signed in' };
-    }
-    
-    if (user.emailVerified) {
-      return { success: false, error: 'Email is already verified' };
-    }
-    
-    await sendEmailVerification(user, {
-      url: 'https://aws-study-flashcards-app.com',
-      handleCodeInApp: false
-    });
-    
-    console.log('[Auth] Verification email resent to:', user.email);
+    await resendSignUpLink(email);
     return { success: true, message: 'Verification email sent! Check your inbox.' };
   } catch (error) {
-    console.error('[Auth] Resend verification error:', error);
-    
-    if (error.code === 'auth/too-many-requests') {
+    console.error('[Auth] Resend verification error:', error.code);
+    if (tooManyAttempts(error.code)) {
       return { success: false, error: 'Please wait before requesting another email' };
     }
-    
+    if (error.code === 'InvalidParameterException') {
+      return { success: false, error: 'Email is already verified' };
+    }
     return { success: false, error: 'Failed to send verification email' };
   }
 };
 
 /**
- * Get current user
+ * Get current user (null while signed out or still loading)
  */
-export const getCurrentUser = () => {
-  return auth.currentUser;
-};
+export const getCurrentUser = async () => userFromTokens(await getTokens().catch(() => null));
 
 /**
- * Listen to auth state changes
+ * Listen to auth state changes. Fires once on start, then on every sign-in
+ * or sign-out (here, on another subdomain, or in another tab).
  */
 export const onAuthChange = (callback) => {
-  return onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      // Update stored user data
-      storeUserData(user);
-      
-      // Update cookie with current token (refreshes only when expired)
-      try {
-        const idToken = await user.getIdToken(true);
-        setAuthCookie(idToken);
-      } catch (error) {
-        console.error('[Auth] Failed to refresh token:', error);
-      }
-    } else {
-      storeUserData(null);
-      localStorage.removeItem('awsStudyGuest');
+  let active = true;
+  const emit = async () => {
+    let user = null;
+    try {
+      user = userFromTokens(await getTokens());
+    } catch (error) {
+      console.warn('[Auth] Could not refresh the session:', error.message);
     }
-    
+    if (!active) return;
+    storeUserData(user);
     callback(user);
-  });
+  };
+  emit();
+  const unsubscribe = onSessionChange(emit);
+  return () => {
+    active = false;
+    unsubscribe();
+  };
 };
 
 /**
- * Get user data from Firestore
+ * Get profile + all progress ({ ...profile, progress: { certId: stats } })
  */
-export const getUserData = async (uid) => {
+export const getUserData = async () => {
   try {
-    const docRef = doc(db, 'users', uid);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      return { success: true, data: docSnap.data() };
-    } else {
-      return { success: false, error: 'User not found' };
-    }
+    const me = await apiFetch('/v1/me');
+    return { success: true, data: { ...me.profile, progress: me.progress, entitlements: me.entitlements } };
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
 /**
- * Get all game progress from the /users/{uid}/progress subcollection.
- * Each document in the subcollection is keyed by certId (e.g. 'ai-practitioner')
- * and contains: totalAnswered, totalCorrect, maxStreak, xp, level, totalSessions, etc.
- * Returns a map of { certId: progressData }
+ * Load one certification's saved game stats (null if none yet)
  */
-export const getUserProgress = async (uid) => {
-  try {
-    const progressRef = collection(db, 'users', uid, 'progress');
-    const snapshot = await getDocs(progressRef);
-    const progress = {};
-    snapshot.forEach((doc) => {
-      progress[doc.id] = doc.data();
-    });
-    return { success: true, data: progress };
-  } catch (error) {
-    console.error('[Auth] Failed to fetch user progress:', error.message);
-    return { success: false, error: error.message };
-  }
+export const loadProgress = async (certId) => {
+  const result = await apiFetch(`/v1/progress/${encodeURIComponent(certId)}`);
+  return result.progress;
 };
 
 /**
- * Update user stats in Firestore
+ * Save one certification's game stats
  */
-export const updateUserStats = async (uid, stats) => {
-  try {
-    const docRef = doc(db, 'users', uid);
-    await updateDoc(docRef, { stats });
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
+export const saveProgress = async (certId, stats) => {
+  await apiFetch(`/v1/progress/${encodeURIComponent(certId)}`, { method: 'PUT', body: stats });
 };
 
 /**
- * Sync local progress to Firestore
- */
-export const syncProgress = async (uid, localStats, certId = null) => {
-  try {
-    const docRef = doc(db, 'users', uid);
-    const docSnap = await getDoc(docRef);
-    
-    if (docSnap.exists()) {
-      const userData = docSnap.data();
-      const cloudStats = userData.stats || {};
-      
-      // Merge: take the higher values
-      const mergedStats = {
-        totalXp: Math.max(cloudStats.totalXp || 0, localStats.xp || localStats.totalXp || 0),
-        level: Math.max(cloudStats.level || 1, localStats.level || 1),
-        totalAnswered: Math.max(cloudStats.totalAnswered || 0, localStats.totalAnswered || 0),
-        totalCorrect: Math.max(cloudStats.totalCorrect || 0, localStats.totalCorrect || 0),
-        maxStreak: Math.max(cloudStats.maxStreak || 0, localStats.maxStreak || 0),
-        sessionsCompleted: Math.max(cloudStats.sessionsCompleted || 0, localStats.sessionsCompleted || 0)
-      };
-      
-      const updateData = { stats: mergedStats };
-      
-      // If certId provided, also update cert-specific progress
-      if (certId && localStats) {
-        updateData[`certProgress.${certId}`] = {
-          lastStudied: new Date().toISOString(),
-          ...localStats
-        };
-      }
-      
-      await updateDoc(docRef, updateData);
-      return { success: true, stats: mergedStats };
-    }
-    
-    return { success: false, error: 'User not found' };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-};
-
-/**
- * Try to auto-login from the shared cross-domain cookie.
- * Used for SSO: if a user is logged in on one subdomain,
- * other subdomains can establish their own Firebase session
- * by exchanging the ID token via a Cloud Function.
- *
- * @returns {Object|null} Firebase user object on success, null on failure
- */
-export const tryAutoLoginFromCookie = async () => {
-  // Skip if already signed in locally
-  if (auth.currentUser) {
-    console.log('[Auth] Already signed in, skipping cookie auto-login');
-    return auth.currentUser;
-  }
-
-  // Check for shared cookie
-  const idToken = getAuthCookie();
-  if (!idToken) {
-    console.log('[Auth] No auth cookie found');
-    return null;
-  }
-
-  console.log('[Auth] Found auth cookie, attempting cross-domain login...');
-
-  try {
-    // Exchange the ID token for a Custom Token (AWS Lambda)
-    const exchangeTokenFn = httpsCallableFromURL(functions, `${CALLABLE_BASE_URL}/exchangeToken`);
-    const result = await exchangeTokenFn({ idToken });
-    const { customToken } = result.data;
-
-    if (!customToken) {
-      console.error('[Auth] Cloud Function returned no custom token');
-      deleteAuthCookie();
-      return null;
-    }
-
-    // Sign in with the custom token to establish a local Firebase session
-    const userCredential = await signInWithCustomToken(auth, customToken);
-    console.log('[Auth] Cross-domain login successful for:', userCredential.user.email);
-
-    // Update cookie with fresh token and store user data
-    const freshToken = await userCredential.user.getIdToken();
-    setAuthCookie(freshToken);
-    storeUserData(userCredential.user);
-
-    return userCredential.user;
-  } catch (error) {
-    console.error('[Auth] Cross-domain login failed:', error.message || error);
-
-    // Delete stale cookie so we don't retry endlessly
-    deleteAuthCookie();
-    return null;
-  }
-};
-
-/**
- * Generate a random username like "CloudLearner_7a3f"
- * Used for Google sign-ups when user doesn't provide one
- */
-const generateRandomUsername = () => {
-  const adjectives = ['Cloud', 'AWS', 'Nimbus', 'Cyber', 'Data', 'Sage', 'Tech', 'Nova', 'Flux', 'Arch'];
-  const nouns = ['Learner', 'Builder', 'Pioneer', 'Explorer', 'Wizard', 'Ninja', 'Coder', 'Ace', 'Pro', 'Hero'];
-  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
-  const hex = Math.floor(Math.random() * 0xffff).toString(16).padStart(4, '0');
-  return `${adj}${noun}_${hex}`;
-};
-
-/**
- * Handle the Google user after sign-in (popup or redirect)
- * Creates Firestore doc if new user, sets cookie
- */
-const handleGoogleUser = async (user) => {
-  console.log('[Auth] Google sign-in successful for:', user.email || user.uid);
-
-  // Check if user document exists in Firestore, create if new
-  let isNewUser = false;
-  const userDocRef = doc(db, 'users', user.uid);
-  const userDoc = await getDoc(userDocRef);
-
-  if (!userDoc.exists()) {
-    isNewUser = true;
-    // Generate a random username for Google sign-ups
-    const randomName = generateRandomUsername();
-    await setDoc(userDocRef, {
-      email: user.email,
-      displayName: randomName,
-      createdAt: new Date().toISOString(),
-      emailVerified: true,
-      authProvider: 'google',
-      stats: {
-        totalXp: 0,
-        level: 1,
-        totalAnswered: 0,
-        totalCorrect: 0,
-        maxStreak: 0,
-        sessionsCompleted: 0
-      },
-      certProgress: {}
-    });
-    // Also update Firebase Auth profile with the random name
-    await updateProfile(user, { displayName: randomName });
-    // Reload user to pick up the new displayName in the auth object
-    await user.reload();
-    console.log('[Auth] Created Firestore user document for new Google user with name:', randomName);
-  }
-
-  // Get ID token and set cookie for cross-domain auth
-  const idToken = await user.getIdToken(true);
-  setAuthCookie(idToken);
-  storeUserData(user);
-
-  return { success: true, user, isNewUser };
-};
-
-/**
- * Handle the Apple user after sign-in (popup or redirect)
- * Creates Firestore doc if new user, sets cookie.
- * NOTE: Apple only sends the user's name on the FIRST sign-in.
- */
-const handleAppleUser = async (user) => {
-  console.log('[Auth] Apple sign-in successful for:', user.email || user.uid);
-
-  let isNewUser = false;
-  const userDocRef = doc(db, 'users', user.uid);
-  const userDoc = await getDoc(userDocRef);
-
-  if (!userDoc.exists()) {
-    isNewUser = true;
-    const randomName = generateRandomUsername();
-    await setDoc(userDocRef, {
-      email: user.email,
-      displayName: randomName,
-      createdAt: new Date().toISOString(),
-      emailVerified: true,
-      authProvider: 'apple',
-      stats: {
-        totalXp: 0,
-        level: 1,
-        totalAnswered: 0,
-        totalCorrect: 0,
-        maxStreak: 0,
-        sessionsCompleted: 0
-      },
-      certProgress: {}
-    });
-    await updateProfile(user, { displayName: randomName });
-    await user.reload();
-    console.log('[Auth] Created Firestore user document for new Apple user with name:', randomName);
-  }
-
-  const idToken = await user.getIdToken(true);
-  setAuthCookie(idToken);
-  storeUserData(user);
-
-  return { success: true, user, isNewUser };
-};
-
-/**
- * Check for pending OAuth redirect result on page load (Google or Apple)
+ * Finish a Google sign-in on page load (the browser returns with ?code=...)
  * Must be called once when the app initializes
  */
 export const checkGoogleRedirectResult = async () => {
   try {
-    const result = await getRedirectResult(auth);
-    if (result && result.user) {
-      const providerId = result.providerId;
-      console.log('[Auth] OAuth redirect result found for provider:', providerId);
-      if (providerId === 'apple.com') {
-        return await handleAppleUser(result.user);
-      }
-      return await handleGoogleUser(result.user);
-    }
-    return null;
+    const user = await completeGoogleSignIn();
+    if (!user) return null;
+    storeUserData(user);
+    console.log('[Auth] Google sign-in completed');
+    return { success: true, user };
   } catch (error) {
-    console.error('[Auth] OAuth redirect result error:', error.code, error.message);
-    return null;
+    console.error('[Auth] Google redirect result error:', error.code, error.message);
+    return { success: false, error: error.message };
   }
 };
 
 /**
- * Sign in with Google — tries popup first, falls back to redirect
- * Works for both new and existing users
+ * Sign in with Google: goes to Google, then comes back to this site
+ * (checkGoogleRedirectResult finishes it). Works for new and existing users.
  */
 export const signInWithGoogle = async () => {
-  const provider = new GoogleAuthProvider();
-
-  // Try popup first (works on most desktop browsers)
   try {
-    const userCredential = await signInWithPopup(auth, provider);
-    return await handleGoogleUser(userCredential.user);
+    await startGoogleSignIn();
+    // The page is navigating away; stay "loading" until it does
+    return await new Promise(() => {});
   } catch (error) {
-    console.warn('[Auth] Google popup failed:', error.code, error.message);
-
-    // For these errors, fall back to redirect flow
-    if (
-      error.code === 'auth/popup-blocked' ||
-      error.code === 'auth/unauthorized-domain' ||
-      error.code === 'auth/operation-not-supported-in-this-environment' ||
-      error.code === 'auth/internal-error'
-    ) {
-      console.log('[Auth] Falling back to redirect flow...');
-      try {
-        await signInWithRedirect(auth, provider);
-        // Page will redirect — this line won't execute
-        return { success: false, error: 'Redirecting to Google...' };
-      } catch (redirectError) {
-        console.error('[Auth] Google redirect also failed:', redirectError.code, redirectError.message);
-        return { success: false, error: 'Google sign-in failed. Please try again.' };
-      }
-    }
-
-    // For user-initiated cancellations, just return the message
-    let errorMessage = 'Google sign-in failed';
-
-    if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-      errorMessage = 'Sign-in cancelled';
-    } else if (error.code === 'auth/account-exists-with-different-credential') {
-      errorMessage = 'An account already exists with this email using a different sign-in method.';
-    }
-
-    return { success: false, error: errorMessage };
-  }
-};
-
-/**
- * Sign in with Apple — tries popup first, falls back to redirect
- * Works for both new and existing users
- */
-export const signInWithApple = async () => {
-  const provider = new OAuthProvider('apple.com');
-  provider.addScope('email');
-  provider.addScope('name');
-
-  try {
-    const userCredential = await signInWithPopup(auth, provider);
-    return await handleAppleUser(userCredential.user);
-  } catch (error) {
-    console.warn('[Auth] Apple popup failed:', error.code, error.message);
-
-    if (
-      error.code === 'auth/popup-blocked' ||
-      error.code === 'auth/unauthorized-domain' ||
-      error.code === 'auth/operation-not-supported-in-this-environment' ||
-      error.code === 'auth/internal-error'
-    ) {
-      console.log('[Auth] Falling back to redirect flow...');
-      try {
-        await signInWithRedirect(auth, provider);
-        return { success: false, error: 'Redirecting to Apple...' };
-      } catch (redirectError) {
-        console.error('[Auth] Apple redirect also failed:', redirectError.code, redirectError.message);
-        return { success: false, error: 'Apple sign-in failed. Please try again.' };
-      }
-    }
-
-    let errorMessage = 'Apple sign-in failed';
-
-    if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-      errorMessage = 'Sign-in cancelled';
-    } else if (error.code === 'auth/account-exists-with-different-credential') {
-      errorMessage = 'An account already exists with this email using a different sign-in method.';
-    }
-
-    return { success: false, error: errorMessage };
+    console.error('[Auth] Google sign-in error:', error);
+    return { success: false, error: 'Google sign-in failed. Please try again.' };
   }
 };
 
@@ -723,69 +267,47 @@ export const signInWithApple = async () => {
 // ============================================
 
 /**
- * Re-authenticate user with email/password credential
+ * Confirm the current user's password
  * Required before sensitive operations like password change or account deletion
  */
 export const reauthenticateUser = async (password) => {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: 'No user signed in' };
+  }
   try {
-    const user = auth.currentUser;
-    if (!user) {
-      return { success: false, error: 'No user signed in' };
-    }
-
-    const credential = EmailAuthProvider.credential(user.email, password);
-    await reauthenticateWithCredential(user, credential);
+    await signInWithPassword(user.email, password);
     console.log('[Auth] Re-authentication successful');
     return { success: true };
   } catch (error) {
-    console.error('[Auth] Re-authentication error:', error.code, error.message);
-
-    let errorMessage = 'Re-authentication failed';
-    if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-      errorMessage = 'Incorrect password';
-    } else if (error.code === 'auth/too-many-requests') {
-      errorMessage = 'Too many attempts. Please try again later.';
+    console.error('[Auth] Re-authentication error:', error.code);
+    if (tooManyAttempts(error.code)) {
+      return { success: false, error: 'Too many attempts. Please try again later.' };
     }
-
-    return { success: false, error: errorMessage };
+    return { success: false, error: 'Incorrect password' };
   }
 };
 
 /**
- * Change user password
- * Requires recent authentication — call reauthenticateUser first
+ * Change user password (checks the current password first)
  */
 export const changePassword = async (currentPassword, newPassword) => {
   try {
-    const user = auth.currentUser;
-    if (!user) {
-      return { success: false, error: 'No user signed in' };
-    }
-
-    // Re-authenticate first
-    const reauth = await reauthenticateUser(currentPassword);
-    if (!reauth.success) {
-      return reauth;
-    }
-
-    // Update password
-    await firebaseUpdatePassword(user, newPassword);
-
-    // Refresh token after password change
-    await user.getIdToken(true);
-    const freshToken = await user.getIdToken();
-    setAuthCookie(freshToken);
-
+    await changeAccountPassword(currentPassword, newPassword);
     console.log('[Auth] Password changed successfully');
     return { success: true };
   } catch (error) {
-    console.error('[Auth] Change password error:', error.code, error.message);
+    console.error('[Auth] Change password error:', error.code);
 
     let errorMessage = 'Failed to change password';
-    if (error.code === 'auth/weak-password') {
+    if (error.code === 'NotAuthorizedException') {
+      errorMessage = 'Incorrect password';
+    } else if (error.code === 'InvalidPasswordException' || error.code === 'InvalidParameterException') {
       errorMessage = 'New password must be at least 6 characters';
-    } else if (error.code === 'auth/requires-recent-login') {
-      errorMessage = 'Please sign out and sign back in, then try again';
+    } else if (tooManyAttempts(error.code)) {
+      errorMessage = 'Too many attempts. Please try again later.';
+    } else if (error.code === 'NotSignedIn') {
+      errorMessage = 'No user signed in';
     }
 
     return { success: false, error: errorMessage };
@@ -793,15 +315,13 @@ export const changePassword = async (currentPassword, newPassword) => {
 };
 
 /**
- * Update user avatar in Firestore
- * @param {string} uid - User ID
+ * Update user avatar
  * @param {object} avatarData - { type: 'initials'|'emoji'|'pattern'|'image', value: string|null, bgColor: string }
  */
-export const updateUserAvatar = async (uid, avatarData) => {
+export const updateUserAvatar = async (avatarData) => {
   try {
-    const docRef = doc(db, 'users', uid);
-    await updateDoc(docRef, { avatar: avatarData });
-    console.log('[Auth] Avatar updated for user:', uid);
+    await apiFetch('/v1/me', { method: 'PATCH', body: { avatar: avatarData } });
+    console.log('[Auth] Avatar updated');
     return { success: true };
   } catch (error) {
     console.error('[Auth] Update avatar error:', error.message);
@@ -810,36 +330,19 @@ export const updateUserAvatar = async (uid, avatarData) => {
 };
 
 /**
- * Update user display name in both Firebase Auth and Firestore
- * @param {string} uid - User ID
- * @param {string} newDisplayName - New display name
+ * Update user display name
  */
-export const updateDisplayName = async (uid, newDisplayName) => {
+export const updateDisplayName = async (newDisplayName) => {
+  const trimmed = newDisplayName.trim();
+  if (!trimmed || trimmed.length < 2) {
+    return { success: false, error: 'Display name must be at least 2 characters' };
+  }
+  if (trimmed.length > 30) {
+    return { success: false, error: 'Display name must be 30 characters or less' };
+  }
+
   try {
-    const user = auth.currentUser;
-    if (!user) {
-      return { success: false, error: 'No user signed in' };
-    }
-
-    // Validate display name
-    const trimmed = newDisplayName.trim();
-    if (!trimmed || trimmed.length < 2) {
-      return { success: false, error: 'Display name must be at least 2 characters' };
-    }
-    if (trimmed.length > 30) {
-      return { success: false, error: 'Display name must be 30 characters or less' };
-    }
-
-    // Update Firebase Auth profile
-    await updateProfile(user, { displayName: trimmed });
-
-    // Update Firestore document
-    const docRef = doc(db, 'users', uid);
-    await updateDoc(docRef, { displayName: trimmed });
-
-    // Update stored user data
-    storeUserData(user);
-
+    await apiFetch('/v1/me', { method: 'PATCH', body: { displayName: trimmed } });
     console.log('[Auth] Display name updated to:', trimmed);
     return { success: true };
   } catch (error) {
@@ -850,43 +353,18 @@ export const updateDisplayName = async (uid, newDisplayName) => {
 
 /**
  * Delete user account permanently
- * For email users: requires password re-auth
- * For Google users: requires Google popup re-auth
- * Deletes Firestore doc first, then Firebase Auth account, then clears local data
+ * Email users confirm their password first; Google users confirm by typing DELETE
+ * The server deletes all study data and the sign-in account
  */
 export const deleteAccount = async (password = null) => {
   try {
-    const user = auth.currentUser;
+    const user = await getCurrentUser();
     if (!user) {
       return { success: false, error: 'No user signed in' };
     }
 
-    // Determine auth provider
-    const isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
-    const isAppleUser = user.providerData.some(p => p.providerId === 'apple.com');
-
-    // Re-authenticate based on provider
-    if (isGoogleUser) {
-      const provider = new GoogleAuthProvider();
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (popupError) {
-        if (popupError.code === 'auth/popup-closed-by-user' || popupError.code === 'auth/cancelled-popup-request') {
-          return { success: false, error: 'Account deletion cancelled' };
-        }
-        return { success: false, error: 'Google re-authentication failed. Please try again.' };
-      }
-    } else if (isAppleUser) {
-      const provider = new OAuthProvider('apple.com');
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (popupError) {
-        if (popupError.code === 'auth/popup-closed-by-user' || popupError.code === 'auth/cancelled-popup-request') {
-          return { success: false, error: 'Account deletion cancelled' };
-        }
-        return { success: false, error: 'Apple re-authentication failed. Please try again.' };
-      }
-    } else {
+    const isGoogleUser = user.providerData.some((p) => p.providerId === 'google.com');
+    if (!isGoogleUser) {
       if (!password) {
         return { success: false, error: 'Password is required to delete your account' };
       }
@@ -896,37 +374,16 @@ export const deleteAccount = async (password = null) => {
       }
     }
 
-    // Delete Firestore user document first (while still authenticated)
-    try {
-      const docRef = doc(db, 'users', user.uid);
-      await deleteDoc(docRef);
-      console.log('[Auth] Firestore user document deleted');
-    } catch (firestoreError) {
-      console.error('[Auth] Firestore deletion error (continuing):', firestoreError.message);
-      // Continue with auth deletion even if Firestore fails
-    }
+    await apiFetch('/v1/me', { method: 'DELETE' });
+    console.log('[Auth] Account deleted');
 
-    // Delete Firebase Auth account
-    await firebaseDeleteUser(user);
-    console.log('[Auth] Firebase Auth account deleted');
-
-    // Clear all local data
-    deleteAuthCookie();
+    forgetSession();
     storeUserData(null);
     localStorage.removeItem('awsStudyGuest');
-    localStorage.removeItem('awsStudyUser');
 
     return { success: true };
   } catch (error) {
-    console.error('[Auth] Delete account error:', error.code, error.message);
-
-    let errorMessage = 'Failed to delete account';
-    if (error.code === 'auth/requires-recent-login') {
-      errorMessage = 'Please sign out and sign back in, then try again';
-    }
-
-    return { success: false, error: errorMessage };
+    console.error('[Auth] Delete account error:', error.message);
+    return { success: false, error: 'Failed to delete account' };
   }
 };
-
-export { auth, db, getAuthCookie, getStoredUserData };

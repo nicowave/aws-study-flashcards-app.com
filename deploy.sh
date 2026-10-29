@@ -69,8 +69,8 @@ deploy_hub() {
     cd "$site_path"
     print_info "Working in: $site_path"
 
-    # Guard: an untracked .env is required — building without it bakes undefined
-    # Firebase config into the bundle (auth/invalid-api-key on load)
+    # Guard: an untracked .env is required — building without it ships with
+    # billing switched off and no price labels
     if [ ! -f .env ]; then
         print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
         cd "$SCRIPT_DIR"
@@ -95,6 +95,7 @@ deploy_hub() {
     aws s3 sync dist/ "s3://${bucket}/" \
         --delete \
         --exclude "index.html" \
+        --exclude "next/*" \
         --cache-control "max-age=31536000,public"
     
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
@@ -130,8 +131,8 @@ deploy_cloud() {
     cd "$site_path"
     print_info "Working in: $site_path"
 
-    # Guard: an untracked .env is required — building without it bakes undefined
-    # Firebase config into the bundle (auth/invalid-api-key on load)
+    # Guard: an untracked .env is required — building without it ships with
+    # billing switched off and no price labels
     if [ ! -f .env ]; then
         print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
         cd "$SCRIPT_DIR"
@@ -156,6 +157,7 @@ deploy_cloud() {
     aws s3 sync dist/ "s3://${bucket}/" \
         --delete \
         --exclude "index.html" \
+        --exclude "next/*" \
         --cache-control "max-age=31536000,public"
     
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
@@ -191,8 +193,8 @@ deploy_ai() {
     cd "$site_path"
     print_info "Working in: $site_path"
 
-    # Guard: an untracked .env is required — building without it bakes undefined
-    # Firebase config into the bundle (auth/invalid-api-key on load)
+    # Guard: an untracked .env is required — building without it ships with
+    # billing switched off and no price labels
     if [ ! -f .env ]; then
         print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
         cd "$SCRIPT_DIR"
@@ -217,6 +219,7 @@ deploy_ai() {
     aws s3 sync dist/ "s3://${bucket}/" \
         --delete \
         --exclude "index.html" \
+        --exclude "next/*" \
         --cache-control "max-age=31536000,public"
     
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
@@ -252,8 +255,8 @@ deploy_saa() {
     cd "$site_path"
     print_info "Working in: $site_path"
 
-    # Guard: an untracked .env is required — building without it bakes undefined
-    # Firebase config into the bundle (auth/invalid-api-key on load)
+    # Guard: an untracked .env is required — building without it ships with
+    # billing switched off and no price labels
     if [ ! -f .env ]; then
         print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
         cd "$SCRIPT_DIR"
@@ -278,6 +281,7 @@ deploy_saa() {
     aws s3 sync dist/ "s3://${bucket}/" \
         --delete \
         --exclude "index.html" \
+        --exclude "next/*" \
         --cache-control "max-age=31536000,public"
 
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
@@ -313,8 +317,8 @@ deploy_dva() {
     cd "$site_path"
     print_info "Working in: $site_path"
 
-    # Guard: an untracked .env is required — building without it bakes undefined
-    # Firebase config into the bundle (auth/invalid-api-key on load)
+    # Guard: an untracked .env is required — building without it ships with
+    # billing switched off and no price labels
     if [ ! -f .env ]; then
         print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
         cd "$SCRIPT_DIR"
@@ -339,6 +343,7 @@ deploy_dva() {
     aws s3 sync dist/ "s3://${bucket}/" \
         --delete \
         --exclude "index.html" \
+        --exclude "next/*" \
         --cache-control "max-age=31536000,public"
 
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
@@ -386,6 +391,42 @@ deploy_tutorials() {
     print_success "CloudFront invalidation created"
     print_success "${site_name} deployed!"
     echo "  📚 https://tutorials.aws-study-flashcards-app.com"
+}
+
+# Hidden test builds at <site>/next/ (sign-in switch, migration step 2).
+# Built with base /next/ into dist-next/; normal deploys leave next/ alone.
+deploy_next() {
+    print_header "Deploying hidden test versions (/next/)"
+    local failed=0
+    local entry folder bucket dist_id
+    for entry in \
+        "aws-study-homepage aws-study-flashcards-app-home E3D126UT3L72OL aws-study-flashcards-app.com" \
+        "aws-cloud-practitioner-game cloud.aws-study-flashcards-app.com E6NUXKK8FTCR1 cloud.aws-study-flashcards-app.com" \
+        "aws-ai-study-game ai.aws-study-flashcards-app.com E23TPCWLVKFC65 ai.aws-study-flashcards-app.com" \
+        "aws-saa-study-game saa.aws-study-flashcards-app.com EBOXWN6EUZHKF architect.aws-study-flashcards-app.com" \
+        "aws-dva-study-game dva.aws-study-flashcards-app.com E2UB744W5YUCTW developer.aws-study-flashcards-app.com"; do
+        local parts=(${=entry})
+        folder=${parts[1]}; bucket=${parts[2]}; dist_id=${parts[3]}
+        print_step "${folder} -> https://${parts[4]}/next/"
+        cd "${SCRIPT_DIR}/${folder}" || { ((failed++)); continue; }
+        if [ ! -f .env ]; then
+            print_error ".env missing in $folder — skipping"
+            ((failed++)); cd "$SCRIPT_DIR"; continue
+        fi
+        [ -d node_modules ] || npm install
+        if npx vite build --base=/next/ --outDir dist-next --emptyOutDir > /dev/null; then
+            aws s3 sync dist-next/ "s3://${bucket}/next/" --delete --exclude "index.html" \
+                --cache-control "max-age=31536000,public" > /dev/null
+            aws s3 cp dist-next/index.html "s3://${bucket}/next/index.html" \
+                --cache-control "no-cache,no-store,must-revalidate" > /dev/null
+            aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/next/*" > /dev/null
+            print_success "${parts[4]}/next/"
+        else
+            print_error "Build failed: $folder"; ((failed++))
+        fi
+        cd "$SCRIPT_DIR"
+    done
+    [ $failed -eq 0 ] && print_success "All 5 test versions deployed" || print_error "$failed failed"
 }
 
 deploy_all() {
@@ -461,8 +502,11 @@ case "${1:-}" in
     tutorials|tuts)
         deploy_tutorials
         ;;
+    next)
+        deploy_next
+        ;;
     -h|--help)
-        echo "Usage: $0 [all|hub|cloud|ai|saa|dva|tutorials]"
+        echo "Usage: $0 [all|hub|cloud|ai|saa|dva|tutorials|next]"
         echo ""
         echo "Options:"
         echo "  all    Deploy all six sites"
@@ -472,6 +516,7 @@ case "${1:-}" in
         echo "  saa    Deploy Solutions Architect Study Game only"
         echo "  dva    Deploy Developer Associate Study Game only"
         echo "  tutorials  Deploy Tutorials site only (static, no build)"
+        echo "  next   Deploy hidden test versions of the 5 apps at /next/"
         echo ""
         ;;
     "")

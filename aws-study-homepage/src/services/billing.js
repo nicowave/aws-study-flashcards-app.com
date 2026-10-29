@@ -1,10 +1,9 @@
-// Billing service — thin client over the Stripe Cloud Functions.
+// Billing service — thin client over the Stripe payment functions (AWS Lambda).
 // Enabled via VITE_BILLING_ENABLED=true once Stripe products/prices exist
-// (see docs/stripe-setup.md). Entitlements are read from Firebase custom
+// (see docs/stripe-setup.md). Entitlements are read from the sign-in token's
 // claims, which the server sets from Stripe webhooks — never from
 // client-writable state.
-import { httpsCallableFromURL } from 'firebase/functions';
-import { functions, auth, CALLABLE_BASE_URL } from '../config/firebase.config';
+import { getTokens, decodeJwt, callFunction } from './awsAuth';
 
 export const BILLING_ENABLED = import.meta.env.VITE_BILLING_ENABLED === 'true';
 
@@ -17,11 +16,10 @@ export const PRO_PRICE_LABEL = import.meta.env.VITE_PRO_PRICE_LABEL || '';
  * freshly-set claims.
  */
 export const getPlan = async ({ forceRefresh = false } = {}) => {
-  const user = auth.currentUser;
-  if (!user) return null;
   try {
-    const { claims } = await user.getIdTokenResult(forceRefresh);
-    return claims.plan || null;
+    const tokens = await getTokens({ forceRefresh });
+    if (!tokens) return null;
+    return decodeJwt(tokens.idToken).plan || null;
   } catch (err) {
     console.warn('[billing] Failed to read plan claim:', err.message);
     return null;
@@ -30,8 +28,7 @@ export const getPlan = async ({ forceRefresh = false } = {}) => {
 
 /** Starts Stripe Checkout for the given plan and redirects the browser. */
 export const startCheckout = async (plan = 'all-access') => {
-  const call = httpsCallableFromURL(functions, `${CALLABLE_BASE_URL}/createCheckoutSession`);
-  const { data } = await call({ plan });
+  const { data } = await callFunction('createCheckoutSession', { plan });
   if (data?.url) {
     window.location.assign(data.url);
   } else {
@@ -41,8 +38,7 @@ export const startCheckout = async (plan = 'all-access') => {
 
 /** Opens the Stripe customer portal (manage / cancel / invoices). */
 export const openBillingPortal = async () => {
-  const call = httpsCallableFromURL(functions, `${CALLABLE_BASE_URL}/createPortalSession`);
-  const { data } = await call();
+  const { data } = await callFunction('createPortalSession');
   if (data?.url) {
     window.location.assign(data.url);
   } else {
