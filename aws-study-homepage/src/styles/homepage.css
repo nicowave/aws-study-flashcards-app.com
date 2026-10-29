@@ -2044,7 +2044,7 @@
 
 .plans-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 24px;
   margin-top: 48px;
   align-items: stretch;
@@ -2131,6 +2131,7 @@
 }
 
 .plan-cta {
+  flex: 0 0 auto;
   justify-content: center;
 }
 
@@ -2154,4 +2155,33 @@
 .footer-legal-links a:hover {
   color: var(--text-primary);
   text-decoration: underline;
+}
+
+.plan-price-range {
+  font-size: 26px;
+}
+
+.plans-fine-print {
+  max-width: 720px;
+  margin: 28px auto 0;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.plans-fine-print a {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
+.cert-price {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.cert-price strong {
+  margin-left: 4px;
+  color: var(--text-primary);
 }

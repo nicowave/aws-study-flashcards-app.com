@@ -1,5 +1,6 @@
 import React from 'react';
 import { LockIcon } from './Icons';
+import { BILLING_ENABLED, CERT_PRICE_LABEL } from '../services/billing';
 import './GuestPrompts.css';
 
 // Slim banner shown at the top of every screen while in guest mode.
@@ -20,15 +21,26 @@ export const GuestUpsell = ({ feature, bullets, onSignUp, onBack }) => (
     <div className="guest-upsell-lock">
       <LockIcon size={40} />
     </div>
-    <h2>{feature} is free with an account</h2>
+    <h2>{BILLING_ENABLED ? `Unlock ${feature}` : `${feature} is free with an account`}</h2>
     <ul className="guest-upsell-bullets">
       {bullets.map((b, i) => (
         <li key={i}>{b}</li>
       ))}
     </ul>
     <p className="guest-upsell-note">
-      Creating an account is free — no card, no catch. Your guest progress
-      carries over automatically.
+      {BILLING_ENABLED ? (
+        <>
+          Start with a free account — no card needed, and your guest progress carries
+          over automatically. It includes every flashcard deck and your first full quiz.
+          The exam simulator and every quiz domain come with this certification&apos;s
+          one-time unlock ({CERT_PRICE_LABEL}).
+        </>
+      ) : (
+        <>
+          Creating an account is free — no card, no catch. Your guest progress
+          carries over automatically.
+        </>
+      )}
     </p>
     <div className="guest-upsell-actions">
       <button className="guest-upsell-primary" onClick={onSignUp}>
