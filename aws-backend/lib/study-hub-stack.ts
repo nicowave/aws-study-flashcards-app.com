@@ -127,13 +127,33 @@ export class StudyHubBackendStack extends cdk.Stack {
       target: route53.RecordTarget.fromAlias(new route53Targets.UserPoolDomainTarget(authDomain)),
     });
 
-    // SPA client: no secret, SRP + hosted-UI code flow.
-    // Google federation is added in Phase 2 (needs a Google OAuth client
-    // secret, which is created in the Google console and stored by the
-    // account owner — see README).
+    // "Sign in with Google". The OAuth client lives in Google Cloud (project
+    // aws-study-hub); scripts/google-signin-to-aws.sh stores its ID and secret
+    // in "study-hub/google-oauth". CloudFormation resolves both at deploy time.
+    const googleSecretId = 'study-hub/google-oauth';
+    const googleProvider = new cognito.UserPoolIdentityProviderGoogle(this, 'GoogleProvider', {
+      userPool,
+      clientId: cdk.SecretValue.secretsManager(googleSecretId, { jsonField: 'clientId' }).unsafeUnwrap(),
+      clientSecretValue: cdk.SecretValue.secretsManager(googleSecretId, { jsonField: 'clientSecret' }),
+      scopes: ['openid', 'email', 'profile'],
+      attributeMapping: {
+        email: cognito.ProviderAttribute.GOOGLE_EMAIL,
+        emailVerified: cognito.ProviderAttribute.GOOGLE_EMAIL_VERIFIED,
+        fullname: cognito.ProviderAttribute.GOOGLE_NAME,
+        givenName: cognito.ProviderAttribute.GOOGLE_GIVEN_NAME,
+        familyName: cognito.ProviderAttribute.GOOGLE_FAMILY_NAME,
+        profilePicture: cognito.ProviderAttribute.GOOGLE_PICTURE,
+      },
+    });
+
+    // SPA client: no secret, SRP + hosted-UI code flow, email/password or Google.
     const webClient = userPool.addClient('WebClient', {
       authFlows: { userSrp: true },
       preventUserExistenceErrors: true,
+      supportedIdentityProviders: [
+        cognito.UserPoolClientIdentityProvider.COGNITO,
+        cognito.UserPoolClientIdentityProvider.GOOGLE,
+      ],
       oAuth: {
         flows: { authorizationCodeGrant: true },
         scopes: [cognito.OAuthScope.EMAIL, cognito.OAuthScope.OPENID, cognito.OAuthScope.PROFILE],
@@ -144,6 +164,7 @@ export class StudyHubBackendStack extends cdk.Stack {
       idTokenValidity: cdk.Duration.hours(1),
       refreshTokenValidity: cdk.Duration.days(30),
     });
+    webClient.node.addDependency(googleProvider);
 
     // -----------------------------------------------------------------
     // HTTP API + Lambda skeleton
