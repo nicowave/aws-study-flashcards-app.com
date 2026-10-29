@@ -26,12 +26,13 @@ const SITE_ORIGINS = [
   'http://localhost:5175',
 ];
 
-// Stripe price IDs aren't secret. They live in the (untracked) functions/.env
-// so the Firebase and AWS deployments read the same values.
+// Stripe price IDs aren't secret, but they live in the untracked
+// aws-backend/.env (STRIPE_PRICE_*=price_...). Refuse to deploy without them:
+// empty prices would switch checkout off.
 function loadPriceEnv(): Record<string, string> {
-  const envPath = path.join(__dirname, '../../functions/.env');
+  const envPath = path.join(__dirname, '../.env');
+  if (!fs.existsSync(envPath)) throw new Error(`Missing ${envPath} (STRIPE_PRICE_* lines; copy it from the main checkout)`);
   const out: Record<string, string> = {};
-  if (!fs.existsSync(envPath)) return out;
   for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
     const m = line.match(/^(STRIPE_PRICE_[A-Z_]+)=(.*)$/);
     if (m) out[m[1]] = m[2].trim();
@@ -39,17 +40,8 @@ function loadPriceEnv(): Record<string, string> {
   return out;
 }
 
-// The Firebase web API key (public; it ships in every app bundle) lets the
-// user-migration trigger check old passwords. Read from the hub's untracked .env.
-function loadFirebaseApiKey(): string {
-  const envPath = path.join(__dirname, '../../aws-study-homepage/.env');
-  if (!fs.existsSync(envPath)) throw new Error(`Missing ${envPath} (needed for VITE_FIREBASE_API_KEY)`);
-  const m = fs.readFileSync(envPath, 'utf8').match(/^VITE_FIREBASE_API_KEY=(.+)$/m);
-  if (!m) throw new Error('VITE_FIREBASE_API_KEY not found in aws-study-homepage/.env');
-  return m[1].trim();
-}
 
-// Hidden test builds of each app live at /next/ until sign-in switches over.
+// Hidden test builds of each app live at /next/ (./deploy.sh next).
 const TEST_PATH = '/next/';
 
 export class StudyHubBackendStack extends cdk.Stack {
@@ -86,14 +78,13 @@ export class StudyHubBackendStack extends cdk.Stack {
     });
     table.grantReadWriteData(preTokenFn); // writes EMAIL#<email> links
 
-    // User-migration + pre-sign-up Lambda — moves Firebase password accounts on
-    // first sign-in (old password checked against Firebase until that project
-    // is deleted) or on password reset, and guards their emails until then
+    // User-migration + pre-sign-up Lambda — moves old Firebase password
+    // accounts on password reset, and guards their emails until then
     const migrateUserFn = new lambda.Function(this, 'MigrateUserFn', {
       runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/migrate-user')),
-      environment: { FIREBASE_API_KEY: loadFirebaseApiKey(), TABLE_NAME: table.tableName },
+      environment: { TABLE_NAME: table.tableName },
       timeout: cdk.Duration.seconds(10),
       memorySize: 128,
     });
