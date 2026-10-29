@@ -230,6 +230,18 @@ export const signUp = (email, password, displayName) =>
 export const resendSignUpLink = (email) =>
   idp('ResendConfirmationCode', { ClientId: COGNITO_CLIENT_ID, Username: normalizeEmail(email) });
 
+/** Emails a reset code. Cognito answers the same way when the email is unknown. */
+export const requestPasswordReset = (email) =>
+  idp('ForgotPassword', { ClientId: COGNITO_CLIENT_ID, Username: normalizeEmail(email) });
+
+export const confirmPasswordReset = (email, code, newPassword) =>
+  idp('ConfirmForgotPassword', {
+    ClientId: COGNITO_CLIENT_ID,
+    Username: normalizeEmail(email),
+    ConfirmationCode: String(code).trim(),
+    Password: newPassword,
+  });
+
 export const changeAccountPassword = async (previousPassword, proposedPassword) => {
   const t = await getTokens();
   if (!t) throw Object.assign(new Error('No user signed in'), { code: 'NotSignedIn' });

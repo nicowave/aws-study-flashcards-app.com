@@ -11,7 +11,6 @@
     "@aws-sdk/client-secrets-manager": "^3.1156.0",
     "@aws-sdk/lib-dynamodb": "^3.1159.0",
     "aws-jwt-verify": "^5.2.1",
-    "firebase-admin": "^13.0.0",
     "stripe": "^18.0.0"
   }
 }

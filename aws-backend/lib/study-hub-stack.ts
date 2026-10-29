@@ -87,7 +87,8 @@ export class StudyHubBackendStack extends cdk.Stack {
     table.grantReadWriteData(preTokenFn); // writes EMAIL#<email> links
 
     // User-migration + pre-sign-up Lambda — moves Firebase password accounts on
-    // first sign-in, and guards their emails until then
+    // first sign-in (old password checked against Firebase until that project
+    // is deleted) or on password reset, and guards their emails until then
     const migrateUserFn = new lambda.Function(this, 'MigrateUserFn', {
       runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'index.handler',
@@ -228,7 +229,7 @@ export class StudyHubBackendStack extends cdk.Stack {
           apigwv2.CorsHttpMethod.POST,
           apigwv2.CorsHttpMethod.OPTIONS,
         ],
-        allowHeaders: ['Authorization', 'Content-Type', 'X-Firebase-AppCheck', 'Firebase-Instance-ID-Token'],
+        allowHeaders: ['Authorization', 'Content-Type'],
         maxAge: cdk.Duration.hours(1),
       },
     });
@@ -254,11 +255,10 @@ export class StudyHubBackendStack extends cdk.Stack {
     }
 
     // -----------------------------------------------------------------
-    // Payments + cross-site sign-in (migration step 1). Called by the apps
-    // with Firebase's httpsCallableFromURL(); still verifies Firebase ID
-    // tokens and mirrors purchases into Firebase until sign-in moves.
-    // Secret "study-hub/billing" = { stripeApiKey, stripeWebhookSecret,
-    // firebaseServiceAccount } — populated by the owner, never in git.
+    // Payments (Stripe checkout, billing portal, webhook). The apps send their
+    // Cognito ID token; purchases and entitlements are stored in the table.
+    // Secret "study-hub/billing" = { stripeApiKey, stripeWebhookSecret },
+    // populated by the owner, never in git.
     // -----------------------------------------------------------------
     const billingSecret = secretsmanager.Secret.fromSecretNameV2(this, 'BillingSecret', 'study-hub/billing');
     const callablesFn = new lambda.Function(this, 'CallablesFn', {

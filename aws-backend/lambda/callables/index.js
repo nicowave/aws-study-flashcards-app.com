@@ -1,17 +1,13 @@
-// Payment + cross-site sign-in functions, moved from Firebase Cloud Functions
-// to AWS Lambda (migration step 1). Step 2 moves sign-in to Cognito: callers
-// may send a Cognito ID token (new apps) or a Firebase ID token (old apps).
-// Purchases and entitlements live in DynamoDB; until the old apps are retired
-// they are also mirrored into Firestore + Firebase custom claims for any user
-// who has a Firebase account.
+// Payment functions (Stripe checkout, billing portal, webhook) on AWS Lambda.
+// Callers sign in with Cognito and send their ID token. Purchases and
+// entitlements live in DynamoDB; the pre-token Lambda turns ENTITLEMENTS into
+// the plan/certs claims the apps read.
 //
-// Routes under /callable/{name} speak the Firebase callable protocol:
+// Routes under /callable/{name} keep the request shape of the old Firebase
+// callable functions, so the apps' callFunction() stayed the same:
 //   request  POST {"data": ...}  (+ "Authorization: Bearer <ID token>")
 //   success  200  {"result": ...}
 //   failure  4xx/5xx {"error": {"status": "UNAUTHENTICATED", "message": "..."}}
-const { initializeApp, cert, getApps } = require("firebase-admin/app");
-const { getAuth } = require("firebase-admin/auth");
-const { getFirestore, Timestamp } = require("firebase-admin/firestore");
 const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
@@ -26,7 +22,6 @@ const cognitoVerifier = CognitoJwtVerifier.create({
   clientId: process.env.USER_POOL_CLIENT_ID,
   tokenUse: "id",
 });
-const COGNITO_ISSUER = `https://cognito-idp.${process.env.AWS_REGION || "us-east-1"}.amazonaws.com/${process.env.USER_POOL_ID}`;
 
 const SITE_URL = "https://aws-study-flashcards-app.com";
 const ALLOWED_ORIGINS = [
@@ -57,9 +52,8 @@ const planForPrice = (priceId) => {
 const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 
 // ---------------------------------------------------------------------------
-// Secrets: one Secrets Manager entry holding the Stripe key, the Stripe
-// webhook signing secret, and the Firebase service account (JSON object).
-// Loaded once per cold start.
+// Secrets: one Secrets Manager entry holding the Stripe key and the Stripe
+// webhook signing secret. Loaded once per cold start.
 // ---------------------------------------------------------------------------
 let secretsPromise = null;
 const loadSecrets = () => {
@@ -79,13 +73,6 @@ const loadSecrets = () => {
 let stripeClient = null;
 const init = async () => {
   const secrets = await loadSecrets();
-  if (!getApps().length) {
-    const sa =
-      typeof secrets.firebaseServiceAccount === "string"
-        ? JSON.parse(secrets.firebaseServiceAccount)
-        : secrets.firebaseServiceAccount;
-    initializeApp({ credential: cert(sa), projectId: sa.project_id });
-  }
   if (!stripeClient) stripeClient = require("stripe")(secrets.stripeApiKey);
   return { stripe: stripeClient, webhookSecret: secrets.stripeWebhookSecret };
 };
@@ -116,26 +103,14 @@ const json = (statusCode, body) => ({
 const rawBody = (event) =>
   event.isBase64Encoded ? Buffer.from(event.body || "", "base64") : Buffer.from(event.body || "", "utf8");
 
-const issuerOf = (jwt) => {
-  try {
-    return JSON.parse(Buffer.from(jwt.split(".")[1], "base64url").toString("utf8")).iss || null;
-  } catch {
-    return null;
-  }
-};
-
-/** Verified { uid, email } from the Authorization header (Cognito or Firebase), or null. */
+/** Verified { uid, email } from the Authorization header, or null. */
 const authFromHeader = async (event) => {
   const header = event.headers?.authorization || event.headers?.Authorization || "";
   const match = header.match(/^Bearer (.+)$/);
   if (!match) return null;
   try {
-    if (issuerOf(match[1]) === COGNITO_ISSUER) {
-      const payload = await cognitoVerifier.verify(match[1]);
-      return { uid: payload.uid || payload.sub, email: payload.email || null };
-    }
-    const decoded = await getAuth().verifyIdToken(match[1]);
-    return { uid: decoded.uid, email: decoded.email || null };
+    const payload = await cognitoVerifier.verify(match[1]);
+    return { uid: payload.uid || payload.sub, email: payload.email || null };
   } catch {
     throw new CallableError("UNAUTHENTICATED", "Invalid or expired sign-in");
   }
@@ -144,26 +119,12 @@ const authFromHeader = async (event) => {
 // ---------------------------------------------------------------------------
 // Billing records. DynamoDB (PK = USER#<uid>): BILLING { stripeCustomerId },
 // PURCHASE#<plan>, ENTITLEMENTS; STRIPE#<customerId>/UID maps back to the uid.
-// Firestore users/{uid} is read as a fallback and kept in sync while the old
-// apps are live, but only for uids that exist in Firebase.
 // ---------------------------------------------------------------------------
-const firebaseUserExists = async (uid) => {
-  try {
-    await getAuth().getUser(uid);
-    return true;
-  } catch (err) {
-    if (err.code === "auth/user-not-found") return false;
-    throw err;
-  }
-};
-
 const getItem = async (PK, SK) => (await ddb.send(new GetCommand({ TableName: TABLE_NAME, Key: { PK, SK } }))).Item;
 
 async function getCustomerId(uid) {
   const billing = await getItem(`USER#${uid}`, "BILLING");
-  if (billing?.stripeCustomerId) return billing.stripeCustomerId;
-  if (!(await firebaseUserExists(uid))) return null;
-  return (await getFirestore().doc(`users/${uid}`).get()).get("stripeCustomerId") || null;
+  return billing?.stripeCustomerId || null;
 }
 
 async function saveCustomerId(uid, customerId) {
@@ -172,9 +133,6 @@ async function saveCustomerId(uid, customerId) {
     new PutCommand({ TableName: TABLE_NAME, Item: { PK: `USER#${uid}`, SK: "BILLING", stripeCustomerId: customerId, updatedAt: now } })
   );
   await ddb.send(new PutCommand({ TableName: TABLE_NAME, Item: { PK: `STRIPE#${customerId}`, SK: "UID", uid } }));
-  if (await firebaseUserExists(uid)) {
-    await getFirestore().doc(`users/${uid}`).set({ stripeCustomerId: customerId }, { merge: true });
-  }
 }
 
 async function recordPurchase(uid, plan, session) {
@@ -191,17 +149,9 @@ async function recordPurchase(uid, plan, session) {
       },
     })
   );
-  if (await firebaseUserExists(uid)) {
-    await getFirestore()
-      .doc(`users/${uid}`)
-      .set(
-        { purchases: { [plan]: { sessionId: session.id, amountTotal: session.amount_total ?? null, purchasedAt: Timestamp.now() } } },
-        { merge: true }
-      );
-  }
 }
 
-async function purchasedPlans(uid, inFirebase) {
+async function purchasedPlans(uid) {
   const plans = new Set();
   const result = await ddb.send(
     new QueryCommand({
@@ -211,43 +161,12 @@ async function purchasedPlans(uid, inFirebase) {
     })
   );
   for (const item of result.Items || []) plans.add(item.plan);
-  if (inFirebase) {
-    const purchases = (await getFirestore().doc(`users/${uid}`).get()).get("purchases") || {};
-    for (const plan of Object.keys(purchases)) plans.add(plan);
-  }
   return plans;
 }
 
 // ---------------------------------------------------------------------------
-// exchangeToken — cross-subdomain sign-in: Firebase ID token -> custom token
-// carrying the user's custom claims (entitlements).
-// ---------------------------------------------------------------------------
-async function exchangeToken(data) {
-  const idToken = data?.idToken;
-  if (!idToken || typeof idToken !== "string") {
-    throw new CallableError("INVALID_ARGUMENT", "ID token is required");
-  }
-  let decoded;
-  try {
-    decoded = await getAuth().verifyIdToken(idToken);
-  } catch (error) {
-    if (error.code === "auth/id-token-expired") throw new CallableError("UNAUTHENTICATED", "Token expired");
-    if (error.code === "auth/id-token-revoked") throw new CallableError("UNAUTHENTICATED", "Token revoked");
-    if (error.code === "auth/argument-error") throw new CallableError("INVALID_ARGUMENT", "Invalid token format");
-    throw error;
-  }
-  if (!decoded.email_verified && decoded.provider_id !== "anonymous") {
-    throw new CallableError("PERMISSION_DENIED", "Email must be verified before cross-domain login");
-  }
-  const userRecord = await getAuth().getUser(decoded.uid);
-  const customToken = await getAuth().createCustomToken(decoded.uid, userRecord.customClaims || {});
-  return { customToken };
-}
-
-// ---------------------------------------------------------------------------
 // Entitlements: Stripe subscriptions (all-access) + recorded one-time cert
-// purchases -> Firestore display summary + Firebase custom claims.
-//   claims: { plan: 'pro' } and/or { certs: 'cert-a,cert-b' }
+// purchases -> DynamoDB ENTITLEMENTS (read by the pre-token Lambda).
 // ---------------------------------------------------------------------------
 async function syncCustomerEntitlements(stripe, uid, customerId) {
   const subs = customerId
@@ -258,8 +177,7 @@ async function syncCustomerEntitlements(stripe, uid, customerId) {
   const certs = new Set();
   const active = [];
 
-  const inFirebase = await firebaseUserExists(uid);
-  for (const plan of await purchasedPlans(uid, inFirebase)) {
+  for (const plan of await purchasedPlans(uid)) {
     if (plan === "all-access") allAccess = true;
     else certs.add(plan);
   }
@@ -295,46 +213,12 @@ async function syncCustomerEntitlements(stripe, uid, customerId) {
     })
   );
   console.log(`[billing] Synced uid=${uid} allAccess=${allAccess} certs=${[...certs].join(",") || "none"}`);
-  if (!inFirebase) return;
-
-  // Mirror for the old Firebase apps
-  const firestoreActive = active.map((a) => ({
-    ...a,
-    currentPeriodEnd: a.currentPeriodEnd ? Timestamp.fromDate(new Date(a.currentPeriodEnd)) : null,
-  }));
-  await getFirestore().doc(`users/${uid}`).set(
-    {
-      subscription: {
-        provider: "stripe",
-        allAccess,
-        certs: [...certs],
-        active: firestoreActive,
-        updatedAt: Timestamp.now(),
-      },
-    },
-    { merge: true }
-  );
-
-  const auth = getAuth();
-  const userRecord = await auth.getUser(uid);
-  const claims = { ...(userRecord.customClaims || {}) };
-  if (allAccess) claims.plan = "pro";
-  else delete claims.plan;
-  if (certs.size > 0) claims.certs = [...certs].join(",");
-  else delete claims.certs;
-  await auth.setCustomUserClaims(uid, claims);
 }
 
 async function uidForSubscription(subscription) {
   if (subscription.metadata?.firebaseUID) return subscription.metadata.firebaseUID;
   const mapped = await getItem(`STRIPE#${subscription.customer}`, "UID");
-  if (mapped?.uid) return mapped.uid;
-  const snap = await getFirestore()
-    .collection("users")
-    .where("stripeCustomerId", "==", subscription.customer)
-    .limit(1)
-    .get();
-  return snap.empty ? null : snap.docs[0].id;
+  return mapped?.uid || null;
 }
 
 /** False when Stripe has no such customer (or it was deleted). */
@@ -476,7 +360,7 @@ async function stripeWebhook(event) {
 // ---------------------------------------------------------------------------
 // Router (API Gateway HTTP API, payload format 2.0)
 // ---------------------------------------------------------------------------
-const CALLABLES = { exchangeToken, createCheckoutSession, createPortalSession };
+const CALLABLES = { createCheckoutSession, createPortalSession };
 
 exports.handler = async (event) => {
   const path = event.rawPath || "";
@@ -494,7 +378,7 @@ exports.handler = async (event) => {
     } catch {
       throw new CallableError("INVALID_ARGUMENT", "Request body must be JSON");
     }
-    const user = name === "exchangeToken" ? null : await authFromHeader(event);
+    const user = await authFromHeader(event);
     const result = await fn(payload.data, user, stripe);
     return json(200, { result });
   } catch (err) {
