@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { MailIcon, KeyIcon, UserIcon } from './Icons';
+import ForgotPassword from './ForgotPassword';
 import './AuthScreen.css';
 
 // Eye icons for password visibility
@@ -31,6 +32,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
   const [formError, setFormError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showReset, setShowReset] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -117,6 +119,19 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
   };
 
   const displayError = formError || error;
+
+  if (showReset) {
+    return (
+      <div className="auth-screen">
+        <div className="auth-container">
+          <ForgotPassword
+            initialEmail={formData.email}
+            onBack={() => { setShowReset(false); if (error) clearError(); }}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-screen">
@@ -221,6 +236,16 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
                 {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
               </button>
             </div>
+            {isLogin && (
+              <button
+                type="button"
+                className="forgot-link"
+                onClick={() => { setShowReset(true); setFormError(''); if (error) clearError(); }}
+                disabled={loading}
+              >
+                Forgot password?
+              </button>
+            )}
           </div>
 
           {/* Confirm Password Field (Register only) */}

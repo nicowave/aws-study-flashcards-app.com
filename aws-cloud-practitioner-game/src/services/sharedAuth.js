@@ -5,6 +5,8 @@ import {
   signInWithPassword,
   signUp,
   resendSignUpLink,
+  requestPasswordReset,
+  confirmPasswordReset,
   changeAccountPassword,
   startGoogleSignIn,
   completeGoogleSignIn,
@@ -77,7 +79,7 @@ export const registerUser = async (email, password, displayName = null) => {
     if (error.code === 'UsernameExistsException') {
       errorMessage = 'An account with this email already exists';
     } else if (error.code === 'UserLambdaValidationException' && /ACCOUNT_EXISTS/.test(error.message)) {
-      errorMessage = 'You already have an account with this email. Sign in with your existing password.';
+      errorMessage = 'You already have an account with this email. Sign in with your existing password, or use "Forgot password?" to reset it.';
     } else if (error.code === 'InvalidPasswordException') {
       errorMessage = 'Password must be at least 6 characters';
     } else if (error.code === 'InvalidParameterException') {
@@ -114,11 +116,11 @@ export const loginUser = async (email, password) => {
 
     let errorMessage = 'Incorrect email or password';
     if (error.code === 'NotAuthorizedException') {
-      errorMessage = 'Incorrect email or password. Never verified your email? Create an account with the same address.';
+      errorMessage = 'Incorrect email or password. Forgot it? Use "Forgot password?" below.';
     } else if (tooManyAttempts(error.code)) {
       errorMessage = 'Too many failed attempts. Please try again later.';
     } else if (error.code === 'PasswordResetRequiredException') {
-      errorMessage = 'Your password needs to be reset. Please contact support.';
+      errorMessage = 'Your password needs to be reset. Use "Forgot password?" below.';
     } else if (error instanceof TypeError) {
       errorMessage = 'Network error. Check your connection and try again.';
     }
@@ -170,6 +172,57 @@ export const resendVerificationEmail = async () => {
       return { success: false, error: 'Email is already verified' };
     }
     return { success: false, error: 'Failed to send verification email' };
+  }
+};
+
+/**
+ * Forgot password, step 1: email a reset code
+ */
+export const sendPasswordReset = async (email) => {
+  try {
+    await requestPasswordReset(email);
+    return {
+      success: true,
+      message: 'If an account uses that email, we sent it a code. Nothing after a few minutes? Check spam, or create an account with that email.'
+    };
+  } catch (error) {
+    console.error('[Auth] Password reset request error:', error.code);
+    if (tooManyAttempts(error.code)) {
+      return { success: false, error: 'Too many requests. Please wait a few minutes and try again.' };
+    }
+    if (error.code === 'InvalidParameterException' || error.code === 'NotAuthorizedException') {
+      // Unverified email, or a Google-only account (no password to reset)
+      return { success: false, error: "This account can't reset a password. If you signed up with Google, use Sign in with Google." };
+    }
+    if (error instanceof TypeError) {
+      return { success: false, error: 'Network error. Check your connection and try again.' };
+    }
+    return { success: false, error: 'Could not send a reset code. Please try again.' };
+  }
+};
+
+/**
+ * Forgot password, step 2: code from the email + new password
+ */
+export const resetPassword = async (email, code, newPassword) => {
+  try {
+    await confirmPasswordReset(email, code, newPassword);
+    return { success: true };
+  } catch (error) {
+    console.error('[Auth] Password reset error:', error.code);
+    if (error.code === 'CodeMismatchException') {
+      return { success: false, error: "That code doesn't match. Check the latest email and try again." };
+    }
+    if (error.code === 'ExpiredCodeException') {
+      return { success: false, error: 'That code has expired. Send a new code.' };
+    }
+    if (error.code === 'InvalidPasswordException' || error.code === 'InvalidParameterException') {
+      return { success: false, error: 'Password must be at least 6 characters' };
+    }
+    if (tooManyAttempts(error.code)) {
+      return { success: false, error: 'Too many attempts. Please wait a few minutes and try again.' };
+    }
+    return { success: false, error: 'Could not reset the password. Please try again.' };
   }
 };
 

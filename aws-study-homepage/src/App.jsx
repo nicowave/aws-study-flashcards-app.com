@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { certifications, categories } from './data/certifications';
 import SettingsPage from './components/SettingsPage';
+import ForgotPassword from './components/ForgotPassword';
 import { applyAnalyticsPreference } from './services/analytics';
 import { BILLING_ENABLED, PRO_PRICE_LABEL, getPlan, startCheckout, openBillingPortal } from './services/billing';
 import {
@@ -767,6 +768,7 @@ const LoginModal = ({ onClose }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localError, setLocalError] = useState(null);
+  const [showReset, setShowReset] = useState(false);
 
   const { login, register, googleSignIn, error, clearError } = useAuth();
 
@@ -817,12 +819,13 @@ const LoginModal = ({ onClose }) => {
 
     setIsSubmitting(true);
     try {
+      // Results carry { success, error }; keep the modal open on failure so
+      // the message shows, and after sign-up so "check your email" shows.
       if (mode === 'login') {
-        await login(email, password);
-        onClose(); // Close modal on success
+        const result = await login(email, password);
+        if (result?.success) onClose();
       } else {
         await register(email, password, username);
-        onClose(); // Close modal on success
       }
     } catch (err) {
       setLocalError(err.message);
@@ -855,6 +858,13 @@ const LoginModal = ({ onClose }) => {
       <div className="login-modal" onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>×</button>
 
+        {showReset ? (
+          <ForgotPassword
+            initialEmail={formData.email}
+            onBack={() => { setShowReset(false); if (error) clearError(); }}
+            onSignedIn={onClose}
+          />
+        ) : (<>
         <div className="modal-header">
           <BookIcon size={32} />
           <h2>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
@@ -937,6 +947,16 @@ const LoginModal = ({ onClose }) => {
                 {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
               </button>
             </div>
+            {mode === 'login' && (
+              <button
+                type="button"
+                className="forgot-link"
+                onClick={() => { setShowReset(true); setLocalError(null); if (error) clearError(); }}
+                disabled={isSubmitting}
+              >
+                Forgot password?
+              </button>
+            )}
           </div>
 
           {mode === 'register' && (
@@ -977,6 +997,7 @@ const LoginModal = ({ onClose }) => {
             {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
           </button>
         </div>
+        </>)}
       </div>
     </div>
   );
@@ -1040,10 +1061,11 @@ function HomepageContent() {
 
 // Main App Content - NO AUTH REQUIRED for hub
 function AppContent() {
-  const { loading } = useAuth();
+  const { authChecked } = useAuth();
 
-  // Show loading while Firebase initializes
-  if (loading) {
+  // Loading screen only until the first sign-in check. (Gating on `loading`
+  // also fired during sign-in attempts and unmounted the sign-in modal.)
+  if (!authChecked) {
     return <LoadingScreen />;
   }
 
