@@ -32,6 +32,7 @@ const ALLOWED_ORIGINS = [
   "https://dva.aws-study-flashcards-app.com",
   "https://architect.aws-study-flashcards-app.com",
   "https://developer.aws-study-flashcards-app.com",
+  "https://bash.aws-study-flashcards-app.com",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
@@ -44,6 +45,9 @@ const PLAN_PRICES = {
   "ai-practitioner": process.env.STRIPE_PRICE_AI_PRACTITIONER || "",
   "solutions-architect-associate": process.env.STRIPE_PRICE_SOLUTIONS_ARCHITECT || "",
   "developer-associate": process.env.STRIPE_PRICE_DEVELOPER_ASSOCIATE || "",
+  // Coding courses: one-time, NOT included in all-access (the course sites
+  // check `certs` only)
+  "bash-for-aws": process.env.STRIPE_PRICE_BASH_COURSE || "",
 };
 const planForPrice = (priceId) => {
   const hit = Object.entries(PLAN_PRICES).find(([, p]) => p && p === priceId);

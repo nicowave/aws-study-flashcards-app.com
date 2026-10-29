@@ -59,6 +59,21 @@
         "--strictPort"
       ],
       "port": 5173
+    },
+    {
+      "name": "bash-course",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "aws-coding-courses",
+        "--",
+        "--port",
+        "5173",
+        "--strictPort"
+      ],
+      "port": 5173
     }
   ]
 }

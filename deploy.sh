@@ -4,7 +4,7 @@
 # =============================================================================
 # Deploys the Study Hub Homepage, the certification study games, and Tutorials
 # Run from: ~/dev/sites/aws-study-flashcards.com/
-# Usage: ./deploy.sh [all|hub|cloud|ai|saa|dva|tutorials]
+# Usage: ./deploy.sh [all|hub|cloud|ai|saa|dva|bash|tutorials]
 # =============================================================================
 
 set -e  # Exit on any error
@@ -362,6 +362,52 @@ deploy_dva() {
     echo "  👨‍💻 https://developer.aws-study-flashcards-app.com"
 }
 
+# Coding course sites: one app (aws-coding-courses), built once per course
+# with COURSE=<id> into dist/<id>/. Add python/js/typescript the same way.
+deploy_course() {
+    local course="$1"
+    local bucket="$2"
+    local dist_id="$3"
+    local site_path="${SCRIPT_DIR}/aws-coding-courses"
+
+    print_header "Deploying: ${course} course"
+    cd "$site_path"
+
+    print_step "Checking dependencies..."
+    if [ ! -d "node_modules" ]; then
+        npm install
+    fi
+
+    print_step "Testing the practice shell and every task's answer..."
+    npm test
+    print_success "Tests passed"
+
+    print_step "Building ${course}..."
+    COURSE="$course" npm run build
+    print_success "Build complete"
+
+    print_step "Uploading to S3: s3://${bucket}/"
+    aws s3 sync "dist/${course}/" "s3://${bucket}/" \
+        --delete \
+        --exclude "index.html" \
+        --cache-control "max-age=31536000,public"
+    aws s3 cp "dist/${course}/index.html" "s3://${bucket}/index.html" \
+        --cache-control "no-cache,no-store,must-revalidate"
+    print_success "Files uploaded to S3"
+
+    print_step "Invalidating CloudFront cache..."
+    aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/*" > /dev/null
+    print_success "CloudFront invalidation created"
+
+    cd "$SCRIPT_DIR"
+    print_success "${course} course deployed!"
+    echo "  💲 https://${bucket}"
+}
+
+deploy_bash() {
+    deploy_course bash "bash.aws-study-flashcards-app.com" "EYR8XH2CLI1DT"
+}
+
 deploy_tutorials() {
     local site_name="Tutorials (Cognito-gated, static)"
     local site_path="${HOME}/dev/aws/tutorials-site/site"
@@ -445,6 +491,8 @@ deploy_all() {
     echo ""
     deploy_dva || ((failed++))
     echo ""
+    deploy_bash || ((failed++))
+    echo ""
     deploy_tutorials || ((failed++))
 
     local end_time=$(date +%s)
@@ -453,7 +501,7 @@ deploy_all() {
     print_header "Deployment Complete!"
     echo ""
     if [ $failed -eq 0 ]; then
-        print_success "All 6 sites deployed successfully in ${duration} seconds"
+        print_success "All 7 sites deployed successfully in ${duration} seconds"
     else
         print_error "$failed deployment(s) failed"
     fi
@@ -463,6 +511,7 @@ deploy_all() {
     echo "  🤖 AI:    https://ai.aws-study-flashcards-app.com"
     echo "  🏗️  Architect: https://architect.aws-study-flashcards-app.com"
     echo "  👨‍💻 Developer: https://developer.aws-study-flashcards-app.com"
+    echo "  💲 Bash:  https://bash.aws-study-flashcards-app.com"
     echo "  📚 Tuts:  https://tutorials.aws-study-flashcards-app.com"
     echo ""
     print_info "CloudFront invalidations may take 1-2 minutes to propagate"
@@ -499,6 +548,9 @@ case "${1:-}" in
     dva)
         deploy_dva
         ;;
+    bash)
+        deploy_bash
+        ;;
     tutorials|tuts)
         deploy_tutorials
         ;;
@@ -506,15 +558,16 @@ case "${1:-}" in
         deploy_next
         ;;
     -h|--help)
-        echo "Usage: $0 [all|hub|cloud|ai|saa|dva|tutorials|next]"
+        echo "Usage: $0 [all|hub|cloud|ai|saa|dva|bash|tutorials|next]"
         echo ""
         echo "Options:"
-        echo "  all    Deploy all six sites"
+        echo "  all    Deploy all seven sites"
         echo "  hub    Deploy Study Hub Homepage only"
         echo "  cloud  Deploy Cloud Practitioner Game only"
         echo "  ai     Deploy AI Study Game only"
         echo "  saa    Deploy Solutions Architect Study Game only"
         echo "  dva    Deploy Developer Associate Study Game only"
+        echo "  bash   Deploy the Bash for AWS course site only"
         echo "  tutorials  Deploy Tutorials site only (static, no build)"
         echo "  next   Deploy hidden test versions of the 5 apps at /next/"
         echo ""
@@ -531,8 +584,9 @@ case "${1:-}" in
         echo "  5) saa    - Solutions Architect Study Game"
         echo "  6) dva    - Developer Associate Study Game"
         echo "  7) tutorials - Tutorials site"
+        echo "  8) bash   - Bash for AWS course"
         echo ""
-        read "choice?Enter choice [all/hub/cloud/ai/saa/dva/tutorials]: "
+        read "choice?Enter choice [all/hub/cloud/ai/saa/dva/tutorials/bash]: "
         
         case $choice in
             1|all) deploy_all ;;
@@ -542,6 +596,7 @@ case "${1:-}" in
             5|saa) deploy_saa ;;
             6|dva) deploy_dva ;;
             7|tutorials|tuts) deploy_tutorials ;;
+            8|bash) deploy_bash ;;
             *) print_error "Invalid choice" ;;
         esac
         ;;

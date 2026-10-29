@@ -34,6 +34,8 @@ const CERT_IDS = new Set([
   'ai-practitioner',
   'solutions-architect-associate',
   'developer-associate',
+  // Coding courses keep their progress the same way
+  'bash-for-aws',
 ]);
 const MAX_PROGRESS_BYTES = 16 * 1024;
 const MAX_PROFILE_BYTES = 256 * 1024; // avatar images are small JPEG data URLs
