@@ -69,8 +69,8 @@ deploy_hub() {
     cd "$site_path"
     print_info "Working in: $site_path"
 
-    # Guard: an untracked .env is required — building without it bakes undefined
-    # Firebase config into the bundle (auth/invalid-api-key on load)
+    # Guard: an untracked .env is required — building without it ships with
+    # billing switched off and no price labels
     if [ ! -f .env ]; then
         print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
         cd "$SCRIPT_DIR"
@@ -131,8 +131,8 @@ deploy_cloud() {
     cd "$site_path"
     print_info "Working in: $site_path"
 
-    # Guard: an untracked .env is required — building without it bakes undefined
-    # Firebase config into the bundle (auth/invalid-api-key on load)
+    # Guard: an untracked .env is required — building without it ships with
+    # billing switched off and no price labels
     if [ ! -f .env ]; then
         print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
         cd "$SCRIPT_DIR"
@@ -193,8 +193,8 @@ deploy_ai() {
     cd "$site_path"
     print_info "Working in: $site_path"
 
-    # Guard: an untracked .env is required — building without it bakes undefined
-    # Firebase config into the bundle (auth/invalid-api-key on load)
+    # Guard: an untracked .env is required — building without it ships with
+    # billing switched off and no price labels
     if [ ! -f .env ]; then
         print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
         cd "$SCRIPT_DIR"
@@ -255,8 +255,8 @@ deploy_saa() {
     cd "$site_path"
     print_info "Working in: $site_path"
 
-    # Guard: an untracked .env is required — building without it bakes undefined
-    # Firebase config into the bundle (auth/invalid-api-key on load)
+    # Guard: an untracked .env is required — building without it ships with
+    # billing switched off and no price labels
     if [ ! -f .env ]; then
         print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
         cd "$SCRIPT_DIR"
@@ -317,8 +317,8 @@ deploy_dva() {
     cd "$site_path"
     print_info "Working in: $site_path"
 
-    # Guard: an untracked .env is required — building without it bakes undefined
-    # Firebase config into the bundle (auth/invalid-api-key on load)
+    # Guard: an untracked .env is required — building without it ships with
+    # billing switched off and no price labels
     if [ ! -f .env ]; then
         print_error ".env missing in $folder — aborting. Copy it from the main checkout before deploying."
         cd "$SCRIPT_DIR"
