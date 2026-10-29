@@ -86,15 +86,17 @@ export class StudyHubBackendStack extends cdk.Stack {
     });
     table.grantReadWriteData(preTokenFn); // writes EMAIL#<email> links
 
-    // User-migration Lambda — moves Firebase password accounts on first sign-in
+    // User-migration + pre-sign-up Lambda — moves Firebase password accounts on
+    // first sign-in, and guards their emails until then
     const migrateUserFn = new lambda.Function(this, 'MigrateUserFn', {
       runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/migrate-user')),
-      environment: { FIREBASE_API_KEY: loadFirebaseApiKey() },
+      environment: { FIREBASE_API_KEY: loadFirebaseApiKey(), TABLE_NAME: table.tableName },
       timeout: cdk.Duration.seconds(10),
       memorySize: 128,
     });
+    table.grantReadData(migrateUserFn); // pre-sign-up checks EMAIL# links
 
     // -----------------------------------------------------------------
     // Cognito user pool
@@ -112,15 +114,17 @@ export class StudyHubBackendStack extends cdk.Stack {
       standardAttributes: {
         email: { required: true, mutable: true },
       },
+      // Same rule as Firebase (6+ characters), so every Firebase password can
+      // move over: Cognito rejects migrated passwords that break its policy.
       passwordPolicy: {
-        minLength: 8,
-        requireLowercase: true,
-        requireDigits: true,
+        minLength: 6,
+        requireLowercase: false,
+        requireDigits: false,
         requireUppercase: false,
         requireSymbols: false,
       },
       accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
-      lambdaTriggers: { preTokenGeneration: preTokenFn, userMigration: migrateUserFn },
+      lambdaTriggers: { preTokenGeneration: preTokenFn, userMigration: migrateUserFn, preSignUp: migrateUserFn },
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 

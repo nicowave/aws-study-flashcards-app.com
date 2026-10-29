@@ -4,20 +4,61 @@
     {
       "name": "ai-game",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "aws-ai-study-game", "--", "--port", "5175", "--strictPort"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "aws-ai-study-game",
+        "--",
+        "--port",
+        "5175",
+        "--strictPort"
+      ],
       "port": 5175
     },
     {
       "name": "hub",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "aws-study-homepage", "--", "--port", "5175", "--strictPort"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "aws-study-homepage",
+        "--",
+        "--port",
+        "5175",
+        "--strictPort"
+      ],
       "port": 5175
     },
     {
       "name": "ccp-game",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "aws-cloud-practitioner-game", "--", "--port", "5174"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "aws-cloud-practitioner-game",
+        "--",
+        "--port",
+        "5174"
+      ],
       "port": 5174
+    },
+    {
+      "name": "saa-game",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "aws-saa-study-game",
+        "--",
+        "--port",
+        "5173",
+        "--strictPort"
+      ],
+      "port": 5173
     }
   ]
 }

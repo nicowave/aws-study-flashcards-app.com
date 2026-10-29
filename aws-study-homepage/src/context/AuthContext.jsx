@@ -1,19 +1,14 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   registerUser,
   loginUser,
   logoutUser,
-  signInAsGuest,
+  onAuthChange,
   isGuestUser,
   resendVerificationEmail,
-  onAuthChange,
   getUserData,
-  getUserProgress,
-  getStoredUserData,
-  syncProgress,
-  tryAutoLoginFromCookie,
+  saveProgress,
   signInWithGoogle,
-  signInWithApple,
   checkGoogleRedirectResult,
   reauthenticateUser,
   changePassword,
@@ -39,72 +34,45 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
   const [authChecked, setAuthChecked] = useState(false);
   const [error, setError] = useState(null);
   const [needsVerification, setNeedsVerification] = useState(false);
-  const autoLoginAttempted = useRef(false);
 
   // Listen for auth state changes
   useEffect(() => {
     console.log('[AuthContext] Setting up auth listener...');
     let isMounted = true;
+    let unsubscribe = () => {};
 
-    // Check for pending OAuth redirect result (Google or Apple signInWithRedirect fallback)
-    checkGoogleRedirectResult().then((result) => {
-      if (result && result.success) {
-        console.log('[AuthContext] OAuth redirect sign-in completed');
+    (async () => {
+      // Finish a Google sign-in first (page loaded with ?code=...)
+      const googleResult = await checkGoogleRedirectResult();
+      if (googleResult && !googleResult.success && isMounted) {
+        setError(googleResult.error);
       }
-    });
-
-    const unsubscribe = onAuthChange(async (firebaseUser) => {
       if (!isMounted) return;
-      console.log('[AuthContext] Auth state changed:', firebaseUser?.email || 'No user');
 
-      if (firebaseUser) {
-        setUser(firebaseUser);
+      unsubscribe = onAuthChange(async (authUser) => {
+        if (!isMounted) return;
+        console.log('[AuthContext] Auth state changed:', authUser ? 'User logged in' : 'No user');
 
-        // Check if this is a guest user
-        if (firebaseUser.isAnonymous || isGuestUser()) {
-          setUserData({ isGuest: true });
+        if (authUser) {
+          // Profile + game progress from the StudyHub API
+          const result = await getUserData();
+          if (!isMounted) return;
+          if (result.success) {
+            setUserData(result.data);
+            setUser({ ...authUser, displayName: result.data.displayName || authUser.displayName });
+            console.log('[AuthContext] Progress loaded:', Object.keys(result.data.progress || {}));
+          } else {
+            setUser(authUser);
+          }
         } else {
-          // Fetch user data from Firestore
-          const result = await getUserData(firebaseUser.uid);
-          if (result.success && isMounted) {
-            const data = result.data;
-
-            // Fetch game progress from /users/{uid}/progress subcollection
-            const progressResult = await getUserProgress(firebaseUser.uid);
-            if (progressResult.success) {
-              data.progress = progressResult.data;
-              console.log('[AuthContext] Progress loaded:', Object.keys(progressResult.data));
-            }
-
-            setUserData(data);
-          }
-        }
-      } else {
-        // Try cross-domain auto-login from shared cookie (only once)
-        if (!autoLoginAttempted.current) {
-          autoLoginAttempted.current = true;
-          const cookieUser = await tryAutoLoginFromCookie();
-          if (cookieUser && isMounted) {
-            return; // onAuthChange will fire again with the signed-in user
-          }
-        }
-        if (isMounted) {
           setUser(null);
           setUserData(null);
         }
-      }
 
-      if (isMounted) {
         setLoading(false);
         setAuthChecked(true);
-      }
-    });
-
-    // Check for stored user data on mount (for faster initial render)
-    const storedUser = getStoredUserData();
-    if (storedUser) {
-      console.log('[AuthContext] Found stored user:', storedUser.email);
-    }
+      });
+    })();
 
     return () => { isMounted = false; unsubscribe(); };
   }, []);
@@ -120,19 +88,20 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     setLoading(true);
     setError(null);
     setNeedsVerification(false);
-    
-    console.log('[AuthContext] Registering user:', email);
-    
+
+    console.log('[AuthContext] Registering user');
+
     const result = await registerUser(email, password, displayName);
-    
+
     if (result.success) {
       setNeedsVerification(true);
+      setError(result.message);
       console.log('[AuthContext] Registration successful, verification email sent');
     } else {
       setError(result.error);
       console.log('[AuthContext] Registration failed:', result.error);
     }
-    
+
     setLoading(false);
     return result;
   };
@@ -142,22 +111,21 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     setLoading(true);
     setError(null);
     setNeedsVerification(false);
-    
-    console.log('[AuthContext] Logging in user:', email);
-    
+
+    console.log('[AuthContext] Logging in');
+
     const result = await loginUser(email, password);
-    
+
     if (result.success) {
       console.log('[AuthContext] Login successful');
     } else {
       setError(result.error);
       if (result.needsVerification) {
         setNeedsVerification(true);
-        setUser(result.user); // Store user for resend verification
       }
       console.log('[AuthContext] Login failed:', result.error);
     }
-    
+
     setLoading(false);
     return result;
   };
@@ -166,20 +134,20 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
   const logout = async () => {
     setLoading(true);
     console.log('[AuthContext] Logging out...');
-    
+
     const result = await logoutUser();
-    
+
     if (result.success) {
       setUser(null);
       setUserData(null);
       console.log('[AuthContext] Logout successful');
     }
-    
+
     setLoading(false);
     return result;
   };
 
-  // Google Sign-In
+  // Google Sign-In (leaves the page; the app finishes it on return)
   const googleSignIn = async () => {
     setLoading(true);
     setError(null);
@@ -189,9 +157,7 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
 
     const result = await signInWithGoogle();
 
-    if (result.success) {
-      console.log('[AuthContext] Google sign-in successful', result.isNewUser ? '(new user)' : '');
-    } else {
+    if (!result.success) {
       setError(result.error);
       console.log('[AuthContext] Google sign-in failed:', result.error);
     }
@@ -200,67 +166,39 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     return result;
   };
 
-  // Apple Sign-In
-  const appleSignIn = async () => {
-    setLoading(true);
-    setError(null);
-    setNeedsVerification(false);
-
-    console.log('[AuthContext] Attempting Apple sign-in...');
-
-    const result = await signInWithApple();
-
-    if (result.success) {
-      console.log('[AuthContext] Apple sign-in successful', result.isNewUser ? '(new user)' : '');
-    } else {
-      setError(result.error);
-      console.log('[AuthContext] Apple sign-in failed:', result.error);
-    }
-
-    setLoading(false);
-    return result;
-  };
-
-  // Guest login
+  // Guest mode: local-only, no account is created
   const loginAsGuest = async () => {
-    setLoading(true);
-    setError(null);
-    
-    console.log('[AuthContext] Signing in as guest...');
-    
-    const result = await signInAsGuest();
-    
-    if (result.success) {
-      setUserData({ isGuest: true });
-      console.log('[AuthContext] Guest login successful');
-    } else {
-      setError(result.error);
-    }
-    
-    setLoading(false);
-    return result;
+    console.log('[AuthContext] Continuing as guest');
+    localStorage.setItem('awsStudyGuest', 'true');
+    setUserData({ isGuest: true });
+    return { success: true, isGuest: true };
   };
 
   // Resend verification email
   const resendVerification = async () => {
     console.log('[AuthContext] Resending verification email...');
     const result = await resendVerificationEmail();
-    
+
     if (!result.success) {
       setError(result.error);
     }
-    
+
     return result;
   };
 
-  // Sync progress to cloud
+  // Save one certification's progress to the cloud
   const syncUserProgress = async (localStats, certId = null) => {
-    if (!user || isGuestUser()) {
-      console.log('[AuthContext] Cannot sync - no authenticated user');
+    if (!user || !certId) {
+      console.log('[AuthContext] Cannot sync - no authenticated user or certification');
       return { success: false, error: 'Not authenticated' };
     }
 
-    return await syncProgress(user.uid, localStats, certId);
+    try {
+      await saveProgress(certId, localStats);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
   };
 
   // Re-authenticate user (for sensitive operations)
@@ -286,7 +224,7 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
       return { success: false, error: 'Not authenticated' };
     }
     console.log('[AuthContext] Updating avatar...');
-    const result = await updateUserAvatar(user.uid, avatarData);
+    const result = await updateUserAvatar(avatarData);
     if (result.success) {
       // Update local userData with new avatar
       setUserData(prev => prev ? { ...prev, avatar: avatarData } : prev);
@@ -313,26 +251,22 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
       return { success: false, error: 'Not authenticated' };
     }
     console.log('[AuthContext] Updating display name...');
-    const result = await updateDisplayName(user.uid, newName);
+    const result = await updateDisplayName(newName);
     if (result.success) {
-      // Update local userData with new name
-      setUserData(prev => prev ? { ...prev, displayName: newName.trim() } : prev);
+      const trimmed = newName.trim();
+      setUserData(prev => prev ? { ...prev, displayName: trimmed } : prev);
+      setUser(prev => prev ? { ...prev, displayName: trimmed } : prev);
       console.log('[AuthContext] Display name updated successfully');
     }
     return result;
   };
 
-  // Refresh user data from Firestore (including progress subcollection)
+  // Refresh user data (profile + progress) from the StudyHub API
   const refreshUserData = async () => {
     if (!user) return;
-    const result = await getUserData(user.uid);
+    const result = await getUserData();
     if (result.success) {
-      const data = result.data;
-      const progressResult = await getUserProgress(user.uid);
-      if (progressResult.success) {
-        data.progress = progressResult.data;
-      }
-      setUserData(data);
+      setUserData(result.data);
     }
     return result;
   };
@@ -344,13 +278,12 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     authChecked,
     error,
     needsVerification,
-    isAuthenticated: !!user && (user.emailVerified || user.isAnonymous || isGuestUser() || user.providerData?.some(p => p.providerId === 'google.com' || p.providerId === 'apple.com')),
+    isAuthenticated: !!user && (user.emailVerified || isGuestUser() || user.providerData?.some(p => p.providerId === 'google.com')),
     isGuest: isGuestUser(),
     register,
     login,
     logout,
     googleSignIn,
-    appleSignIn,
     loginAsGuest,
     resendVerification,
     clearError,

@@ -1,19 +1,16 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { db } from '../config/firebase.config';
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   registerUser,
   loginUser,
   logoutUser,
   onAuthChange,
   resendVerificationEmail as resendVerification,
-  tryAutoLoginFromCookie,
   signInWithGoogle,
   checkGoogleRedirectResult,
   getUserData,
-  getStoredUserData,
+  loadProgress as loadSavedProgress,
+  saveProgress,
   isGuestUser,
-  reauthenticateUser,
   changePassword,
   updateUserAvatar,
   updateDisplayName,
@@ -36,60 +33,49 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isGuest, setIsGuest] = useState(isGuestUser());
-  const autoLoginAttempted = useRef(false);
 
   useEffect(() => {
     console.log('[AuthContext] Setting up auth listener...');
     let isMounted = true;
+    let unsubscribe = () => {};
 
-    // Check for pending Google redirect result (from signInWithRedirect fallback)
-    checkGoogleRedirectResult().then((result) => {
-      if (result && result.success) {
-        console.log('[AuthContext] Google redirect sign-in completed');
+    (async () => {
+      // Finish a Google sign-in first (page loaded with ?code=...), so the
+      // first auth state we report is already the signed-in one
+      const googleResult = await checkGoogleRedirectResult();
+      if (googleResult && !googleResult.success && isMounted) {
+        setError(googleResult.error);
       }
-    });
-
-    const unsubscribe = onAuthChange(async (firebaseUser) => {
       if (!isMounted) return;
 
-      if (firebaseUser) {
-        console.log('[AuthContext] Auth state changed: User logged in -', firebaseUser.email);
-        setUser(firebaseUser);
+      unsubscribe = onAuthChange(async (authUser) => {
+        if (!isMounted) return;
 
-        // A real sign-in supersedes guest mode
-        localStorage.removeItem('awsStudyGuest');
-        setIsGuest(false);
+        if (authUser) {
+          console.log('[AuthContext] Auth state changed: User logged in');
 
-        // Fetch user data from Firestore
-        const result = await getUserData(firebaseUser.uid);
-        if (result.success && isMounted) {
-          setUserData(result.data);
-        }
-      } else {
-        console.log('[AuthContext] Auth state changed: No user');
+          // A real sign-in supersedes guest mode
+          localStorage.removeItem('awsStudyGuest');
+          setIsGuest(false);
 
-        // Try cross-domain auto-login from shared cookie (only once)
-        if (!autoLoginAttempted.current) {
-          autoLoginAttempted.current = true;
-          console.log('[AuthContext] Attempting cross-domain auto-login...');
-          const cookieUser = await tryAutoLoginFromCookie();
-          if (cookieUser && isMounted) {
-            // signInWithCustomToken succeeded — onAuthChange will fire again with the user
-            console.log('[AuthContext] Cross-domain auto-login succeeded');
-            return; // Don't setLoading(false) yet — wait for the next onAuthChange
+          // Profile from the StudyHub API (the app's display name lives there)
+          const result = await getUserData();
+          if (!isMounted) return;
+          if (result.success) {
+            setUserData(result.data);
+            setUser({ ...authUser, displayName: result.data.displayName || authUser.displayName });
+          } else {
+            setUser(authUser);
           }
-        }
-
-        if (isMounted) {
+        } else {
+          console.log('[AuthContext] Auth state changed: No user');
           setUser(null);
           setUserData(null);
         }
-      }
 
-      if (isMounted) {
         setLoading(false);
-      }
-    });
+      });
+    })();
 
     return () => {
       isMounted = false;
@@ -102,12 +88,14 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     setLoading(true);
 
-    console.log('[AuthContext] Registering user with email:', email);
+    console.log('[AuthContext] Registering user');
 
     try {
       const result = await registerUser(email, password, username || null);
 
       if (result.success) {
+        // Not signed in until the email link is clicked; tell them what's next
+        setError(result.message);
         console.log('[AuthContext] Registration successful, verification email sent');
       } else {
         setError(result.error);
@@ -129,7 +117,7 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     setLoading(true);
 
-    console.log('[AuthContext] Logging in user:', email);
+    console.log('[AuthContext] Logging in');
 
     try {
       const result = await loginUser(email, password);
@@ -159,7 +147,6 @@ export const AuthProvider = ({ children }) => {
       if (result.success) {
         setUser(null);
         setUserData(null);
-        autoLoginAttempted.current = false; // Reset for next session
         console.log('[AuthContext] Logout successful');
       }
     } catch (err) {
@@ -171,7 +158,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Enter guest mode: local-only preview, no Firebase user is created.
+  // Enter guest mode: local-only preview, no account is created.
   // Progress stays in localStorage and carries over on later sign-up.
   const continueAsGuest = () => {
     console.log('[AuthContext] Continuing as guest');
@@ -201,7 +188,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Google Sign-In
+  // Google Sign-In (leaves the page; the app finishes it on return)
   const googleSignIn = async () => {
     setError(null);
     setLoading(true);
@@ -211,9 +198,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const result = await signInWithGoogle();
 
-      if (result.success) {
-        console.log('[AuthContext] Google sign-in successful', result.isNewUser ? '(new user)' : '');
-      } else {
+      if (!result.success) {
         setError(result.error);
         console.log('[AuthContext] Google sign-in failed:', result.error);
       }
@@ -231,34 +216,28 @@ export const AuthProvider = ({ children }) => {
   // Clear error
   const clearError = () => setError(null);
 
-  // Sync local progress to Firestore (game-specific)
+  // Save this game's progress to the cloud
   const syncLocalProgress = async (localStats, certId) => {
     if (!user || !localStats) return;
 
     try {
-      const progressRef = doc(db, 'users', user.uid, 'progress', certId);
-      await setDoc(progressRef, {
-        ...localStats,
-        certId,
-        lastUpdated: serverTimestamp()
-      }, { merge: true });
+      await saveProgress(certId, localStats);
       console.log('[AuthContext] Progress synced for:', certId);
     } catch (err) {
       console.warn('[AuthContext] Failed to sync progress:', err.message);
     }
   };
 
-  // Load progress from Firestore (game-specific)
+  // Load this game's progress from the cloud
   const loadProgress = async (certId) => {
     if (!user) return null;
 
     try {
-      const progressRef = doc(db, 'users', user.uid, 'progress', certId);
-      const progressDoc = await getDoc(progressRef);
-      if (progressDoc.exists()) {
+      const progress = await loadSavedProgress(certId);
+      if (progress) {
         console.log('[AuthContext] Progress loaded for:', certId);
-        return progressDoc.data();
       }
+      return progress;
     } catch (err) {
       console.warn('[AuthContext] Failed to load progress:', err.message);
     }
@@ -287,7 +266,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false, error: 'Not authenticated' };
     }
     console.log('[AuthContext] Updating avatar...');
-    const result = await updateUserAvatar(user.uid, avatarData);
+    const result = await updateUserAvatar(avatarData);
     if (result.success) {
       // Update local userData with new avatar
       setUserData(prev => prev ? { ...prev, avatar: avatarData } : prev);
@@ -302,10 +281,11 @@ export const AuthProvider = ({ children }) => {
       return { success: false, error: 'Not authenticated' };
     }
     console.log('[AuthContext] Updating display name...');
-    const result = await updateDisplayName(user.uid, newName);
+    const result = await updateDisplayName(newName);
     if (result.success) {
-      // Update local userData with new name
-      setUserData(prev => prev ? { ...prev, displayName: newName.trim() } : prev);
+      const trimmed = newName.trim();
+      setUserData(prev => prev ? { ...prev, displayName: trimmed } : prev);
+      setUser(prev => prev ? { ...prev, displayName: trimmed } : prev);
       console.log('[AuthContext] Display name updated successfully');
     }
     return result;
@@ -323,10 +303,10 @@ export const AuthProvider = ({ children }) => {
     return result;
   };
 
-  // Refresh user data from Firestore
+  // Refresh user data from the StudyHub API
   const refreshUserData = async () => {
     if (!user) return;
-    const result = await getUserData(user.uid);
+    const result = await getUserData();
     if (result.success) {
       setUserData(result.data);
     }

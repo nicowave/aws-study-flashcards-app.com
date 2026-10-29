@@ -1,8 +1,8 @@
-// Billing service — thin client over the Stripe Cloud Functions.
-// Enabled via VITE_BILLING_ENABLED=true. Entitlements come from Firebase
-// custom claims set by the Stripe webhook — never client-writable state.
-import { httpsCallableFromURL } from 'firebase/functions';
-import { functions, auth, CALLABLE_BASE_URL } from '../config/firebase.config';
+// Billing service — thin client over the Stripe payment functions (AWS Lambda).
+// Enabled via VITE_BILLING_ENABLED=true. Entitlements come from the sign-in
+// token's plan/certs claims, set server-side from the Stripe webhook — never
+// client-writable state.
+import { getTokens, decodeJwt, callFunction } from './awsAuth';
 
 export const BILLING_ENABLED = import.meta.env.VITE_BILLING_ENABLED === 'true';
 
@@ -11,13 +11,14 @@ export const CERT_PRICE_LABEL = import.meta.env.VITE_CERT_PRICE_LABEL || 'one-ti
 
 /**
  * True when the signed-in user may access this cert's premium content:
- * an all-access plan ('pro') or a per-cert subscription claim.
+ * an all-access plan ('pro') or a purchase of this cert.
+ * Pass { forceRefresh: true } right after checkout to pick up a new purchase.
  */
 export const hasCertEntitlement = async (certId, { forceRefresh = false } = {}) => {
-  const user = auth.currentUser;
-  if (!user) return false;
   try {
-    const { claims } = await user.getIdTokenResult(forceRefresh);
+    const tokens = await getTokens({ forceRefresh });
+    if (!tokens) return false;
+    const claims = decodeJwt(tokens.idToken);
     if (claims.plan === 'pro') return true;
     return (claims.certs || '').split(',').includes(certId);
   } catch (err) {
@@ -28,8 +29,7 @@ export const hasCertEntitlement = async (certId, { forceRefresh = false } = {}) 
 
 /** Starts Stripe Checkout for this plan (one-time or subscription) and redirects. */
 export const startCheckout = async (plan) => {
-  const call = httpsCallableFromURL(functions, `${CALLABLE_BASE_URL}/createCheckoutSession`);
-  const { data } = await call({ plan, returnUrl: window.location.origin });
+  const { data } = await callFunction('createCheckoutSession', { plan, returnUrl: window.location.origin });
   if (data?.url) {
     window.location.assign(data.url);
   } else {
@@ -39,8 +39,7 @@ export const startCheckout = async (plan) => {
 
 /** Opens the Stripe customer portal (manage / cancel / invoices). */
 export const openBillingPortal = async () => {
-  const call = httpsCallableFromURL(functions, `${CALLABLE_BASE_URL}/createPortalSession`);
-  const { data } = await call();
+  const { data } = await callFunction('createPortalSession');
   if (data?.url) {
     window.location.assign(data.url);
   } else {

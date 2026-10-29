@@ -87,7 +87,8 @@ async function main() {
 
     const email = emailOf(authUser, doc);
     if (email) {
-      items.push({ PK: `EMAIL#${email}`, SK: 'UID', uid, source: 'firebase' });
+      // firebaseVerified: sign-up with this email is blocked until the owner signs in
+      items.push({ PK: `EMAIL#${email}`, SK: 'UID', uid, source: 'firebase', firebaseVerified: authUser.emailVerified });
       counts.emails++;
     } else if (!googleId) {
       counts.noEmail++;
