@@ -39,6 +39,19 @@ function loadPriceEnv(): Record<string, string> {
   return out;
 }
 
+// The Firebase web API key (public; it ships in every app bundle) lets the
+// user-migration trigger check old passwords. Read from the hub's untracked .env.
+function loadFirebaseApiKey(): string {
+  const envPath = path.join(__dirname, '../../aws-study-homepage/.env');
+  if (!fs.existsSync(envPath)) throw new Error(`Missing ${envPath} (needed for VITE_FIREBASE_API_KEY)`);
+  const m = fs.readFileSync(envPath, 'utf8').match(/^VITE_FIREBASE_API_KEY=(.+)$/m);
+  if (!m) throw new Error('VITE_FIREBASE_API_KEY not found in aws-study-homepage/.env');
+  return m[1].trim();
+}
+
+// Hidden test builds of each app live at /next/ until sign-in switches over.
+const TEST_PATH = '/next/';
+
 export class StudyHubBackendStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -71,7 +84,17 @@ export class StudyHubBackendStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(5),
       memorySize: 128,
     });
-    table.grantReadData(preTokenFn);
+    table.grantReadWriteData(preTokenFn); // writes EMAIL#<email> links
+
+    // User-migration Lambda — moves Firebase password accounts on first sign-in
+    const migrateUserFn = new lambda.Function(this, 'MigrateUserFn', {
+      runtime: lambda.Runtime.NODEJS_24_X,
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/migrate-user')),
+      environment: { FIREBASE_API_KEY: loadFirebaseApiKey() },
+      timeout: cdk.Duration.seconds(10),
+      memorySize: 128,
+    });
 
     // -----------------------------------------------------------------
     // Cognito user pool
@@ -80,6 +103,12 @@ export class StudyHubBackendStack extends cdk.Stack {
       selfSignUpEnabled: true,
       signInAliases: { email: true },
       autoVerify: { email: true },
+      // Sign-up sends a link (like Firebase did), not a code to type in.
+      userVerification: {
+        emailStyle: cognito.VerificationEmailStyle.LINK,
+        emailSubject: 'Verify your AWS Study Hub email',
+        emailBody: 'Welcome to AWS Study Hub! {##Click here to verify your email##}, then come back and sign in.',
+      },
       standardAttributes: {
         email: { required: true, mutable: true },
       },
@@ -91,7 +120,7 @@ export class StudyHubBackendStack extends cdk.Stack {
         requireSymbols: false,
       },
       accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
-      lambdaTriggers: { preTokenGeneration: preTokenFn },
+      lambdaTriggers: { preTokenGeneration: preTokenFn, userMigration: migrateUserFn },
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
@@ -146,9 +175,10 @@ export class StudyHubBackendStack extends cdk.Stack {
       },
     });
 
-    // SPA client: no secret, SRP + hosted-UI code flow, email/password or Google.
+    // SPA client: no secret. Email/password uses USER_PASSWORD_AUTH (the
+    // migration trigger needs the password); Google uses the hosted code flow.
     const webClient = userPool.addClient('WebClient', {
-      authFlows: { userSrp: true },
+      authFlows: { userSrp: true, userPassword: true },
       preventUserExistenceErrors: true,
       supportedIdentityProviders: [
         cognito.UserPoolClientIdentityProvider.COGNITO,
@@ -157,7 +187,10 @@ export class StudyHubBackendStack extends cdk.Stack {
       oAuth: {
         flows: { authorizationCodeGrant: true },
         scopes: [cognito.OAuthScope.EMAIL, cognito.OAuthScope.OPENID, cognito.OAuthScope.PROFILE],
-        callbackUrls: SITE_ORIGINS.map((o) => `${o}/`),
+        callbackUrls: [
+          ...SITE_ORIGINS.map((o) => `${o}/`),
+          ...SITE_ORIGINS.filter((o) => o.startsWith('https://')).map((o) => `${o}${TEST_PATH}`),
+        ],
         logoutUrls: SITE_ORIGINS.map((o) => `${o}/`),
       },
       accessTokenValidity: cdk.Duration.hours(1),
@@ -173,11 +206,12 @@ export class StudyHubBackendStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/api')),
-      environment: { TABLE_NAME: table.tableName },
+      environment: { TABLE_NAME: table.tableName, USER_POOL_ID: userPool.userPoolId },
       timeout: cdk.Duration.seconds(10),
       memorySize: 256,
     });
     table.grantReadWriteData(apiFn);
+    userPool.grant(apiFn, 'cognito-idp:AdminDeleteUser'); // DELETE /v1/me
 
     const httpApi = new apigwv2.HttpApi(this, 'StudyHubApi', {
       corsPreflight: {
@@ -185,6 +219,8 @@ export class StudyHubBackendStack extends cdk.Stack {
         allowMethods: [
           apigwv2.CorsHttpMethod.GET,
           apigwv2.CorsHttpMethod.PUT,
+          apigwv2.CorsHttpMethod.PATCH,
+          apigwv2.CorsHttpMethod.DELETE,
           apigwv2.CorsHttpMethod.POST,
           apigwv2.CorsHttpMethod.OPTIONS,
         ],
@@ -207,7 +243,7 @@ export class StudyHubBackendStack extends cdk.Stack {
 
     // Authenticated
     for (const route of [
-      { path: '/v1/me', methods: [apigwv2.HttpMethod.GET] },
+      { path: '/v1/me', methods: [apigwv2.HttpMethod.GET, apigwv2.HttpMethod.PATCH, apigwv2.HttpMethod.DELETE] },
       { path: '/v1/progress/{certId}', methods: [apigwv2.HttpMethod.GET, apigwv2.HttpMethod.PUT] },
     ]) {
       httpApi.addRoutes({ ...route, integration, authorizer });
@@ -225,11 +261,18 @@ export class StudyHubBackendStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/callables')),
-      environment: { SECRET_ID: 'study-hub/billing', ...loadPriceEnv() },
+      environment: {
+        SECRET_ID: 'study-hub/billing',
+        TABLE_NAME: table.tableName,
+        USER_POOL_ID: userPool.userPoolId,
+        USER_POOL_CLIENT_ID: webClient.userPoolClientId,
+        ...loadPriceEnv(),
+      },
       timeout: cdk.Duration.seconds(20),
       memorySize: 512,
     });
     billingSecret.grantRead(callablesFn);
+    table.grantReadWriteData(callablesFn);
 
     const callablesIntegration = new HttpLambdaIntegration('CallablesIntegration', callablesFn);
     httpApi.addRoutes({
