@@ -19,12 +19,14 @@ Keep answers direct, no fluff.
 | Developer Associate (DVA-C02) | `aws-dva-study-game/` | developer.aws-study-flashcards-app.com (old: dva.) | `dva.aws-study-flashcards-app.com` | `E2UB744W5YUCTW` |
 | Bash for AWS (coding course) | `aws-coding-courses/` (`COURSE=bash`) | bash.aws-study-flashcards-app.com | `bash.aws-study-flashcards-app.com` | `EYR8XH2CLI1DT` |
 | Python for AWS (coding course) | `aws-coding-courses/` (`COURSE=python`) | python.aws-study-flashcards-app.com | `python.aws-study-flashcards-app.com` | `E205DY614C5Q4C` |
+| JavaScript for AWS (coding course) | `aws-coding-courses/` (`COURSE=javascript`) | js.aws-study-flashcards-app.com (javascript. redirects here) | `js.aws-study-flashcards-app.com` | `E1JMSZCG8CKTGT` (redirect: `E27Y7QTYXZD1SM`) |
+| TypeScript for AWS (coding course) | `aws-coding-courses/` (`COURSE=typescript`) | typescript.aws-study-flashcards-app.com | `typescript.aws-study-flashcards-app.com` | `E2HBJJFM265RJL` |
 | Tutorials (static, Cognito-gated) | `~/dev/aws/tutorials-site/site/` | tutorials.aws-study-flashcards-app.com | `tutorials-aws-study-flashcards-app-418272768335` | `E24YKUY1M23PV0` |
 
 Stack: Vite + React for the apps, Cognito for sign-in, DynamoDB + API Gateway/Lambda (`aws-backend/`, CDK) for profiles, progress and payments, S3 + CloudFront hosting. Firebase is fully retired (data archived in `s3://study-hub-archive-418272768335/firebase/`). AWS account `418272768335`, region `us-east-1`.
 
 ## Deploying
-`./deploy.sh [all|hub|cloud|ai|saa|dva|bash|python|tutorials]` from repo root.
+`./deploy.sh [all|hub|cloud|ai|saa|dva|bash|python|js|typescript|tutorials]` from repo root.
 - React apps: `npm run build`, sync `dist/` (long cache), `index.html` no-cache, invalidate `/*`.
 - Course sites (`bash`): `deploy_course` runs `npm test` first, then builds `COURSE=<id>` into `dist/<id>/`.
 - Tutorials: no build. Uploads `site/index.html` plus every `site/<slug>/index.html`.
@@ -44,7 +46,7 @@ Stack: Vite + React for the apps, Cognito for sign-in, DynamoDB + API Gateway/La
 - **Tutorials clean URLs:** the bucket is private (OAC, REST origin), so CloudFront won't map `/slug` to `/slug/index.html`. `deploy.sh` uploads each page twice: `slug/index.html` and a bare `slug` key with `Content-Type: text/html`. Keep doing that.
 
 ## Coding courses (`aws-coding-courses/`)
-- One React app (the tutorial engine) built once per course site: `src/courses/<id>/` holds the content (`meta.json` + `index.js` + `tutorials/*.js`), `src/shared/startHere.js` is the free setup tutorial every course shows. Plan: bash. and python. (live), js., typescript.; never short forms like sh. or ts.
+- One React app (the tutorial engine) built once per course site: `src/courses/<id>/` holds the content (`meta.json` + `index.js` + `tutorials/*.js`), `src/shared/startHere.js` is the free setup tutorial every course shows. All four are live: bash., python., js., typescript. (javascript. redirects to js.; never other short forms like sh. or ts.).
 - The practice terminal is our own Bash subset in `src/engine/shell/` (parser, interpreter, commands, awk, a pretend AWS account). Nothing runs on a server. If a tutorial needs a command it lacks, add it there plus a test in `shell.test.js`.
 - Python steps (`runtime: 'python'`) run real Python 3.13 in the browser through Pyodide, in a Web Worker (`src/engine/python/`). The page loads Pyodide from jsDelivr; the tests load the same version from npm. Bump `PYODIDE_VERSION` in `runtime.js` and the exact `pyodide` version in package.json together.
   - `practice_aws.py` is a pretend boto3 (STS, EC2, S3, SNS, the DynamoDB table resource) with real response shapes, error classes and parameter checks. `practice_net.py` fakes `urlopen`, sockets, `ssl` certificates and the clock. `practice_sandbox.py` runs files, console cells and Lambda-style invocations (`invoke`), and returns output, errors with plain-English tips, files and the AWS state for the checks.
@@ -66,6 +68,8 @@ Stack: Vite + React for the apps, Cognito for sign-in, DynamoDB + API Gateway/La
 - `courses.test.js` runs every "try" step's answer through its own check. Keep it green; `deploy_course` refuses to deploy otherwise.
 - **Course access is `certs` only** (`bash-for-aws`, `python-for-aws`), never `plan: pro`: courses are not part of all-access. Progress saves to `/v1/progress/<course id>`.
 - **Purchases switch on** when the course's price (`STRIPE_PRICE_BASH_COURSE`, `STRIPE_PRICE_PYTHON_COURSE`) is in `aws-backend/.env` and the backend is redeployed. Until then the unlock button says purchases open soon. A new course also needs its plan in `callables/index.js` (`PLAN_PRICES`, `ALLOWED_ORIGINS`), its ID in `api/index.js` (`CERT_IDS`), and its site in `SITE_ORIGINS` (`study-hub-stack.ts`).
+- **Developer Path bundle** (`developer-path`, $59 one-time): `BUNDLES` in `callables/index.js` expands it into all four course certs plus `developer-associate` when entitlements sync.
+- **Sales:** `PROMOTIONS` in `callables/index.js` applies a Stripe coupon at checkout automatically during its window (falls back to full price if the coupon fails). Display copies of the window live in `aws-coding-courses/src/services/offers.js`, `aws-study-homepage/src/services/offers.js` and each game's `src/services/offers.js`; keep them in step. Halloween 2026: `HALLOWEEN31` (31% off single courses and games) and `HALLOWEEN10` (10% off the bundle and All-Access), Oct 31–Nov 6 Eastern; the coupons expire on their own (`redeem_by`). `?promo=on` / `?promo=soon` previews banners in dev builds.
 - Paid lesson text ships in the public bundle (same as the games' premium content). Fine for now; serve paid tutorials from the API if leaking becomes a problem.
 
 ## Tutorials site
