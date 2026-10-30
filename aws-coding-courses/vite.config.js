@@ -20,7 +20,8 @@ export default defineConfig({
           html
             .replaceAll('%COURSE_TITLE%', meta.pageTitle)
             .replaceAll('%COURSE_DESCRIPTION%', meta.description)
-            .replaceAll('%COURSE_URL%', meta.url),
+            .replaceAll('%COURSE_URL%', meta.url)
+            .replaceAll('%COURSE_ID%', COURSE), // share image: hub's public/og/<id>.png
       },
       // Each course site is its own host, so it needs its own robots.txt and sitemap
       generateBundle() {
