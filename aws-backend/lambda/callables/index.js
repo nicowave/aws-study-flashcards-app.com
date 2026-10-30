@@ -33,6 +33,7 @@ const ALLOWED_ORIGINS = [
   "https://architect.aws-study-flashcards-app.com",
   "https://developer.aws-study-flashcards-app.com",
   "https://bash.aws-study-flashcards-app.com",
+  "https://python.aws-study-flashcards-app.com",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
@@ -48,6 +49,7 @@ const PLAN_PRICES = {
   // Coding courses: one-time, NOT included in all-access (the course sites
   // check `certs` only)
   "bash-for-aws": process.env.STRIPE_PRICE_BASH_COURSE || "",
+  "python-for-aws": process.env.STRIPE_PRICE_PYTHON_COURSE || "",
 };
 const planForPrice = (priceId) => {
   const hit = Object.entries(PLAN_PRICES).find(([, p]) => p && p === priceId);

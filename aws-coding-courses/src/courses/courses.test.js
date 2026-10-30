@@ -1,13 +1,35 @@
 // Every "try" task must be solvable: running its answer passes its check,
 // and doing nothing doesn't. Also checks the course data is well formed.
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { Shell } from '../engine/shell/shell';
+import { nodePython } from '../engine/python/nodePython';
 import bash from './bash/index';
+import pythonCourse from './python/index';
 
-const COURSES = [bash];
+const COURSES = [bash, pythonCourse];
 
 const runCheck = (step, shell, result) => step.check({ shell, fs: shell.fs, aws: shell.aws, result, history: shell.history });
 const freshShell = (step) => new Shell(typeof step.scenario === 'function' ? step.scenario() : step.scenario);
+
+// Python steps: same idea, through the practice Python the site runs
+let py;
+beforeAll(async () => { py = await nodePython(); }, 60000);
+
+const pyCheck = (step, result, kind, sources) => step.check({
+  result, probe: result.probe?.value, probeError: result.probe?.error, files: result.files, aws: result.aws, web: result.web, kind, sources,
+});
+
+const pyAttempt = async (step, code) => {
+  await py.reset(typeof step.scenario === 'function' ? step.scenario() : step.scenario);
+  if (!step.files) {
+    const result = await py.cell({ source: code, probe: step.probe });
+    return { result, verdict: pyCheck(step, result, 'cell', {}) };
+  }
+  const [file, ...others] = step.files;
+  const sources = { [file.path]: code, ...Object.fromEntries(others.map((f) => [f.path, f.starter ?? ''])) };
+  const result = await py.run({ path: file.path, files: sources, probe: step.probe, invoke: file.invoke });
+  return { result, verdict: pyCheck(step, result, 'run', sources) };
+};
 
 for (const course of COURSES) {
   describe(course.title, () => {
@@ -32,7 +54,26 @@ for (const course of COURSES) {
     });
 
     for (const t of course.tutorials) {
-      for (const step of t.steps.filter((s) => s.kind === 'try')) {
+      for (const step of t.steps.filter((s) => s.kind === 'try' && s.runtime === 'python')) {
+        it(`${t.slug} / ${step.id}: the answer passes and doing nothing doesn't`, async () => {
+          const idle = await pyAttempt({ ...step, files: undefined }, 'None');
+          expect(idle.verdict).not.toBe(true);
+          const { result, verdict } = await pyAttempt(step, step.solution);
+          if (verdict !== true) console.log(step.id, { verdict, stdout: result.stdout.slice(0, 3000), stderr: result.stderr.slice(0, 3000), probe: result.probe });
+          expect(verdict).toBe(true);
+        });
+
+        if (step.files) {
+          it(`${t.slug} / ${step.id}: the unfinished starter doesn't pass yet`, async () => {
+            const { result, verdict } = await pyAttempt(step, step.files[0].starter);
+            expect(result.error?.type).not.toBe('SyntaxError');
+            expect(result.error?.type).not.toBe('IndentationError');
+            expect(verdict).not.toBe(true);
+          });
+        }
+      }
+
+      for (const step of t.steps.filter((s) => s.kind === 'try' && s.runtime !== 'python')) {
         it(`${t.slug} / ${step.id}: the answer passes and doing nothing doesn't`, () => {
           const idle = freshShell(step);
           const idleResult = idle.run('ls');

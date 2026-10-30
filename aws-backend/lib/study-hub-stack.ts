@@ -22,6 +22,7 @@ const SITE_ORIGINS = [
   'https://architect.aws-study-flashcards-app.com',
   'https://developer.aws-study-flashcards-app.com',
   'https://bash.aws-study-flashcards-app.com',
+  'https://python.aws-study-flashcards-app.com',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',

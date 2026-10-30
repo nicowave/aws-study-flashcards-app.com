@@ -198,7 +198,7 @@ git push
 
 GitHub asks you to sign in the first time. The easiest way is the [GitHub command line](https://cli.github.com/): \`gh auth login\`.
 
-> **Keep secrets out of Git.** Anything you commit can be found forever, even after you delete it. Put passwords and keys in a vault (you'll use AWS Secrets Manager in the Bash course) and list local secret files in \`.gitignore\`.`,
+> **Keep secrets out of Git.** Anything you commit can be found forever, even after you delete it. Put passwords and keys in a vault, such as AWS Secrets Manager, and list local secret files in \`.gitignore\`.`,
       checklist: [
         'Git is installed and knows my name and email',
         'My aws-study-projects repository is on GitHub',

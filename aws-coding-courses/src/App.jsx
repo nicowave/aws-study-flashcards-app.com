@@ -46,6 +46,13 @@ const useCourseAccess = (user) => {
     return () => { live = false; };
   }, [user]);
 
+  // Local development only: add ?unlocked to the address to preview paid tutorials
+  if (import.meta.env.DEV) {
+    try {
+      if (new URLSearchParams(window.location.search).has('unlocked')) sessionStorage.setItem('awsCourse_devUnlocked', '1');
+      if (sessionStorage.getItem('awsCourse_devUnlocked')) return { access: true, notice, clearNotice: () => setNotice(null) };
+    } catch { /* storage blocked */ }
+  }
   return { access, notice, clearNotice: () => setNotice(null) };
 };
 

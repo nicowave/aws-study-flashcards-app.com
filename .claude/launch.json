@@ -74,6 +74,21 @@
         "--strictPort"
       ],
       "port": 5173
+    },
+    {
+      "name": "python-course",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev:python",
+        "--prefix",
+        "aws-coding-courses",
+        "--",
+        "--port",
+        "5176",
+        "--strictPort"
+      ],
+      "port": 5176
     }
   ]
 }

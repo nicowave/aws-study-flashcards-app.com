@@ -1,19 +1,21 @@
 // Renders lesson text (Markdown, written by us and bundled with the site).
-// ```bash blocks get a "Run" button when a practice terminal is on the page;
-// every code block gets "Copy".
+// Practice code blocks (```bash for the shell, ```python for Python) get a
+// "Run" button when that practice area is on the page; every block gets "Copy".
 import React, { useMemo } from 'react';
 import { Marked } from 'marked';
 
 const escapeHtml = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-const makeParser = (runnable) => {
+const LABELS = { bash: 'practice shell', python: 'practice Python', sh: 'your terminal', py: 'on your computer', console: 'output', text: '' };
+
+const makeParser = (runLang) => {
   const marked = new Marked({ gfm: true, breaks: false });
   marked.use({
     renderer: {
       code({ text, lang }) {
         const language = (lang || '').trim();
-        const label = { bash: 'practice shell', sh: 'your terminal', console: 'output', text: '' }[language] ?? language;
-        const run = runnable && language === 'bash'
+        const label = LABELS[language] ?? language;
+        const run = runLang && language === runLang
           ? `<button type="button" class="code-btn run-code" data-code="${escapeHtml(text)}">▶ Run</button>`
           : '';
         return `<div class="code-block lang-${escapeHtml(language || 'text')}">` +
@@ -30,14 +32,14 @@ const makeParser = (runnable) => {
   return marked;
 };
 
-const parsers = { true: makeParser(true), false: makeParser(false) };
+const parsers = { none: makeParser(null), bash: makeParser('bash'), python: makeParser('python') };
 
-const Markdown = ({ text, onRun, className = '' }) => {
+const Markdown = ({ text, onRun, runLang = 'bash', className = '' }) => {
   const inline = className.split(' ').includes('inline');
   const html = useMemo(() => {
-    const parser = parsers[!!onRun];
+    const parser = parsers[onRun ? runLang : 'none'];
     return inline ? parser.parseInline(text || '') : parser.parse(text || '');
-  }, [text, onRun, inline]);
+  }, [text, onRun, runLang, inline]);
   const onClick = (e) => {
     const btn = e.target.closest('.code-btn');
     if (!btn) return;

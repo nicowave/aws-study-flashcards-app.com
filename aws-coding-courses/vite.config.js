@@ -25,6 +25,7 @@ export default defineConfig({
     },
   ],
   resolve: { alias: { '@course': `${courseDir}index.js` } },
+  worker: { format: 'es' }, // the practice Python's worker loads Pyodide with import()
   build: {
     outDir: `dist/${COURSE}`,
     emptyOutDir: true,
