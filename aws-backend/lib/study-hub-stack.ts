@@ -8,6 +8,8 @@ import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations
 import { HttpJwtAuthorizer } from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as eventsTargets from 'aws-cdk-lib/aws-events-targets';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
@@ -263,6 +265,36 @@ export class StudyHubBackendStack extends cdk.Stack {
       'POST /v1/leads': { ThrottlingRateLimit: 5, ThrottlingBurstLimit: 10 },
     });
     leadRoutes.forEach((r) => stage.node.addDependency(r)); // the route must exist first
+
+    // Follow-up emails to the readiness list (lambda/api/campaigns.js), sent
+    // once each at 9:00 Eastern (14:00 UTC after daylight saving ends)
+    const sesSend = new iam.PolicyStatement({
+      actions: ['ses:SendEmail'],
+      resources: [`arn:aws:ses:${this.region}:${this.account}:identity/nico-tek.com`],
+    });
+    const leadEmailsFn = new lambda.Function(this, 'LeadEmailsFn', {
+      runtime: lambda.Runtime.NODEJS_24_X,
+      handler: 'campaigns.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/api')),
+      environment: { TABLE_NAME: table.tableName, API_URL: httpApi.apiEndpoint },
+      timeout: cdk.Duration.minutes(10),
+      memorySize: 256,
+      reservedConcurrentExecutions: 1, // one run at a time
+    });
+    table.grantReadWriteData(leadEmailsFn);
+    leadEmailsFn.addToRolePolicy(sesSend);
+    for (const { id, day } of [
+      { id: 'day3', day: '4' }, // Wednesday
+      { id: '48-hours', day: '5' }, // Thursday
+      { id: 'last-day', day: '6' }, // Friday
+    ]) {
+      new events.Rule(this, `LeadEmails-${id}`, {
+        description: `Readiness list follow-up email: ${id}`,
+        schedule: events.Schedule.cron({ minute: '0', hour: '14', day, month: '11', year: '2026' }),
+        targets: [new eventsTargets.LambdaFunction(leadEmailsFn, { event: events.RuleTargetInput.fromObject({ campaign: id }) })],
+      });
+    }
+    new cdk.CfnOutput(this, 'LeadEmailsFunctionName', { value: leadEmailsFn.functionName });
 
     // Authenticated
     for (const route of [
