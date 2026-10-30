@@ -14,6 +14,7 @@ import StudyGuide from './components/StudyGuide';
 import Flashcards from './components/Flashcards';
 import ExamMode from './components/ExamMode';
 import { GuestBanner, GuestUpsell } from './components/GuestPrompts';
+import PromoBanner from './components/PromoBanner';
 import PaywallScreen from './components/PaywallScreen';
 import { BILLING_ENABLED, hasCertEntitlement } from './services/billing';
 import AuthScreen from './components/AuthScreen';
@@ -236,6 +237,7 @@ function GameContent() {
 
   return (
     <div className="game-container">
+      <PromoBanner />
       <AchievementNotification achievement={newAchievement} />
       
       {/* User Header */}
@@ -388,7 +390,12 @@ function AppContent() {
 
   // Require authentication or guest preview - show auth screen otherwise
   if (!isAuthenticated && !isGuest) {
-    return <AuthScreen hubUrl={HUB_URL} onGuestContinue={continueAsGuest} />;
+    return (
+      <>
+        <PromoBanner />
+        <AuthScreen hubUrl={HUB_URL} onGuestContinue={continueAsGuest} />
+      </>
+    );
   }
 
   // User is authenticated, show the game

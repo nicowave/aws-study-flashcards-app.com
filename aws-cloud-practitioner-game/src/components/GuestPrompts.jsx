@@ -1,7 +1,14 @@
 import React from 'react';
 import { LockIcon } from './Icons';
 import { BILLING_ENABLED, CERT_PRICE_LABEL } from '../services/billing';
+import { certSale } from './PromoBanner';
 import './GuestPrompts.css';
+
+// "$9.99 one-time", or the sale price while a sale runs
+const unlockPriceText = () => {
+  const sale = certSale(CERT_PRICE_LABEL);
+  return sale ? `${sale.salePrice} during the ${sale.promo.label}, normally ${sale.price}` : CERT_PRICE_LABEL;
+};
 
 // Slim banner shown at the top of every screen while in guest mode.
 export const GuestBanner = ({ onSignUp }) => (
@@ -33,7 +40,7 @@ export const GuestUpsell = ({ feature, bullets, onSignUp, onBack }) => (
           Start with a free account — no card needed, and your guest progress carries
           over automatically. It includes every flashcard deck and your first full quiz.
           The exam simulator and every quiz domain come with this certification&apos;s
-          one-time unlock ({CERT_PRICE_LABEL}).
+          one-time unlock ({unlockPriceText()}).
         </>
       ) : (
         <>

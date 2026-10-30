@@ -1,0 +1,24 @@
+/* Sale banner, above everything else in the app */
+
+.promo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: #3a1f05;
+  color: #ffd8a8;
+  border: 1px solid #f28c28;
+  border-radius: var(--md-radius-md);
+  padding: 8px 16px;
+  margin: 0 auto 16px;
+  max-width: 900px;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.price-was {
+  opacity: 0.6;
+  font-weight: 400;
+  margin-left: 8px;
+}

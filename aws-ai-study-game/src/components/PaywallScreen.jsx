@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { startCheckout, CERT_PRICE_LABEL } from '../services/billing';
 import { LockIcon, CheckCircleIcon } from './Icons';
+import { certSale } from './PromoBanner';
 import './PaywallScreen.css';
 
 /**
@@ -10,6 +11,7 @@ import './PaywallScreen.css';
 const PaywallScreen = ({ certId, certName, onBack }) => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const sale = certSale(CERT_PRICE_LABEL);
 
   const handleSubscribe = async () => {
     setError('');
@@ -40,8 +42,18 @@ const PaywallScreen = ({ certId, certName, onBack }) => {
         <li><CheckCircleIcon size={16} /> One-time payment - lifetime access for this cert</li>
       </ul>
       <div className="paywall-price">
-        <span className="paywall-price-value mono">{CERT_PRICE_LABEL}</span>
-        <span className="paywall-price-note">for this certification</span>
+        {sale ? (
+          <>
+            <span className="paywall-price-value mono">{sale.salePrice}</span>
+            <s className="paywall-price-note price-was mono">{sale.price}</s>
+            <span className="paywall-price-note">one-time: {sale.promo.label}, until {sale.promo.ends}</span>
+          </>
+        ) : (
+          <>
+            <span className="paywall-price-value mono">{CERT_PRICE_LABEL}</span>
+            <span className="paywall-price-note">for this certification</span>
+          </>
+        )}
       </div>
       <div className="paywall-actions">
         <button className="paywall-subscribe-btn" onClick={handleSubscribe} disabled={busy}>
