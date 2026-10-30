@@ -13,15 +13,15 @@ const course = {
   headline: 'Catch the bug before your users do.',
   lede: 'TypeScript for AWS is JavaScript with safety rails, and it\'s what most cloud teams and the AWS Cloud Development Kit use. You\'ll make a page bug-proof, build a typed command-line tool on the AWS SDK, and describe a whole app as code so one command deploys it and every push to GitHub updates it.',
   heroNote: 'Start here and Tutorial 1 are free. The real TypeScript compiler runs in your browser, in strict mode, so you see every error the way your editor would.',
-  heroTerminal: `app.ts(14,22): error TS2551: Property 'fornt' does not
+  heroTerminal: `$ npx tsc
+app.ts: error TS2551: Property 'fornt' does not
   exist on type 'Card'. Did you mean 'front'?
 
-$ npx tsx bin/app.ts
-Synthesized stack StudyTracker:
-  AWS::DynamoDB::Table      Progress
-  AWS::Lambda::Function     Api
-  AWS::ApiGatewayV2::Api    HttpApi
-  AWS::Cognito::UserPool    Users`,
+$ ops usage team-assets
+team-assets: 2,350 objects, 4.8 MB
+
+$ npx cdk deploy
+✅  StudyTracker`,
   outcomes: [
     'Use types, interfaces, union types and generics, and read compiler errors with confidence',
     'Turn on strict mode and fix the bugs it finds: undefined values, wrong property names, missing cases',
@@ -46,7 +46,7 @@ Synthesized stack StudyTracker:
   siblings: [
     { title: 'Bash for AWS', url: 'https://bash.aws-study-flashcards-app.com', live: true },
     { title: 'Python for AWS', url: 'https://python.aws-study-flashcards-app.com', live: true },
-    { title: 'JavaScript for AWS', url: 'https://js.aws-study-flashcards-app.com', live: false },
+    { title: 'JavaScript for AWS', url: 'https://js.aws-study-flashcards-app.com', live: true },
   ],
   tutorials: [startHere, bugProofFlashcards, awsCliTool, deployWithCode],
 };

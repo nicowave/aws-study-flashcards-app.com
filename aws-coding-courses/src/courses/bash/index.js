@@ -51,8 +51,8 @@ Live at https://www.example.com`,
 - Continue with [Python for AWS](https://python.aws-study-flashcards-app.com): the language AWS automation runs on, with boto3, Lambda and DynamoDB.`,
   siblings: [
     { title: 'Python for AWS', url: 'https://python.aws-study-flashcards-app.com', live: true },
-    { title: 'JavaScript for AWS', url: 'https://js.aws-study-flashcards-app.com', live: false },
-    { title: 'TypeScript for AWS', url: 'https://typescript.aws-study-flashcards-app.com', live: false },
+    { title: 'JavaScript for AWS', url: 'https://js.aws-study-flashcards-app.com', live: true },
+    { title: 'TypeScript for AWS', url: 'https://typescript.aws-study-flashcards-app.com', live: true },
   ],
   tutorials: [startHere, serverHealthCheck, logDetective, nightlyBackup, websiteDeploy],
 };

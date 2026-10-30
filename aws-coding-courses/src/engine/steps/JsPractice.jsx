@@ -11,6 +11,7 @@ import Editor from './Editor';
 import { TaskBox, useVerdict, scenarioOf, runLangFor } from './TaskBox';
 import { jsRunner, tsCompiler, prepare, TimeLimitError } from '../js/session';
 import { buildPage } from '../js/webPage';
+import { guardLoops } from '../js/loopGuard';
 import { TIPS } from '../js/tips';
 
 const consoleText = (ts, where) => ({
@@ -52,6 +53,13 @@ const useStatus = (session) => {
 // Marks a page run in progress: if it's still there after a reload, that run froze the tab
 const PAGE_LOAD = `${Date.now()}-${Math.random()}`;
 
+// Resolves once the tab is in front (right away if it already is)
+const visible = () => new Promise((resolve) => {
+  if (typeof document === 'undefined' || !document.hidden) { resolve(); return; }
+  const onChange = () => { if (!document.hidden) { document.removeEventListener('visibilitychange', onChange); resolve(); } };
+  document.addEventListener('visibilitychange', onChange);
+});
+
 // Top-level const/let in a console line would vanish after the line runs; var keeps them
 const keepDeclarations = (code) => code.replace(/^(const|let)\s+(?=[A-Za-z_$])/gm, 'var ');
 
@@ -60,10 +68,12 @@ const keepDeclarations = (code) => code.replace(/^(const|let)\s+(?=[A-Za-z_$])/g
 export const WebPracticeArea = forwardRef(({ step, storageId, done, onDone }, ref) => {
   const [resets, setResets] = useState(0);
   const [page, setPage] = useState(null);
+  const [checkPage, setCheckPage] = useState(null); // hidden copy the check runs in
   const [busy, setBusy] = useState(false);
   const isTs = runLangFor(step) === 'ts';
   const tsStatus = useStatus(tsCompiler);
   const frame = useRef(null);
+  const checkFrame = useRef(null);
   const out = useRef(null);
   const waiters = useRef(new Map());
   const log = useRef({ console: [], errors: [] });
@@ -83,8 +93,20 @@ export const WebPracticeArea = forwardRef(({ step, storageId, done, onDone }, re
 
   useEffect(() => {
     const onMessage = (e) => {
-      if (!frame.current || e.source !== frame.current.contentWindow || !e.data?.__practice) return;
+      if (!e.data?.__practice) return;
       const msg = e.data;
+      // The check's hidden copy: only its answers and errors matter, and it saves nothing
+      if (checkFrame.current && e.source === checkFrame.current.contentWindow) {
+        if (msg.type === 'error' && !log.current.errors.some((x) => x.text === msg.text)) {
+          log.current.errors.push({ text: msg.text, file: msg.file, line: msg.line });
+          out.current?.print('err', `While checking your page: ${msg.text}`);
+          if (msg.tip) out.current?.print('tip', `Tip: ${msg.tip}`);
+        }
+        const key = msg.type === 'ready' ? `check-ready-${msg.runId}` : msg.id;
+        if (waiters.current.has(key)) waiters.current.get(key)(msg);
+        return;
+      }
+      if (!frame.current || e.source !== frame.current.contentWindow) return;
       if (msg.type === 'console') {
         log.current.console.push({ level: msg.level, text: msg.text });
         out.current?.print(msg.level === 'error' || msg.level === 'warn' ? 'err' : 'out', msg.text);
@@ -107,10 +129,10 @@ export const WebPracticeArea = forwardRef(({ step, storageId, done, onDone }, re
     const t = setTimeout(() => { waiters.current.delete(key); resolve(null); }, ms);
     waiters.current.set(key, (msg) => { clearTimeout(t); waiters.current.delete(key); resolve(msg); });
   });
-  const ask = (msg, ms) => {
+  const ask = (msg, ms, target = frame) => {
     seq.current += 1;
     const answer = waitFor(seq.current, ms);
-    frame.current?.contentWindow?.postMessage({ __practiceParent: true, ...msg, id: seq.current }, '*');
+    target.current?.contentWindow?.postMessage({ __practiceParent: true, ...msg, id: seq.current }, '*');
     return answer;
   };
 
@@ -125,18 +147,31 @@ export const WebPracticeArea = forwardRef(({ step, storageId, done, onDone }, re
       const prepared = await prepare(sources);
       if (stale()) return;
       showDiagnostics(out.current, prepared.diagnostics);
-      const { html } = buildPage({ files: sources, compiled: prepared.compiled, lineMaps: prepared.lineMaps, storage: storage.current, web: scenario.web || {}, tips: TIPS, runId });
+      // Both copies start from the same files and saved data
+      const pageFor = (role) => buildPage({ files: sources, compiled: prepared.compiled, lineMaps: prepared.lineMaps, storage: storage.current, web: scenario.web || {}, tips: TIPS, runId, role }).html;
+      const viewHtml = pageFor('view');
+      const checkHtml = step.probe ? pageFor('probe') : null;
       log.current = { console: [], errors: [] };
       const ready = waitFor(`ready-${runId}`, 8000);
-      setPage({ html, id: runId });
+      setCheckPage(null);
+      setPage({ html: viewHtml, id: runId });
       const loaded = !!(await ready);
       if (stale()) return;
       try { sessionStorage.removeItem(runningKey); } catch { /* blocked */ }
       if (!loaded) out.current?.print('err', 'The page didn\'t finish loading within 8 seconds. Is there a loop that never ends?');
       let probe = null;
-      if (step.probe && loaded) {
-        probe = await ask({ type: 'probe', body: step.probe }, 8000);
+      if (checkHtml && loaded) {
+        // Browsers slow down timers in background tabs: check once the tab is in front
+        await visible();
         if (stale()) return;
+        const checkReady = waitFor(`check-ready-${runId}`, 8000);
+        setCheckPage({ html: checkHtml, id: runId });
+        if (await checkReady) {
+          if (stale()) return;
+          probe = await ask({ type: 'probe', body: step.probe }, 8000, checkFrame);
+        }
+        if (stale()) return;
+        setCheckPage(null);
         if (!probe) out.current?.print('err', 'The check got no answer from the page within 8 seconds.');
       }
       judge({
@@ -175,7 +210,7 @@ export const WebPracticeArea = forwardRef(({ step, storageId, done, onDone }, re
       out.current?.print('err', e.message);
       return;
     }
-    const answer = await ask({ type: 'eval', code: keepDeclarations(code) }, 5000);
+    const answer = await ask({ type: 'eval', code: guardLoops(keepDeclarations(code), 'console') }, 5000);
     if (!answer) out.current?.print('err', 'No answer from the page. Is it still running?');
     else if (answer.error) {
       out.current?.print('err', answer.error);
@@ -206,6 +241,7 @@ export const WebPracticeArea = forwardRef(({ step, storageId, done, onDone }, re
           <button type="button" className="code-btn run-code" onClick={() => !busy && run()}>{busy ? 'Running…' : '▶ Run'}</button>
         </div>
         {page && <iframe key={page.id} ref={frame} title="Page preview" sandbox="allow-scripts allow-modals allow-forms" srcDoc={page.html} />}
+        {checkPage && <iframe key={`check-${checkPage.id}`} ref={checkFrame} className="web-check-frame" title="Page check" aria-hidden="true" tabIndex={-1} sandbox="allow-scripts allow-forms" srcDoc={checkPage.html} />}
       </div>
       <PyConsole
         ref={out} onSubmit={evaluate} busy={false} status={isTs ? tsStatus : 'ready'}

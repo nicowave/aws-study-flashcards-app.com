@@ -5,16 +5,26 @@
 //   - localStorage, kept by the course page between runs
 //   - fetch(), answered by the step's pretend internet
 //   - the check's probe: async code run inside the page (click, read the DOM)
+//   - loop protection, so `while (true)` can't freeze the course page
 // The page talks to its parent with postMessage, or through
 // window.__practiceBridge when a test runs it in jsdom.
+//
+// Each run builds the page twice: the preview the learner sees (role 'view',
+// which keeps its localStorage) and a hidden copy for the check (role
+// 'probe', same files and starting storage, saves nothing), so a check's
+// clicks never change the learner's page or saved data.
 import { inspect } from './inspect';
 import { makeFakeFetch } from './fakeFetch';
+import { guardLoops, installLoopGuard } from './loopGuard';
+
+export const LOOP_LIMIT_MS = 2000;
 
 const escapeScript = (code) => code.replace(/<\/(script)/gi, '<\\/$1');
 
 // Runs inside the page, before anything else. It's copied in as source text,
 // so it may only use its parameters and the page's globals.
-function pageShim(config, inspect, makeFakeFetch) {
+function pageShim(config, inspect, makeFakeFetch, installLoopGuard) {
+  installLoopGuard(window, config.loopLimit);
   const formatArgs = (args) => args.map((a) => (typeof a === 'string' ? a : inspect(a))).join(' ');
   const send = window.__practiceBridge || ((msg) => window.parent.postMessage({ __practice: true, ...msg }, '*'));
   const lines = [];
@@ -46,7 +56,8 @@ function pageShim(config, inspect, makeFakeFetch) {
     const ranges = window.__practiceRanges || [];
     let file = null;
     let line = null;
-    for (const r of ranges) {
+    if (err && err.practiceFile) { file = err.practiceFile; line = err.practiceLine; } // the loop guard knows exactly
+    for (const r of file ? [] : ranges) {
       const esc = r.path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const m = err && err.stack && String(err.stack).match(new RegExp(`(?:^|[\\s(/])${esc}:(\\d+):\\d+`));
       if (m) { file = r.path; line = Number(m[1]); break; }
@@ -100,7 +111,7 @@ function pageShim(config, inspect, makeFakeFetch) {
       getOwnPropertyDescriptor: (t, k) => (data.has(k) ? { value: data.get(k), enumerable: true, configurable: true } : undefined),
     });
   };
-  const local = makeStorage(config.storage, true);
+  const local = makeStorage(config.storage, config.persist);
   for (const [name, value] of [['localStorage', local], ['sessionStorage', makeStorage({}, false)]]) {
     try { Object.defineProperty(window, name, { value, configurable: true }); } catch (e) { /* keep the real one */ }
   }
@@ -194,7 +205,7 @@ function pageShim(config, inspect, makeFakeFetch) {
   };
   window.__practiceHandle = handle;
   window.addEventListener('message', (e) => { if (e.data && e.data.__practiceParent) handle(e.data); });
-  window.addEventListener('load', () => setTimeout(() => send({ type: 'ready', runId: config.runId }), 20));
+  window.addEventListener('load', () => setTimeout(() => send({ type: 'ready', runId: config.runId, role: config.role }), 20));
 }
 
 /**
@@ -202,7 +213,7 @@ function pageShim(config, inspect, makeFakeFetch) {
  * compiled: JavaScript for .ts files ({ 'app.ts': '...' }).
  * Returns the full HTML for the preview frame.
  */
-export const buildPage = ({ files, compiled = {}, lineMaps = {}, storage = {}, web = {}, tips = [], runId = 0 }) => {
+export const buildPage = ({ files, compiled = {}, lineMaps = {}, storage = {}, web = {}, tips = [], runId = 0, role = 'view' }) => {
   const compiledOrSource = (path) => (path.endsWith('.ts') ? compiled[path] ?? '' : files[path] ?? '');
   const htmlPath = Object.keys(files).find((p) => p === 'index.html') || Object.keys(files).find((p) => p.endsWith('.html'));
   const scriptFiles = [];
@@ -212,7 +223,7 @@ export const buildPage = ({ files, compiled = {}, lineMaps = {}, storage = {}, w
     const path = [name, `${stem}.ts`, `${stem}.js`].find((p) => p in files);
     if (!path) return null;
     scriptFiles.push(path);
-    return { path, code: `${compiledOrSource(path)}\n//# sourceURL=${path}` };
+    return { path, code: `${guardLoops(compiledOrSource(path), path)}\n//# sourceURL=${path}` };
   };
 
   let html = htmlPath ? files[htmlPath] : '<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>';
@@ -233,8 +244,8 @@ export const buildPage = ({ files, compiled = {}, lineMaps = {}, storage = {}, w
     }
   }
 
-  const config = { storage, web, runId, tips: tips.map(([re, tip]) => [re.source, tip]) };
-  const shim = `<script>(${pageShim})(${JSON.stringify(config).replace(/<\//g, '<\\/')}, ${inspect}, ${makeFakeFetch});</script>`;
+  const config = { storage, web, runId, role, persist: role === 'view', loopLimit: LOOP_LIMIT_MS, tips: tips.map(([re, tip]) => [re.source, tip]) };
+  const shim = `<script>(${pageShim})(${JSON.stringify(config).replace(/<\//g, '<\\/')}, ${inspect}, ${makeFakeFetch}, ${installLoopGuard});</script>`;
   html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => `${m}\n${shim}`) : `${shim}\n${html}`;
 
   // Where each script starts in the final page, for errors that only know the page line

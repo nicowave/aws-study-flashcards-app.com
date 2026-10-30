@@ -47,11 +47,11 @@ Response:
   afterCourse: `**Next steps:**
 - Put the four programs on your résumé as a "Python and AWS automation" project, linking to your GitHub.
 - Practice for the exam with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com).
-- JavaScript for AWS is coming next: web pages, and Lambda functions behind a real sign-in.`,
+- Continue with [JavaScript for AWS](https://js.aws-study-flashcards-app.com): web pages, and Lambda functions behind a real sign-in.`,
   siblings: [
     { title: 'Bash for AWS', url: 'https://bash.aws-study-flashcards-app.com', live: true },
-    { title: 'JavaScript for AWS', url: 'https://js.aws-study-flashcards-app.com', live: false },
-    { title: 'TypeScript for AWS', url: 'https://typescript.aws-study-flashcards-app.com', live: false },
+    { title: 'JavaScript for AWS', url: 'https://js.aws-study-flashcards-app.com', live: true },
+    { title: 'TypeScript for AWS', url: 'https://typescript.aws-study-flashcards-app.com', live: true },
   ],
   tutorials: [startHere, spreadsheetReport, awsBill, uptimeAlerts, uploadPipeline],
 };

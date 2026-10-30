@@ -337,20 +337,15 @@ function save() {
 ${STORAGE_TAIL}`;
 
 // ---------------------------------------------------------------------------
-// Probes: they click the learner's real page, so each one puts the saved
-// progress and the page back the way it found them.
+// Probes: they run in a hidden copy of the page, so their clicks never touch
+// the learner's page or saved progress. `saved` is the progress the page
+// started with.
 // ---------------------------------------------------------------------------
 
-const withRestore = (body) => `const saved = practice.storage();
-try {
-${body}
-} finally {
-  localStorage.clear();
-  for (const [k, v] of Object.entries(saved)) localStorage.setItem(k, v);
-  try { state = typeof load === 'function' ? load() : { index: 0, known: [], unknown: [] }; render(); } catch (e) { /* not built yet */ }
-}`;
+const withSaved = (body) => `const saved = practice.storage();
+${body}`;
 
-const FLIP_PROBE = withRestore(`  const flipped = () => practice.$('#card').classList.contains('flipped');
+const FLIP_PROBE = withSaved(`  const flipped = () => practice.$('#card').classList.contains('flipped');
   const look = () => ({ front: practice.text('#front-text'), score: practice.text('#score'), flipped: flipped() });
   const start = look();
   await practice.click('#flip');
@@ -372,7 +367,7 @@ const FLIP_PROBE = withRestore(`  const flipped = () => practice.$('#card').clas
   const wrapped = look();
   return { start, afterFlip, afterSecondFlip, afterKnow, afterAgain, afterSpace, afterRight, afterLeft, wrapped };`);
 
-const REMEMBER_PROBE = withRestore(`  const before = saved['flashcards-progress'] ?? null;
+const REMEMBER_PROBE = withSaved(`  const before = saved['flashcards-progress'] ?? null;
   const shown = { front: practice.text('#front-text'), score: practice.text('#score') };
   await practice.click('#know');
   const afterKnow = localStorage.getItem('flashcards-progress');
@@ -733,7 +728,7 @@ document.querySelector('#tags').append(li);
       solution: SHOW_SOLUTION,
       files: files(SHOW_STARTER),
       scenario: {},
-      probe: withRestore(`  const look = () => ({ front: practice.text('#front-text'), back: practice.text('#back-text'), score: practice.text('#score'), tags: practice.all('#tags li').map((li) => li.textContent) });
+      probe: withSaved(`  const look = () => ({ front: practice.text('#front-text'), back: practice.text('#back-text'), score: practice.text('#score'), tags: practice.all('#tags li').map((li) => li.textContent) });
   const first = look();
   state.index = 3;
   render();

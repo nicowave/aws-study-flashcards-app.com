@@ -14,14 +14,15 @@ const course = {
   headline: 'Build the web pages and serverless back ends AWS teams ship.',
   lede: 'JavaScript for AWS teaches the language of the web through things teams really build: a study page that remembers your progress, a live status dashboard, a contact form with no server to run, and a tracker with sign-in on Lambda, API Gateway, DynamoDB and Cognito. No programming background needed.',
   heroNote: 'Start here and Tutorial 1 are free. Nothing to install to begin: your pages and Lambda functions run right in the browser, with a pretend AWS account to practice on.',
-  heroTerminal: `> cards.filter((c) => !c.known).length
-3
+  heroTerminal: `> scoreText(['s3-bucket', 'lambda-what'], ['iam-least'])
+'2 known · 1 to review'
 
 $ test index.mjs with the sample event
 START RequestId: 6f1c… Version: $LATEST
-saved progress for learner-42
-REPORT Duration: 41.20 ms
-Response: { "statusCode": 200 }`,
+END RequestId: 6f1c…
+Response:
+{ "statusCode": 200,
+  "body": "{\\"saved\\":true,\\"deckId\\":\\"aws-basics\\"}" }`,
   outcomes: [
     'Read and write modern JavaScript: values, arrays, objects, functions, modules, and async/await',
     'Build web pages that react to clicks and remember progress, with the DOM and localStorage',
@@ -46,7 +47,7 @@ Response: { "statusCode": 200 }`,
   siblings: [
     { title: 'Bash for AWS', url: 'https://bash.aws-study-flashcards-app.com', live: true },
     { title: 'Python for AWS', url: 'https://python.aws-study-flashcards-app.com', live: true },
-    { title: 'TypeScript for AWS', url: 'https://typescript.aws-study-flashcards-app.com', live: false },
+    { title: 'TypeScript for AWS', url: 'https://typescript.aws-study-flashcards-app.com', live: true },
   ],
   tutorials: [startHere, flashcardPage, statusDashboard, contactForm, studyTracker],
 };
