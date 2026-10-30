@@ -52,6 +52,18 @@ print_info() {
 # Deployment Function
 # =============================================================================
 
+# robots.txt, sitemap.xml and llms.txt: short cache (the sync gives everything a year),
+# and llms.txt as UTF-8 so its dashes don't garble.
+upload_crawler_files() {
+    local dir="$1" bucket="$2" f
+    for f in robots.txt sitemap.xml llms.txt; do
+        [ -f "${dir}/${f}" ] || continue
+        local ctype="text/plain; charset=utf-8"
+        [ "$f" = sitemap.xml ] && ctype="application/xml"
+        aws s3 cp "${dir}/${f}" "s3://${bucket}/${f}" --cache-control "max-age=3600,public" --content-type "$ctype" > /dev/null
+    done
+}
+
 deploy_hub() {
     local site_name="Study Hub Homepage"
     local folder="aws-study-homepage"
@@ -100,6 +112,7 @@ deploy_hub() {
     
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
         --cache-control "no-cache,no-store,must-revalidate"
+    upload_crawler_files dist "$bucket"
     print_success "Files uploaded to S3"
     
     # Invalidate CloudFront
@@ -162,6 +175,7 @@ deploy_cloud() {
     
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
         --cache-control "no-cache,no-store,must-revalidate"
+    upload_crawler_files dist "$bucket"
     print_success "Files uploaded to S3"
     
     # Invalidate CloudFront
@@ -224,6 +238,7 @@ deploy_ai() {
     
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
         --cache-control "no-cache,no-store,must-revalidate"
+    upload_crawler_files dist "$bucket"
     print_success "Files uploaded to S3"
     
     # Invalidate CloudFront
@@ -286,6 +301,7 @@ deploy_saa() {
 
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
         --cache-control "no-cache,no-store,must-revalidate"
+    upload_crawler_files dist "$bucket"
     print_success "Files uploaded to S3"
 
     # Invalidate CloudFront
@@ -348,6 +364,7 @@ deploy_dva() {
 
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
         --cache-control "no-cache,no-store,must-revalidate"
+    upload_crawler_files dist "$bucket"
     print_success "Files uploaded to S3"
 
     # Invalidate CloudFront
@@ -393,6 +410,7 @@ deploy_course() {
         --cache-control "max-age=31536000,public"
     aws s3 cp "dist/${course}/index.html" "s3://${bucket}/index.html" \
         --cache-control "no-cache,no-store,must-revalidate"
+    upload_crawler_files "dist/${course}" "$bucket"
     print_success "Files uploaded to S3"
 
     print_step "Invalidating CloudFront cache..."

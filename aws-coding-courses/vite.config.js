@@ -22,6 +22,16 @@ export default defineConfig({
             .replaceAll('%COURSE_DESCRIPTION%', meta.description)
             .replaceAll('%COURSE_URL%', meta.url),
       },
+      // Each course site is its own host, so it needs its own robots.txt and sitemap
+      generateBundle() {
+        const emit = (fileName, source) => this.emitFile({ type: 'asset', fileName, source });
+        emit('robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${meta.url}/sitemap.xml\n`);
+        emit('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>${meta.url}/</loc></url>
+</urlset>
+`);
+      },
     },
   ],
   resolve: { alias: { '@course': `${courseDir}index.js` } },

@@ -1,0 +1,24 @@
+# AWS Study Hub
+
+> Study sites for Amazon Web Services (AWS) certification exams, plus hands-on coding courses for AWS. Each certification has a quiz game, flashcards, a study guide and a full-length timed exam simulator scored on the real 100–1,000 scale. Start free with no account; unlocking a certification or course is a one-time payment. Made by Nico Tek Solutions; not affiliated with Amazon Web Services.
+
+## Certification prep
+
+- [AWS Certified Cloud Practitioner (CLF-C02)](https://cloud.aws-study-flashcards-app.com/): 65-question, 90-minute exam simulator, pass mark 700. $9.99 one-time unlock.
+- [AWS Certified AI Practitioner (AIF-C01)](https://ai.aws-study-flashcards-app.com/): generative AI, Amazon Bedrock, Amazon SageMaker. 65-question, 90-minute exam simulator, pass mark 700. $9.99 one-time unlock.
+- [AWS Certified Solutions Architect – Associate (SAA-C03)](https://architect.aws-study-flashcards-app.com/): 65-question, 130-minute exam simulator, pass mark 720. $14.99 one-time unlock.
+- [AWS Certified Developer – Associate (DVA-C02)](https://developer.aws-study-flashcards-app.com/): 65-question, 130-minute exam simulator, pass mark 720. $14.99 one-time unlock.
+
+## Coding courses (the Developer Path)
+
+Practice in the browser (a practice terminal, real Python, a JavaScript and TypeScript editor with a pretend AWS account), then build the same thing on your own AWS account. The first tutorial of each course is free; each course is $19.99 once, or $59 for all four plus the Developer – Associate study game.
+
+- [Bash for AWS](https://bash.aws-study-flashcards-app.com/): health checks, log digging, backups to Amazon S3, one-command website deploys.
+- [Python for AWS](https://python.aws-study-flashcards-app.com/): spreadsheet reports, the AWS bill, certificate alerts, an upload pipeline with Lambda and DynamoDB.
+- [JavaScript for AWS](https://js.aws-study-flashcards-app.com/): web pages, live dashboards, a serverless contact form, a study tracker with sign-in.
+- [TypeScript for AWS](https://typescript.aws-study-flashcards-app.com/): type-safe code, a command-line tool for AWS, infrastructure as code with the Cloud Development Kit.
+
+## Optional
+
+- [Terms of Service](https://aws-study-flashcards-app.com/terms.html)
+- [Privacy Policy](https://aws-study-flashcards-app.com/privacy.html)
