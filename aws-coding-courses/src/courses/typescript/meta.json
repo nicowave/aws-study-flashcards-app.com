@@ -1,0 +1,10 @@
+{
+  "id": "typescript-for-aws",
+  "language": "TypeScript",
+  "title": "TypeScript for AWS",
+  "pageTitle": "TypeScript for AWS — typed JavaScript, the AWS SDK and the CDK",
+  "description": "Learn TypeScript by making real code safer: catch bugs before they ship, build a typed AWS command-line tool with the AWS SDK for JavaScript, and deploy a whole app with the AWS Cloud Development Kit and GitHub Actions. Practice in your browser, then build it on your own AWS account.",
+  "url": "https://typescript.aws-study-flashcards-app.com",
+  "price": "$19.99",
+  "hours": 14
+}

@@ -134,6 +134,36 @@
         "--strictPort"
       ],
       "port": 5181
+    },
+    {
+      "name": "javascript-course",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev:javascript",
+        "--prefix",
+        "aws-coding-courses",
+        "--",
+        "--port",
+        "5177",
+        "--strictPort"
+      ],
+      "port": 5177
+    },
+    {
+      "name": "typescript-course",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev:typescript",
+        "--prefix",
+        "aws-coding-courses",
+        "--",
+        "--port",
+        "5178",
+        "--strictPort"
+      ],
+      "port": 5178
     }
   ]
 }

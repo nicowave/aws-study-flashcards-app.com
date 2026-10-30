@@ -3,10 +3,15 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { Shell } from '../engine/shell/shell';
 import { nodePython } from '../engine/python/nodePython';
+import { nodeRunner, prepareFiles, transpile } from '../engine/js/nodeJs';
+import { runWebPage } from '../engine/js/webJsdom';
 import bash from './bash/index';
 import pythonCourse from './python/index';
+import javascriptCourse from './javascript/index';
+import typescriptCourse from './typescript/index';
 
-const COURSES = [bash, pythonCourse];
+const COURSES = [bash, pythonCourse, javascriptCourse, typescriptCourse];
+const JS_RUNTIMES = ['web', 'node'];
 
 const runCheck = (step, shell, result) => step.check({ shell, fs: shell.fs, aws: shell.aws, result, history: shell.history });
 const freshShell = (step) => new Shell(typeof step.scenario === 'function' ? step.scenario() : step.scenario);
@@ -29,6 +34,34 @@ const pyAttempt = async (step, code) => {
   const sources = { [file.path]: code, ...Object.fromEntries(others.map((f) => [f.path, f.starter ?? ''])) };
   const result = await py.run({ path: file.path, files: sources, probe: step.probe, invoke: file.invoke });
   return { result, verdict: pyCheck(step, result, 'run', sources) };
+};
+
+// JavaScript and TypeScript steps: web pages in jsdom, server code in the
+// same runner the site's worker uses. A solution is code for the first file,
+// or { path: code } for several files.
+const jsr = nodeRunner();
+const scenarioOf = (step) => (typeof step.scenario === 'function' ? step.scenario() : step.scenario) || {};
+
+const jsAttempt = async (step, code) => {
+  const scenario = scenarioOf(step);
+  const files = step.files
+    ? Object.fromEntries(step.files.map((f, i) => [f.path, typeof code === 'object' ? code[f.path] ?? f.starter ?? '' : i === 0 ? code : f.starter ?? '']))
+    : {};
+  if (step.runtime === 'web') {
+    const r = await runWebPage({ files, storage: scenario.storage, web: scenario.web, probe: step.probe });
+    return { result: r.result, diagnostics: r.diagnostics, verdict: step.check({ result: r.result, probe: r.probe, probeError: r.probeError, files, diagnostics: r.diagnostics, kind: 'run', sources: files }) };
+  }
+  await jsr.reset({ scenario });
+  const prepared = await prepareFiles(files);
+  const isTs = step.lang === 'ts' || Object.keys(files).some((p) => p.endsWith('.ts'));
+  const result = step.files
+    ? await jsr.run({ path: step.files[0].path, files: prepared.files, lineMaps: prepared.lineMaps, probe: step.probe, invoke: step.files[0].invoke })
+    : await jsr.cell({ source: isTs ? transpile(code) : code, files: prepared.files, probe: step.probe });
+  const verdict = step.check({
+    result, invoke: result.invoke, aws: result.aws, web: result.web, cdk: result.cdk, probe: result.probe?.value, probeError: result.probe?.error,
+    files, diagnostics: prepared.diagnostics, kind: step.files ? 'run' : 'cell', sources: files,
+  });
+  return { result, diagnostics: prepared.diagnostics, verdict };
 };
 
 for (const course of COURSES) {
@@ -54,6 +87,25 @@ for (const course of COURSES) {
     });
 
     for (const t of course.tutorials) {
+      for (const step of t.steps.filter((s) => s.kind === 'try' && JS_RUNTIMES.includes(s.runtime))) {
+        it(`${t.slug} / ${step.id}: the answer passes and doing nothing doesn't`, async () => {
+          if (!step.files) {
+            const idle = await jsAttempt(step, 'undefined');
+            expect(idle.verdict).not.toBe(true);
+          }
+          const { result, diagnostics, verdict } = await jsAttempt(step, step.solution);
+          if (verdict !== true) console.log(step.id, { verdict, diagnostics, result: JSON.stringify(result).slice(0, 3000) });
+          expect(verdict).toBe(true);
+        });
+
+        if (step.files) {
+          it(`${t.slug} / ${step.id}: the unfinished starter doesn't pass yet`, async () => {
+            const { verdict } = await jsAttempt(step, Object.fromEntries(step.files.map((f) => [f.path, f.starter ?? ''])));
+            expect(verdict).not.toBe(true);
+          });
+        }
+      }
+
       for (const step of t.steps.filter((s) => s.kind === 'try' && s.runtime === 'python')) {
         it(`${t.slug} / ${step.id}: the answer passes and doing nothing doesn't`, async () => {
           const idle = await pyAttempt({ ...step, files: undefined }, 'None');
@@ -73,7 +125,7 @@ for (const course of COURSES) {
         }
       }
 
-      for (const step of t.steps.filter((s) => s.kind === 'try' && s.runtime !== 'python')) {
+      for (const step of t.steps.filter((s) => s.kind === 'try' && !s.runtime)) {
         it(`${t.slug} / ${step.id}: the answer passes and doing nothing doesn't`, () => {
           const idle = freshShell(step);
           const idleResult = idle.run('ls');

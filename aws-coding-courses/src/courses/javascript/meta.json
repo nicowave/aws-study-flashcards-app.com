@@ -1,0 +1,10 @@
+{
+  "id": "javascript-for-aws",
+  "language": "JavaScript",
+  "title": "JavaScript for AWS",
+  "pageTitle": "JavaScript for AWS — build web apps and Lambda functions on AWS",
+  "description": "Learn JavaScript by building what teams really ask for: a flashcard page, a live status dashboard, a serverless contact form and a study tracker with sign-in, on Lambda, API Gateway, DynamoDB and Cognito. Practice in your browser, then build it on your own AWS account.",
+  "url": "https://js.aws-study-flashcards-app.com",
+  "price": "$19.99",
+  "hours": 18
+}

@@ -1,6 +1,7 @@
-// The practice Python console: shows program output and takes Python one
-// line (or block) at a time at the >>> prompt, like the real REPL. History
-// with up/down, Ctrl+C to clear the line, Ctrl+L to clear the screen.
+// The practice console for Python and JavaScript: shows program output and
+// takes code one line (or block) at a time at the prompt, like the real REPL
+// (>>> for Python by default, > for JavaScript). History with up/down, Ctrl+C
+// to clear the line, Ctrl+L to clear the screen.
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 // Is this console input unfinished? Open brackets or triple quotes, a trailing
@@ -34,7 +35,37 @@ export const pyIncomplete = (source) => {
   return block && last.trim() !== '';
 };
 
-const PyConsole = forwardRef(({ onSubmit, busy, status, label = 'Practice Python' }, ref) => {
+// JavaScript: unfinished while brackets, quotes or a `template` are open
+export const jsIncomplete = (source) => {
+  let depth = 0;
+  let quote = null;
+  for (let i = 0; i < source.length; i++) {
+    const c = source[i];
+    if (quote) {
+      if (c === '\\') { i++; continue; }
+      if (c === quote) quote = null;
+      else if (c === '\n' && quote !== '`') quote = null;
+      continue;
+    }
+    if (c === '/' && source[i + 1] === '/') { while (i < source.length && source[i] !== '\n') i++; continue; }
+    if (c === '/' && source[i + 1] === '*') { const end = source.indexOf('*/', i + 2); if (end < 0) return true; i = end + 1; continue; }
+    if (c === '"' || c === "'" || c === '`') quote = c;
+    else if ('([{'.includes(c)) depth++;
+    else if (')]}'.includes(c)) depth = Math.max(0, depth - 1);
+  }
+  return quote === '`' || depth > 0 || /[\\,]\s*$/.test(source);
+};
+
+const PYTHON_TEXT = {
+  intro: 'Practice Python 3.13 in your browser, with a pretend AWS account. Nothing here touches your computer or a real AWS account.',
+  starting: 'Starting Python… The first time takes a few seconds (about 10 MB), then your browser keeps it.',
+  failed: 'Python couldn\'t start. Check your internet connection, then reload the page.',
+  hint: <>type Python at <code>&gt;&gt;&gt;</code>, or press Run</>,
+};
+
+const PyConsole = forwardRef(({
+  onSubmit, busy, status, label = 'Practice Python', prompt: mainPrompt = '>>> ', more = '... ', incomplete = pyIncomplete, text = PYTHON_TEXT, inputLabel = 'Python console input',
+}, ref) => {
   const [lines, setLines] = useState([]);
   const [input, setInput] = useState('');
   const [pending, setPending] = useState('');
@@ -52,21 +83,21 @@ const PyConsole = forwardRef(({ onSubmit, busy, status, label = 'Practice Python
 
   useImperativeHandle(ref, () => ({
     // A snippet run from a button: show it as if it was typed at the prompt
-    echoCell: (source) => add(source.replace(/\n+$/, '').split('\n').map((l, i) => ({ kind: 'cmd', prompt: i === 0 ? '>>> ' : '... ', text: l }))),
+    echoCell: (source) => add(source.replace(/\n+$/, '').split('\n').map((l, i) => ({ kind: 'cmd', prompt: i === 0 ? mainPrompt : more, text: l }))),
     echoCommand: (text) => add([{ kind: 'cmd', prompt: '$ ', text }]),
     show: (transcript) => add(transcript.map((c) => ({ kind: c.stream, text: c.text }))),
     print: (kind, text) => add([{ kind, text }]),
     clear: () => setLines([]),
     focus: () => inputRef.current?.focus({ preventScroll: true }),
-  }), []);
+  }), [mainPrompt, more]);
 
   const submit = () => {
     const source = pending ? `${pending}\n${input}` : input;
-    add([{ kind: 'cmd', prompt: pending ? '... ' : '>>> ', text: input }]);
+    add([{ kind: 'cmd', prompt: pending ? more : mainPrompt, text: input }]);
     setInput('');
     setHistoryIdx(null);
     if (!source.trim()) { setPending(''); return; }
-    if (pyIncomplete(source)) { setPending(source); return; }
+    if (incomplete(source)) { setPending(source); return; }
     setPending('');
     // The arrows bring back single lines; blocks are easier to run again from the editor
     if (!source.includes('\n')) typed.current.push(source);
@@ -93,7 +124,7 @@ const PyConsole = forwardRef(({ onSubmit, busy, status, label = 'Practice Python
     }
     if (e.ctrlKey && e.key === 'c') {
       e.preventDefault();
-      add([{ kind: 'cmd', prompt: pending ? '... ' : '>>> ', text: `${input}` }, { kind: 'err', text: 'KeyboardInterrupt' }]);
+      add([{ kind: 'cmd', prompt: pending ? more : mainPrompt, text: `${input}` }, ...(mainPrompt === '>>> ' ? [{ kind: 'err', text: 'KeyboardInterrupt' }] : [])]);
       setInput('');
       setPending('');
       return;
@@ -107,12 +138,12 @@ const PyConsole = forwardRef(({ onSubmit, busy, status, label = 'Practice Python
       <div className="terminal-bar">
         <span className="dots"><i /><i /><i /></span>
         <span className="terminal-title">{label}</span>
-        <span className="terminal-hint">type Python at <code>&gt;&gt;&gt;</code>, or press Run</span>
+        <span className="terminal-hint">{text.hint}</span>
       </div>
       <div className="terminal-screen" ref={screenRef} role="log" aria-live="polite">
-        <div className="t-line t-info">Practice Python 3.13 in your browser, with a pretend AWS account. Nothing here touches your computer or a real AWS account.</div>
-        {starting && <div className="t-line t-info">Starting Python… The first time takes a few seconds (about 10 MB), then your browser keeps it.</div>}
-        {status === 'failed' && <div className="t-line t-err">Python couldn't start. Check your internet connection, then reload the page.</div>}
+        <div className="t-line t-info">{text.intro}</div>
+        {starting && text.starting && <div className="t-line t-info">{text.starting}</div>}
+        {status === 'failed' && <div className="t-line t-err">{text.failed}</div>}
         {lines.map((l, i) => (
           l.kind === 'cmd'
             ? <div key={i} className="t-line"><span className="t-prompt">{l.prompt}</span>{l.text}</div>
@@ -121,7 +152,7 @@ const PyConsole = forwardRef(({ onSubmit, busy, status, label = 'Practice Python
         {busy && <div className="t-line t-info t-busy">running…</div>}
         {/* Always mounted, so typing focus survives a run (Enter waits until it ends) */}
         <div className="t-line t-input-line">
-          <span className="t-prompt">{pending ? '... ' : '>>> '}</span>
+          <span className="t-prompt">{pending ? more : mainPrompt}</span>
           <input
             ref={inputRef}
             className="t-input"
@@ -132,7 +163,7 @@ const PyConsole = forwardRef(({ onSubmit, busy, status, label = 'Practice Python
             autoCapitalize="off"
             autoComplete="off"
             autoCorrect="off"
-            aria-label="Python console input"
+            aria-label={inputLabel}
           />
         </div>
       </div>

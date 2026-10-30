@@ -1,7 +1,8 @@
 // One step of a tutorial. Every step can have text; the kind adds the rest:
 //   read  — text (and an optional practice area to follow along)
 //   try   — a task in the practice area, checked automatically
-// The practice area is the shell, or Python for steps with runtime: 'python'.
+// The practice area comes from step.runtime: the shell (default), 'python',
+// 'web' (a page preview) or 'node' (server-side JavaScript, like Lambda).
 //   quiz  — multiple-choice questions
 //   cards — flashcards
 //   build — do it for real on your computer and AWS account, with a checklist
@@ -12,6 +13,8 @@ import PyConsole from '../PyConsole';
 import { Shell } from '../shell/shell';
 import { python, TimeLimitError } from '../python/session';
 import Editor from './Editor';
+import { TaskBox, useVerdict, scenarioOf, runLangFor } from './TaskBox';
+import { WebPracticeArea, NodePracticeArea } from './JsPractice';
 import Quiz from './Quiz';
 import Cards from './Cards';
 import Checklist from './Checklist';
@@ -24,50 +27,6 @@ const saveFile = (filename, text) => {
 };
 
 const WELCOME = 'Practice shell: a pretend Linux server in your browser. Nothing here touches your computer or a real AWS account.';
-
-const isPython = (step) => step.runtime === 'python';
-const scenarioOf = (step) => (typeof step.scenario === 'function' ? step.scenario() : step.scenario);
-
-// The task card above a practice area: task, hint, answer, feedback
-const TaskBox = ({ step, passed, feedback, onRun }) => {
-  const [showHint, setShowHint] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
-  if (!step.task) return null;
-  const answerLang = step.files ? step.files[0].path : isPython(step) ? 'python' : 'bash';
-  return (
-    <div className={`task ${passed ? 'passed' : ''}`}>
-      <div className="task-head">
-        <span className="task-label">{passed ? '✓ Done' : 'Your task'}</span>
-        <span className="task-tools">
-          {step.hint && <button type="button" className="link-btn" onClick={() => setShowHint(!showHint)}>{showHint ? 'Hide hint' : 'Hint'}</button>}
-          {step.solution && <button type="button" className="link-btn" onClick={() => setShowAnswer(!showAnswer)}>{showAnswer ? 'Hide answer' : 'Show an answer'}</button>}
-        </span>
-      </div>
-      <Markdown text={step.task} />
-      {showHint && <div className="task-hint"><Markdown text={step.hint} /></div>}
-      {showAnswer && (
-        <div className="task-answer">
-          {/* A whole-file answer is for the editor, so it gets Copy, not Run */}
-          <Markdown text={'```' + answerLang + '\n' + step.solution + '\n```'} onRun={onRun} runLang={isPython(step) ? 'python' : 'bash'} />
-        </div>
-      )}
-      {feedback && !feedback.ok && <div className="task-feedback">{feedback.text}</div>}
-      {passed && step.success && <div className="task-success"><Markdown text={step.success} /></div>}
-    </div>
-  );
-};
-
-const useVerdict = (step, done, onDone) => {
-  const [feedback, setFeedback] = useState(null);
-  const judge = useCallback((args) => {
-    if (!step.check) return;
-    let verdict;
-    try { verdict = step.check(args); } catch { verdict = false; }
-    if (verdict === true) { setFeedback({ ok: true }); onDone(); }
-    else if (typeof verdict === 'string') setFeedback({ ok: false, text: verdict });
-  }, [step, onDone]);
-  return { feedback, setFeedback, judge, passed: done || !!feedback?.ok };
-};
 
 const ShellPracticeArea = forwardRef(({ step, storageId, done, onDone }, ref) => {
   const [resets, setResets] = useState(0);
@@ -170,8 +129,8 @@ const StepView = ({ tutorial, step, progressKey, progress, actions, onNext, next
   const practiceRef = useRef(null);
   const storageId = `${tutorial.slug}_${step.id}`;
   const hasPractice = !!step.scenario;
-  const PracticeArea = isPython(step) ? PythonPracticeArea : ShellPracticeArea;
-  const runLang = isPython(step) ? 'python' : 'bash';
+  const PracticeArea = { python: PythonPracticeArea, web: WebPracticeArea, node: NodePracticeArea }[step.runtime] || ShellPracticeArea;
+  const runLang = runLangFor(step);
 
   // "Run" buttons in the text send code to this step's terminal or console
   const onRun = useMemo(() => (hasPractice ? (code) => practiceRef.current?.run(code) : undefined), [hasPractice]);
