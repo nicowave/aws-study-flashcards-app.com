@@ -1,4 +1,4 @@
-# Marketing: tracked links, readiness check, share images
+# Marketing: tracked links, readiness check, newsletter, share images
 
 ## Tracked links (launch week, Oct 31 – Nov 6, 2026)
 
@@ -56,6 +56,10 @@ aws lambda invoke --function-name "$(aws cloudformation describe-stacks --stack-
 ```
 
 Each run logs a line like `[campaigns] Done day3 {"sent":42,"skipped":{...}}` in the function's CloudWatch logs. Email links use `utm_source=readiness` with `utm_campaign` = `day3`, `sale-48-hours` or `sale-last-day`.
+
+## Weekly newsletter
+
+Sign-up boxes on the hub (`#newsletter`) and on each game's menu and results screens post to `POST /v1/newsletter` and send a welcome email. The newsletter goes to the whole list (sign-ups and readiness-check takers) every Tuesday at 9:00 Eastern; Nico gets a preview or a "nothing queued" reminder on Monday. How to write and queue an issue: [newsletter/README.md](../newsletter/README.md). Sign-ups show in Google Analytics as the `newsletter_signup` event; newsletter links use `utm_source=newsletter`.
 
 ## Share images
 

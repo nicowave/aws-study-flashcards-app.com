@@ -10,6 +10,8 @@ import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as eventsTargets from 'aws-cdk-lib/aws-events-targets';
+import * as scheduler from 'aws-cdk-lib/aws-scheduler';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
@@ -248,9 +250,10 @@ export class StudyHubBackendStack extends cdk.Stack {
       integration,
     });
 
-    // Readiness check on the homepage: saves the email and sends the score
-    // plus a study plan from nico@nico-tek.com (a verified identity)
-    const leadRoutes = ['/v1/leads', '/v1/leads/unsubscribe'].flatMap((p) =>
+    // The email list: the homepage's readiness check (score plus a study
+    // plan) and the newsletter sign-up box, sent from nico@nico-tek.com (a
+    // verified identity)
+    const leadRoutes = ['/v1/leads', '/v1/newsletter', '/v1/leads/unsubscribe'].flatMap((p) =>
       httpApi.addRoutes({ path: p, methods: [apigwv2.HttpMethod.POST], integration })
     );
     apiFn.addToRolePolicy(
@@ -263,6 +266,7 @@ export class StudyHubBackendStack extends cdk.Stack {
     const stage = httpApi.defaultStage!.node.defaultChild as apigwv2.CfnStage;
     stage.addPropertyOverride('RouteSettings', {
       'POST /v1/leads': { ThrottlingRateLimit: 5, ThrottlingBurstLimit: 10 },
+      'POST /v1/newsletter': { ThrottlingRateLimit: 5, ThrottlingBurstLimit: 10 },
     });
     leadRoutes.forEach((r) => stage.node.addDependency(r)); // the route must exist first
 
@@ -295,6 +299,52 @@ export class StudyHubBackendStack extends cdk.Stack {
       });
     }
     new cdk.CfnOutput(this, 'LeadEmailsFunctionName', { value: leadEmailsFn.functionName });
+
+    // Weekly newsletter (lambda/api/newsletter.js). Issues are Markdown files
+    // uploaded by `./deploy.sh newsletter`; Monday's run emails Nico a preview
+    // (or a reminder), Tuesday's sends the issue that's due.
+    const newsletterBucket = new s3.Bucket(this, 'NewsletterBucket', {
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      enforceSSL: true,
+      versioned: true,
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
+    });
+    const newsletterFn = new lambda.Function(this, 'NewsletterFn', {
+      runtime: lambda.Runtime.NODEJS_24_X,
+      handler: 'newsletter.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/api')),
+      environment: { TABLE_NAME: table.tableName, API_URL: httpApi.apiEndpoint, NEWSLETTER_BUCKET: newsletterBucket.bucketName },
+      timeout: cdk.Duration.minutes(15),
+      memorySize: 256,
+      reservedConcurrentExecutions: 1, // one run at a time
+    });
+    table.grantReadWriteData(newsletterFn);
+    newsletterBucket.grantRead(newsletterFn);
+    newsletterFn.addToRolePolicy(sesSend);
+    const schedulerRole = new iam.Role(this, 'NewsletterSchedulerRole', {
+      assumedBy: new iam.ServicePrincipal('scheduler.amazonaws.com'),
+    });
+    newsletterFn.grantInvoke(schedulerRole);
+    for (const { id, day, action } of [
+      { id: 'NewsletterRemind', day: 'MON', action: 'remind' },
+      { id: 'NewsletterSend', day: 'TUE', action: 'send' },
+    ]) {
+      new scheduler.CfnSchedule(this, id, {
+        description: `Weekly newsletter: ${action}`,
+        scheduleExpression: `cron(0 9 ? * ${day} *)`,
+        scheduleExpressionTimezone: 'America/New_York',
+        flexibleTimeWindow: { mode: 'OFF' },
+        target: {
+          arn: newsletterFn.functionArn,
+          roleArn: schedulerRole.roleArn,
+          input: JSON.stringify({ action }),
+          retryPolicy: { maximumRetryAttempts: 2 },
+        },
+      });
+    }
+    new cdk.CfnOutput(this, 'NewsletterBucketName', { value: newsletterBucket.bucketName });
+    new cdk.CfnOutput(this, 'NewsletterFunctionName', { value: newsletterFn.functionName });
 
     // Authenticated
     for (const route of [

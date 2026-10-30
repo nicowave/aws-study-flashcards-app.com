@@ -1,10 +1,15 @@
-// "Am I ready?" exam check: the homepage's 10-question check posts the score
-// here with an email; we save it and send the score plus a 7-day study plan.
+// The email list. Two ways in:
 //   POST /v1/leads              { email, certId, score, total, domains, source, website }
+//     the homepage's "Am I ready?" check: we save the score and email it with a
+//     7-day study plan
+//   POST /v1/newsletter         { email, site, source, website }
+//     the weekly newsletter sign-up box (hub and games): sends a welcome email
 //   POST /v1/leads/unsubscribe  { email, token }   (also the one-click header)
+// Everyone on the list gets the weekly newsletter (newsletter.js) until they
+// unsubscribe.
 //
 // Items (PK = LEAD#<email>): PROFILE (token, first source, unsubscribed,
-// daily send count) and CHECK#<iso time> for each check taken.
+// daily send count, newsletter sign-up) and CHECK#<iso time> for each check.
 const crypto = require('crypto');
 const { GetCommand, PutCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 const { SESv2Client, SendEmailCommand } = require('@aws-sdk/client-sesv2');
@@ -35,7 +40,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const clean = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-const FOOTER_NOTE = "You're getting this because you took the readiness check on aws-study-flashcards-app.com. I may send a few more study tips this week.";
+const FOOTER_NOTE = "You're on the AWS Study Hub email list (one study email a week) because you signed up or took the readiness check on aws-study-flashcards-app.com.";
 
 const footerText = (unsubscribeUrl) => `---
 ${FOOTER_NOTE} Unsubscribe: ${unsubscribeUrl}
@@ -176,6 +181,62 @@ const validDomains = (raw) => {
   return out;
 };
 
+const cleanSource = (raw) => {
+  const src = raw && typeof raw === 'object' ? raw : {};
+  return {
+    utm_source: clean(src.utm_source, 60) || 'direct',
+    utm_medium: clean(src.utm_medium, 60),
+    utm_campaign: clean(src.utm_campaign, 60),
+    referrer: clean(src.referrer, 200),
+  };
+};
+
+const newToken = () => crypto.randomBytes(16).toString('hex');
+
+// Count today's emails to this address; returns the profile when one more may
+// be sent (not past the cap, not unsubscribed), otherwise null. The first
+// email of the day restarts the count, later ones add to it. `set` is saved
+// either way it succeeds.
+async function claimDailySend(ddb, table, pk, now, set = {}) {
+  const names = {};
+  const values = { ':today': now.toISOString().slice(0, 10), ':one': 1, ':f': false };
+  const sets = Object.entries(set).map(([k, v], i) => {
+    names[`#s${i}`] = k;
+    values[`:s${i}`] = v;
+    return `#s${i} = :s${i}`;
+  });
+  const extra = sets.length ? `${sets.join(', ')}, ` : '';
+  const attempts = [
+    {
+      UpdateExpression: `SET ${extra}sendDay = :today, sendCount = :one`,
+      ConditionExpression: 'unsubscribed = :f AND (attribute_not_exists(sendDay) OR sendDay <> :today)',
+      ExpressionAttributeValues: values,
+    },
+    {
+      UpdateExpression: `SET ${extra}sendCount = sendCount + :one`,
+      ConditionExpression: 'unsubscribed = :f AND sendDay = :today AND sendCount < :max',
+      ExpressionAttributeValues: { ...values, ':max': MAX_EMAILS_PER_DAY },
+    },
+  ];
+  for (const update of attempts) {
+    try {
+      const res = await ddb.send(
+        new UpdateCommand({
+          TableName: table,
+          Key: { PK: pk, SK: 'PROFILE' },
+          ReturnValues: 'ALL_NEW',
+          ...(sets.length ? { ExpressionAttributeNames: names } : {}),
+          ...update,
+        })
+      );
+      return res.Attributes;
+    } catch (err) {
+      if (err.name !== 'ConditionalCheckFailedException') throw err;
+    }
+  }
+  return null;
+}
+
 async function createLead(ddb, table, body, event) {
   // Bots fill the hidden "website" field; pretend it worked
   if (body.website) return { status: 200, body: { ok: true } };
@@ -191,16 +252,9 @@ async function createLead(ddb, table, body, event) {
   if (!Number.isInteger(total) || total < 1 || total > 30 || !Number.isInteger(score) || score < 0 || score > total || !domains) {
     return { status: 400, body: { error: 'Invalid score' } };
   }
-  const src = body.source && typeof body.source === 'object' ? body.source : {};
-  const source = {
-    utm_source: clean(src.utm_source, 60) || 'direct',
-    utm_medium: clean(src.utm_medium, 60),
-    utm_campaign: clean(src.utm_campaign, 60),
-    referrer: clean(src.referrer, 200),
-  };
+  const source = cleanSource(body.source);
 
   const now = new Date();
-  const today = now.toISOString().slice(0, 10);
   const pk = `LEAD#${email}`;
 
   // Profile: created once (keeps the first source and the unsubscribe token)
@@ -208,7 +262,7 @@ async function createLead(ddb, table, body, event) {
     .send(
       new PutCommand({
         TableName: table,
-        Item: { PK: pk, SK: 'PROFILE', email, token: crypto.randomBytes(16).toString('hex'), createdAt: now.toISOString(), source, unsubscribed: false },
+        Item: { PK: pk, SK: 'PROFILE', email, token: newToken(), createdAt: now.toISOString(), source, unsubscribed: false },
         ConditionExpression: 'attribute_not_exists(PK)',
       })
     )
@@ -223,33 +277,7 @@ async function createLead(ddb, table, body, event) {
     })
   );
 
-  // Count today's emails; skip sending past the cap or after unsubscribing.
-  // First email of the day restarts the count, later ones add to it.
-  const values = { ':now': now.toISOString(), ':cert': certId, ':today': today, ':one': 1, ':f': false };
-  const attempts = [
-    {
-      UpdateExpression: 'SET lastCheckAt = :now, lastCertId = :cert, sendDay = :today, sendCount = :one',
-      ConditionExpression: 'unsubscribed = :f AND (attribute_not_exists(sendDay) OR sendDay <> :today)',
-      ExpressionAttributeValues: values,
-    },
-    {
-      UpdateExpression: 'SET lastCheckAt = :now, lastCertId = :cert, sendCount = sendCount + :one',
-      ConditionExpression: 'unsubscribed = :f AND sendDay = :today AND sendCount < :max',
-      ExpressionAttributeValues: { ...values, ':max': MAX_EMAILS_PER_DAY },
-    },
-  ];
-  let profile;
-  for (const update of attempts) {
-    try {
-      const res = await ddb.send(
-        new UpdateCommand({ TableName: table, Key: { PK: pk, SK: 'PROFILE' }, ReturnValues: 'ALL_NEW', ...update })
-      );
-      profile = res.Attributes;
-      break;
-    } catch (err) {
-      if (err.name !== 'ConditionalCheckFailedException') throw err;
-    }
-  }
+  const profile = await claimDailySend(ddb, table, pk, now, { lastCheckAt: now.toISOString(), lastCertId: certId });
   if (!profile) return { status: 200, body: { ok: true, emailed: false } };
 
   const { unsubscribeUrl, oneClick } = unsubscribeLinks(email, profile.token, `https://${event.requestContext?.domainName}`);
@@ -257,6 +285,75 @@ async function createLead(ddb, table, body, event) {
   await sendEmail({ to: email, subject, text, html, oneClick });
   console.log('[leads] Sent readiness email', certId, `${score}/${total}`, source.utm_source);
   return { status: 200, body: { ok: true, emailed: true } };
+}
+
+function buildWelcomeEmail(unsubscribeUrl) {
+  const checkUrl = `${HUB}/?utm_source=newsletter&utm_medium=email&utm_campaign=welcome#readiness`;
+  const subject = "You're in: one AWS study email a week";
+  const text = `You're on the list.
+
+Every Tuesday morning I send one short email to help you pass your AWS certification: an exam trap people fall for, one service explained in plain English, and what's new on AWS Study Hub. That's it.
+
+While you wait for the first one, take the free 10-question readiness check. It shows which exam areas to study first: ${checkUrl}
+
+Reply any time with a question. I read every one.
+
+Nico
+AWS Study Hub
+
+${footerText(unsubscribeUrl)}`;
+  const html = emailShell(`<p style="margin:0 0 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#d9620f">AWS Study Hub · Weekly</p>
+<h1 style="margin:0 0 16px;font-size:24px;line-height:1.25">You're on the list</h1>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.55">Every Tuesday morning I send one short email to help you pass your AWS certification:</p>
+<ul style="margin:0 0 16px;padding-left:20px;font-size:15px;line-height:1.6"><li>an exam trap people fall for</li><li>one service explained in plain English</li><li>what's new on AWS Study Hub</li></ul>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.55">While you wait for the first one, take the free 10-question readiness check. It shows which exam areas to study first.</p>
+${button(checkUrl, 'Take the readiness check')}
+<p style="margin:20px 0 0;font-size:15px;line-height:1.5">Reply any time with a question. I read every one.<br><br>Nico<br><span style="color:#5d6070">AWS Study Hub</span></p>`, unsubscribeUrl);
+  return { subject, text, html };
+}
+
+// Newsletter sign-up box. New people and people who unsubscribed before get a
+// welcome email; anyone already on the list just gets "you're on the list".
+async function subscribe(ddb, table, body, event) {
+  if (body.website) return { status: 200, body: { ok: true } };
+  const email = clean(body.email, 254).toLowerCase();
+  if (!EMAIL_RE.test(email)) return { status: 400, body: { error: 'Please enter a valid email address.' } };
+  const site = clean(body.site, 40) || 'hub';
+  const source = cleanSource(body.source);
+  const now = new Date();
+  const pk = `LEAD#${email}`;
+
+  let welcome = true;
+  try {
+    await ddb.send(
+      new PutCommand({
+        TableName: table,
+        Item: { PK: pk, SK: 'PROFILE', email, token: newToken(), createdAt: now.toISOString(), source, unsubscribed: false, newsletter: true, newsletterAt: now.toISOString(), newsletterSite: site },
+        ConditionExpression: 'attribute_not_exists(PK)',
+      })
+    );
+  } catch (err) {
+    if (err.name !== 'ConditionalCheckFailedException') throw err;
+    // Already on the list (from the readiness check or an earlier sign-up)
+    const res = await ddb.send(
+      new UpdateCommand({
+        TableName: table,
+        Key: { PK: pk, SK: 'PROFILE' },
+        UpdateExpression: 'SET newsletter = :t, newsletterAt = if_not_exists(newsletterAt, :now), newsletterSite = if_not_exists(newsletterSite, :site), unsubscribed = :f REMOVE unsubscribedAt',
+        ExpressionAttributeValues: { ':t': true, ':f': false, ':now': now.toISOString(), ':site': site },
+        ReturnValues: 'ALL_OLD',
+      })
+    );
+    welcome = res.Attributes?.unsubscribed === true;
+  }
+  if (!welcome) return { status: 200, body: { ok: true, already: true } };
+
+  const profile = await claimDailySend(ddb, table, pk, now);
+  if (!profile) return { status: 200, body: { ok: true } };
+  const { unsubscribeUrl, oneClick } = unsubscribeLinks(email, profile.token, `https://${event.requestContext?.domainName}`);
+  await sendEmail({ to: email, ...buildWelcomeEmail(unsubscribeUrl), oneClick });
+  console.log('[leads] Newsletter sign-up', site, source.utm_source);
+  return { status: 200, body: { ok: true } };
 }
 
 async function unsubscribe(ddb, table, email, token) {
@@ -279,7 +376,10 @@ async function unsubscribe(ddb, table, email, token) {
 
 module.exports = {
   createLead,
+  subscribe,
   unsubscribe,
+  buildWelcomeEmail,
+  HUB,
   buildEmail,
   CERTS,
   SALE,

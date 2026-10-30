@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrophyIcon, TargetIcon, FlameIcon, RefreshIcon, HomeIcon, GridIcon } from './Icons';
 import ShareScore from './ShareScore';
+import NewsletterSignup from './NewsletterSignup';
 
 const ResultsScreen = ({
   domain,
@@ -120,6 +121,8 @@ const ResultsScreen = ({
         campaign="quiz-score"
         label={accuracy >= 70 ? 'Share your score' : 'Studying with friends? Challenge them'}
       />
+
+      <NewsletterSignup />
     </div>
   );
 };

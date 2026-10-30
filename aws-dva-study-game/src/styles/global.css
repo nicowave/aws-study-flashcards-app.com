@@ -1839,3 +1839,45 @@ button {
   pointer-events: none;
   z-index: 100;
 }
+
+/* Weekly newsletter sign-up box */
+.newsletter-box {
+  margin: 24px auto 0;
+  max-width: 520px;
+  padding: 18px 20px;
+  background: var(--md-surface-variant);
+  border: 1px solid var(--md-border);
+  border-radius: var(--md-radius-md);
+  text-align: left;
+}
+.newsletter-box-title { font-size: 15px; font-weight: 700; color: var(--md-on-surface); margin: 0 0 4px; }
+.newsletter-box-text { font-size: 13px; line-height: 1.5; color: var(--md-on-surface-variant); margin: 0 0 12px; }
+.newsletter-box-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.newsletter-box-row input {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 16px;
+  color: var(--md-on-surface);
+  background: var(--md-surface);
+  border: 1px solid var(--md-border-variant, var(--md-border));
+  border-radius: var(--md-radius-md);
+}
+.newsletter-box-row input:focus { outline: none; border-color: var(--md-primary); }
+.newsletter-box-row button {
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--md-on-primary);
+  background: var(--md-primary);
+  border: none;
+  border-radius: var(--md-radius-md);
+  cursor: pointer;
+}
+.newsletter-box-row button:disabled { opacity: 0.6; cursor: default; }
+.newsletter-box-hp, .newsletter-box-sr { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.newsletter-box-error { color: var(--md-error); font-size: 13px; margin: 8px 0 0; }
+.newsletter-box-fine { font-size: 11px; color: var(--md-on-surface-variant); margin: 10px 0 0; }
+.newsletter-box-fine a { color: var(--md-on-surface-variant); }

@@ -7,7 +7,7 @@
 //   DELETE /v1/me                    delete data + the Cognito user
 //   GET    /v1/progress/{certId}
 //   PUT    /v1/progress/{certId}     body = the game's stats object
-//   POST   /v1/leads, /v1/leads/unsubscribe   public, see leads.js
+//   POST   /v1/leads, /v1/newsletter, /v1/leads/unsubscribe   public, see leads.js
 //
 // Items (PK = USER#<uid>): PROFILE, PROGRESS#<certId>, ENTITLEMENTS, BILLING,
 // PURCHASE#<plan>. EMAIL#<email>/UID links sign-ins to a uid.
@@ -229,6 +229,12 @@ exports.handler = async (event) => {
       const { value, error } = parseBody(event, 8 * 1024);
       if (error) return json(400, { error });
       const res = await leads.createLead(ddb, TABLE_NAME, value, event);
+      return json(res.status, res.body);
+    }
+    if (routeKey === 'POST /v1/newsletter') {
+      const { value, error } = parseBody(event, 4 * 1024);
+      if (error) return json(400, { error });
+      const res = await leads.subscribe(ddb, TABLE_NAME, value, event);
       return json(res.status, res.body);
     }
     if (routeKey === 'POST /v1/leads/unsubscribe') {

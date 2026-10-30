@@ -231,7 +231,7 @@ const ReadinessCheck = () => {
             <h2 className="readiness-title">Where should I send it?</h2>
             <p className="readiness-lede">
               You'll see your score here right away, and get it by email with a 7-day {cert.name} study plan built
-              around your weakest areas. A few study tips may follow this week. Unsubscribe any time.
+              around your weakest areas. After that, one study email a week. Unsubscribe any time.
             </p>
             <label htmlFor="readiness-email" className="sr-only">Email</label>
             <div className="readiness-email-row">
