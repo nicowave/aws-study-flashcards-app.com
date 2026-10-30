@@ -1579,6 +1579,16 @@ button {
   background: #0d5bbf;
 }
 
+.share-btn.copy {
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.share-btn.copy:hover {
+  border-color: var(--md-on-surface-variant);
+}
+
 /* Mobile: stack share buttons vertically */
 @media (max-width: 480px) {
   .share-buttons {

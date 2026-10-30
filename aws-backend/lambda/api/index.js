@@ -7,6 +7,7 @@
 //   DELETE /v1/me                    delete data + the Cognito user
 //   GET    /v1/progress/{certId}
 //   PUT    /v1/progress/{certId}     body = the game's stats object
+//   POST   /v1/leads, /v1/leads/unsubscribe   public, see leads.js
 //
 // Items (PK = USER#<uid>): PROFILE, PROGRESS#<certId>, ENTITLEMENTS, BILLING,
 // PURCHASE#<plan>. EMAIL#<email>/UID links sign-ins to a uid.
@@ -21,6 +22,7 @@ const {
   DeleteCommand,
 } = require('@aws-sdk/lib-dynamodb');
 const { CognitoIdentityProviderClient, AdminDeleteUserCommand } = require('@aws-sdk/client-cognito-identity-provider');
+const leads = require('./leads');
 
 const TABLE_NAME = process.env.TABLE_NAME;
 const USER_POOL_ID = process.env.USER_POOL_ID;
@@ -221,6 +223,21 @@ exports.handler = async (event) => {
   const routeKey = event.routeKey;
   try {
     if (routeKey === 'GET /v1/health') return json(200, { ok: true, service: 'study-hub-api', phase: 2 });
+
+    // Public: the homepage's readiness check and its unsubscribe link
+    if (routeKey === 'POST /v1/leads') {
+      const { value, error } = parseBody(event, 8 * 1024);
+      if (error) return json(400, { error });
+      const res = await leads.createLead(ddb, TABLE_NAME, value, event);
+      return json(res.status, res.body);
+    }
+    if (routeKey === 'POST /v1/leads/unsubscribe') {
+      // Mail apps' one-click unsubscribe sends the details in the query string
+      const q = event.queryStringParameters || {};
+      const { value } = event.body ? parseBody(event, 2048) : {};
+      const res = await leads.unsubscribe(ddb, TABLE_NAME, value?.email || q.email, value?.token || q.token);
+      return json(res.status, res.body);
+    }
 
     const claims = claimsOf(event);
     const uid = uidOf(claims);

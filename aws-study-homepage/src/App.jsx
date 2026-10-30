@@ -8,6 +8,8 @@ import { BILLING_ENABLED, PRO_PRICE_LABEL, getPlan, startCheckout, openBillingPo
 import CodingCourses, { COURSES, PromoBanner } from './components/CodingCourses';
 import Faq from './components/Faq';
 import { currentPromotion, salePrice } from './services/offers';
+import ReadinessCheck from './components/ReadinessCheck';
+import { captureSource } from './services/leads';
 import {
   CloudIcon,
   RobotIcon,
@@ -41,6 +43,8 @@ import './styles/homepage.css';
 
 // Apply analytics preference before components render
 applyAnalyticsPreference();
+// Remember which tracked link brought this visit (sent with readiness emails)
+captureSource();
 
 // Icon mapping for certifications
 const certIconMap = {
@@ -305,15 +309,16 @@ const Hero = () => {
           Know you&apos;re ready before you book the real exam.
         </p>
         <div className="hero-actions">
+          <a href="#readiness" className="btn btn-primary">
+            <TargetIcon size={20} />
+            Am I Ready? Free 10-Question Check
+          </a>
           <a
             href="https://cloud.aws-study-flashcards-app.com"
-            className="btn btn-primary"
+            className="btn btn-secondary"
           >
             <CloudIcon size={20} />
             Try It Free — No Account Needed
-          </a>
-          <a href="#certifications" className="btn btn-secondary">
-            Browse Certifications
           </a>
         </div>
         {isAuthenticated && (
@@ -1063,6 +1068,7 @@ function HomepageContent() {
         <>
           <main>
             <Hero />
+            <ReadinessCheck />
             <Certifications />
             <CodingCourses onShowLogin={() => setShowLoginModal(true)} />
             <About />

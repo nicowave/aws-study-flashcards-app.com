@@ -7,6 +7,7 @@ import * as apigwv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import { HttpJwtAuthorizer } from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
@@ -244,6 +245,24 @@ export class StudyHubBackendStack extends cdk.Stack {
       methods: [apigwv2.HttpMethod.GET],
       integration,
     });
+
+    // Readiness check on the homepage: saves the email and sends the score
+    // plus a study plan from nico@nico-tek.com (a verified identity)
+    const leadRoutes = ['/v1/leads', '/v1/leads/unsubscribe'].flatMap((p) =>
+      httpApi.addRoutes({ path: p, methods: [apigwv2.HttpMethod.POST], integration })
+    );
+    apiFn.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['ses:SendEmail'],
+        resources: [`arn:aws:ses:${this.region}:${this.account}:identity/nico-tek.com`],
+      })
+    );
+    // Keep the public form from being hammered
+    const stage = httpApi.defaultStage!.node.defaultChild as apigwv2.CfnStage;
+    stage.addPropertyOverride('RouteSettings', {
+      'POST /v1/leads': { ThrottlingRateLimit: 5, ThrottlingBurstLimit: 10 },
+    });
+    leadRoutes.forEach((r) => stage.node.addDependency(r)); // the route must exist first
 
     // Authenticated
     for (const route of [

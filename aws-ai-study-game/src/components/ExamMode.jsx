@@ -8,6 +8,7 @@ import {
   ChevronRightIcon,
   FlagIcon
 } from './Icons';
+import ShareScore from './ShareScore';
 import './ExamMode.css';
 
 // ---- Per-app configuration ----
@@ -289,6 +290,12 @@ const ExamMode = ({ onExit }) => {
             questions and change answers until you submit.
           </p>
           {readiness && <ReadinessCard r={readiness} />}
+
+        <ShareScore
+          brag={`I scored ${result.scaled}/1000 on a full timed practice exam`}
+          campaign="exam-score"
+          label={result.passed ? 'Passed! Share your score' : 'Studying with friends? Challenge them'}
+        />
           {history.length > 0 && (
             <p className="exam-intro-history">
               Attempts: {history.length} · Best score: <strong>{bestScaled}</strong>
