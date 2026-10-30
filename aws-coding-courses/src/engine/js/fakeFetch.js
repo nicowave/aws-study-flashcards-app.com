@@ -61,7 +61,9 @@ export function makeFakeFetch(web, log, scale = 0.1) {
     log.push(entry);
     return new Promise((resolve, reject) => {
       if (signal && signal.aborted) { entry.result = 'aborted'; reject(abortError(signal)); return; }
-      const site = lookup(url);
+      let site = lookup(url);
+      // { sequence: [first answer, second, ...] }: a flaky endpoint; the last answer repeats
+      if (site && site.sequence) site = site.sequence[Math.min(log.filter((e) => e.url === url).length - 1, site.sequence.length - 1)];
       let timer = null;
       const finish = (fn) => { if (timer) clearTimeout(timer); if (signal) signal.removeEventListener('abort', onAbort); fn(); };
       const onAbort = () => finish(() => { entry.result = 'aborted'; reject(abortError(signal)); });

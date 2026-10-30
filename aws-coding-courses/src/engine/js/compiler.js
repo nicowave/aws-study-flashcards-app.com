@@ -12,6 +12,11 @@ import nodeTypes from './typings/node.d.ts?raw';
 // Pinned: the browser loads this version from the CDN, the tests from npm.
 // TypeScript 7 is the native compiler with no JavaScript API, so stay on 6.
 export const TS_VERSION = '6.0.3';
+
+// A console line after transpiling: drop what the compiler adds for whole
+// files, the "use strict" line and the `export {}` it writes when the only
+// import was type-only, so a cell of just types runs and shows nothing.
+export const cleanCell = (js) => js.replace(/^\s*["']use strict["'];?[ \t]*$/m, '').replace(/^export \{\};?[ \t]*$/m, '');
 export const TS_CDN = `https://cdn.jsdelivr.net/npm/typescript@${TS_VERSION}/lib/`;
 export const ROOT_LIBS = ['lib.es2022.d.ts', 'lib.dom.d.ts', 'lib.dom.iterable.d.ts'];
 

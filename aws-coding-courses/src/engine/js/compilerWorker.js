@@ -1,6 +1,6 @@
 // The TypeScript compiler, in its own worker: about 9 MB of JavaScript that
 // takes a moment to load, so it loads once and never blocks the page.
-import { createCompiler, loadLibs, TS_CDN } from './compiler';
+import { createCompiler, loadLibs, TS_CDN, cleanCell } from './compiler';
 
 let ready = null;
 
@@ -24,7 +24,7 @@ self.onmessage = async ({ data: { id, request } }) => {
     else if (request.op === 'compile') response = compiler.compile(request.files);
     else if (request.op === 'transpile') {
       // Console lines: types removed, no checking
-      response = { code: ts.transpileModule(request.source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText };
+      response = { code: cleanCell(ts.transpileModule(request.source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText) };
     }
     self.postMessage({ id, response });
   } catch (e) {

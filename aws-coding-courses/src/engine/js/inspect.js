@@ -14,7 +14,13 @@ export function inspect(value, depth = 0, seen = new Set()) {
   if (t === 'symbol') return value.toString();
   if (t === 'function') return /^class\s/.test(Function.prototype.toString.call(value)) ? `[class ${value.name || '(anonymous)'}]` : `[Function: ${value.name || '(anonymous)'}]`;
   if (seen.has(value)) return '[Circular *1]';
-  if (value instanceof Error) return value.stack && depth === 0 ? value.stack : `[${value.name}: ${value.message}]`;
+  if (value instanceof Error) {
+    if (!value.stack || depth !== 0) return `[${value.name}: ${value.message}]`;
+    // Keep the learner's frames; drop the practice engine's own (the pretend SDK is a data: URL)
+    const lines = String(value.stack).split('\n');
+    const own = lines.filter((l, i) => i === 0 || !/^\s+at /.test(l) || !/data:text\/javascript|\/src\/engine\/|worker_file|\/node_modules\//.test(l));
+    return own.join('\n');
+  }
   if (value instanceof Date) return isNaN(value) ? 'Invalid Date' : value.toISOString();
   if (value instanceof RegExp) return String(value);
   if (typeof Promise !== 'undefined' && value instanceof Promise) return 'Promise { <pending> }';

@@ -14,6 +14,9 @@ declare module '@aws-sdk/types' {
   export interface ClientConfig {
     region?: string;
     maxAttempts?: number;
+    retryMode?: 'standard' | 'adaptive';
+    /** S3 only: follow a bucket to its own Region instead of failing with PermanentRedirect */
+    followRegionRedirects?: boolean;
   }
   /** Every command remembers its input and output types, so send() returns the right shape. */
   export class Command<Input extends object, Output extends MetadataBearer> {

@@ -524,6 +524,8 @@ CLIENT_NAMES['dynamodb-doc'] = 'DynamoDBDocumentClient';
 
 const buckets = () => (STATE.s3 = STATE.s3 || {});
 const bucket = (name) => {
+  // A bucket that exists in someone else's account: S3 says AccessDenied, not NoSuchBucket
+  if ((STATE.s3Denied || []).includes(name)) fail('s3', 'AccessDenied', 'Access Denied', 403);
   const b = buckets()[name];
   if (!b) fail('s3', 'NoSuchBucket', 'The specified bucket does not exist', 404);
   return b;
@@ -758,8 +760,13 @@ export const reset = (scenario = {}) => {
   STATE.dynamodb = Object.fromEntries(Object.entries(s.dynamodb || {}).map(([name, t]) => [name, { key: t.key, types: t.types || {}, items: t.items || [] }]));
   STATE.s3 = Object.fromEntries(Object.entries(s.s3 || {}).map(([b, objects]) => [b, Object.fromEntries(Object.entries(objects).map(([k, v]) => {
     const o = typeof v === 'string' ? { body: v } : v;
-    return [k, object(encoder.encode(o.body || ''), o.contentType || 'text/plain', o.metadata, o.modified ? new Date(o.modified) : new Date())];
+    // { size } makes an object of that many bytes without spelling out its contents
+    const data = o.size !== undefined ? new Uint8Array(o.size) : encoder.encode(o.body || '');
+    const made = object(data, o.contentType || 'text/plain', o.metadata, o.modified ? new Date(o.modified) : new Date());
+    if (o.size !== undefined) made.sized = true;
+    return [k, made];
   }))]));
+  STATE.s3Denied = s.s3Denied || [];
   STATE.ses = { sandbox: s.ses?.sandbox !== false, verified: s.ses?.verified || [], sent: [] };
   STATE.cloudfront = { distributions: (s.cloudfront?.distributions || []).map((d) => (typeof d === 'string' ? { id: d } : { ...d })) };
   STATE.ec2 = s.ec2 || {};
@@ -778,7 +785,7 @@ export const snapshot = () => ({
   account: STATE.account,
   dynamodb: Object.fromEntries(Object.entries(STATE.dynamodb || {}).map(([name, t]) => [name, plain(t.items)])),
   s3: Object.fromEntries(Object.entries(STATE.s3 || {}).map(([b, objects]) => [b, Object.fromEntries(Object.entries(objects).map(([k, o]) => [k, {
-    size: o.data.length, contentType: o.type, metadata: { ...o.meta }, ...(o.data.length <= 20000 ? { text: new TextDecoder().decode(o.data) } : {}),
+    size: o.data.length, contentType: o.type, metadata: { ...o.meta }, ...(o.data.length <= 20000 && !o.sized ? { text: new TextDecoder().decode(o.data) } : {}),
   }]))])),
   ses: { sent: plain(STATE.ses?.sent || []) },
   cloudfront: Object.fromEntries((STATE.cloudfront?.distributions || []).map((d) => [d.id, { invalidations: plain(d.invalidations || []) }])),

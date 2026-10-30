@@ -156,7 +156,26 @@ function pageShim(config, inspect, makeFakeFetch) {
   const handle = async (msg) => {
     if (msg.type === 'eval') {
       try {
-        let value = (0, eval)(msg.code); // eslint-disable-line no-eval
+        let value;
+        try {
+          value = (0, eval)(msg.code); // eslint-disable-line no-eval
+        } catch (e) {
+          // Top-level await, as in the browser's own console: run it in an async function
+          if (!(e instanceof SyntaxError) || !/\bawait\b/.test(msg.code)) throw e;
+          try {
+            value = (0, eval)(`(async () => (${msg.code.replace(/;\s*$/, '')}))()`); // eslint-disable-line no-eval
+          } catch {
+            // Several lines: keep their variables and functions on the page, and show the last line's value
+            const lines = msg.code
+              .replace(/^var\s+([A-Za-z_$][\w$]*)\s*=/gm, '$1 =')
+              .replace(/^(async\s+)?function\s+([A-Za-z_$][\w$]*)/gm, '$2 = $1function $2')
+              .split('\n');
+            let last = lines.length - 1;
+            while (last >= 0 && !lines[last].trim()) last -= 1;
+            if (last >= 0 && !/^\s*(}|\)|\]|return\b|if\b|for\b|while\b|try\b|throw\b|\/\/|[A-Za-z_$][\w$]*\s*=[^=>])/.test(lines[last])) lines[last] = `return ${lines[last]}`;
+            value = (0, eval)(`(async () => {\n${lines.join('\n')}\n})()`); // eslint-disable-line no-eval
+          }
+        }
         if (value && typeof value.then === 'function') value = await value;
         send({ type: 'eval-result', id: msg.id, text: value === undefined ? null : inspect(value, typeof value === 'string' ? 1 : 0) });
       } catch (e) {

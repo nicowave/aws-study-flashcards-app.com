@@ -3,7 +3,7 @@
 import { createRequire } from 'module';
 import { dirname, join } from 'path';
 import { readFileSync } from 'fs';
-import { createCompiler, loadLibs } from './compiler';
+import { createCompiler, loadLibs, cleanCell } from './compiler';
 import { createJsRunner } from './runner';
 
 const require = createRequire(import.meta.url);
@@ -31,5 +31,5 @@ export const nodeRunner = () => createJsRunner();
 /** A console line in TypeScript: types removed, like the site's compiler worker does. */
 export const transpile = (source) => {
   const ts = require('typescript');
-  return ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText;
+  return cleanCell(ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText);
 };

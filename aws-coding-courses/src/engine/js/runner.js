@@ -24,6 +24,36 @@ class ExitSignal {
 
 const tipFor = (text) => TIPS.find(([re]) => re.test(text))?.[1];
 
+// Node.js on Lambda has Buffer; a browser worker doesn't. Enough of it for
+// request bodies: Buffer.from(text, 'base64' | 'utf8'), .toString('utf8' | 'base64').
+class MiniBuffer extends Uint8Array {
+  static from(value, encoding = 'utf8') {
+    let bytes;
+    if (typeof value === 'string') {
+      bytes = encoding === 'base64'
+        ? Uint8Array.from(atob(value.replace(/[^A-Za-z0-9+/=]/g, '')), (c) => c.charCodeAt(0))
+        : new TextEncoder().encode(value);
+    } else bytes = Uint8Array.from(value);
+    const buf = new MiniBuffer(bytes.length);
+    buf.set(bytes);
+    return buf;
+  }
+
+  static byteLength(text) { return new TextEncoder().encode(String(text)).length; }
+
+  static isBuffer(value) { return value instanceof MiniBuffer; }
+
+  toString(encoding = 'utf8') {
+    if (encoding === 'base64') {
+      let binary = '';
+      for (let i = 0; i < this.length; i += 0x8000) binary += String.fromCharCode(...this.subarray(i, i + 0x8000));
+      return btoa(binary);
+    }
+    return new TextDecoder().decode(this);
+  }
+}
+if (typeof globalThis.Buffer === 'undefined') globalThis.Buffer = MiniBuffer;
+
 export const createJsRunner = ({ importModule = (url) => import(/* @vite-ignore */ url) } = {}) => {
   let sdk = null;
   let cdk = null;
@@ -373,7 +403,12 @@ export const createJsRunner = ({ importModule = (url) => import(/* @vite-ignore 
         get: (t, k) => {
           if (k === Symbol.unscopables) return undefined;
           if (k in t) return t[k];
-          if (k in globalThis) return globalThis[k];
+          if (k in globalThis) {
+            // Called through `with`, a global function's `this` would be the scope, and the
+            // browser refuses (atob, setTimeout: "Illegal invocation"). Classes keep their statics.
+            const v = globalThis[k];
+            return typeof v === 'function' && /^[a-z]/.test(k) ? v.bind(globalThis) : v;
+          }
           throw new ReferenceError(`${String(k)} is not defined`);
         },
         set: (t, k, v) => { t[k] = v; return true; },
