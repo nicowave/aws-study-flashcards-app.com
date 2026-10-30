@@ -51,18 +51,8 @@ const siteScenario = () => {
   };
 };
 
-// What Amazon EventBridge sends a function on a schedule
-const SCHEDULED_EVENT = {
-  version: '0',
-  id: '53dc4d37-cffa-4f76-80c9-8b7d4a4d2eaa',
-  'detail-type': 'Scheduled Event',
-  source: 'aws.events',
-  account: '111122223333',
-  time: '2026-11-02T09:00:00Z',
-  region: 'us-east-1',
-  resources: ['arn:aws:events:us-east-1:111122223333:rule/site-checker-hourly'],
-  detail: {},
-};
+// What EventBridge Scheduler sends a function when the schedule has no input: nothing
+const SCHEDULED_EVENT = {};
 
 // ---------------------------------------------------------------------------
 // Code the learner builds up
@@ -101,7 +91,8 @@ def check_site(url):
     start = time.monotonic()
     # TODO: pass timeout=TIMEOUT, and catch the errors:
     #   urllib.error.HTTPError  -> the site answered with an error: status = e.code
-    #   urllib.error.URLError   -> no answer at all: return ok False and str(e.reason)
+    #   (urllib.error.URLError, TimeoutError) -> no answer at all: return ok False
+    #       and the reason: str(getattr(e, "reason", e))
     with urllib.request.urlopen(url) as resp:
         status = resp.status
     ms = round((time.monotonic() - start) * 1000)
@@ -335,7 +326,7 @@ except urllib.error.HTTPError as e:
     print("answered with", e.code)
 \`\`\`
 
-When there's **no answer at all**, you get a \`URLError\` instead, and \`e.reason\` says why: the name doesn't exist, the connection was refused, or it timed out.
+When the request never gets through, you get a \`URLError\` instead, and \`e.reason\` says why: the name doesn't exist, the connection was refused, or connecting timed out.
 
 \`\`\`python
 try:
@@ -351,8 +342,8 @@ The status page is stuck: it accepts the connection and never answers. Without a
 \`\`\`python
 try:
     urllib.request.urlopen("https://status.example.com")
-except urllib.error.URLError as e:
-    print("gave up:", e.reason)
+except (urllib.error.URLError, TimeoutError) as e:
+    print("gave up:", e)
 \`\`\`
 
 The practice internet gave up for you after two minutes and printed a warning. A real Lambda function would sit there until it hit its own time limit and was stopped, without ever sending your alert. With \`timeout=10\`, it gives up after 10 seconds and moves on to the next site:
@@ -360,9 +351,11 @@ The practice internet gave up for you after two minutes and printed a warning. A
 \`\`\`python
 try:
     urllib.request.urlopen("https://status.example.com", timeout=10)
-except urllib.error.URLError as e:
-    print("gave up:", e.reason)
+except (urllib.error.URLError, TimeoutError) as e:
+    print("gave up:", e)
 \`\`\`
+
+Notice this one is a plain \`TimeoutError\`, not a \`URLError\`. Python wraps errors that happen while **connecting** in \`URLError\`, but a site that connects and then never sends its answer raises \`TimeoutError\` directly. Catch both: \`except (urllib.error.URLError, TimeoutError)\`.
 
 > **Why not the popular \`requests\` library?** It's nicer to use, but it isn't part of the Lambda Python runtime: you'd have to package it with your code. \`urllib\` is always there, so small Lambda functions often use it.`,
       scenario: siteScenario,
@@ -385,9 +378,9 @@ Two details matter:
 - **Order of the \`except\` lines.** \`HTTPError\` is a kind of \`URLError\` (a *subclass*), and Python uses the first \`except\` that matches. Catch \`HTTPError\` first, or the 503 lands in the "no answer" branch.
 - **Response time.** \`time.monotonic()\` is a clock that only goes forward. Read it before and after, and the difference is how long the request took. (Don't use the time of day for this: it can jump when the computer's clock is corrected.)
 
-A slow answer can also time out halfway through reading, and then Python raises \`TimeoutError\` directly instead of wrapping it in a \`URLError\`. Catching both, \`except (urllib.error.URLError, TimeoutError) as e:\`, covers it.`,
-      task: 'Finish `check_site(url)` in `uptime.py` so it never crashes: pass `timeout=TIMEOUT`, catch `HTTPError` (use `e.code` as the status) and `URLError` (return `ok` False with `str(e.reason)` as `error`). Keep `ms` in every result.',
-      hint: 'Wrap the `with urllib.request.urlopen(url, timeout=TIMEOUT) as resp:` block in `try:`. Then `except urllib.error.HTTPError as e: status = e.code`, and after it `except urllib.error.URLError as e:` returning `{"url": url, "ok": False, "error": str(e.reason), "ms": ...}`.',
+- **Two kinds of "no answer".** A failed connection is a \`URLError\` (with \`e.reason\`); a site that connects and then goes quiet raises a bare \`TimeoutError\` (no \`.reason\`). Catch both with \`except (urllib.error.URLError, TimeoutError) as e:\`, and \`str(getattr(e, "reason", e))\` gives a readable reason either way.`,
+      task: 'Finish `check_site(url)` in `uptime.py` so it never crashes: pass `timeout=TIMEOUT`, catch `HTTPError` (use `e.code` as the status), and `URLError` and `TimeoutError` (return `ok` False with the reason as `error`). Keep `ms` in every result.',
+      hint: 'Wrap the `with urllib.request.urlopen(url, timeout=TIMEOUT) as resp:` block in `try:`. Then `except urllib.error.HTTPError as e: status = e.code`, and after it `except (urllib.error.URLError, TimeoutError) as e:` returning `{"url": url, "ok": False, "error": str(getattr(e, "reason", e)), "ms": ...}`.',
       solution: UPTIME_SOLUTION,
       files: [{ path: 'uptime.py', starter: UPTIME_STARTER }],
       scenario: siteScenario,
@@ -395,7 +388,8 @@ A slow answer can also time out halfway through reading, and then Python raises 
       check: ({ probe, probeError, web, result }) => {
         if (probeError === 'NameError') return null;
         if (probeError === 'HTTPError' || result.error?.type === 'HTTPError') return 'check_site crashed on the 503 from api.example.com. Catch `urllib.error.HTTPError` and use `e.code` as the status.';
-        if (probeError === 'URLError' || result.error?.type === 'URLError') return 'check_site crashed on a site that didn\'t answer. Catch `urllib.error.URLError` and return ok False with `str(e.reason)`.';
+        if (probeError === 'URLError' || result.error?.type === 'URLError') return 'check_site crashed on a site that didn\'t answer. Catch `urllib.error.URLError` and return ok False with the reason.';
+        if (probeError === 'TimeoutError' || result.error?.type === 'TimeoutError') return 'check_site crashed on status.example.com, which connects and never answers. That raises a bare `TimeoutError`: catch `(urllib.error.URLError, TimeoutError)`.';
         if (probeError) return `check_site raised ${probeError}. It should catch failures and return a dictionary instead.`;
         if (!Array.isArray(probe) || probe.some((r) => !r || typeof r !== 'object')) return null;
         const [www, api, dns, hang] = probe;
@@ -416,7 +410,7 @@ A slow answer can also time out halfway through reading, and then Python raises 
       runtime: 'python',
       title: 'Read a site\'s certificate',
       minutes: 15,
-      body: `The padlock in the browser comes from the site's **TLS certificate**: proof that the site really is \`www.example.com\`. Every certificate has an expiry date. Free ones from Let's Encrypt last 90 days, paid ones about a year. When it passes, browsers show a full-page warning and most people leave.
+      body: `The padlock in the browser comes from the site's **TLS certificate**: proof that the site really is \`www.example.com\`. Every certificate has an expiry date. Free ones from Let's Encrypt last 90 days (moving to 45), and since March 2026 paid ones last at most 200 days, dropping to 47 days by 2029. Renewals keep getting more frequent, which is exactly why you automate this check. When it passes, browsers show a full-page warning and most people leave.
 
 To read the date, open a connection to the site's secure port (443) and do the same **handshake** a browser does:
 
@@ -525,7 +519,7 @@ def lambda_handler(event, context):
     return {"ok": True}
 \`\`\`
 
-- **event**: a dictionary describing what happened. A schedule sends little more than the time; an upload sends the bucket and file name.
+- **event**: a dictionary describing what happened. A schedule from EventBridge Scheduler sends an empty event, \`{}\`, unless you give it an input; an upload sends the bucket and file name.
 - **context**: details about this run, like \`context.aws_request_id\` and \`context.get_remaining_time_in_millis()\`.
 - **return**: the answer, sent back to whoever called it. Lambda turns it into JSON.
 - **print()** output goes to **Amazon CloudWatch Logs**, where you'll read it later.
@@ -534,7 +528,7 @@ In the practice console, \`practice.context()\` makes a stand-in for the context
 
 \`\`\`python
 import practice
-lambda_handler({"time": "2026-11-02T09:00:00Z"}, practice.context())
+lambda_handler({}, practice.context())
 \`\`\`
 
 ### Settings in environment variables
@@ -708,7 +702,7 @@ If the code crashes, the schedule keeps running it every hour. Two safety nets:
       cards: [
         { id: 'p3-urlopen', front: 'Open `url` with Python\'s standard library, giving up after 10 seconds', back: '`urllib.request.urlopen(url, timeout=10)`', tags: ['http'], difficulty: 'easy' },
         { id: 'p3-httperror', front: 'The site answered 404. What does urlopen do, and where\'s the number?', back: 'Raises `urllib.error.HTTPError`; the status is `e.code`.', tags: ['http', 'exceptions'], difficulty: 'medium' },
-        { id: 'p3-urlerror', front: 'No answer at all (unknown name, refused, timed out): which exception, and why?', back: '`urllib.error.URLError`; `e.reason` says why.', tags: ['http', 'exceptions'], difficulty: 'medium' },
+        { id: 'p3-urlerror', front: 'urlopen got no answer. Which exceptions can that be?', back: '`urllib.error.URLError` when connecting fails (unknown name, refused, connect timeout; `e.reason` says why), or a bare `TimeoutError` when the site connects and never answers. Catch both.', tags: ['http', 'exceptions'], difficulty: 'medium' },
         { id: 'p3-days', front: 'Days until a certificate expires, from `cert["notAfter"]`', back: '`(ssl.cert_time_to_seconds(cert["notAfter"]) - time.time()) // 86400`', tags: ['certificates'], difficulty: 'hard' },
         { id: 'p3-handler', front: 'The Python handler Lambda calls, by default', back: '`def lambda_handler(event, context):` in `lambda_function.py` (handler setting `lambda_function.lambda_handler`)', tags: ['lambda'], difficulty: 'easy' },
         { id: 'p3-env', front: 'Read the environment variable `TOPIC_ARN` in Python', back: '`os.environ["TOPIC_ARN"]` (or `os.environ.get("TOPIC_ARN")` for None if missing)', tags: ['lambda'], difficulty: 'easy' },
@@ -765,7 +759,7 @@ cat > env.json <<EOF
 EOF
 \`\`\`
 
-5. **Create the function**, with a 60-second timeout:
+5. **Create the function**, with a 60-second timeout. On Ubuntu or the Windows Subsystem for Linux, install \`zip\` first: \`sudo apt install -y zip\`.
 
 \`\`\`sh
 zip function.zip lambda_function.py
@@ -785,12 +779,12 @@ If it says the role *cannot be assumed by Lambda*, the new role hasn't reached e
 6. **Test it**, then read its logs:
 
 \`\`\`sh
-aws lambda invoke --function-name site-checker response.json
+aws lambda invoke --cli-read-timeout 90 --function-name site-checker response.json
 cat response.json
 aws logs tail /aws/lambda/site-checker --follow
 \`\`\`
 
-Press Ctrl+C to stop following the logs. To see an alert, add a site that doesn't exist (like \`https://no-such-site.example.com\`) to \`env.json\`, then \`aws lambda update-function-configuration --function-name site-checker --environment file://env.json\` and invoke again. After a code change: \`zip function.zip lambda_function.py\` and \`aws lambda update-function-code --function-name site-checker --zip-file fileb://function.zip\`.
+The AWS command line normally stops waiting after 60 seconds and tries again, which could run (and email) twice; \`--cli-read-timeout 90\` gives this 60-second function room. Press Ctrl+C to stop following the logs. To see an alert, add a site that doesn't exist (like \`https://no-such-site.example.com\`) to \`env.json\`, then \`aws lambda update-function-configuration --function-name site-checker --environment file://env.json\` and invoke again. After a code change: \`zip function.zip lambda_function.py\` and \`aws lambda update-function-code --function-name site-checker --zip-file fileb://function.zip\`.
 
 7. **Every hour.** The scheduler's role may only invoke this one function:
 
@@ -813,7 +807,7 @@ aws scheduler create-schedule \\
   --target "{\\"Arn\\": \\"$FUNCTION_ARN\\", \\"RoleArn\\": \\"$SCHEDULER_ROLE_ARN\\"}"
 \`\`\`
 
-Within the hour, \`aws logs tail /aws/lambda/site-checker\` shows a run you didn't start.
+Within the hour, \`aws logs tail /aws/lambda/site-checker --since 1h\` shows a run you didn't start. (Without \`--since\`, it only looks back 10 minutes.)
 
 8. **Push it to GitHub.** \`lambda_function.py\` has no addresses, ARNs or keys in it: they're all in the environment. Add \`env.json\`, \`response.json\` and \`function.zip\` to \`.gitignore\`.
 
@@ -822,6 +816,7 @@ Within the hour, \`aws logs tail /aws/lambda/site-checker\` shows a run you didn
 **Cleanup**, when you're done:
 
 \`\`\`sh
+TOPIC_ARN=$(aws sns list-topics --query "Topics[?ends_with(TopicArn, ':site-alerts')].TopicArn" --output text)
 aws scheduler delete-schedule --name site-checker-hourly
 aws lambda delete-function --function-name site-checker
 aws sns delete-topic --topic-arn "$TOPIC_ARN"

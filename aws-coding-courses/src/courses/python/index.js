@@ -16,16 +16,16 @@ const course = {
   heroNote: 'Start here and Tutorial 1 are free. Nothing to install to begin: real Python runs in your browser, with a pretend AWS account to practice on.',
   heroTerminal: `$ python weekly_report.py
 Tickets: 48 (3 duplicates removed)
-  Network: 15 tickets, 15.6 hours to close on average
-Open P1 tickets: HD-1032, HD-1041, HD-1044, HD-1047
+  Network: 15 tickets, 15.6 hours to close
+Open P1 tickets: 4, oldest HD-1032
 
 $ python cost_report.py
 4 regions checked
 Forgotten: 8 resources, about $49.10 a month
-Saved forgotten.csv
 
-$ test lambda_function.py with the sample event
-Response: {"checked": 6, "problems": 5, "alerted": true}`,
+$ test lambda_function.py
+Response:
+{"checked": 6, "problems": 5, "alerted": true}`,
   outcomes: [
     'Read and write Python: values, lists, dictionaries, loops, functions and error handling',
     'Clean a messy spreadsheet export and write the weekly report automatically, with the `csv` and `datetime` modules',

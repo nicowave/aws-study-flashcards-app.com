@@ -234,14 +234,16 @@ for url in ['https://api.example.com/health', 'https://nowhere.example.org', 'ht
         print('http', e.code)
     except urllib.error.URLError as e:
         print('url', type(e.reason).__name__)
+    except TimeoutError:
+        print('timeout')
 start = time.monotonic(); time.sleep(30); print(round(time.monotonic() - start))`, { scenario: WEB });
-    expect(r.stdout).toBe('200 <title>Shop</title>\nhttp 503\nurl gaierror\nurl TimeoutError\n30\n');
+    expect(r.stdout).toBe('200 <title>Shop</title>\nhttp 503\nurl gaierror\ntimeout\n30\n');
     expect(r.web.log.filter((e) => e.kind === 'http').every((e) => e.timeout !== null)).toBe(true);
   });
 
   it('warns when a request has no timeout', async () => {
     const r = await run("import urllib.request\ntry:\n    urllib.request.urlopen('https://slow.example.com')\nexcept Exception as e:\n    print(type(e).__name__)", { scenario: WEB });
-    expect(r.stdout).toBe('URLError\n');
+    expect(r.stdout).toBe('TimeoutError\n');
     expect(r.stderr).toContain('never answered');
   });
 

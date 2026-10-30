@@ -2217,3 +2217,14 @@
 .submit-btn + .forgot-link {
   margin: 12px auto 0;
 }
+
+/* ---------- Coding courses, the bundle, sales ---------- */
+.course-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; }
+.course-mark { font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; }
+.course-go { margin-top: auto; padding-top: 12px; font-weight: 600; color: var(--aws-orange, #ff9900); }
+.price-was { opacity: 0.6; font-weight: 400; }
+.bundle-card { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 22px 26px; border-radius: 14px; border: 1px solid rgba(255, 153, 0, 0.35); background: rgba(255, 153, 0, 0.07); }
+.bundle-card h3 { margin: 6px 0; }
+.bundle-card p { margin: 0; max-width: 60ch; }
+.sale-pill { display: inline-block; background: #f28c28; color: #1a0f00; font-weight: 700; font-size: 0.78rem; padding: 3px 10px; border-radius: 999px; margin: 6px 0; }
+.promo-banner { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; padding: 8px 16px; background: #3a1f05; color: #ffd8a8; font-size: 0.9rem; text-align: center; }

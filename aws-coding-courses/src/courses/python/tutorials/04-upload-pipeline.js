@@ -187,7 +187,7 @@ const VALIDATE_TAIL = `
     order = {
         "order_id": row["order_id"].strip(),
         "partner": row["partner"].strip(),
-        "order_date": row["order_date"].strip(),
+        "order_date": order_date,
         "sku": row["sku"].strip(),
         "quantity": quantity,
         "unit_price": unit_price,
@@ -201,6 +201,8 @@ const VALIDATE_BODY = `
         unit_price = Decimal(row["unit_price"].strip())
     except InvalidOperation:
         return None, f"unit_price {row['unit_price']!r} is not a number"
+    if not unit_price.is_finite():  # Decimal also reads "NaN" and "Infinity"
+        return None, f"unit_price {row['unit_price']!r} is not a number"
     if unit_price <= 0:
         return None, "unit_price must be more than 0"
 
@@ -209,7 +211,8 @@ const VALIDATE_BODY = `
         return None, f"unknown currency {currency}"
 
     try:
-        date.fromisoformat(row["order_date"].strip())
+        # .isoformat() stores every date as 2026-10-29, even if it came as 20261029
+        order_date = date.fromisoformat(row["order_date"].strip()).isoformat()
     except ValueError:
         return None, f"order_date {row['order_date']!r} is not a date like 2026-10-29"
 ${VALIDATE_TAIL}`;
@@ -219,14 +222,17 @@ const VALIDATE_FUNCTION = `${VALIDATE_HEAD}${VALIDATE_BODY}`;
 const VALIDATE_STARTER = `# orders.py: is this row a real order?
 ${VALIDATE_HEAD}
     # TODO: unit_price -> Decimal, made from the text (never a float).
-    #       Text that isn't a number raises InvalidOperation. It must be more than 0.
+    #       Text that isn't a number raises InvalidOperation. Decimal also reads
+    #       "NaN" and "Infinity": refuse those with unit_price.is_finite().
+    #       It must be more than 0.
     unit_price = row["unit_price"]
 
     # TODO: currency must be in CURRENCIES, after .strip().upper()
     currency = row["currency"]
 
     # TODO: order_date must be a real date like 2026-10-29: date.fromisoformat()
-    #       raises ValueError for anything else.
+    #       raises ValueError for anything else. Keep date.fromisoformat(...).isoformat()
+    order_date = row["order_date"]
 ${VALIDATE_TAIL}
 
 
@@ -436,6 +442,7 @@ const VALIDATE_ROWS = (() => {
     ['currency JPY', { ...good, currency: 'JPY' }],
     ['date "10/29/2026"', { ...good, order_date: '10/29/2026' }],
     ['an empty sku', { ...good, sku: '' }],
+    ['price "NaN"', { ...good, unit_price: 'NaN' }],
   ];
 })();
 
@@ -443,6 +450,7 @@ const VALIDATE_PROBE = `import json
 RESULT = [validate_order(row) for row in json.loads(r'''${JSON.stringify(VALIDATE_ROWS.map(([, row]) => row))}''')]`;
 
 const checkValidate = ({ probe, probeError, result }) => {
+  if (probeError === 'InvalidOperation') return 'A price of "NaN" crashed validate_order: Decimal reads "NaN", and comparing it with 0 fails. Check `unit_price.is_finite()` first.';
   if (result.error || probeError || !Array.isArray(probe)) return null;
   const [goodOrder, goodReason] = probe[0] || [];
   if (goodReason) return `The good row was refused: "${goodReason}".`;
@@ -647,7 +655,9 @@ There's a second reason, which you'll meet in a moment: **DynamoDB doesn't accep
 
 ### Dates
 
-\`date.fromisoformat()\` reads \`2026-10-29\` and raises \`ValueError\` for anything else, like \`10/29/2026\`. Keep the text in the order (DynamoDB has no date type, and ISO dates sort correctly as text); just check it's a real date.`,
+\`date.fromisoformat()\` reads \`2026-10-29\` and raises \`ValueError\` for things like \`10/29/2026\`. Since Python 3.11 it also accepts compact forms like \`20261029\`, so store \`date.fromisoformat(text).isoformat()\`: every date then reads \`2026-10-29\`. DynamoDB has no date type, and ISO dates sort correctly as text.
+
+One more trap: \`Decimal\` happily reads \`"NaN"\` and \`"Infinity"\`. \`unit_price.is_finite()\` refuses them.`,
       scenario: {},
     },
     {
@@ -730,7 +740,7 @@ If a retry comes in after the file has moved, \`get_object\` raises \`NoSuchKey\
 
 ### The trap that costs real money
 
-The function writes into the **same bucket** that triggers it. If the trigger fires on *every* new object, then moving a file to \`processed/\` creates a new object, which triggers the function, which writes again… a loop that can run up thousands of invocations an hour. The fix is in the trigger: **only fire for the \`incoming/\` prefix.** (Even better: a separate bucket for the output.)`,
+The function writes into the **same bucket** that triggers it. If the trigger fires on *every* new object, then moving a file to \`processed/\` creates a new object, which triggers the function, which writes again… a loop. The fix is in the trigger: **only fire for the \`incoming/\` prefix.** (Even better: a separate bucket for the output.) Lambda's recursive loop detection now usually stops this kind of loop after about 16 runs, but don't rely on it: it only catches some loops, and it can be turned off.`,
       scenario: pipelineScenario,
     },
     {
@@ -814,14 +824,18 @@ So read it with \`page.get("Contents", [])\`.`,
 Then make sure someone hears about it. An **Amazon CloudWatch** alarm on the function's \`Errors\` metric can email you through SNS, the way your certificate alerts did in Tutorial 3:
 
 \`\`\`sh
+ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
+REGION=$(aws configure get region)
 aws cloudwatch put-metric-alarm --alarm-name order-intake-errors \\
   --namespace AWS/Lambda --metric-name Errors \\
   --dimensions Name=FunctionName,Value=order-intake \\
   --statistic Sum --period 300 --evaluation-periods 1 \\
   --threshold 1 --comparison-operator GreaterThanOrEqualToThreshold \\
   --treat-missing-data notBreaching \\
-  --alarm-actions arn:aws:sns:us-east-1:YOUR_ACCOUNT:alerts
+  --alarm-actions "arn:aws:sns:$REGION:$ACCOUNT:site-alerts"
 \`\`\`
+
+This sends to the \`site-alerts\` topic from Tutorial 3. If you've deleted it, create it again first (\`aws sns create-topic --name site-alerts\`, then subscribe your email).
 
 ### Why idempotency makes all of this safe
 
@@ -840,13 +854,13 @@ Retries and replays are only safe because the function is idempotent. A retry af
       minutes: 6,
       body: `This tutorial covers some of the most-asked topics on the exam:
 
-- **S3 → Lambda is asynchronous.** Lambda retries failed async invocations twice. Failed events go to an on-failure destination (SQS, SNS, another Lambda function or EventBridge) or a dead-letter queue (SQS or SNS).
+- **S3 → Lambda is asynchronous.** Lambda retries failed async invocations twice. Failed events go to an on-failure destination (SQS, SNS, S3, another Lambda function or EventBridge) or a dead-letter queue (SQS or SNS).
 - **Recursive triggers**: a function that writes to the bucket that triggers it needs a **prefix or suffix filter**, or a second bucket. Expect a question where costs explode overnight.
 - **S3 event keys are URL-encoded.** Decode them before calling \`get_object\`.
 - **Idempotency**: events can be delivered more than once. Use a **conditional write** (\`attribute_not_exists\`) or an idempotency key.
 - **DynamoDB and Python**: boto3 needs \`Decimal\` for numbers, and \`ConditionalCheckFailedException\` means the condition was false, not that DynamoDB broke.
 - **Pagination**: \`list_objects_v2\` returns up to 1,000 keys; most AWS list calls page their results. Use paginators.
-- **Least privilege**: the function's role gets \`s3:GetObject\`, \`s3:PutObject\` and \`s3:DeleteObject\` on that bucket's objects, and \`dynamodb:PutItem\` on that table only. A resource-based policy (from \`lambda add-permission\`) is what lets S3 invoke the function.
+- **Least privilege**: the function's role gets \`s3:GetObject\`, \`s3:PutObject\` and \`s3:DeleteObject\` on that bucket's objects, \`s3:ListBucket\` on the bucket, and \`dynamodb:PutItem\` on that table only. Without \`s3:ListBucket\`, S3 answers a missing key with 403 AccessDenied instead of 404 NoSuchKey, so it won't even say whether a file exists. A resource-based policy (from \`lambda add-permission\`) is what lets S3 invoke the function.
 - **Strong consistency**: S3 reads right after a write see the new object, so the function never reads a half-uploaded file.`,
     },
     {
@@ -858,7 +872,7 @@ Retries and replays are only safe because the function is idempotent. A retry af
         { q: 'The event says the key is `incoming/2026-10-29+batch.csv`, but `get_object` fails with NoSuchKey. Why?', options: ['The file hasn\'t finished uploading', 'Event keys are URL-encoded: the real key has a space. Decode with `urllib.parse.unquote_plus()`', 'The function needs a bigger timeout', 'S3 renamed the file'], answer: 1, explain: 'S3 event keys are URL-encoded. `unquote_plus` turns `+` back into a space and `%xx` back into characters.' },
         { q: '`table.put_item(Item={"order_id": "A1", "price": 9.99})` raises a TypeError. What\'s the fix?', options: ['Use `Decimal("9.99")`', 'Use `str(9.99)` and hope', 'Use `round(9.99, 2)`', 'Switch the table to provisioned capacity'], answer: 0, explain: 'boto3 refuses floats for DynamoDB. Build a Decimal from text so it\'s exact.' },
         { q: 'The same S3 upload triggered the function twice. What stops the orders being saved twice?', options: ['Nothing can', 'A bigger Lambda timeout', '`put_item` with `ConditionExpression="attribute_not_exists(order_id)"`', 'Reading the file twice'], answer: 2, explain: 'A conditional write only saves when the key doesn\'t exist yet. The second run gets ConditionalCheckFailedException and skips.' },
-        { q: 'The function moves finished files to `processed/` in the same bucket. Overnight it ran 400,000 times. What went wrong?', options: ['A partner uploaded too many files', 'The trigger fires for every new object, so each move triggered it again. Filter the trigger to the `incoming/` prefix', 'Lambda retried too often', 'DynamoDB was throttled'], answer: 1, explain: 'A function writing to the bucket that triggers it creates a loop. A prefix filter (or a separate output bucket) breaks it.' },
+        { q: 'The function moves finished files to `processed/` in the same bucket. With loop detection turned off, it would have run for ever. What went wrong?', options: ['A partner uploaded too many files', 'The trigger fires for every new object, so each move triggered it again. Filter the trigger to the `incoming/` prefix', 'Lambda retried too often', 'DynamoDB was throttled'], answer: 1, explain: 'A function writing to the bucket that triggers it creates a loop. A prefix filter (or a separate output bucket) breaks it.' },
         { q: '`list_objects_v2` on a folder of 1,237 files returns 1,000. Why?', options: ['The other files are still uploading', 'It returns at most 1,000 keys per call; use a paginator', 'The bucket is in another region', 'Prefix only matches 1,000 files'], answer: 1, explain: 'Most AWS list calls return results in pages. `IsTruncated` and `NextContinuationToken` say there\'s more; a paginator follows them.' },
         { q: 'After its retries, a failed event from S3 should go somewhere a person can find it. Which setting does that?', options: ['Reserved concurrency', 'An on-failure destination, such as an Amazon SQS queue', 'A bigger memory setting', 'S3 versioning'], answer: 1, explain: 'Without a destination or dead-letter queue, Lambda drops the event after the last retry.' },
       ],
@@ -899,7 +913,10 @@ cd ~/aws-study-projects/python/order-intake
 ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
 REGION=$(aws configure get region)
 BUCKET="order-intake-$ACCOUNT"
+echo "$ACCOUNT $REGION $BUCKET"
 \`\`\`
+
+If the region comes out empty, set it yourself: \`REGION=us-east-1\` (or your region). **In a new terminal later, run this step again first**: the other commands need these names.
 
 3. **The bucket, the table and the failure queue:**
 
@@ -930,6 +947,7 @@ cat > access.json <<EOF
   "Version": "2012-10-17",
   "Statement": [
     {"Effect": "Allow", "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"], "Resource": "arn:aws:s3:::$BUCKET/*"},
+    {"Effect": "Allow", "Action": "s3:ListBucket", "Resource": "arn:aws:s3:::$BUCKET"},
     {"Effect": "Allow", "Action": "dynamodb:PutItem", "Resource": "arn:aws:dynamodb:$REGION:$ACCOUNT:table/Orders"},
     {"Effect": "Allow", "Action": "sqs:SendMessage", "Resource": "arn:aws:sqs:$REGION:$ACCOUNT:order-intake-failures"}
   ]
@@ -938,7 +956,9 @@ EOF
 aws iam put-role-policy --role-name order-intake-role --policy-name order-intake-access --policy-document file://access.json
 \`\`\`
 
-5. **The function.** Wait about ten seconds after creating the role: a brand-new role takes a moment to reach Lambda.
+\`s3:ListBucket\` looks like more than the code needs, but without it S3 answers a missing file with **AccessDenied** instead of **NoSuchKey**, and the retry-safe \`except s3.exceptions.NoSuchKey\` never fires.
+
+5. **The function.** Wait about ten seconds after creating the role: a brand-new role takes a moment to reach Lambda. On Ubuntu or the Windows Subsystem for Linux, install \`zip\` first: \`sudo apt install -y zip\`.
 
 \`\`\`sh
 zip function.zip lambda_function.py
@@ -994,14 +1014,15 @@ aws dynamodb scan --table-name Orders --select COUNT
 
 You should see 12 orders saved, the Northwind file in \`processed/\`, and the Globex file and its \`.error.txt\` in \`rejected/\`. Upload the Northwind file again: the log shows 12 duplicates, and the count stays at 12.
 
-9. **Push it to GitHub**: \`lambda_function.py\` and the three JSON policy files. They contain your account number but no secrets; if you'd rather not publish it, replace it with \`ACCOUNT_ID\` before you commit.
+9. **Push it to GitHub**: \`lambda_function.py\` and the four JSON files. They contain your account number but no secrets; if you'd rather not publish it, replace it with \`ACCOUNT_ID\` before you commit.
 
 **Cost:** Lambda, SQS and CloudWatch Logs fit in the free tier at this size. DynamoDB on-demand and S3 cost a fraction of a cent for a few test files.
 
-**Cleanup**, when you're done:
+**Cleanup**, when you're done. In a new terminal, run step 2 first so \`$BUCKET\` is set:
 
 \`\`\`sh
 aws s3 rb "s3://$BUCKET" --force
+aws cloudwatch delete-alarms --alarm-names order-intake-errors
 aws lambda delete-function --function-name order-intake
 aws dynamodb delete-table --table-name Orders
 aws sqs delete-queue --queue-url "$(aws sqs get-queue-url --queue-name order-intake-failures --query QueueUrl --output text)"

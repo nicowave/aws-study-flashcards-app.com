@@ -10,6 +10,7 @@ import { useProgress } from './engine/progress';
 import { hasCourseAccess } from './services/billing';
 import CourseHome from './engine/CourseHome';
 import TutorialPage from './engine/TutorialPage';
+import { currentPromotion } from './services/offers';
 
 const HUB_URL = 'https://aws-study-flashcards-app.com';
 
@@ -78,6 +79,23 @@ const Header = ({ user, onSignIn, onSignOut }) => (
   </header>
 );
 
+// A sale about to start, or running: one line above every page
+const PromoBanner = ({ access }) => {
+  const sale = currentPromotion();
+  if (!sale) return null;
+  const { promo, live } = sale;
+  const deal = `${promo.single}% off every course, ${promo.bundle}% off the Developer Path bundle`;
+  return (
+    <div className="promo-banner" role="note">
+      <span aria-hidden="true">🎃</span>
+      {live
+        ? <span><strong>{promo.label}:</strong> {deal}, until {promo.ends}.</span>
+        : <span><strong>{promo.label}</strong> starts {promo.starts}: {deal}, for one week.</span>}
+      {live && !access && <a href="/#pricing" onClick={(e) => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('pricing')?.scrollIntoView(), 0); }}>See prices</a>}
+    </div>
+  );
+};
+
 const Footer = () => (
   <footer className="site-footer">
     <div>
@@ -135,6 +153,7 @@ const Content = () => {
 
   return (
     <div className="site" style={{ '--accent': course.accent }}>
+      <PromoBanner access={access} />
       <Header user={user} onSignIn={openSignIn} onSignOut={logout} />
       {notice && (
         <div className={`notice ${notice.kind}`} role="status">

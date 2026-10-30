@@ -151,17 +151,19 @@ def urlopen(url, data=None, timeout=_NO_TIMEOUT, *, context=None, **_):
         raise urllib.error.URLError(ConnectionRefusedError(111, 'Connection refused'))
     if parts.scheme == 'https':
         _verify(parts.hostname, context, entry, wrap=True)
+    # The connection works, then the answer is slow or never comes: like real
+    # urlopen, that's a bare TimeoutError, not wrapped in URLError
     ms = 60_000_000 if site.get('hang') else site.get('ms', 120)
     if has_timeout and ms > timeout * 1000:
         advance(timeout)
         entry['result'] = 'timeout'
-        raise urllib.error.URLError(TimeoutError('timed out'))
+        raise TimeoutError('timed out')
     if site.get('hang'):
         advance(120)
         entry['result'] = 'timeout'
         _warn(f"{full} never answered. Without timeout=..., a real program waits for ever "
               "(and a Lambda function is stopped at its time limit). The practice internet gave up after 2 minutes.")
-        raise urllib.error.URLError(TimeoutError('timed out'))
+        raise TimeoutError('timed out')
     advance(ms / 1000)
     status = site.get('status', 200)
     body = site.get('body', _STATUS_TEXT.get(status, '')).encode('utf-8')

@@ -301,3 +301,14 @@ section h2 { font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.01em; }
   .pricing { padding: 18px; }
   .code-block pre, .terminal, .editor textarea { font-size: 0.8rem; }
 }
+
+/* ---------- sales and the bundle ---------- */
+.promo-banner { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; padding: 8px 16px; background: #3a1f05; color: #ffd8a8; font-size: 0.9rem; text-align: center; }
+.promo-banner a { color: #ffb366; font-weight: 600; }
+.sale-tag { margin: 0; align-self: flex-start; background: #f28c28; color: #1a0f00; font-weight: 700; font-size: 0.8rem; padding: 3px 10px; border-radius: 999px; }
+.unlock-price .was, .bundle-price .was { color: var(--faint); font-size: 1rem; }
+.bundle { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 8px; }
+.bundle-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.bundle-price { display: flex; align-items: baseline; gap: 8px; }
+.bundle-price .price { font-size: 1.3rem; font-weight: 700; }
+.bundle p { margin: 0; color: var(--muted); font-size: 0.9rem; }

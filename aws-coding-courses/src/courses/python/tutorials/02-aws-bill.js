@@ -69,7 +69,7 @@ export const account = () => ({ aws: {
   },
 } });
 
-const PRICE_PER_GB = { gp3: 0.08, gp2: 0.10, io1: 0.125, st1: 0.045, sc1: 0.015, standard: 0.05 };
+const PRICE_PER_GB = { gp3: 0.08, gp2: 0.10, io1: 0.125, io2: 0.125, st1: 0.045, sc1: 0.015, standard: 0.05 };
 const SNAPSHOT_PER_GB = 0.05;
 const PUBLIC_IP = 0.005 * 720;
 const COLLECTION = { instance: 'instances', volume: 'volumes', snapshot: 'snapshots', address: 'addresses' };
@@ -171,7 +171,9 @@ OUT_FILE = "forgotten.csv"
 FIELDS = ["region", "kind", "id", "name", "detail", "monthly_usd"]
 
 # About what each costs per month in us-east-1. Other regions are close.
-PRICE_PER_GB = {"gp3": 0.08, "gp2": 0.10, "io1": 0.125, "st1": 0.045, "sc1": 0.015, "standard": 0.05}
+# Storage only: io1 and io2 also charge for provisioned IOPS, and gp3 adds
+# a charge above its 3,000 IOPS / 125 MB/s baseline.
+PRICE_PER_GB = {"gp3": 0.08, "gp2": 0.10, "io1": 0.125, "io2": 0.125, "st1": 0.045, "sc1": 0.015, "standard": 0.05}
 SNAPSHOT_PER_GB = 0.05
 PUBLIC_IP = 0.005 * 720  # $0.005 an hour, about 720 hours a month
 OLD_SNAPSHOT_DAYS = 90
@@ -476,7 +478,7 @@ You never put a password or access key in the code. boto3 looks for credentials 
 
 1. Environment variables (\`AWS_ACCESS_KEY_ID\` and friends), if set.
 2. Your AWS config files in \`~/.aws/\`: the sign-in you set up with \`aws configure sso\` in *Start here*.
-3. The **role** of the machine it runs on: an Amazon EC2 server's instance profile, or a Lambda function's execution role.
+3. The **role** of where it runs: an Amazon EC2 server's instance profile, or a container's role. (On Lambda, the execution role's short-lived keys arrive as the environment variables in step 1.)
 
 So the same program works on your laptop and in AWS, unchanged. The region works the same way: \`boto3.client("ec2", region_name="eu-west-1")\` picks one, and without it boto3 uses your default region.`,
       scenario: account,
@@ -609,7 +611,7 @@ for region in regions:
 
 ### Pages
 
-AWS returns long lists in **pages**: a chunk of results and a \`NextToken\` that means "there's more, ask again with this". A loop that makes one call can miss everything after the first page. A **paginator** asks again for you until the list ends:
+Most AWS list calls return **pages**: a chunk of results and a \`NextToken\` that means "there's more, ask again with this". A loop that makes one call can miss everything after the first page. EC2's describe calls are a little different: they return everything at once unless you ask for pages, which gets slow and throttled in big accounts. A **paginator** handles both, asking again for you until the list ends:
 
 \`\`\`python
 ec2 = boto3.client("ec2", region_name="us-east-1")
@@ -619,7 +621,7 @@ for page in ec2.get_paginator("describe_volumes").paginate():
 len(volumes)
 \`\`\`
 
-In a small account there's only one page, so a plain call looks fine, until the account grows. A paginator works either way, so **make it a habit** for every list. A few calls, like \`describe_addresses\`, always answer in one go and have no paginator:
+In a small account there's only one page, so a plain call looks fine. A paginator works either way, so **make it a habit** for every list. A few calls, like \`describe_addresses\`, always answer in one go and have no paginator:
 
 \`\`\`python
 ec2.can_paginate("describe_volumes"), ec2.can_paginate("describe_addresses")
@@ -753,7 +755,7 @@ Permissions are written as an **IAM policy**: JSON that AWS Identity and Access 
 }
 \`\`\`
 
-- **Action** names a service and an API call, \`ec2:DescribeVolumes\`. A \`*\` matches many: \`ec2:Describe*\` is every read-only EC2 call.
+- **Action** names a service and an API call, \`ec2:DescribeVolumes\`. A \`*\` matches many: \`ec2:Describe*\` is every EC2 \`Describe\` call. (EC2 has a few other read-only calls, like \`GetConsoleOutput\`, that it doesn't cover.)
 - **Resource** is what it applies to. EC2's \`Describe\` calls can't be limited to particular resources, so they need \`"*"\`.
 - **Condition** narrows it further: this program may only add tags whose key is \`cleanup-review\`.
 - Anything not allowed is denied. There's no \`ec2:TerminateInstances\` here, so even a bad bug can't delete a server.
@@ -846,7 +848,7 @@ except ClientError as e:
       minutes: 45,
       body: `Run the report against your own AWS account, with read-only permissions.
 
-1. **A project folder with boto3**, in a virtual environment (Tutorial 1's Build step explains these):
+1. **A project folder with boto3**, in a virtual environment (Tutorial 1's Build step explains these). On Ubuntu or the Windows Subsystem for Linux, install \`python3-venv\` first if you haven't: \`sudo apt install -y python3-venv\`.
 
 \`\`\`sh
 mkdir -p ~/aws-study-projects/python/cost-report
@@ -889,7 +891,7 @@ AWS_PROFILE=cost-report python3 tag_for_review.py
 
 8. **Push it to GitHub**, with a \`.gitignore\` containing \`.venv/\` and \`forgotten.csv\`: resource IDs and account details don't belong in a public repository.
 
-**Cost:** \`Describe\` calls and tags are free. A 1 GB gp3 test volume costs about $0.08 a month. **Clean up:** delete the test volume (**Volumes** → select → **Delete volume**), and remove the tag from anything else with \`aws ec2 delete-tags --resources <id> --tags Key=cleanup-review\`.`,
+**Cost:** \`Describe\` calls and tags are free. A 1 GB gp3 test volume costs about $0.08 a month. **Clean up:** delete the test volume (**Volumes** → select → **Delete volume**), and remove the tag from anything else with \`aws ec2 delete-tags --resources vol-0123456789abcdef0 --tags Key=cleanup-review\` (use the real ID). Run it with your normal sign-in, not \`cost-report\`: the read-only profile isn't allowed to delete tags.`,
       checklist: [
         'cost_report.py runs against my account with the read-only `cost-report` profile',
         'It found my unattached test volume',

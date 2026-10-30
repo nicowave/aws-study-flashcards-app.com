@@ -4,7 +4,7 @@
 # =============================================================================
 # Deploys the Study Hub Homepage, the certification study games, and Tutorials
 # Run from: ~/dev/sites/aws-study-flashcards.com/
-# Usage: ./deploy.sh [all|hub|cloud|ai|saa|dva|bash|python|tutorials]
+# Usage: ./deploy.sh [all|hub|cloud|ai|saa|dva|bash|python|js|typescript|tutorials]
 # =============================================================================
 
 set -e  # Exit on any error
@@ -412,6 +412,15 @@ deploy_python() {
     deploy_course python "python.aws-study-flashcards-app.com" "E205DY614C5Q4C"
 }
 
+# javascript.aws-study-flashcards-app.com is a bucket that redirects here (E27Y7QTYXZD1SM)
+deploy_js() {
+    deploy_course javascript "js.aws-study-flashcards-app.com" "E1JMSZCG8CKTGT"
+}
+
+deploy_typescript() {
+    deploy_course typescript "typescript.aws-study-flashcards-app.com" "E2HBJJFM265RJL"
+}
+
 deploy_tutorials() {
     local site_name="Tutorials (Cognito-gated, static)"
     local site_path="${HOME}/dev/aws/tutorials-site/site"
@@ -499,6 +508,10 @@ deploy_all() {
     echo ""
     deploy_python || ((failed++))
     echo ""
+    deploy_js || ((failed++))
+    echo ""
+    deploy_typescript || ((failed++))
+    echo ""
     deploy_tutorials || ((failed++))
 
     local end_time=$(date +%s)
@@ -507,7 +520,7 @@ deploy_all() {
     print_header "Deployment Complete!"
     echo ""
     if [ $failed -eq 0 ]; then
-        print_success "All 8 sites deployed successfully in ${duration} seconds"
+        print_success "All 10 sites deployed successfully in ${duration} seconds"
     else
         print_error "$failed deployment(s) failed"
     fi
@@ -519,6 +532,8 @@ deploy_all() {
     echo "  👨‍💻 Developer: https://developer.aws-study-flashcards-app.com"
     echo "  💲 Bash:  https://bash.aws-study-flashcards-app.com"
     echo "  🐍 Python: https://python.aws-study-flashcards-app.com"
+    echo "  🟨 JavaScript: https://js.aws-study-flashcards-app.com"
+    echo "  🔷 TypeScript: https://typescript.aws-study-flashcards-app.com"
     echo "  📚 Tuts:  https://tutorials.aws-study-flashcards-app.com"
     echo ""
     print_info "CloudFront invalidations may take 1-2 minutes to propagate"
@@ -561,6 +576,12 @@ case "${1:-}" in
     python)
         deploy_python
         ;;
+    js|javascript)
+        deploy_js
+        ;;
+    typescript|ts)
+        deploy_typescript
+        ;;
     tutorials|tuts)
         deploy_tutorials
         ;;
@@ -568,10 +589,10 @@ case "${1:-}" in
         deploy_next
         ;;
     -h|--help)
-        echo "Usage: $0 [all|hub|cloud|ai|saa|dva|bash|python|tutorials|next]"
+        echo "Usage: $0 [all|hub|cloud|ai|saa|dva|bash|python|js|typescript|tutorials|next]"
         echo ""
         echo "Options:"
-        echo "  all    Deploy all eight sites"
+        echo "  all    Deploy all ten sites"
         echo "  hub    Deploy Study Hub Homepage only"
         echo "  cloud  Deploy Cloud Practitioner Game only"
         echo "  ai     Deploy AI Study Game only"
@@ -579,6 +600,8 @@ case "${1:-}" in
         echo "  dva    Deploy Developer Associate Study Game only"
         echo "  bash   Deploy the Bash for AWS course site only"
         echo "  python Deploy the Python for AWS course site only"
+        echo "  js     Deploy the JavaScript for AWS course site only"
+        echo "  typescript  Deploy the TypeScript for AWS course site only"
         echo "  tutorials  Deploy Tutorials site only (static, no build)"
         echo "  next   Deploy hidden test versions of the 5 apps at /next/"
         echo ""
@@ -597,8 +620,10 @@ case "${1:-}" in
         echo "  7) tutorials - Tutorials site"
         echo "  8) bash   - Bash for AWS course"
         echo "  9) python - Python for AWS course"
+        echo "  10) js    - JavaScript for AWS course"
+        echo "  11) typescript - TypeScript for AWS course"
         echo ""
-        read "choice?Enter choice [all/hub/cloud/ai/saa/dva/tutorials/bash/python]: "
+        read "choice?Enter choice [all/hub/cloud/ai/saa/dva/tutorials/bash/python/js/typescript]: "
         
         case $choice in
             1|all) deploy_all ;;
@@ -610,6 +635,8 @@ case "${1:-}" in
             7|tutorials|tuts) deploy_tutorials ;;
             8|bash) deploy_bash ;;
             9|python) deploy_python ;;
+            10|js|javascript) deploy_js ;;
+            11|typescript|ts) deploy_typescript ;;
             *) print_error "Invalid choice" ;;
         esac
         ;;

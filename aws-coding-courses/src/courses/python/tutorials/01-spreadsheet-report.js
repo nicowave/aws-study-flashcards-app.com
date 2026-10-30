@@ -841,8 +841,8 @@ Run it as often as you like. After a run, the console knows everything the progr
 
 1. **Install Python 3.** Check first: \`python3 --version\` in your terminal. If it says 3.10 or newer, you're set.
    - **Mac:** download the installer from [python.org/downloads](https://www.python.org/downloads/), or \`brew install python\` if you use Homebrew.
-   - **Windows (with the Windows Subsystem for Linux from Start here):** \`sudo apt update && sudo apt install -y python3\`
-   - **Linux:** usually already there; otherwise \`sudo apt install -y python3\`.
+   - **Windows (with the Windows Subsystem for Linux from Start here):** \`sudo apt update && sudo apt install -y python3 python3-venv\`
+   - **Linux:** usually already there; otherwise \`sudo apt install -y python3 python3-venv\`. (On Ubuntu and Debian, the virtual environments in step 5 come in that separate \`python3-venv\` package.)
 
 2. **Make a project folder** and download the practice export into it (button below):
 
@@ -884,10 +884,12 @@ Excel already stores dates as dates, so those cells arrive as \`datetime\` value
 6. **Every Monday at 8:00.** On Mac or Linux, \`crontab -e\` and add this line (the Bash course covers cron in depth). Change the path to your real folder:
 
 \`\`\`sh
-0 8 * * 1 cd ~/aws-study-projects/python/weekly-report && python3 weekly_report.py >> run.log 2>&1
+0 8 * * 1 cd ~/aws-study-projects/python/weekly-report && .venv/bin/python weekly_report.py >> run.log 2>&1
 \`\`\`
 
-On Windows itself, **Task Scheduler** does the same job.
+cron starts programs with a very short list of places to look (\`/usr/bin:/bin\`), so a plain \`python3\` may find the wrong Python, or none. \`.venv/bin/python\` is the Python from step 5, with \`openpyxl\`. No virtual environment? Use the full path that \`which python3\` prints instead.
+
+cron only runs while the computer is awake (and on the Windows Subsystem for Linux, while Linux is running). On Windows itself, **Task Scheduler** does the same job.
 
 7. **Push it to GitHub** (see *Start here*). Add a \`.gitignore\` with \`.venv/\`, \`tickets*.csv\` and \`report.txt\`: real exports contain names and email addresses, and don't belong in a public repository.`,
       downloads: [{ label: 'Download tickets.csv (practice export)', filename: 'tickets.csv', content: () => ticketData().csv }],
