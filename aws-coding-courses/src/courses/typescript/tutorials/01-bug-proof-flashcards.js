@@ -678,7 +678,8 @@ After \`if (isStringArray(x))\`, TypeScript treats \`x\` as \`string[]\`. The co
 1. **Install Node.js 22** (it brings \`npm\`, which installs TypeScript). The simplest way on Mac, Linux and the Windows Subsystem for Linux is **nvm**, the Node version manager:
 
 \`\`\`sh
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+touch ~/.zshrc   # Mac only: the installer needs this file to exist
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
 \`\`\`
 
 Close and reopen the terminal, then:
@@ -701,7 +702,7 @@ npm install --save-dev typescript
 
 3. **Download the three files** with the buttons below into that folder, or copy \`app.ts\`, \`index.html\` and \`style.css\` from the last step.
 
-4. **Tell the compiler how to work** with a file called \`tsconfig.json\`. (\`npx tsc --init\` writes one with every option explained in comments; for this page, a short one is clearer.)
+4. **Tell the compiler how to work** with a file called \`tsconfig.json\`. (\`npx tsc --init\` writes a starter config meant for Node.js projects; its settings would turn this page's script into a module the browser can't run, so use this short one instead.)
 
 \`\`\`json
 {

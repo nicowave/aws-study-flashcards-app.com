@@ -244,11 +244,19 @@ interface TrustPolicy {
   Version: '2012-10-17';
   Statement: WebIdentityStatement[];
 }
+// A GitHub repository, with the numeric ids GitHub gives the owner and the repo
+interface GitHubRepo {
+  owner: string;
+  ownerId: number;
+  name: string;
+  id: number;
+}
 `;
 
+const NICOTEK = `{ owner: 'nicotek', ownerId: 81234567, name: 'study-tracker', id: 912345678 }`;
+
 const TRUST_STARTER = `${TRUST_HEAD}
-// repo is "owner/name", like "nicotek/study-tracker"
-export function githubTrustPolicy(accountId: string, repo: string): TrustPolicy {
+export function githubTrustPolicy(accountId: string, repo: GitHubRepo): TrustPolicy {
   return {
     Version: '2012-10-17',
     Statement: [{
@@ -258,19 +266,20 @@ export function githubTrustPolicy(accountId: string, repo: string): TrustPolicy 
       Condition: {
         StringEquals: { [\`\${PROVIDER}:aud\`]: 'sts.amazonaws.com' },
         // TODO: this lets ANY repository on GitHub deploy to your account.
-        //       Allow only pushes to main in the repo passed in.
+        //       Allow only pushes to main in the repo passed in, with the subject
+        //       new repositories use: repo:OWNER@OWNER-ID/NAME@REPO-ID:ref:refs/heads/main
         StringLike: { [\`\${PROVIDER}:sub\`]: 'repo:*' },
       },
     }],
   };
 }
 
-console.log(JSON.stringify(githubTrustPolicy('111122223333', 'nicotek/study-tracker'), null, 2));
+console.log(JSON.stringify(githubTrustPolicy('111122223333', ${NICOTEK}), null, 2));
 `;
 
 const TRUST_SOLUTION = `${TRUST_HEAD}
-// repo is "owner/name", like "nicotek/study-tracker"
-export function githubTrustPolicy(accountId: string, repo: string): TrustPolicy {
+export function githubTrustPolicy(accountId: string, repo: GitHubRepo): TrustPolicy {
+  const subject = \`repo:\${repo.owner}@\${repo.ownerId}/\${repo.name}@\${repo.id}:ref:refs/heads/main\`;
   return {
     Version: '2012-10-17',
     Statement: [{
@@ -280,14 +289,14 @@ export function githubTrustPolicy(accountId: string, repo: string): TrustPolicy 
       Condition: {
         StringEquals: {
           [\`\${PROVIDER}:aud\`]: 'sts.amazonaws.com',
-          [\`\${PROVIDER}:sub\`]: \`repo:\${repo}:ref:refs/heads/main\`,
+          [\`\${PROVIDER}:sub\`]: subject,
         },
       },
     }],
   };
 }
 
-console.log(JSON.stringify(githubTrustPolicy('111122223333', 'nicotek/study-tracker'), null, 2));`;
+console.log(JSON.stringify(githubTrustPolicy('111122223333', ${NICOTEK}), null, 2));`;
 
 // ---------------------------------------------------------------------------
 // Reading the synthesized template
@@ -391,7 +400,7 @@ new dynamodb.Table(stack, 'Notes', {
 app.synth().stacks[0].template
 \`\`\`
 
-Four lines of TypeScript became a full \`AWS::DynamoDB::Table\` resource. Look at its name in the template: \`Notes\` plus a code. That's its **logical ID**, which CloudFormation uses to recognize it next time. If you change a construct's id, CloudFormation sees a new table and deletes the old one, data and all. **Choose ids once, and don't rename them.**
+Four lines of TypeScript became a full \`AWS::DynamoDB::Table\` resource. Look at its name in the template: \`Notes\` plus a code. That's its **logical ID**, which CloudFormation uses to recognize it next time. If you change a construct's id, CloudFormation treats it as a different resource: it creates a new table, and the old one is kept, abandoned outside the stack (with the default \`RETAIN\`), or deleted with its data (with \`DESTROY\`). If the table has a fixed \`tableName\`, the deploy fails instead, because that name is taken. **Choose ids once, and don't rename them.**
 
 The CDK also filled in settings you didn't choose: \`ProvisionedThroughput\` (capacity you pay for every hour) and \`DeletionPolicy: Retain\` (keep the table if the stack is deleted). Safe defaults, but worth knowing.
 
@@ -614,7 +623,7 @@ Resources
  └─ [~] KeySchema (requires replacement)
 \`\`\`
 
-That says changing the table's keys means a new table, and the old one, with its data, is deleted. Some settings can't be changed in place. The diff tells you before it happens, not after.
+That says changing the table's keys means a new table. Some settings can't be changed in place. The old table is then kept or deleted depending on its removal policy, and with a fixed \`tableName\` like this tutorial's, the deploy fails instead: CloudFormation can't create a second table with the same name. Rename it or leave the name out. The diff tells you before it happens, not after.
 
 **\`cdk deploy\`** synthesizes, uploads the code, and asks CloudFormation to apply the change set. If the change adds or widens permissions, it shows them and asks you to confirm. When it finishes, it prints the outputs:
 
@@ -631,7 +640,7 @@ If a resource fails to create, CloudFormation rolls the whole stack back to how 
 
 Where a stack goes is its **environment**: an account and region. Leave it out and the CDK uses your current credentials. Set it to deploy the same code twice:
 
-\`\`\`py
+\`\`\`bin/study-tracker.ts
 new StudyTrackerStack(app, 'StudyTracker-Test', { env: { account: '111122223333', region: 'us-east-1' } });
 new StudyTrackerStack(app, 'StudyTracker-Prod', { env: { account: '444455556666', region: 'us-east-1' } });
 \`\`\`
@@ -697,12 +706,14 @@ The trust policy is the whole security of this setup. It says *which* tokens may
 "Condition": {
   "StringEquals": {
     "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-    "token.actions.githubusercontent.com:sub": "repo:nicotek/study-tracker:ref:refs/heads/main"
+    "token.actions.githubusercontent.com:sub": "repo:nicotek@81234567/study-tracker@912345678:ref:refs/heads/main"
   }
 }
 \`\`\`
 
 The \`sub\` (subject) line is the important one: only pushes to \`main\` in that one repository. Leave it out, or write \`repo:*\`, and **every repository on GitHub** could deploy into your account. That has happened to real companies.
+
+The subject's shape depends on the repository's age. Repositories created, renamed or transferred since July 15, 2026 get \`repo:OWNER@OWNER-ID/NAME@REPO-ID:ref:refs/heads/main\`, with the numeric ids GitHub gives the owner and the repository. Because ids never change, a deleted repository's name can't be re-created by someone else to inherit your trust. Older repositories keep the short form, \`repo:owner/name:ref:refs/heads/main\`. The Build step looks the ids up for you.
 
 ### What the role may do
 
@@ -719,12 +730,12 @@ With the CDK, the pipeline's role needs very little: the bootstrap step already 
 Look at the interface: \`Effect: 'Allow' | 'Deny'\`. That's a **union of literal types**: only those two exact strings are allowed. Press **Run**, and the compiler finds the first mistake.
 
 Keys written like \`\`[\`\${PROVIDER}:sub\`]\`\` are **computed property names**: the text inside the square brackets becomes the key.`,
-      task: 'Fix `githubTrustPolicy` so it compiles with no errors, uses the action `sts:AssumeRoleWithWebIdentity`, and lets in only pushes to `main` in the repository passed in: `repo:<owner>/<name>:ref:refs/heads/main`, with no wildcards.',
-      hint: '`Effect: \'Allow\'`, `Action: \'sts:AssumeRoleWithWebIdentity\'`. Remove the `StringLike` line and add a second key to `StringEquals`: ``[`${PROVIDER}:sub`]: `repo:${repo}:ref:refs/heads/main` ``.',
+      task: 'Fix `githubTrustPolicy` so it compiles with no errors, uses the action `sts:AssumeRoleWithWebIdentity`, and lets in only pushes to `main` in the repository passed in, using the subject new repositories get: `repo:OWNER@OWNER-ID/NAME@REPO-ID:ref:refs/heads/main`. No wildcards.',
+      hint: '`Effect: \'Allow\'`, `Action: \'sts:AssumeRoleWithWebIdentity\'`. Remove the `StringLike` line and add a second key to `StringEquals`: ``[`${PROVIDER}:sub`]: `repo:${repo.owner}@${repo.ownerId}/${repo.name}@${repo.id}:ref:refs/heads/main` ``.',
       solution: TRUST_SOLUTION,
       files: [{ path: 'trust-policy.ts', starter: TRUST_STARTER }],
       scenario: {},
-      probe: `return [mod.githubTrustPolicy('111122223333', 'nicotek/study-tracker'), mod.githubTrustPolicy('444455556666', 'someone/other-repo')];`,
+      probe: `return [mod.githubTrustPolicy('111122223333', ${NICOTEK}), mod.githubTrustPolicy('444455556666', { owner: 'someone', ownerId: 1234, name: 'other-repo', id: 5678 })];`,
       check: ({ diagnostics, probe, result }) => {
         if (result.error || !Array.isArray(probe)) return null;
         const errors = typeErrors(diagnostics);
@@ -739,8 +750,9 @@ Keys written like \`\`[\`\${PROVIDER}:sub\`]\`\` are **computed property names**
         if (eq['token.actions.githubusercontent.com:aud'] !== 'sts.amazonaws.com') return 'Keep the aud condition: sts.amazonaws.com.';
         const sub = eq['token.actions.githubusercontent.com:sub'];
         if (!sub) return 'Add the sub condition to StringEquals, so only your repository can use the role.';
-        if (sub !== 'repo:nicotek/study-tracker:ref:refs/heads/main') return `The sub for nicotek/study-tracker should be "repo:nicotek/study-tracker:ref:refs/heads/main", but it's "${sub}".`;
-        if (b.Condition?.StringEquals?.['token.actions.githubusercontent.com:sub'] !== 'repo:someone/other-repo:ref:refs/heads/main') return 'Build the sub from the repo parameter, so the function works for any repository.';
+        if (sub === 'repo:nicotek/study-tracker:ref:refs/heads/main') return 'That\'s the subject older repositories use. New ones include the numeric ids: "repo:nicotek@81234567/study-tracker@912345678:ref:refs/heads/main".';
+        if (sub !== 'repo:nicotek@81234567/study-tracker@912345678:ref:refs/heads/main') return `The sub for nicotek/study-tracker should be "repo:nicotek@81234567/study-tracker@912345678:ref:refs/heads/main", but it's "${sub}".`;
+        if (b.Condition?.StringEquals?.['token.actions.githubusercontent.com:sub'] !== 'repo:someone@1234/other-repo@5678:ref:refs/heads/main') return 'Build the sub from the repo parameter, so the function works for any repository.';
         return true;
       },
       success: 'One wrong character in a trust policy is either a role that never works or a door left open. Typed, tested code makes both much harder.',
@@ -767,11 +779,11 @@ Keys written like \`\`[\`\${PROVIDER}:sub\`]\`\` are **computed property names**
       minutes: 6,
       questions: [
         { q: 'What does `cdk synth` produce?', options: ['A running stack', 'A CloudFormation template', 'A Docker image', 'A list of AWS bills'], answer: 1, explain: 'The CDK turns your code into a CloudFormation template. `cdk deploy` then asks CloudFormation to build it.' },
-        { q: 'You changed a table\'s sort key. What does `cdk diff` warn you about?', options: ['Nothing: keys can change any time', 'The table will be replaced: a new table, and the old one and its data deleted', 'The stack will be deleted', 'The function will be renamed'], answer: 1, explain: 'Some settings can\'t change in place. The diff marks those resources for replacement before you deploy, not after.' },
+        { q: 'You changed a table\'s sort key. What does `cdk diff` warn you about?', options: ['Nothing: keys can change any time', 'The table must be replaced with a new one', 'The stack will be deleted', 'The function will be renamed'], answer: 1, explain: 'Some settings can\'t change in place. The diff marks those resources for replacement before you deploy, not after. The old table is then kept or deleted by its removal policy, and a fixed tableName makes the deploy fail.' },
         { q: 'What does `table.grantReadWriteData(fn)` do?', options: ['Makes the table public', 'Adds a policy to the function\'s role with read and write actions on that one table', 'Gives every function in the account access', 'Copies the table into the function'], answer: 1, explain: 'Grants write least-privilege IAM for you: the right actions, on just that resource\'s ARN.' },
         { q: 'Why does `new CfnOutput(this, \'ApiUrl\', { value: api.url })` fail to compile?', options: ['CfnOutput takes a number', '`api.url` is `string | undefined`, and value must be a string', 'Outputs can\'t contain URLs', 'The id must be lowercase'], answer: 1, explain: 'An API might have no default address, so TypeScript won\'t assume one. `api.url!` says "I know it\'s there".' },
         { q: 'Why use OpenID Connect instead of access keys in GitHub secrets?', options: ['It\'s faster', 'The credentials are temporary, nothing is stored to leak or rotate, and the trust policy limits which repository and branch can use them', 'Access keys don\'t work with the CDK', 'GitHub requires it'], answer: 1, explain: 'Each job gets short-lived credentials for one role. The trust policy decides exactly who may assume it.' },
-        { q: 'A trust policy has `"token.actions.githubusercontent.com:sub": "repo:*"` under StringLike. What\'s the problem?', options: ['None', 'Any repository on GitHub could assume the role and deploy into your account', 'Only private repositories can use it', 'It blocks every repository'], answer: 1, explain: 'The sub condition is what ties the role to your repository. Make it exact: `repo:owner/name:ref:refs/heads/main`.' },
+        { q: 'A trust policy has `"token.actions.githubusercontent.com:sub": "repo:*"` under StringLike. What\'s the problem?', options: ['None', 'Any repository on GitHub could assume the role and deploy into your account', 'Only private repositories can use it', 'It blocks every repository'], answer: 1, explain: 'The sub condition is what ties the role to your repository. Make it exact: `repo:OWNER@OWNER-ID/NAME@REPO-ID:ref:refs/heads/main` for repositories made since July 15, 2026, `repo:owner/name:ref:refs/heads/main` for older ones.' },
       ],
     },
     {
@@ -787,7 +799,7 @@ Keys written like \`\`[\`\${PROVIDER}:sub\`]\`\` are **computed property names**
         { id: 'ts3-removal', front: 'Delete a practice table along with its stack', back: '`removalPolicy: RemovalPolicy.DESTROY` (production keeps the default, RETAIN)', tags: ['cdk'], difficulty: 'medium' },
         { id: 'ts3-nonnull', front: 'Tell TypeScript a `string | undefined` value is really there', back: 'A non-null assertion: `api.url!`. Only when you\'re sure.', tags: ['typescript'], difficulty: 'medium' },
         { id: 'ts3-oidc', front: 'Which STS call does GitHub Actions use to sign in to AWS with OIDC?', back: '`AssumeRoleWithWebIdentity`, with the workflow permission `id-token: write`', tags: ['iam', 'ci/cd'], difficulty: 'hard' },
-        { id: 'ts3-sub', front: 'The trust policy condition that allows only pushes to main in one repository', back: '`token.actions.githubusercontent.com:sub` = `repo:owner/name:ref:refs/heads/main` (StringEquals)', tags: ['iam', 'ci/cd'], difficulty: 'hard' },
+        { id: 'ts3-sub', front: 'The trust policy condition that allows only pushes to main in one repository', back: '`token.actions.githubusercontent.com:sub` = `repo:OWNER@OWNER-ID/NAME@REPO-ID:ref:refs/heads/main` (StringEquals). Repositories older than July 15, 2026: `repo:owner/name:ref:refs/heads/main`', tags: ['iam', 'ci/cd'], difficulty: 'hard' },
       ],
     },
     {
@@ -811,13 +823,13 @@ That makes a Git repository with \`bin/study-tracker.ts\` (the app), \`lib/study
 
 3. **Your stack.** Replace the class in \`lib/study-tracker-stack.ts\` with your \`StudyTrackerStack\` from the last practice step: the imports and the class, without the last three lines. In \`bin/study-tracker.ts\`, set the stack's id to \`StudyTracker\`:
 
-\`\`\`py
+\`\`\`bin/study-tracker.ts
 new StudyTrackerStack(app, 'StudyTracker', {});
 \`\`\`
 
-4. **The function's code.** If you built the study tracker in the JavaScript course, copy its \`lambda/index.mjs\` into a \`lambda\` folder here. Otherwise, this short version works. Save it as \`lambda/index.mjs\`:
+4. **The function's code.** If you built the study tracker in the JavaScript course, copy its \`index.mjs\` (from that project's main folder) into a new \`lambda\` folder here. Otherwise, this short version works. Save it as \`lambda/index.mjs\`:
 
-\`\`\`py
+\`\`\`lambda/index.mjs
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 
@@ -869,7 +881,7 @@ aws cognito-idp sign-up --client-id "$CLIENT" --username you@example.com --passw
 aws cognito-idp admin-confirm-sign-up --user-pool-id "$POOL" --username you@example.com
 TOKEN=$(aws cognito-idp initiate-auth --client-id "$CLIENT" --auth-flow USER_PASSWORD_AUTH \\
   --auth-parameters 'USERNAME=you@example.com,PASSWORD=Practice-Pass1!' \\
-  --query AuthenticationResult.IdToken --output text)
+  --query AuthenticationResult.AccessToken --output text)
 
 curl -s -X PUT "\${API}progress/aws-basics" -H "Authorization: Bearer $TOKEN" \\
   -H "content-type: application/json" -d '{"known": 12, "total": 40}'
@@ -897,10 +909,12 @@ aws iam create-open-id-connect-provider \\
   --client-id-list sts.amazonaws.com
 \`\`\`
 
-Then the role the workflow uses. Put your GitHub name in \`REPO\`:
+Then the role the workflow uses. Its trust policy needs your repository's subject, which includes the numeric ids GitHub gave your account and the repository. This looks them up with \`jq\`, a small JSON tool: install it first if \`jq --version\` says it's missing (\`brew install jq\` on a Mac, \`sudo apt install -y jq\` on Ubuntu or the Windows Subsystem for Linux). Put your GitHub name in \`REPO\`:
 
 \`\`\`sh
 REPO=YOUR-NAME/study-tracker
+SUB=$(curl -s https://api.github.com/repos/$REPO | jq -r '"repo:\\(.owner.login)@\\(.owner.id)/\\(.name)@\\(.id):ref:refs/heads/main"')
+echo "$SUB"
 cat > trust.json <<EOF
 {
   "Version": "2012-10-17",
@@ -911,7 +925,7 @@ cat > trust.json <<EOF
     "Condition": {
       "StringEquals": {
         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-        "token.actions.githubusercontent.com:sub": "repo:$REPO:ref:refs/heads/main"
+        "token.actions.githubusercontent.com:sub": "$SUB"
       }
     }
   }]
@@ -928,6 +942,8 @@ aws iam put-role-policy --role-name github-deploy-study-tracker --policy-name as
 echo "arn:aws:iam::$ACCOUNT:role/github-deploy-study-tracker"
 \`\`\`
 
+\`echo "$SUB"\` should print something like \`repo:you@12345678/study-tracker@987654321:ref:refs/heads/main\`. If it prints \`repo:null@null…\`, the repository name is wrong, or the repository is private and the request wasn't signed in. For a private repository, sign in with GitHub's command line (\`gh auth login\`) and use it instead of \`curl\`: \`SUB=$(gh api repos/$REPO --jq '"repo:\\(.owner.login)@\\(.owner.id)/\\(.name)@\\(.id):ref:refs/heads/main"')\`.
+
 The role can do one thing: assume the roles \`cdk bootstrap\` created. Those do the deploying.
 
 9. **The workflow.** Save the workflow from the *Deploy on every push* step as \`.github/workflows/deploy.yml\`, with your role ARN (the last line above) and region. Then:
@@ -940,7 +956,7 @@ git push
 
 Open your repository's **Actions** tab and watch it run: install, test, diff, deploy. Change something small, like the function's \`timeout\`, push again, and watch the pipeline deploy it while you do something else.
 
-10. **Clean up.** The table and user pool use \`DESTROY\`, so one command removes the app:
+10. **Clean up.** In a new terminal, run the \`ACCOUNT=...\` line from step 5 again first. The table and user pool use \`DESTROY\`, so one command removes the app:
 
 \`\`\`sh
 npx cdk destroy
@@ -949,9 +965,16 @@ aws iam delete-role --role-name github-deploy-study-tracker
 aws iam delete-open-id-connect-provider --open-id-connect-provider-arn arn:aws:iam::$ACCOUNT:oidc-provider/token.actions.githubusercontent.com
 \`\`\`
 
-Keep the \`CDKToolkit\` stack if you'll use the CDK again (its bucket costs fractions of a cent). To remove it too, empty its bucket and delete the stack in the CloudFormation console. In a new terminal, run the \`ACCOUNT=...\` line from step 5 again first.
+The function's log group isn't part of the stack, so \`cdk destroy\` leaves it behind. Find it and delete it:
 
-**Cost:** for a few test users, Lambda, API Gateway, DynamoDB on-demand and Cognito cost nothing or a few cents. GitHub Actions is free for public repositories and includes free minutes for private ones.`,
+\`\`\`sh
+aws logs describe-log-groups --log-group-name-prefix /aws/lambda/StudyTracker --query "logGroups[].logGroupName" --output text
+aws logs delete-log-group --log-group-name /aws/lambda/StudyTracker-ProgressFunction...   # the name printed above
+\`\`\`
+
+Keep the \`CDKToolkit\` stack if you'll use the CDK again (its bucket costs fractions of a cent). To remove it too, empty its bucket and delete the stack in the CloudFormation console.
+
+**Cost:** for a few test users, Lambda, API Gateway and Cognito stay in their free amounts, and DynamoDB on-demand costs fractions of a cent at this size (its first 25 GB of storage are free). GitHub Actions is free for public repositories and includes free minutes for private ones.`,
       checklist: [
         '`npx cdk deploy` created the study tracker and printed its outputs',
         'A signed-in `curl` saved and read progress; without a token it got 401',

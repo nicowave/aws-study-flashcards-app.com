@@ -282,10 +282,11 @@ In Visual Studio Code, hold ⌘ or Ctrl and click a type's name to see every fie
       runtime: 'node',
       title: 'List the servers',
       minutes: 15,
-      body: `\`servers.ts\` asks EC2 for every instance and prints one line each. TypeScript has found two real bugs in \`nameOf\`, on the same line. Press **Run** and read them:
+      body: `\`servers.ts\` asks EC2 for every instance and prints one line each. TypeScript has found two real bugs in \`nameOf\`, on the same line, and reports them as three messages. Press **Run** and read them:
 
 - \`'instance.Tags' is possibly 'undefined'\`: servers launched without tags have no \`Tags\` field at all. The practice account has one.
 - \`Object is possibly 'undefined'\`: \`find\` gives \`undefined\` when no tag matches. Another server has tags, but no \`Name\`.
+- \`Type 'string | undefined' is not assignable to type 'string'\`: the same problem seen from the return type. Even a tag's \`Value\` is optional in the SDK's types.
 
 Then make the table readable. \`padEnd(n)\` adds spaces to the end of a string until it's \`n\` characters long, which lines up columns:
 
@@ -608,7 +609,8 @@ On your computer, the same thing is \`npx tsx ops.ts usage team-assets\`.`,
 1. **Node.js 22.** Check with \`node --version\`. If it's missing or older, install it with the Node Version Manager:
 
 \`\`\`sh
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+touch ~/.zshrc   # Mac only: the installer needs this file to exist
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
 \`\`\`
 
 Close and reopen the terminal, then:
@@ -640,6 +642,7 @@ npm install --save-dev typescript tsx @types/node
     "moduleResolution": "NodeNext",
     "strict": true,
     "outDir": "dist",
+    "types": ["node"],
     "skipLibCheck": true
   },
   "include": ["ops.ts"]
@@ -698,7 +701,7 @@ ops usage YOUR_BUCKET
         '`npx tsx ops.ts whoami` shows my real account',
         '`npx tsc --noEmit` reports no errors',
         '`ops` works as a command after `npm link`',
-        'The ops-tool policy exists, with only the five permissions it needs',
+        'The ops-tool policy exists, with only the four permissions it needs',
         'It\'s on GitHub, with node_modules and dist in .gitignore',
       ],
     },

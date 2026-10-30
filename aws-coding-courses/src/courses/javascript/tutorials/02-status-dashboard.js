@@ -539,7 +539,7 @@ After two seconds: a \`TimeoutError\`. **Every request to a server you don't con
 await fetch('${GONE}')
 \`\`\`
 
-\`TypeError: Failed to fetch\`.
+A \`TypeError\`. Chrome says \`Failed to fetch\`; Firefox says \`NetworkError when attempting to fetch resource.\` and Safari says \`Load failed\`, so check the error's type, not its words.
 
 ### try / catch
 
@@ -753,12 +753,12 @@ return { flaky: await attempt(flaky, 3), missing: await attempt('/missing.json',
       minutes: 8,
       body: `The AWS Certified Developer – Associate exam asks about the same ideas, on AWS's side.
 
-- **Throttling.** When you call an AWS API too fast, it answers with a throttling error: HTTP 429, \`ThrottlingException\`, or, for Amazon DynamoDB, \`ProvisionedThroughputExceededException\`. The answer the exam wants: **retry with exponential backoff and jitter**. The AWS SDKs already do this for you (the JavaScript SDK version 3 tries up to 3 times by default; \`maxAttempts\` changes it).
+- **Throttling.** When you call an AWS API too fast, it answers with a throttling error, usually HTTP 400 with a throttling error name (\`ThrottlingException\`, or for Amazon DynamoDB \`ProvisionedThroughputExceededException\`), sometimes HTTP 429 (API Gateway uses 429 \`Too Many Requests\`). The answer the exam wants: **retry with exponential backoff and jitter**. The AWS SDKs already do this for you (the JavaScript SDK version 3 tries up to 3 times by default; \`maxAttempts\` changes it).
 - **Amazon API Gateway** throttles too: by default 10,000 requests per second per Region for an account, with bursts of 5,000, and it answers **429 Too Many Requests** beyond that. Usage plans set limits per API key.
 - **Who retries a Lambda function?** Asynchronous invocations (like Amazon S3 events) are retried by Lambda twice. Synchronous ones (like API Gateway calls) aren't: the caller decides.
-- **Timeouts everywhere.** A Lambda function has a timeout (default 3 seconds, up to 15 minutes); API Gateway's integration timeout is 29 seconds by default. Timeouts in your code should be shorter than the ones around them.
+- **Timeouts everywhere.** A Lambda function has a timeout (default 3 seconds, up to 15 minutes); API Gateway's integration timeout is 29 seconds by default for REST APIs (Regional and private ones can ask for more) and 30 seconds, fixed, for HTTP APIs. Timeouts in your code should be shorter than the ones around them.
 - **CORS.** A page can only \`fetch\` another site's data if that site allows it, with an \`Access-Control-Allow-Origin\` header. "Enable CORS on the API Gateway API (or the S3 bucket)" is a classic answer when a browser shows a CORS error.
-- **Watching endpoints from outside.** **Amazon CloudWatch Synthetics canaries** run scripts on a schedule to check your endpoints and pages; **Amazon Route 53 health checks** check endpoints and can fail traffic over. The **AWS Health Dashboard** shows events that affect your account; its API (the AWS Health API) needs a Business, Enterprise On-Ramp or Enterprise Support plan.`,
+- **Watching endpoints from outside.** **Amazon CloudWatch Synthetics canaries** run scripts on a schedule to check your endpoints and pages; **Amazon Route 53 health checks** check endpoints and can fail traffic over. The **AWS Health Dashboard** shows events that affect your account; its API (the AWS Health API) needs a paid support plan: Business Support+, Enterprise Support or Unified Operations (older Business and Enterprise plans still count where they haven't moved over).`,
     },
     {
       id: 'quiz',

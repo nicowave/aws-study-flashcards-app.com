@@ -753,7 +753,7 @@ Not \`ses:*\`, and not every identity. If the code is ever tricked into doing so
 - **Proxy integration event formats.** HTTP APIs send **payload 2.0** (\`routeKey\`, \`rawPath\`, \`requestContext.http.method\`). REST APIs send **1.0** (\`httpMethod\`, \`path\`, \`multiValueHeaders\`). In both, \`body\` is a string, and \`isBase64Encoded\` says whether to decode it.
 - **CORS on a REST API with Lambda proxy integration**: API Gateway can answer the preflight, but **the function must add \`Access-Control-Allow-Origin\` to its own responses**. A classic exam answer to "the browser still shows a CORS error".
 - **502 Bad Gateway** from a REST API proxy integration usually means the function returned the wrong shape: for example \`body\` as an object instead of a string. HTTP APIs are more forgiving with payload 2.0.
-- **Timeouts**: API Gateway waits about **30 seconds** at most for the integration, whatever the Lambda timeout says. Long jobs belong behind a queue.
+- **Timeouts**: an HTTP API waits **30 seconds** at most for the integration (a fixed limit; REST APIs default to 29 seconds), whatever the Lambda timeout says. Long jobs belong behind a queue.
 - **Throttling**: a client over the limit gets **429**. API Gateway allows 10,000 requests per second per account and Region by default. Lambda's concurrency limit is usually 1,000 per Region. **Reserved concurrency** caps (and guarantees) one function's share.
 - **SES sandbox**: only verified recipients, 200 emails a day, one per second, until you request production access. \`MessageRejected\` "Email address is not verified" is the giveaway.
 - **Environment variables** are encrypted at rest with AWS KMS, 4 KB in total. Secrets that need rotation or auditing belong in **Secrets Manager** (or Systems Manager Parameter Store \`SecureString\`).
@@ -931,7 +931,7 @@ Open [http://localhost:8080](http://localhost:8080), send a message, and watch i
 
 **10. Push it to GitHub.** The code has no addresses, keys or account numbers in it: those live in the function's settings. Add \`function.zip\` to \`.gitignore\`.
 
-**Cost:** for a contact form, practically nothing. Lambda includes a million requests a month free. HTTP APIs cost about $1 per million requests (and new accounts get a free allowance for their first year). SES costs $0.10 per 1,000 emails.
+**Cost:** for a contact form, practically nothing. Lambda includes a million requests a month free. HTTP APIs cost about $1 per million requests (new accounts get free credits to start with). SES costs $0.10 per 1,000 emails.
 
 **To clean up** (in a new terminal, run step 2 first):
 

@@ -169,8 +169,11 @@ export const handler = async (event) => {
 
   switch (event.routeKey) {`;
 
-const PUT_ROUTE = `    case 'PUT /progress/{deckId}':
-      return saveProgress(userId, event.pathParameters?.deckId, event.body);`;
+const PUT_ROUTE = `    case 'PUT /progress/{deckId}': {
+      // HTTP APIs base64-encode bodies not sent as text, as in the contact form
+      const body = event.isBase64Encoded ? Buffer.from(event.body ?? '', 'base64').toString('utf8') : event.body;
+      return saveProgress(userId, event.pathParameters?.deckId, body);
+    }`;
 
 const NOT_FOUND = `    default:
       return reply(404, { message: \`No route \${event.routeKey}\` });
@@ -588,6 +591,8 @@ So the rule is simple: **your page may read a token to show a name, but your API
 
 \`atob()\` turns base64 back into text, but tokens use **base64url**, a variant that swaps \`+\` for \`-\` and \`/\` for \`_\` so it's safe in web addresses. Swap them back first, or \`atob\` fails on some tokens and not others: the worst kind of bug.
 
+One more catch: \`atob\` gives back raw bytes, so a claim with an accent, like the name \`José\`, comes out garbled. When names matter, decode the bytes as UTF-8: \`new TextDecoder().decode(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)))\`.
+
 Time in tokens is **seconds** since 1970. JavaScript's \`Date.now()\` counts **milliseconds**. Mixing them up gives you tokens that "expire" in the year 57,000.`,
       task: 'Finish `readClaims(token)` so it returns the payload as an object, and `secondsLeft(claims, now)` so it returns how many whole seconds remain before `claims.exp` (negative once it has run out).',
       hint: '`token.split(\'.\')[1]`, then `.replace(/-/g, \'+\').replace(/_/g, \'/\')`, then `JSON.parse(atob(...))`. For the time: `Math.floor(claims.exp - now / 1000)`.',
@@ -684,7 +689,7 @@ Each request arrives with \`event.routeKey\`, like \`'PUT /progress/{deckId}'\`,
       runtime: 'node',
       title: 'Save progress for the signed-in user',
       minutes: 30,
-      body: `The function's skeleton is ready: it reads the user from the claims, and sends \`PUT /progress/{deckId}\` to \`saveProgress\`. **Test with the sample event** sends what API Gateway would for Ana saving the \`aws-basics\` deck.
+      body: `The function's skeleton is ready: it reads the user from the claims, and sends \`PUT /progress/{deckId}\` to \`saveProgress\`, decoding the body first if API Gateway sent it base64-encoded (the same line as the contact form). **Test with the sample event** sends what API Gateway would for Ana saving the \`aws-basics\` deck.
 
 \`JSON.parse\` throws on bad JSON, so it goes in **try / catch**:
 
@@ -802,7 +807,7 @@ With \`fetch\`, headers go in the second argument:
 fetch(\`\${API}/progress\`, { headers: { Authorization: \`Bearer \${session.AccessToken}\` } })
 \`\`\`
 
-Use the **access token** for APIs. The ID token is for the page itself: here it shows who's signed in. (An HTTP API's JWT authorizer accepts either, because both carry your app's ID. But the access token is the one meant for this.)
+Use the **access token** for APIs. The ID token is for the page itself: here it shows who's signed in. (An HTTP API's JWT authorizer checks a token's \`aud\` claim, or its \`client_id\` when there's no \`aud\`, so on its own it would accept either: both carry your app's ID. That's why the Build step's routes also require a **scope**, \`aws.cognito.signin.user.admin\`. Only access tokens carry scopes, so an ID token gets 401.)
 
 ### When the token runs out
 
@@ -989,7 +994,8 @@ INTEGRATION_ID=$(aws apigatewayv2 create-integration --api-id "$API_ID" \\
 for ROUTE in 'GET /progress' 'PUT /progress/{deckId}'; do
   aws apigatewayv2 create-route --api-id "$API_ID" --route-key "$ROUTE" \\
     --target "integrations/$INTEGRATION_ID" \\
-    --authorization-type JWT --authorizer-id "$AUTHORIZER_ID" > /dev/null
+    --authorization-type JWT --authorizer-id "$AUTHORIZER_ID" \\
+    --authorization-scopes aws.cognito.signin.user.admin > /dev/null
 done
 
 aws apigatewayv2 create-stage --api-id "$API_ID" --stage-name '$default' --auto-deploy > /dev/null
@@ -1027,7 +1033,7 @@ Sign in with your test user. Save some progress with curl, press **Refresh**, an
 
 9. **Push to GitHub.** The client ID and API address aren't secrets: anyone using your page can see them. The password is: never commit it.
 
-**Cost:** Cognito is free for your first 10,000 monthly active users. Lambda and DynamoDB on-demand stay within their always-free amounts at this size, and an HTTP API costs about $1 per million requests. Expect nothing, or a few cents.
+**Cost:** Cognito is free for your first 10,000 monthly active users, Lambda stays in its free amount at this size, DynamoDB on-demand costs fractions of a cent (its first 25 GB of storage are free), and an HTTP API costs about $1 per million requests. Expect nothing, or a few cents.
 
 **Clean up** when you're done. In a new terminal, set the variables again first:
 
