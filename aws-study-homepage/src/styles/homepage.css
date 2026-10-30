@@ -601,6 +601,47 @@
 }
 
 /* ========================================
+   FAQ Section
+   ======================================== */
+.faq-section {
+  padding: 80px 24px;
+  background: var(--surface-card);
+  border-top: 1px solid var(--border-muted);
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.faq-list {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item {
+  background: var(--surface-base);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+}
+
+.faq-item summary {
+  padding: 18px 22px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.faq-item[open] summary {
+  color: var(--accent-primary);
+}
+
+.faq-item p {
+  padding: 0 22px 20px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ========================================
    Resources Section
    ======================================== */
 .resources-section {

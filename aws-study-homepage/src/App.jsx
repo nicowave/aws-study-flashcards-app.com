@@ -6,6 +6,7 @@ import ForgotPassword from './components/ForgotPassword';
 import { applyAnalyticsPreference } from './services/analytics';
 import { BILLING_ENABLED, PRO_PRICE_LABEL, getPlan, startCheckout, openBillingPortal } from './services/billing';
 import CodingCourses, { COURSES, PromoBanner } from './components/CodingCourses';
+import Faq from './components/Faq';
 import { currentPromotion, salePrice } from './services/offers';
 import {
   CloudIcon,
@@ -1066,6 +1067,7 @@ function HomepageContent() {
             <CodingCourses onShowLogin={() => setShowLoginModal(true)} />
             <About />
             <Plans onShowLogin={() => setShowLoginModal(true)} />
+            <Faq />
             <Resources />
           </main>
           <Footer />
