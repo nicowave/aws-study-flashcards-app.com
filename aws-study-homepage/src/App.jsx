@@ -5,6 +5,8 @@ import SettingsPage from './components/SettingsPage';
 import ForgotPassword from './components/ForgotPassword';
 import { applyAnalyticsPreference } from './services/analytics';
 import { BILLING_ENABLED, PRO_PRICE_LABEL, getPlan, startCheckout, openBillingPortal } from './services/billing';
+import CodingCourses, { COURSES, PromoBanner } from './components/CodingCourses';
+import { currentPromotion, salePrice } from './services/offers';
 import {
   CloudIcon,
   RobotIcon,
@@ -111,6 +113,7 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
         </div>
         <nav className="nav">
           <a href="#certifications" className="nav-link">Certifications</a>
+          <a href="#courses" className="nav-link">Courses</a>
           <a href="#about" className="nav-link">About</a>
           <a href="#plans" className="nav-link">Plans</a>
           <a href="#resources" className="nav-link">Resources</a>
@@ -359,7 +362,12 @@ const CertCard = ({ cert }) => {
       <p className="cert-description">{cert.description}</p>
 
       {isAvailable && cert.price && (
-        <p className="cert-price">One-time unlock <strong className="mono">{cert.price}</strong></p>
+        <p className="cert-price">
+          One-time unlock{' '}
+          {liveSale()
+            ? <><strong className="mono">{salePrice(cert.price, liveSale().single)}</strong> <s className="mono price-was">{cert.price}</s></>
+            : <strong className="mono">{cert.price}</strong>}
+        </p>
       )}
 
       <div className="cert-details">
@@ -401,6 +409,9 @@ const CertCard = ({ cert }) => {
     </div>
   );
 };
+
+// The sale running right now, if any (checkout applies its discount itself)
+const liveSale = () => { const s = currentPromotion(); return s?.live ? s.promo : null; };
 
 // Certifications Section
 const Certifications = () => (
@@ -528,6 +539,7 @@ const ProPlanCard = ({ onShowLogin }) => {
     }
   };
 
+  const sale = liveSale();
   return (
     <div className={`plan-card ${BILLING_ENABLED ? 'plan-featured' : 'plan-dimmed'}`}>
       {BILLING_ENABLED && plan === 'pro' && <div className="plan-badge">Your Plan</div>}
@@ -535,6 +547,7 @@ const ProPlanCard = ({ onShowLogin }) => {
       <div className="plan-price mono">
         {BILLING_ENABLED ? (PRO_PRICE_LABEL || 'Pro') : 'Coming Soon'}
       </div>
+      {BILLING_ENABLED && sale && <div className="sale-pill">{sale.label}: {sale.bundle}% off your first year until {sale.ends}</div>}
       <div className="plan-tagline">For serious exam prep</div>
       <ul className="plan-features">
         <li>Every live certification unlocked</li>
@@ -605,6 +618,7 @@ const Plans = ({ onShowLogin }) => (
       <div className="plan-card">
         <div className="plan-name">One Certification</div>
         <div className="plan-price plan-price-range mono">$9.99–$14.99</div>
+        {liveSale() && <div className="sale-pill">{liveSale().label}: {liveSale().single}% off, so {salePrice('$9.99', liveSale().single)}–{salePrice('$14.99', liveSale().single)}</div>}
         <div className="plan-tagline">One-time payment, no subscription</div>
         <ul className="plan-features">
           <li>Every quiz domain &amp; flashcard deck for that certification</li>
@@ -712,6 +726,10 @@ const Footer = () => (
           <a href="https://ai.aws-study-flashcards-app.com">AI Practitioner</a>
           <a href="https://architect.aws-study-flashcards-app.com">Solutions Architect</a>
           <a href="https://developer.aws-study-flashcards-app.com">Developer</a>
+        </div>
+        <div className="footer-column">
+          <h4>Coding courses</h4>
+          {COURSES.map((c) => <a key={c.id} href={c.url}>{c.title}</a>)}
         </div>
         <div className="footer-column">
           <h4>Resources</h4>
@@ -1030,6 +1048,7 @@ function HomepageContent() {
 
   return (
     <div className="app">
+      <PromoBanner />
       <Header
         onShowLogin={() => setShowLoginModal(true)}
         onNavigateSettings={handleNavigateSettings}
@@ -1044,6 +1063,7 @@ function HomepageContent() {
           <main>
             <Hero />
             <Certifications />
+            <CodingCourses onShowLogin={() => setShowLoginModal(true)} />
             <About />
             <Plans onShowLogin={() => setShowLoginModal(true)} />
             <Resources />

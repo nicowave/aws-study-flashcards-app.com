@@ -21,6 +21,10 @@ const SITE_ORIGINS = [
   'https://dva.aws-study-flashcards-app.com',
   'https://architect.aws-study-flashcards-app.com',
   'https://developer.aws-study-flashcards-app.com',
+  'https://bash.aws-study-flashcards-app.com',
+  'https://python.aws-study-flashcards-app.com',
+  'https://js.aws-study-flashcards-app.com',
+  'https://typescript.aws-study-flashcards-app.com',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',
@@ -28,10 +32,14 @@ const SITE_ORIGINS = [
 
 // Stripe price IDs aren't secret, but they live in the untracked
 // aws-backend/.env (STRIPE_PRICE_*=price_...). Refuse to deploy without them:
-// empty prices would switch checkout off.
+// empty prices would switch checkout off. CI only builds (never deploys), so
+// it synthesizes without prices.
 function loadPriceEnv(): Record<string, string> {
   const envPath = path.join(__dirname, '../.env');
-  if (!fs.existsSync(envPath)) throw new Error(`Missing ${envPath} (STRIPE_PRICE_* lines; copy it from the main checkout)`);
+  if (!fs.existsSync(envPath)) {
+    if (process.env.CI === 'true') return {};
+    throw new Error(`Missing ${envPath} (STRIPE_PRICE_* lines; copy it from the main checkout)`);
+  }
   const out: Record<string, string> = {};
   for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
     const m = line.match(/^(STRIPE_PRICE_[A-Z_]+)=(.*)$/);

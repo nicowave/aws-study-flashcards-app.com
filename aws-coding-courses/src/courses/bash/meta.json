@@ -1,0 +1,10 @@
+{
+  "id": "bash-for-aws",
+  "language": "Bash",
+  "title": "Bash for AWS",
+  "pageTitle": "Bash for AWS — learn shell scripting with real AWS tasks",
+  "description": "Learn Bash by doing the jobs IT teams really ask for: health checks, log digging, backups to Amazon S3 and one-command website deploys. Practice in your browser, then build it on your own AWS account.",
+  "url": "https://bash.aws-study-flashcards-app.com",
+  "price": "$19.99",
+  "hours": 10
+}

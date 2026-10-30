@@ -1,0 +1,29 @@
+{
+  "name": "aws-coding-courses",
+  "version": "1.0.0",
+  "description": "Coding courses for AWS Study Hub: one tutorial engine, built once per course site (bash., python., js., typescript.)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:python": "COURSE=python vite",
+    "dev:javascript": "COURSE=javascript vite",
+    "dev:typescript": "COURSE=typescript vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "marked": "^15.0.12",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "jsdom": "30.1.2",
+    "pyodide": "0.29.5",
+    "typescript": "6.0.3",
+    "vite": "^5.4.21",
+    "vitest": "^2.1.9"
+  }
+}

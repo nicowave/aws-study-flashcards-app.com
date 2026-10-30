@@ -32,6 +32,10 @@ const ALLOWED_ORIGINS = [
   "https://dva.aws-study-flashcards-app.com",
   "https://architect.aws-study-flashcards-app.com",
   "https://developer.aws-study-flashcards-app.com",
+  "https://bash.aws-study-flashcards-app.com",
+  "https://python.aws-study-flashcards-app.com",
+  "https://js.aws-study-flashcards-app.com",
+  "https://typescript.aws-study-flashcards-app.com",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
@@ -44,6 +48,33 @@ const PLAN_PRICES = {
   "ai-practitioner": process.env.STRIPE_PRICE_AI_PRACTITIONER || "",
   "solutions-architect-associate": process.env.STRIPE_PRICE_SOLUTIONS_ARCHITECT || "",
   "developer-associate": process.env.STRIPE_PRICE_DEVELOPER_ASSOCIATE || "",
+  // Coding courses: one-time, NOT included in all-access (the course sites
+  // check `certs` only)
+  "bash-for-aws": process.env.STRIPE_PRICE_BASH_COURSE || "",
+  "python-for-aws": process.env.STRIPE_PRICE_PYTHON_COURSE || "",
+  "javascript-for-aws": process.env.STRIPE_PRICE_JAVASCRIPT_COURSE || "",
+  "typescript-for-aws": process.env.STRIPE_PRICE_TYPESCRIPT_COURSE || "",
+  // One-time bundle: unlocks everything in BUNDLES["developer-path"]
+  "developer-path": process.env.STRIPE_PRICE_DEVELOPER_PATH || "",
+};
+const BUNDLES = {
+  "developer-path": ["bash-for-aws", "python-for-aws", "javascript-for-aws", "typescript-for-aws", "developer-associate"],
+};
+
+// Sales: during the window, checkout applies the coupon automatically (no
+// code to type). The coupons also stop working on their own at redeem_by,
+// and each one only applies to its own Stripe products.
+const PROMOTIONS = [
+  {
+    name: "halloween-2026", // Oct 31 00:00 to Nov 6 23:59, US Eastern
+    start: Date.parse("2026-10-31T04:00:00Z"),
+    end: Date.parse("2026-11-07T05:00:00Z"),
+    coupons: { "all-access": "HALLOWEEN10", "developer-path": "HALLOWEEN10", default: "HALLOWEEN31" },
+  },
+];
+const promotionFor = (plan, now = Date.now()) => {
+  const promo = PROMOTIONS.find((p) => now >= p.start && now < p.end);
+  return promo ? { name: promo.name, coupon: promo.coupons[plan] || promo.coupons.default } : null;
 };
 const planForPrice = (priceId) => {
   const hit = Object.entries(PLAN_PRICES).find(([, p]) => p && p === priceId);
@@ -179,6 +210,7 @@ async function syncCustomerEntitlements(stripe, uid, customerId) {
 
   for (const plan of await purchasedPlans(uid)) {
     if (plan === "all-access") allAccess = true;
+    else if (BUNDLES[plan]) BUNDLES[plan].forEach((c) => certs.add(c));
     else certs.add(plan);
   }
 
@@ -268,7 +300,7 @@ async function createCheckoutSession(data, user, stripe) {
   // plan in subscription mode. Derived from the plan (not a Stripe price
   // lookup) so the restricted API key needs no Prices read permission.
   const mode = plan === "all-access" ? "subscription" : "payment";
-  const session = await stripe.checkout.sessions.create({
+  const params = {
     mode,
     customer: customerId,
     line_items: [{ price: priceId, quantity: 1 }],
@@ -279,7 +311,24 @@ async function createCheckoutSession(data, user, stripe) {
     allow_promotion_codes: true,
     success_url: `${returnBase}/?checkout=success`,
     cancel_url: `${returnBase}/?checkout=cancelled`,
-  });
+  };
+  // Stripe allows a discount or promotion codes, not both
+  const promo = promotionFor(plan);
+  if (promo) {
+    try {
+      const { allow_promotion_codes: _codes, ...withoutCodes } = params;
+      const session = await stripe.checkout.sessions.create({
+        ...withoutCodes,
+        discounts: [{ coupon: promo.coupon }],
+        metadata: { ...params.metadata, promotion: promo.name },
+      });
+      return { url: session.url };
+    } catch (err) {
+      // An expired or mistyped coupon must never block a sale: charge full price
+      console.error(`[billing] ${promo.coupon} not applied for ${plan}:`, err.message);
+    }
+  }
+  const session = await stripe.checkout.sessions.create(params);
   return { url: session.url };
 }
 
