@@ -1,4 +1,5 @@
 import React from 'react';
+import NewsletterSignup from './NewsletterSignup';
 import { TrophyIcon, TargetIcon, FlameIcon, VolumeIcon, VolumeOffIcon, BookOpenIcon, ChartIcon } from './Icons';
 
 const MenuScreen = ({
@@ -81,6 +82,8 @@ const MenuScreen = ({
         {soundEnabled ? <VolumeIcon size={20} /> : <VolumeOffIcon size={20} />}
         <span>{soundEnabled ? 'Sound On' : 'Sound Off'}</span>
       </button>
+
+      <NewsletterSignup />
     </div>
   );
 };

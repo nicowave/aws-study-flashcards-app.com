@@ -1,4 +1,4 @@
-# Marketing: tracked links, readiness check, share images
+# Marketing: tracked links, readiness check, newsletter, share images
 
 ## Tracked links (launch week, Oct 31 – Nov 6, 2026)
 
@@ -35,6 +35,31 @@ aws dynamodb scan --table-name "$(aws cloudformation describe-stacks --stack-nam
 ```
 
 Any follow-up email must honor `unsubscribed` and include the unsubscribe link: `https://aws-study-flashcards-app.com/?unsubscribe=<email>&t=<token>`.
+
+### Follow-up emails (launch week)
+
+`aws-backend/lambda/api/campaigns.js`, run by the `LeadEmailsFn` Lambda. Three EventBridge rules in `study-hub-stack.ts` send them at 9:00 Eastern:
+
+| When | Campaign | What it says |
+|---|---|---|
+| Wed Nov 4 | `day3` | Today's step of their 7-day plan (counted from their latest check), a study tip, the sale price |
+| Thu Nov 5 | `48-hours` | The deal ends Friday at midnight Eastern: price, what's in the full game, their score |
+| Fri Nov 6 | `last-day` | Last day of the deal; promises no more sale emails |
+
+Who gets them: everyone on the list except people who unsubscribed and people who signed up in the last 24 hours. The two sale emails also skip anyone who already owns that certification (matched through their sign-in email). The sale emails send nothing outside the sale window. Each person gets each email once (`sent_<campaign>` on their PROFILE item), so a retried run continues where it stopped.
+
+Preview one email to one address (sends it, marks nothing, ignores the rules above):
+
+```bash
+aws lambda invoke --function-name "$(aws cloudformation describe-stacks --stack-name StudyHubBackend --query "Stacks[0].Outputs[?OutputKey=='LeadEmailsFunctionName'].OutputValue" --output text)" \
+  --cli-binary-format raw-in-base64-out --payload '{"campaign":"day3","only":"nico@nico-tek.com","preview":true}' /dev/stdout
+```
+
+Each run logs a line like `[campaigns] Done day3 {"sent":42,"skipped":{...}}` in the function's CloudWatch logs. Email links use `utm_source=readiness` with `utm_campaign` = `day3`, `sale-48-hours` or `sale-last-day`.
+
+## Weekly newsletter
+
+Sign-up boxes on the hub (`#newsletter`) and on each game's menu and results screens post to `POST /v1/newsletter` and send a welcome email. The newsletter goes to the whole list (sign-ups and readiness-check takers) every Tuesday at 9:00 Eastern; Nico gets a preview or a "nothing queued" reminder on Monday. How to write and queue an issue: [newsletter/README.md](../newsletter/README.md). Sign-ups show in Google Analytics as the `newsletter_signup` event; newsletter links use `utm_source=newsletter`.
 
 ## Share images
 

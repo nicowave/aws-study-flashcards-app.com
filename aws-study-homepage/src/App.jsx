@@ -9,6 +9,7 @@ import CodingCourses, { COURSES, PromoBanner } from './components/CodingCourses'
 import Faq from './components/Faq';
 import { currentPromotion, salePrice } from './services/offers';
 import ReadinessCheck from './components/ReadinessCheck';
+import NewsletterSignup from './components/NewsletterSignup';
 import { captureSource } from './services/leads';
 import {
   CloudIcon,
@@ -1084,6 +1085,7 @@ function HomepageContent() {
             <Plans onShowLogin={() => setShowLoginModal(true)} />
             <Faq />
             <Resources />
+            <NewsletterSignup />
           </main>
           <Footer />
         </>

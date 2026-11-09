@@ -4,7 +4,7 @@
 # =============================================================================
 # Deploys the Study Hub Homepage, the certification study games, and Tutorials
 # Run from: ~/dev/sites/aws-study-flashcards.com/
-# Usage: ./deploy.sh [all|hub|cloud|ai|saa|dva|bash|python|js|typescript|tutorials]
+# Usage: ./deploy.sh [all|hub|cloud|ai|saa|dva|bash|python|js|typescript|tutorials|newsletter]
 # =============================================================================
 
 set -e  # Exit on any error
@@ -506,6 +506,29 @@ deploy_next() {
     [ $failed -eq 0 ] && print_success "All 5 test versions deployed" || print_error "$failed failed"
 }
 
+# Weekly newsletter: upload newsletter/issues/*.md to the newsletter bucket
+# and email a preview of the next issue to Nico. See newsletter/README.md.
+deploy_newsletter() {
+    print_header "Uploading newsletter issues"
+    local outputs bucket fn
+    outputs=$(aws cloudformation describe-stacks --stack-name StudyHubBackend \
+        --query "Stacks[0].Outputs[?OutputKey=='NewsletterBucketName' || OutputKey=='NewsletterFunctionName'].[OutputKey,OutputValue]" --output text)
+    bucket=$(echo "$outputs" | awk '$1=="NewsletterBucketName"{print $2}')
+    fn=$(echo "$outputs" | awk '$1=="NewsletterFunctionName"{print $2}')
+    if [ -z "$bucket" ] || [ -z "$fn" ]; then
+        print_error "Newsletter bucket not found. Deploy aws-backend (cdk deploy) first."
+        return 1
+    fi
+    print_step "Syncing newsletter/issues/ (files starting with _ are skipped)"
+    aws s3 sync "${SCRIPT_DIR}/newsletter/issues/" "s3://${bucket}/issues/" --delete \
+        --exclude "*" --include "[0-9]*.md" --content-type "text/markdown; charset=utf-8"
+    print_step "Emailing a preview of the next issue to nico@nico-tek.com"
+    aws lambda invoke --function-name "$fn" --cli-binary-format raw-in-base64-out \
+        --payload '{"action":"preview","to":"nico@nico-tek.com"}' /dev/stdout | head -1
+    echo ""
+    print_success "Issues uploaded. They go out Tuesdays at 9:00 Eastern."
+}
+
 deploy_all() {
     print_header "Deploying ALL Sites"
     
@@ -606,8 +629,11 @@ case "${1:-}" in
     next)
         deploy_next
         ;;
+    newsletter)
+        deploy_newsletter
+        ;;
     -h|--help)
-        echo "Usage: $0 [all|hub|cloud|ai|saa|dva|bash|python|js|typescript|tutorials|next]"
+        echo "Usage: $0 [all|hub|cloud|ai|saa|dva|bash|python|js|typescript|tutorials|next|newsletter]"
         echo ""
         echo "Options:"
         echo "  all    Deploy all ten sites"
@@ -622,6 +648,7 @@ case "${1:-}" in
         echo "  typescript  Deploy the TypeScript for AWS course site only"
         echo "  tutorials  Deploy Tutorials site only (static, no build)"
         echo "  next   Deploy hidden test versions of the 5 apps at /next/"
+        echo "  newsletter  Upload newsletter issues and email a preview of the next one"
         echo ""
         ;;
     "")

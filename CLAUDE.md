@@ -30,6 +30,7 @@ Stack: Vite + React for the apps, Cognito for sign-in, DynamoDB + API Gateway/La
 - React apps: `npm run build`, sync `dist/` (long cache), `index.html` no-cache, invalidate `/*`.
 - Course sites (`bash`): `deploy_course` runs `npm test` first, then builds `COURSE=<id>` into `dist/<id>/`.
 - Tutorials: no build. Uploads `site/index.html` plus every `site/<slug>/index.html`.
+- Newsletter: `./deploy.sh newsletter` uploads `newsletter/issues/*.md` and emails Nico a preview of the next issue. Issues go out Tuesdays 9:00 Eastern to everyone on the email list (`LEAD#<email>` items). See `newsletter/README.md`.
 - Verify a deploy: `curl` the page and check the bundle hash changed. Tutorials returns a 302 to Cognito for unauthenticated requests — that's expected, not a failure.
 
 ## AWS CLI

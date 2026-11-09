@@ -48,3 +48,7 @@ export const submitReadiness = ({ email, certId, score, total, domains, website 
   post('/v1/leads', { email, certId, score, total, domains, website, source: getSource() });
 
 export const unsubscribe = (email, token) => post('/v1/leads/unsubscribe', { email, token });
+
+/** Weekly newsletter sign-up box. */
+export const subscribeNewsletter = ({ email, website }) =>
+  post('/v1/newsletter', { email, site: 'hub', website, source: getSource() });
