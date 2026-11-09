@@ -82,6 +82,12 @@ const planForPrice = (priceId) => {
 };
 const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 
+// Pro starts with a free week for anyone who hasn't had Pro before. Checkout
+// still takes a card; the first yearly charge runs when the trial ends unless
+// they cancel first. One-time plans have no trial (the free tier is the trial).
+// Keep in step with PRO_TRIAL_DAYS in aws-study-homepage/src/services/billing.js.
+const PRO_TRIAL_DAYS = 7;
+
 // ---------------------------------------------------------------------------
 // Secrets: one Secrets Manager entry holding the Stripe key and the Stripe
 // webhook signing secret. Loaded once per cold start.
@@ -264,6 +270,29 @@ async function customerExists(stripe, customerId) {
   }
 }
 
+/**
+ * True when nobody behind this account has had Pro before, trial or paid.
+ * Checks the current customer plus any other Stripe customer with the same
+ * email, so deleting the account and signing up again doesn't earn a second
+ * free week.
+ */
+async function proTrialAvailable(stripe, uid, customerId, email) {
+  if ((await purchasedPlans(uid)).has("all-access")) return false;
+  const customerIds = new Set([customerId]);
+  if (email) {
+    const sameEmail = await stripe.customers.list({ email, limit: 10 });
+    sameEmail.data.forEach((c) => customerIds.add(c.id));
+  }
+  for (const customer of customerIds) {
+    const subs = await stripe.subscriptions.list({ customer, status: "all", limit: 100 });
+    const hadPro = subs.data.some(
+      (sub) => (sub.metadata?.plan || planForPrice(sub.items?.data?.[0]?.price?.id)) === "all-access"
+    );
+    if (hadPro) return false;
+  }
+  return true;
+}
+
 // ---------------------------------------------------------------------------
 // createCheckoutSession — { plan, returnUrl } -> { url }
 // ---------------------------------------------------------------------------
@@ -300,12 +329,31 @@ async function createCheckoutSession(data, user, stripe) {
   // plan in subscription mode. Derived from the plan (not a Stripe price
   // lookup) so the restricted API key needs no Prices read permission.
   const mode = plan === "all-access" ? "subscription" : "payment";
+  let trial = false;
+  if (mode === "subscription") {
+    try {
+      trial = await proTrialAvailable(stripe, uid, customerId, user.email);
+    } catch (err) {
+      // A failed lookup must never block a sale: check out without the trial
+      console.error(`[billing] Trial check failed for uid=${uid}:`, err.message);
+    }
+  }
   const params = {
     mode,
     customer: customerId,
     line_items: [{ price: priceId, quantity: 1 }],
     ...(mode === "subscription"
-      ? { subscription_data: { metadata: { firebaseUID: uid, plan } } }
+      ? {
+          // Card up front, even when a coupon or the trial makes today $0
+          payment_method_collection: "always",
+          subscription_data: {
+            metadata: { firebaseUID: uid, plan },
+            ...(trial && {
+              trial_period_days: PRO_TRIAL_DAYS,
+              trial_settings: { end_behavior: { missing_payment_method: "cancel" } },
+            }),
+          },
+        }
       : { invoice_creation: { enabled: true } }),
     metadata: { firebaseUID: uid, plan },
     allow_promotion_codes: true,
