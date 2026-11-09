@@ -10,6 +10,10 @@ export const BILLING_ENABLED = import.meta.env.VITE_BILLING_ENABLED === 'true';
 // Optional display label for the Pro price, e.g. "$29/yr" (set in .env)
 export const PRO_PRICE_LABEL = import.meta.env.VITE_PRO_PRICE_LABEL || '';
 
+// Free week for first-time Pro members; checkout decides who qualifies.
+// Keep in step with PRO_TRIAL_DAYS in aws-backend/lambda/callables/index.js.
+export const PRO_TRIAL_DAYS = 7;
+
 /**
  * Returns the signed-in user's plan from ID token claims ('pro' or null).
  * Pass { forceRefresh: true } right after checkout returns to pick up

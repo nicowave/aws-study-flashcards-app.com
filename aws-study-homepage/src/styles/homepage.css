@@ -2202,6 +2202,19 @@
   font-size: 26px;
 }
 
+.plan-trial {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.plan-trial-note {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 .plans-fine-print {
   max-width: 720px;
   margin: 28px auto 0;

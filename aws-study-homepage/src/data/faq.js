@@ -27,6 +27,10 @@ export const FAQ = [
     a: 'A Foundational certification (Cloud Practitioner or AI Practitioner) is $9.99 once. An Associate certification is $14.99 once. Each coding course is $19.99 once, and the Developer Path bundle (all four courses plus the Developer – Associate study game) is $59 once. Prices are in US dollars.',
   },
   {
+    q: 'Is there a free trial?',
+    a: 'Yes, for Pro, which unlocks every certification for $39 a year. Your first 7 days are free. Checkout asks for a card, and the first yearly charge happens when the 7 days end unless you cancel before then. One free trial per person. The one-time unlocks have no trial, because the free preview and the free account already let you try every certification first.',
+  },
+  {
     q: 'Do I need to install anything for the coding courses?',
     a: 'No. You practice in your browser: a practice terminal for Bash, real Python running in the page, and a JavaScript and TypeScript editor with a pretend AWS account. Each tutorial then shows you how to build the same thing on your own AWS account. The first tutorial of every course is free.',
   },

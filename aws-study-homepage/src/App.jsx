@@ -4,7 +4,7 @@ import { certifications, categories } from './data/certifications';
 import SettingsPage from './components/SettingsPage';
 import ForgotPassword from './components/ForgotPassword';
 import { applyAnalyticsPreference } from './services/analytics';
-import { BILLING_ENABLED, PRO_PRICE_LABEL, getPlan, startCheckout, openBillingPortal } from './services/billing';
+import { BILLING_ENABLED, PRO_PRICE_LABEL, PRO_TRIAL_DAYS, getPlan, startCheckout, openBillingPortal } from './services/billing';
 import CodingCourses, { COURSES, PromoBanner } from './components/CodingCourses';
 import Faq from './components/Faq';
 import { currentPromotion, salePrice } from './services/offers';
@@ -546,6 +546,7 @@ const ProPlanCard = ({ onShowLogin }) => {
   };
 
   const sale = liveSale();
+  const offerTrial = BILLING_ENABLED && plan !== 'pro';
   return (
     <div className={`plan-card ${BILLING_ENABLED ? 'plan-featured' : 'plan-dimmed'}`}>
       {BILLING_ENABLED && plan === 'pro' && <div className="plan-badge">Your Plan</div>}
@@ -553,6 +554,7 @@ const ProPlanCard = ({ onShowLogin }) => {
       <div className="plan-price mono">
         {BILLING_ENABLED ? (PRO_PRICE_LABEL || 'Pro') : 'Coming Soon'}
       </div>
+      {offerTrial && <div className="plan-trial">First {PRO_TRIAL_DAYS} days free</div>}
       {BILLING_ENABLED && sale && <div className="sale-pill">{sale.label}: {sale.bundle}% off your first year until {sale.ends}</div>}
       <div className="plan-tagline">For serious exam prep</div>
       <ul className="plan-features">
@@ -561,6 +563,13 @@ const ProPlanCard = ({ onShowLogin }) => {
         <li>Full-length timed exam simulators with readiness scores</li>
         <li>New certifications as they ship</li>
       </ul>
+      {/* Above the button so it lines up with the other cards' buttons */}
+      {offerTrial && (
+        <p className="plan-trial-note">
+          Card required. Cancel before day {PRO_TRIAL_DAYS} and you pay nothing; otherwise Pro
+          renews yearly. One free trial per person.
+        </p>
+      )}
       {!BILLING_ENABLED ? (
         <button className="btn btn-card-disabled plan-cta" disabled>
           Coming Soon
@@ -571,11 +580,11 @@ const ProPlanCard = ({ onShowLogin }) => {
         </button>
       ) : isAuthenticated ? (
         <button className="btn btn-card-primary plan-cta" onClick={handleUpgrade} disabled={busy}>
-          {busy ? 'Redirecting…' : 'Upgrade to Pro'} {!busy && <ArrowRightIcon size={16} />}
+          {busy ? 'Redirecting…' : 'Start Free Trial'} {!busy && <ArrowRightIcon size={16} />}
         </button>
       ) : (
         <button className="btn btn-card-primary plan-cta" onClick={onShowLogin}>
-          Sign In to Upgrade
+          Sign In to Start Free Trial
         </button>
       )}
       {billingError && <p className="plan-error">{billingError}</p>}
