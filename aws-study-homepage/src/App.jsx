@@ -760,6 +760,8 @@ const Footer = () => (
         Not affiliated with Amazon Web Services. AWS and all related marks are trademarks of Amazon.com, Inc.
       </p>
       <p className="footer-legal-links">
+        Made by <a href="https://nico-tek.com/study-hub">Nico Tek Solutions</a>
+        <span aria-hidden="true"> · </span>
         <a href="/terms.html">Terms of Service</a>
         <span aria-hidden="true"> · </span>
         <a href="/privacy.html">Privacy Policy</a>
