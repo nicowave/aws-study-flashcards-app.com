@@ -12,7 +12,16 @@ const dollars = (price) => price.replace('$', '')
 
 // Structured data: who we are, the site, every course we sell, and the FAQ.
 function structuredData() {
-  const org = { '@type': 'Organization', '@id': `${SITE}/#org`, name: 'Nico Tek Solutions', url: SITE, logo: `${SITE}/logo.png` }
+  // The maker is the firm nico-tek.com describes. Same @id and url as there, so search engines and AI answers
+  // see one company behind both sites instead of two firms with the same name.
+  const org = {
+    '@type': 'Organization',
+    '@id': 'https://nico-tek.com/#organization',
+    name: 'Nico Tek Solutions',
+    url: 'https://nico-tek.com/',
+    logo: 'https://nico-tek.com/assets/nico-tek-icon-512.png',
+    sameAs: ['https://nico-tek.com/study-hub'],
+  }
   const course = ({ name, description, url, price, hours }) => ({
     '@type': 'Course',
     '@id': `${url}/#course`,
@@ -78,7 +87,7 @@ function staticPage() {
       <ul>${courseItems}
       </ul>
       <h2>Questions People Ask</h2>${faqItems}
-      <p><a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a></p>
+      <p>Made by <a href="https://nico-tek.com/study-hub">Nico Tek Solutions</a> · <a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a></p>
       <p>Not affiliated with Amazon Web Services. AWS and all related marks are trademarks of Amazon.com, Inc.</p>
     </div>
   `
