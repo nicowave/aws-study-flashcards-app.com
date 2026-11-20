@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import './AuthScreen.css';
 
 const AuthScreen = ({ 
-  siteName = 'AWS Study Hub', 
+  siteName = 'Level Up Study Hub', 
   onClose = null,
   showGuestOption = true 
 }) => {

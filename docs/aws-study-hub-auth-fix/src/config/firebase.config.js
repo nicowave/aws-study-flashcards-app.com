@@ -1,4 +1,4 @@
-// Firebase Configuration for AWS Study Hub
+// Firebase Configuration for Level Up Study Hub
 // Your Firebase project: aws-study-hub
 
 // IMPORTANT: API key removed - use environment variables instead

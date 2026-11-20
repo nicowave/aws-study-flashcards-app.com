@@ -1,5 +1,5 @@
 // Dev Track — Protocols & Backend flashcards
-// Follows the AWS Study Hub module convention: {id, front, back, hint, tags, difficulty}
+// Follows the Level Up Study Hub module convention: {id, front, back, hint, tags, difficulty}
 
 export const decks = [
   {

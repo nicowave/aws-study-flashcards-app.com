@@ -1,4 +1,4 @@
-# Dev Track: Protocols & Backend — AWS Study Hub module
+# Dev Track: Protocols & Backend — Level Up Study Hub module
 
 Interactive labs, a study guide, a quiz game, a practice exam and flashcards for the networking and backend fundamentals
 (TCP/UDP handshake, TLS, DNS, HTTP/REST idempotency, ASP.NET Core vocabulary, MQTT, WMTS).

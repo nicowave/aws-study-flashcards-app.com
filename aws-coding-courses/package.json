@@ -1,7 +1,7 @@
 {
   "name": "aws-coding-courses",
   "version": "1.0.0",
-  "description": "Coding courses for AWS Study Hub: one tutorial engine, built once per course site (bash., python., js., typescript.)",
+  "description": "Coding courses for Level Up Study Hub: one tutorial engine, built once per course site (bash., python., js., typescript.)",
   "private": true,
   "type": "module",
   "scripts": {
