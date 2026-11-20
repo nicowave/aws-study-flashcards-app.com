@@ -63,7 +63,7 @@ const Header = ({ user, onSignIn, onSignOut }) => (
   <header className="site-header">
     <a className="brand" {...linkProps('/')}>
       <span className="brand-mark" aria-hidden="true">{course.mark}</span>
-      <span className="brand-text">{course.title}<small>AWS Study Hub</small></span>
+      <span className="brand-text">{course.title}<small>Level Up Study Hub</small></span>
     </a>
     <nav>
       <a href="/#tutorials" className="nav-link hide-sm" onClick={(e) => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('tutorials')?.scrollIntoView(), 0); }}>Tutorials</a>
@@ -113,7 +113,7 @@ const Footer = () => (
       <ul>
         <li><a href={onThisName('https://developer.aws-study-flashcards-app.com')}>Developer Associate</a></li>
         <li><a href={onThisName('https://cloud.aws-study-flashcards-app.com')}>Cloud Practitioner</a></li>
-        <li><a href={HUB_URL}>All of AWS Study Hub</a></li>
+        <li><a href={HUB_URL}>All of Level Up Study Hub</a></li>
       </ul>
     </div>
     <p className="fine">© {new Date().getFullYear()} Nico Tek Solutions. Not affiliated with Amazon Web Services. AWS is a trademark of Amazon.com, Inc.</p>

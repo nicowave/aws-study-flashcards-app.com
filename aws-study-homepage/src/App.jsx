@@ -454,7 +454,7 @@ const Certifications = () => (
 const About = () => (
   <section id="about" className="about-section">
     <div className="about-content">
-      <h2 className="section-title">Why AWS Study Hub?</h2>
+      <h2 className="section-title">Why Level Up Study Hub?</h2>
       <div className="features-grid">
         <div className="feature-card">
           <div className="feature-icon">

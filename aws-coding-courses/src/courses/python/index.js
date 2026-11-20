@@ -42,7 +42,7 @@ Response:
     { q: 'Will the real AWS projects cost money?', a: 'Almost nothing. Lambda, EventBridge, SNS email and S3 stay within AWS\'s monthly free amounts for these projects, and DynamoDB on-demand costs fractions of a cent at this size. Each Build step ends with cleanup commands.' },
     { q: 'Mac, Windows or Linux?', a: 'All three. Tutorial 1\'s Build step shows how to install Python on each, and *Start here* sets up a terminal.' },
     { q: 'Does this help with the AWS Certified Developer – Associate exam?', a: 'Yes. A third of that exam is writing code against AWS services: Lambda, DynamoDB, S3 and SNS, with retries, error handling and permissions. Each tutorial ends with exam tips. Pair it with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com) for full exam practice.' },
-    { q: 'Is this an official AWS course?', a: 'No. AWS Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
+    { q: 'Is this an official AWS course?', a: 'No. Level Up Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
   ],
   afterCourse: `**Next steps:**
 - Put the four programs on your résumé as a "Python and AWS automation" project, linking to your GitHub.

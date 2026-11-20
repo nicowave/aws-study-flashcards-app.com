@@ -38,7 +38,7 @@ Response:
     { q: 'Do I need an AWS account?', a: 'Not to start. Every lesson practices against a pretend AWS account in your browser. The **Build it** step at the end of each tutorial uses your own free AWS account, and *Start here* shows how to set one up with a budget alert.' },
     { q: 'Will the real AWS projects cost money?', a: 'Almost nothing. Lambda, API Gateway, Cognito and SES stay within AWS\'s free amounts for these projects, and DynamoDB on-demand costs fractions of a cent at this size. Each Build step ends with cleanup commands.' },
     { q: 'Does this help with the AWS Certified Developer – Associate exam?', a: 'Yes. The exam is about writing code against Lambda, API Gateway, DynamoDB and Cognito, with security and error handling: exactly what tutorials 3 and 4 build. Each tutorial ends with exam tips. Pair it with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com).' },
-    { q: 'Is this an official AWS course?', a: 'No. AWS Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
+    { q: 'Is this an official AWS course?', a: 'No. Level Up Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
   ],
   afterCourse: `**Next steps:**
 - Put the four projects on your résumé and GitHub: a live page, a dashboard, an API and an app with sign-in.
