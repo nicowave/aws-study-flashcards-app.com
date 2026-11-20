@@ -6,7 +6,7 @@ export const highPerforming = {
   name: 'Design High-Performing Architectures',
   icon: '⚡',
   weight: '24%',
-  color: '#58a6ff',
+  color: '#a78bfa',
   description: 'High-performing and scalable storage, compute, database, networking, and data ingestion solutions',
   questions: [
     {

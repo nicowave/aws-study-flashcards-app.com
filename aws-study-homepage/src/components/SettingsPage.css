@@ -151,8 +151,8 @@
 }
 
 .inline-edit-save {
-  background: var(--accent-primary);
-  color: #fff;
+  background: var(--brand-run);
+  color: var(--brand-ink);
   border: none;
   width: 30px;
   height: 30px;
@@ -166,7 +166,7 @@
 }
 
 .inline-edit-save:hover {
-  background: var(--accent-primary-dim);
+  filter: brightness(1.08);
 }
 
 .inline-edit-save:disabled {
@@ -221,7 +221,7 @@
   justify-content: center;
   font-size: 2rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--brand-ink);
   border: 3px solid var(--border-default);
   overflow: hidden;
   position: relative;
@@ -274,7 +274,7 @@
 
 .avatar-tab.active {
   background: var(--accent-primary);
-  color: #fff;
+  color: var(--brand-ink);
 }
 
 /* Avatar Tab Content */
@@ -407,19 +407,19 @@
 
 /* Save Avatar Button */
 .save-avatar-btn {
-  background: var(--accent-primary);
-  color: #fff;
+  background: var(--brand-run);
+  color: var(--brand-ink);
   border: none;
   padding: 10px 24px;
   border-radius: var(--radius-md);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .save-avatar-btn:hover {
-  background: var(--accent-primary-dim);
+  filter: brightness(1.08);
   transform: translateY(-1px);
 }
 
@@ -463,8 +463,8 @@
 
 .settings-input:focus {
   outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--accent-glow);
+  border-color: var(--brand-spark);
+  box-shadow: 0 0 0 2px rgba(103, 232, 249, 0.2);
 }
 
 .settings-input::placeholder {
@@ -473,20 +473,20 @@
 
 .password-submit-btn {
   align-self: flex-start;
-  background: var(--accent-primary);
-  color: #fff;
+  background: var(--brand-run);
+  color: var(--brand-ink);
   border: none;
   padding: 10px 20px;
   border-radius: var(--radius-md);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-fast);
   margin-top: 4px;
 }
 
 .password-submit-btn:hover {
-  background: var(--accent-primary-dim);
+  filter: brightness(1.08);
 }
 
 .password-submit-btn:disabled {
@@ -558,7 +558,7 @@
 }
 
 .toggle-switch input:checked + .toggle-slider {
-  background-color: var(--accent-primary);
+  background-color: var(--accent-primary-dim);
 }
 
 .toggle-switch input:checked + .toggle-slider:before {

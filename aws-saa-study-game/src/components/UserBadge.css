@@ -28,13 +28,13 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FF9900 0%, #FF6B00 100%);
+  background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
   font-weight: 600;
-  color: white;
+  color: var(--brand-ink);
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -47,7 +47,7 @@
 }
 
 .user-avatar.guest {
-  background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+  background: linear-gradient(135deg, #a3b1c6 0%, #8493ab 100%);
 }
 
 .user-info {
@@ -81,7 +81,7 @@
 }
 
 .user-status.guest {
-  color: #9CA3AF;
+  color: var(--md-on-surface-variant);
   font-style: italic;
 }
 
@@ -100,7 +100,7 @@
   top: calc(100% + 8px);
   right: 0;
   min-width: 260px;
-  background: #1F2937;
+  background: var(--md-surface-elevated);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
@@ -170,7 +170,7 @@
 }
 
 .dropdown-status.unverified {
-  color: #F59E0B;
+  color: var(--md-warning);
 }
 
 .dropdown-divider {

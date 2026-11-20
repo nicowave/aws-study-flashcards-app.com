@@ -15,7 +15,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(13, 17, 23, 0.85);
+  background: rgba(11, 18, 32, 0.85);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-default);
 }
@@ -124,7 +124,7 @@
 }
 
 .highlight {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  background: var(--brand-run);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -164,16 +164,17 @@
 }
 
 .btn-primary {
-  background: var(--accent-primary);
-  color: #fff;
+  background: var(--brand-run);
+  color: var(--brand-ink);
+  font-weight: 700;
 }
 
 .btn-primary:hover {
-  background: var(--accent-primary-dim);
+  filter: brightness(1.08);
   box-shadow: var(--shadow-glow);
   transform: translateY(-2px);
   text-decoration: none;
-  color: #fff;
+  color: var(--brand-ink);
 }
 
 .btn-secondary {
@@ -341,7 +342,7 @@
 
 .cert-card:hover {
   border-color: transparent;
-  box-shadow: var(--shadow-lg), 0 0 30px rgba(88, 166, 255, 0.15);
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(139, 92, 246, 0.15);
   transform: translateY(-4px);
 }
 
@@ -463,27 +464,27 @@
 .btn-card-primary {
   flex: 1;
   padding: 10px 16px;
-  background: var(--accent-primary);
-  color: #fff;
+  background: var(--brand-run);
+  color: var(--brand-ink);
   border-radius: var(--radius-md);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
   text-align: center;
   text-decoration: none;
   transition: all var(--transition-fast);
 }
 
 .btn-card-primary:hover {
-  background: var(--accent-primary-dim);
+  filter: brightness(1.08);
   text-decoration: none;
-  color: #fff;
+  color: var(--brand-ink);
 }
 
 .btn-card-disabled {
   flex: 1;
   padding: 10px 16px;
   background: var(--surface-active);
-  color: var(--text-muted);
+  color: var(--text-secondary);
   border: none;
   border-radius: var(--radius-md);
   font-size: 14px;
@@ -847,19 +848,20 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  background: var(--brand-run);
   border: none;
   border-radius: var(--radius-md);
   font-size: 14px;
-  font-weight: 500;
-  color: white;
+  font-weight: 700;
+  color: var(--brand-ink);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .login-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  filter: brightness(1.08);
 }
 
 .user-menu {
@@ -895,7 +897,7 @@
   justify-content: center;
   font-size: 11px;
   font-weight: 600;
-  color: white;
+  color: var(--brand-ink);
 }
 
 .user-avatar.large {
@@ -1048,7 +1050,7 @@
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   border-radius: 50%;
   margin-bottom: 16px;
-  color: white;
+  color: var(--brand-ink);
 }
 
 .auth-title {
@@ -1105,8 +1107,8 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+  border-color: var(--brand-spark);
+  box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.2);
 }
 
 .form-group input::placeholder {
@@ -1148,12 +1150,12 @@
   gap: 8px;
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  background: var(--brand-run);
   border: none;
   border-radius: var(--radius-md);
   font-size: 15px;
-  font-weight: 600;
-  color: white;
+  font-weight: 700;
+  color: var(--brand-ink);
   cursor: pointer;
   transition: all var(--transition-fast);
   margin-top: 8px;
@@ -1161,7 +1163,8 @@
 
 .auth-submit-btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  filter: brightness(1.08);
 }
 
 .auth-submit-btn:disabled {
@@ -1227,8 +1230,8 @@
 .hero-welcome {
   margin-top: 24px;
   padding: 12px 20px;
-  background: rgba(88, 166, 255, 0.1);
-  border: 1px solid rgba(88, 166, 255, 0.2);
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: var(--radius-md);
   font-size: 14px;
   color: var(--text-secondary);
@@ -1341,7 +1344,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+  background: linear-gradient(135deg, var(--surface-base) 0%, var(--surface-card) 100%);
 }
 
 .loading-content {
@@ -1378,7 +1381,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+  background: linear-gradient(135deg, var(--surface-base) 0%, var(--surface-card) 50%, var(--surface-base) 100%);
   padding: 40px 20px;
 }
 
@@ -1407,10 +1410,6 @@
   font-size: 32px;
   font-weight: 700;
   color: var(--text-primary);
-}
-
-.aws-orange {
-  color: #ff9900;
 }
 
 .auth-tagline {
@@ -1501,8 +1500,8 @@
 
 .form-field input:focus {
   outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+  border-color: var(--brand-spark);
+  box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.2);
 }
 
 .form-field input::placeholder {
@@ -1541,12 +1540,12 @@
   gap: 8px;
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  background: var(--brand-run);
   border: none;
   border-radius: var(--radius-md);
   font-size: 15px;
-  font-weight: 600;
-  color: white;
+  font-weight: 700;
+  color: var(--brand-ink);
   cursor: pointer;
   transition: all 0.2s ease;
   margin-top: 8px;
@@ -1554,7 +1553,8 @@
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  filter: brightness(1.08);
 }
 
 .submit-btn:disabled {
@@ -1605,7 +1605,7 @@
   justify-content: center;
   font-size: 12px;
   font-weight: 600;
-  color: white;
+  color: var(--brand-ink);
 }
 
 .user-name-header {
@@ -1731,7 +1731,7 @@
   border: none;
   padding: 4px;
   cursor: pointer;
-  color: #64748b;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1739,7 +1739,7 @@
 }
 
 .password-toggle:hover {
-  color: #00F7FF;
+  color: var(--accent-tertiary);
 }
 
 .password-toggle:focus {
@@ -2075,7 +2075,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: var(--accent-primary);
-  color: #0d1117;
+  color: var(--brand-ink);
   font-size: 12px;
   font-weight: 700;
   padding: 4px 14px;
@@ -2135,7 +2135,7 @@
 }
 
 .plan-error {
-  color: #f85149;
+  color: var(--status-error);
   font-size: 13px;
   margin: 8px 0 0;
   text-align: center;
@@ -2201,8 +2201,8 @@
 /* Reset code sent (sign-in modal) */
 .auth-notice-box {
   padding: 12px 16px;
-  background: rgba(88, 166, 255, 0.1);
-  border: 1px solid rgba(88, 166, 255, 0.3);
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.3);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
   font-size: 14px;
@@ -2233,10 +2233,10 @@
 /* ---------- Coding courses, the bundle, sales ---------- */
 .course-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; }
 .course-mark { font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; }
-.course-go { margin-top: auto; padding-top: 12px; font-weight: 600; color: var(--aws-orange, #ff9900); }
+.course-go { margin-top: auto; padding-top: 12px; font-weight: 600; color: var(--accent-secondary); }
 .price-was { opacity: 0.6; font-weight: 400; }
-.bundle-card { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 22px 26px; border-radius: 14px; border: 1px solid rgba(255, 153, 0, 0.35); background: rgba(255, 153, 0, 0.07); }
+.bundle-card { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 22px 26px; border-radius: 14px; border: 1px solid rgba(236, 72, 153, 0.35); background: rgba(236, 72, 153, 0.07); }
 .bundle-card h3 { margin: 6px 0; }
 .bundle-card p { margin: 0; max-width: 60ch; }
-.sale-pill { display: inline-block; background: #f28c28; color: #1a0f00; font-weight: 700; font-size: 0.78rem; padding: 3px 10px; border-radius: 999px; margin: 6px 0; }
-.promo-banner { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; padding: 8px 16px; background: #3a1f05; color: #ffd8a8; font-size: 0.9rem; text-align: center; }
+.sale-pill { display: inline-block; background: var(--brand-pop); color: var(--brand-ink); font-weight: 700; font-size: 0.78rem; padding: 3px 10px; border-radius: 999px; margin: 6px 0; }
+.promo-banner { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; padding: 8px 16px; background: linear-gradient(90deg, rgba(139, 92, 246, 0.22), rgba(236, 72, 153, 0.22), rgba(34, 211, 238, 0.22)), var(--surface-base); color: var(--text-primary); font-size: 0.9rem; text-align: center; }

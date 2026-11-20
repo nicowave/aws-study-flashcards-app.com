@@ -7,7 +7,7 @@ export const domain2 = {
   name: 'Fundamentals of Generative AI',
   description: 'Generative AI concepts, model selection, and AWS GenAI infrastructure',
   icon: '✨',
-  color: '#9B59B6',
+  color: '#c084fc',
   gradient: 'linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%)',
   source: 'AWS Certified AI Practitioner Exam Guide - Domain 2',
   examWeight: '24%',

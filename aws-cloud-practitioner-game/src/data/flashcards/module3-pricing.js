@@ -6,8 +6,8 @@ export const module3 = {
   name: 'Pricing & Support',
   description: 'AWS pricing models, billing tools, and support plans',
   icon: '💰',
-  color: '#d29922',
-  gradient: 'linear-gradient(135deg, #d29922 0%, #b38600 100%)',
+  color: '#67e8f9',
+  gradient: 'linear-gradient(135deg, #67e8f9 0%, #22d3ee 100%)',
   source: 'AWS Cloud Practitioner Essentials',
   cards: [
     {

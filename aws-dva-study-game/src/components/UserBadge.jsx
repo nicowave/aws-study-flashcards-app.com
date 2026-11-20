@@ -38,7 +38,7 @@ const AvatarDisplay = ({ userData, user, size = 32, fontSize = 13 }) => {
 
   if (avatar?.type === 'emoji' && avatar.value) {
     return (
-      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#FF9900', fontSize: Math.round(size * 0.55) }}>
+      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#ec4899', fontSize: Math.round(size * 0.55) }}>
         {avatar.value}
       </div>
     );
@@ -46,7 +46,7 @@ const AvatarDisplay = ({ userData, user, size = 32, fontSize = 13 }) => {
 
   if ((avatar?.type === 'pattern' || avatar?.type === 'image') && avatar.value) {
     return (
-      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#FF9900' }}>
+      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#ec4899' }}>
         <img src={avatar.value} alt="Avatar" />
       </div>
     );
@@ -60,7 +60,7 @@ const AvatarDisplay = ({ userData, user, size = 32, fontSize = 13 }) => {
     );
   }
 
-  // Default: orange gradient with initials
+  // Default: brand gradient with initials
   return (
     <div className="user-avatar" style={{ fontSize }}>
       {initial}

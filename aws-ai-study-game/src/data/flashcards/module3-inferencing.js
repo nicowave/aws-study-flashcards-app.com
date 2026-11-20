@@ -7,7 +7,7 @@ export const module3 = {
   name: 'Inferencing & Model Deployment',
   description: 'Batch vs Real-time inferencing and the ML pipeline',
   icon: '⚡',
-  color: '#9370DB',
+  color: '#a78bfa',
   gradient: 'linear-gradient(135deg, #9370DB 0%, #7B68EE 100%)',
   source: 'AWS Skill Builder - Certified AI Practitioner Course #1',
   cards: [

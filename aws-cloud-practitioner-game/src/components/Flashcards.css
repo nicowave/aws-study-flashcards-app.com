@@ -283,13 +283,13 @@
 
 .flashcard-hint-btn {
   background: transparent;
-  color: var(--md-warning);
-  border: 1px dashed var(--md-warning);
+  color: var(--md-secondary);
+  border: 1px dashed var(--md-secondary);
   cursor: pointer;
 }
 
 .flashcard-hint {
-  color: var(--md-warning);
+  color: var(--md-secondary);
   border: 1px solid transparent;
 }
 

@@ -6,7 +6,7 @@ export const billingSupport = {
   name: 'Billing, Pricing & Support',
   icon: '💰',
   weight: '12%',
-  color: '#d29922',
+  color: '#f472b6',
   description: 'AWS pricing models, billing services, and support plans',
   questions: [
     {

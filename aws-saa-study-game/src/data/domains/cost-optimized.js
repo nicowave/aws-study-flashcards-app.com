@@ -6,7 +6,7 @@ export const costOptimized = {
   name: 'Design Cost-Optimized Architectures',
   icon: '💰',
   weight: '20%',
-  color: '#d29922',
+  color: '#f472b6',
   description: 'Cost-optimized storage, compute, database, and network architectures',
   questions: [
     // ---------- Task 4.1: Cost-optimized storage ----------

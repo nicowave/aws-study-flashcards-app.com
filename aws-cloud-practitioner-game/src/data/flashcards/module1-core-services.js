@@ -6,8 +6,8 @@ export const module1 = {
   name: 'AWS Core Services',
   description: 'Essential compute, storage, and database services',
   icon: '⚙️',
-  color: '#58a6ff',
-  gradient: 'linear-gradient(135deg, #58a6ff 0%, #388bfd 100%)',
+  color: '#a78bfa',
+  gradient: 'linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%)',
   source: 'AWS Cloud Practitioner Essentials',
   cards: [
     {

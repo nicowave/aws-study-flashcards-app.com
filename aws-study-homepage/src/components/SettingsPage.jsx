@@ -7,12 +7,12 @@ import './SettingsPage.css';
 // Constants
 const EMOJI_OPTIONS = ['🤖', '🎓', '🚀', '☁️', '🧠', '💻', '🔥', '⚡', '🎯', '🏆', '💡', '🔒', '🌟', '📚', '🎮', '💎'];
 const COLOR_OPTIONS = [
-  '#ff9900', '#58a6ff', '#3fb950', '#f85149', '#d29922', '#bc8cff',
-  '#56d4dd', '#f778ba', '#6e7681', '#e6edf3', '#388bfd', '#ff6b6b'
+  '#ec4899', '#8b5cf6', '#3fb950', '#f85149', '#d29922', '#a78bfa',
+  '#22d3ee', '#f472b6', '#8493ab', '#f2f5f9', '#67e8f9', '#ff6b6b'
 ];
 
 // Generate deterministic pattern from seed string
-const generatePattern = (seed, bgColor = '#58a6ff') => {
+const generatePattern = (seed, bgColor = '#a78bfa') => {
   const canvas = document.createElement('canvas');
   canvas.width = 128;
   canvas.height = 128;

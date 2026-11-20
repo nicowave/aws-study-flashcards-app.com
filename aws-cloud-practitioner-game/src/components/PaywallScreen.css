@@ -79,8 +79,8 @@
 }
 
 .paywall-subscribe-btn {
-  background: var(--md-primary);
-  color: var(--md-on-primary);
+  background: var(--brand-run);
+  color: var(--brand-ink);
   border: none;
   border-radius: var(--md-radius-md);
   padding: 14px 24px;
@@ -91,7 +91,7 @@
 }
 
 .paywall-subscribe-btn:hover:not(:disabled) {
-  filter: brightness(1.15);
+  filter: brightness(1.08);
 }
 
 .paywall-subscribe-btn:disabled {

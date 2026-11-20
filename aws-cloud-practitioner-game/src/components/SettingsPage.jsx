@@ -2,17 +2,18 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeftIcon, UserIcon, CameraIcon, PaletteIcon, KeyIcon, BarChartIcon, TrashIcon, ImageIcon, RefreshIcon, CheckIcon } from './Icons';
 import { isAnalyticsOptedOut, setAnalyticsOptOut } from '../services/analytics';
+import { fixAvatarColor } from './avatarColors';
 import './SettingsPage.css';
 
 // Constants
 const EMOJI_OPTIONS = ['🤖', '🎓', '🚀', '☁️', '🧠', '💻', '🔥', '⚡', '🎯', '🏆', '💡', '🔒', '🌟', '📚', '🎮', '💎'];
 const COLOR_OPTIONS = [
-  '#ff9900', '#58a6ff', '#3fb950', '#f85149', '#d29922', '#bc8cff',
-  '#56d4dd', '#f778ba', '#6e7681', '#e6edf3', '#388bfd', '#ff6b6b'
+  '#a78bfa', '#f472b6', '#3fb950', '#f85149', '#67e8f9', '#c4b5fd',
+  '#22d3ee', '#ec4899', '#8493ab', '#f2f5f9', '#fbcfe8', '#9366f7'
 ];
 
 // Generate deterministic pattern from seed string
-const generatePattern = (seed, bgColor = '#58a6ff') => {
+const generatePattern = (seed, bgColor = '#8b5cf6') => {
   const canvas = document.createElement('canvas');
   canvas.width = 128;
   canvas.height = 128;
@@ -150,7 +151,7 @@ const SettingsPage = ({ onBack }) => {
   useEffect(() => {
     if (userData?.avatar) {
       const { type, value, bgColor } = userData.avatar;
-      if (bgColor) setSelectedColor(bgColor);
+      if (bgColor) setSelectedColor(fixAvatarColor(bgColor));
       if (type === 'emoji' && value) {
         setSelectedEmoji(value);
         setAvatarTab('emoji');

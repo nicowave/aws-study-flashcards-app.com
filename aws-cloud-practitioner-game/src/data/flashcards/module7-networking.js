@@ -6,8 +6,8 @@ export const module7 = {
   name: 'Networking',
   description: 'VPC, subnets, Route 53, CloudFront, Direct Connect, and more',
   icon: '🔗',
-  color: '#79c0ff',
-  gradient: 'linear-gradient(135deg, #79c0ff 0%, #58a6ff 100%)',
+  color: '#22d3ee',
+  gradient: 'linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)',
   source: 'AWS CCP Exam Prep - 175+ Q&A',
   cards: [
     {

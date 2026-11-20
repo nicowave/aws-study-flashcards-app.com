@@ -79,8 +79,8 @@
 }
 
 .paywall-subscribe-btn {
-  background: var(--md-primary);
-  color: var(--md-on-primary);
+  background: var(--brand-run);
+  color: var(--brand-ink);
   border: none;
   border-radius: var(--md-radius-md);
   padding: 14px 24px;
