@@ -113,10 +113,8 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
     <header className="header">
       <div className="header-content">
         <div className="logo">
-          <BookIcon size={28} className="logo-icon" />
-          <span className="logo-text">
-            <span className="logo-aws">AWS</span> Study Hub
-          </span>
+          {/* The Level Up Study Hub lockup. 28 px tall = one third of its 84-unit drawing, so its edges land on whole pixels. */}
+          <img src="/brand/level-up-study-hub-horizontal-reverse.svg" alt="Level Up Study Hub" className="logo-lockup" width="262" height="28" />
         </div>
         <nav className="nav">
           <a href="#certifications" className="nav-link">Certifications</a>
@@ -727,10 +725,7 @@ const Footer = () => (
     <div className="footer-content">
       <div className="footer-main">
         <div className="footer-brand">
-          <BookIcon size={24} className="logo-icon" />
-          <span className="logo-text">
-            <span className="logo-aws">AWS</span> Study Hub
-          </span>
+          <img src="/brand/level-up-study-hub-horizontal-reverse.svg" alt="Level Up Study Hub" className="logo-lockup" width="262" height="28" />
         </div>
         <p className="footer-tagline">
           Game-based study tools for AWS certification exams
@@ -775,9 +770,9 @@ const Footer = () => (
 const LoadingScreen = () => (
   <div className="loading-screen-hub">
     <div className="loading-content">
-      <BookIcon size={48} />
+      <img src="/brand/level-up-study-hub-mark-reverse.svg" alt="" width="48" height="48" />
       <div className="loading-spinner"></div>
-      <p>Loading AWS Study Hub...</p>
+      <p>Loading Level Up Study Hub...</p>
     </div>
   </div>
 );
@@ -903,7 +898,7 @@ const LoginModal = ({ onClose }) => {
           />
         ) : (<>
         <div className="modal-header">
-          <BookIcon size={32} />
+          <img src="/brand/level-up-study-hub-mark-reverse.svg" alt="" width="32" height="32" />
           <h2>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
           <p>{mode === 'login' ? 'Sign in to sync your progress' : 'Start your AWS journey today'}</p>
         </div>

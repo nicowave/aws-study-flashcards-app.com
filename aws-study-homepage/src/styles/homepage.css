@@ -37,14 +37,11 @@
   font-weight: 600;
 }
 
-.logo-icon {
-  font-size: 24px;
-}
-
-.logo-aws {
-  color: var(--aws-orange);
-  font-family: 'IBM Plex Mono', monospace;
-  font-weight: 700;
+/* Level Up Study Hub lockup (header and footer). The drawing carries its own colours. */
+.logo-lockup {
+  display: block;
+  height: 28px;
+  width: auto;
 }
 
 .nav {
@@ -1906,6 +1903,12 @@
 .modal-header svg {
   color: var(--primary);
   margin-bottom: 12px;
+}
+
+/* The Level Up mark above "Welcome Back" (an image, so it needs its own centring). */
+.modal-header img {
+  display: block;
+  margin: 0 auto 12px;
 }
 
 .modal-header h2 {
