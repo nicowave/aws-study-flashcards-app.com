@@ -173,31 +173,6 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
   );
 };
 
-// Badge images for hero background banner
-const badgeImages = [
-  'cloud-practitioner', 'ai-practitioner', 'solutions-architect-associate',
-  'developer-associate', 'sysops-administrator', 'data-engineer-associate',
-  'ml-engineer-associate', 'solutions-architect-professional', 'devops-engineer-professional',
-  'security-specialty', 'ml-specialty', 'database-specialty',
-  'advanced-networking-specialty', 'sap-on-aws-specialty'
-];
-
-const BadgeBanner = () => (
-  <div className="badge-banner" aria-hidden="true">
-    <div className="badge-track">
-      {[...badgeImages, ...badgeImages].map((badge, i) => (
-        <img
-          key={i}
-          src={`/badges/${badge}.png`}
-          alt=""
-          className="badge-img"
-          loading="lazy"
-        />
-      ))}
-    </div>
-  </div>
-);
-
 // User Stats Panel (shown inside hero-welcome for signed-in users)
 // Reads from userData.progress — a map of certId -> game stats from the
 // Firestore subcollection /users/{uid}/progress/{certId}
@@ -294,7 +269,6 @@ const Hero = () => {
 
   return (
     <section className="hero">
-      <BadgeBanner />
       <div className="hero-content">
         <div className="hero-badge">
           <TargetIcon size={16} className="badge-icon" />

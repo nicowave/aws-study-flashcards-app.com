@@ -79,42 +79,6 @@
   overflow: hidden;
 }
 
-/* Badge Banner — behind hero content */
-.badge-banner {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  transform: translateY(-50%);
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.06;
-  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-}
-
-.badge-track {
-  display: flex;
-  align-items: center;
-  gap: 48px;
-  width: max-content;
-  animation: scrollBadges 60s linear infinite;
-}
-
-.badge-img {
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
-  flex-shrink: 0;
-  filter: grayscale(30%);
-}
-
-@keyframes scrollBadges {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
 .hero-glow {
   position: absolute;
   top: -200px;
@@ -793,15 +757,6 @@
   
   .hero {
     padding: 60px 20px 80px;
-  }
-
-  .badge-img {
-    width: 80px;
-    height: 80px;
-  }
-
-  .badge-track {
-    gap: 32px;
   }
 
   .hero-title {
