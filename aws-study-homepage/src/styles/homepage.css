@@ -69,6 +69,53 @@
   color: var(--accent-primary);
 }
 
+/* Header fit. The lockup is a fixed-width picture, so the header can no longer squeeze the logo to make room:
+   when the nav does not fit beside it, the nav wraps onto a second right-aligned row instead of pushing the
+   page sideways. The member's name ends in "..." rather than splitting, and the buttons keep their size. */
+.header-content {
+  gap: 24px;
+}
+
+.nav {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.user-menu-header,
+.settings-link-header,
+.user-name-header {
+  min-width: 0;
+}
+
+.user-name-header {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-divider,
+.user-avatar-small,
+.settings-icon-btn,
+.logout-btn-header,
+.signin-btn-header {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* A wrapped row would leave the divider dangling at its end: drop it below 1200 px, where the nav may wrap,
+   and next to the member box, which is its own separator. */
+@media (max-width: 1199px) {
+  .nav-divider {
+    display: none;
+  }
+}
+
+.nav-divider:has(+ .user-menu-header) {
+  display: none;
+}
+
 /* ========================================
    Hero Section
    ======================================== */
