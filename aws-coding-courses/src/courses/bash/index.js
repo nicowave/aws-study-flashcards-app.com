@@ -43,7 +43,7 @@ Live at https://www.example.com`,
     { q: 'Will the real AWS projects cost money?', a: 'Almost nothing. Everything fits in the AWS Free Tier or costs a few cents, except AWS Secrets Manager in Tutorial 4 ($0.40 a month per secret after a 30-day free trial). Each Build step ends with cleanup commands.' },
     { q: 'Mac, Windows or Linux?', a: 'All three. Mac and Linux have a terminal built in. On Windows, *Start here* shows how to install the Windows Subsystem for Linux, which gives you a real Ubuntu terminal.' },
     { q: 'Does this help with the AWS Certified Developer – Associate exam?', a: 'Yes. The exam expects you to work with the AWS command line, S3, CloudFront, IAM policies and Secrets Manager, and each tutorial ends with exam tips. Pair it with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com) for full exam practice.' },
-    { q: 'Is this an official AWS course?', a: 'No. AWS Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
+    { q: 'Is this an official AWS course?', a: 'No. Level Up Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
   ],
   afterCourse: `**Next steps:**
 - Put the four scripts on your résumé as a "Bash automation" project, linking to your GitHub.

@@ -1,4 +1,4 @@
-# AWS Study Hub - Multi-Site Architecture
+# Level Up Study Hub - Multi-Site Architecture
 
 A comprehensive AWS certification study platform with a central homepage and dedicated subdomains for each certification path.
 

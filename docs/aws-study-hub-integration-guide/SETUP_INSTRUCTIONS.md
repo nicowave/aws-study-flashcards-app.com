@@ -1,8 +1,8 @@
-# AWS Study Hub - Authentication Setup Guide
+# Level Up Study Hub - Authentication Setup Guide
 
 ## 📋 Overview
 
-This update adds Firebase-based authentication across all three AWS Study Hub sites with cross-domain persistence. Users can sign up once and stay logged in across:
+This update adds Firebase-based authentication across all three Level Up Study Hub sites with cross-domain persistence. Users can sign up once and stay logged in across:
 
 - **Portal**: aws-study-flashcards-app.com
 - **AI App**: ai.aws-study-flashcards-app.com  
@@ -33,7 +33,7 @@ This update adds Firebase-based authentication across all three AWS Study Hub si
 
 2. **Add Web App**
    - Click "Web" icon (</> symbol)
-   - Register app name: "AWS Study Hub"
+   - Register app name: "Level Up Study Hub"
    - **Don't check** "Firebase Hosting"
    - Click "Register app"
    - Copy the firebaseConfig object
@@ -280,7 +280,7 @@ If you encounter issues:
 
 ## 🎉 You're Done!
 
-Your AWS Study Hub now has:
+Your Level Up Study Hub now has:
 - ✅ Unified authentication across all sites
 - ✅ Email verification for security
 - ✅ Cross-domain login persistence

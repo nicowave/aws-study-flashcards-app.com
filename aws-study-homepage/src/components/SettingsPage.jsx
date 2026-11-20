@@ -621,7 +621,7 @@ const SettingsPage = ({ onBack }) => {
           <div className="analytics-toggle-info">
             <p>Opt out of Google Analytics</p>
             <p className="toggle-description">
-              When enabled, no usage data will be collected. This applies to all AWS Study Hub sites on this browser.
+              When enabled, no usage data will be collected. This applies to all Level Up Study Hub sites on this browser.
             </p>
           </div>
           <label className="toggle-switch">

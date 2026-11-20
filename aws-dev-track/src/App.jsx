@@ -120,7 +120,7 @@ export default function App() {
     <div className="shell">
       <div className="topbar">
         <div><h1>Dev Track: protocols and backend</h1><p className="lead" style={{ margin: 0 }}>Hands-on labs for the stuff behind every cloud API and IoT fleet.</p></div>
-        <div className="brand"><a href={HUB_URL}>AWS Study Hub</a></div>
+        <div className="brand"><a href={HUB_URL}>Level Up Study Hub</a></div>
       </div>
       <nav className="tabs" aria-label="Sections">
         {TABS.map(([id, label]) => <button key={id} onClick={() => setTab(id)} aria-current={tab === id ? 'page' : undefined}>{label}</button>)}

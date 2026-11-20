@@ -1,8 +1,8 @@
-# AWS Study Hub - Authentication Update Package
+# Level Up Study Hub - Authentication Update Package
 
 ## 📦 What's Included
 
-This package contains all the files needed to add Firebase authentication with cross-domain persistence to your AWS Study Hub (aws-study-flashcards-app.com).
+This package contains all the files needed to add Firebase authentication with cross-domain persistence to your Level Up Study Hub (aws-study-flashcards-app.com).
 
 ---
 

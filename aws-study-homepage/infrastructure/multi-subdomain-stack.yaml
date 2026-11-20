@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-  AWS Study Hub - Multi-subdomain Static Hosting Architecture
+  Level Up Study Hub - Multi-subdomain Static Hosting Architecture
   Supports: aws-study-flashcards-app.com (homepage) and multiple subdomains (ai., ccp., etc.)
 
 Parameters:

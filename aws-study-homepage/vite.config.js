@@ -46,7 +46,7 @@ function structuredData() {
     '@context': 'https://schema.org',
     '@graph': [
       org,
-      { '@type': 'WebSite', '@id': `${SITE}/#website`, name: 'AWS Study Hub', url: `${SITE}/`, publisher: { '@id': org['@id'] } },
+      { '@type': 'WebSite', '@id': `${SITE}/#website`, name: 'Level Up Study Hub', url: `${SITE}/`, publisher: { '@id': org['@id'] } },
       ...courses,
       {
         '@type': 'ItemList',

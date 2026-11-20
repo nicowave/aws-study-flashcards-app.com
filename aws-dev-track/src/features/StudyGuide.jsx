@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { chapters, getChapterById } from '../data/devTrackGuide.js'
 
-// Renders one content block of a guide section. Block types match the AWS Study Hub guides, plus `code`.
+// Renders one content block of a guide section. Block types match the Level Up Study Hub guides, plus `code`.
 function Block({ b }) {
   switch (b.type) {
     case 'paragraph':

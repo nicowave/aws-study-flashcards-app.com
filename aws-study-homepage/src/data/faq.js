@@ -3,8 +3,8 @@
 // both places print the same words, and search engines want them to match.
 export const FAQ = [
   {
-    q: 'What is AWS Study Hub?',
-    a: 'AWS Study Hub is a set of free-to-start study sites for Amazon Web Services certification exams. Each certification has a quiz game, flashcards, a study guide and a full-length timed exam simulator. Four coding courses (Bash, Python, JavaScript and TypeScript) teach scripting with real AWS tasks.',
+    q: 'What is Level Up Study Hub?',
+    a: 'Level Up Study Hub is a set of free-to-start study sites for Amazon Web Services certification exams. Each certification has a quiz game, flashcards, a study guide and a full-length timed exam simulator. Four coding courses (Bash, Python, JavaScript and TypeScript) teach scripting with real AWS tasks.',
   },
   {
     q: 'Which AWS certifications can I study for?',
@@ -19,7 +19,7 @@ export const FAQ = [
     a: 'Each simulator has 65 questions and the real time limit: 90 minutes for Cloud Practitioner and AI Practitioner, 130 minutes for the Associate exams. It scores you on the same 100 to 1,000 scale, against the real pass mark (700 for the Foundational exams, 720 for Associate), and shows how ready you are in each exam domain.',
   },
   {
-    q: 'Is AWS Study Hub free?',
+    q: 'Is Level Up Study Hub free?',
     a: 'You can start free with no account: the study guides, the first quiz domain and the first flashcard deck of every certification. A free account adds every flashcard deck and cloud sync. Unlocking everything for one certification is a one-time payment, with no subscription.',
   },
   {
@@ -35,7 +35,7 @@ export const FAQ = [
     a: 'No. You practice in your browser: a practice terminal for Bash, real Python running in the page, and a JavaScript and TypeScript editor with a pretend AWS account. Each tutorial then shows you how to build the same thing on your own AWS account. The first tutorial of every course is free.',
   },
   {
-    q: 'Is AWS Study Hub made by Amazon Web Services?',
-    a: 'No. AWS Study Hub is an independent study tool by Nico Tek Solutions. It is not affiliated with or endorsed by Amazon Web Services. AWS and related marks are trademarks of Amazon.com, Inc.',
+    q: 'Is Level Up Study Hub made by Amazon Web Services?',
+    a: 'No. Level Up Study Hub is an independent study tool by Nico Tek Solutions. It is not affiliated with or endorsed by Amazon Web Services. AWS and related marks are trademarks of Amazon.com, Inc.',
   },
 ];

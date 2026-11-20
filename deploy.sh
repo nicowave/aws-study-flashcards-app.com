@@ -1,6 +1,6 @@
 #!/bin/zsh
 # =============================================================================
-# AWS Study Hub - Universal Deployment Script (ZSH Compatible)
+# Level Up Study Hub - Universal Deployment Script (ZSH Compatible)
 # =============================================================================
 # Deploys the Study Hub Homepage, the certification study games, and Tutorials
 # Run from: ~/dev/sites/aws-study-flashcards.com/
@@ -653,8 +653,8 @@ case "${1:-}" in
         ;;
     "")
         echo ""
-        echo "AWS Study Hub Deployment"
-        echo "========================"
+        echo "Level Up Study Hub Deployment"
+        echo "============================="
         echo ""
         echo "  1) all    - Deploy ALL sites"
         echo "  2) hub    - Study Hub Homepage"

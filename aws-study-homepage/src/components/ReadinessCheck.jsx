@@ -261,7 +261,7 @@ const ReadinessCheck = () => {
             />
             {error && <p className="readiness-error" role="alert">{error}</p>}
             <p className="readiness-fine">
-              Sent by Nico at AWS Study Hub. <a href="/privacy.html">Privacy</a>
+              Sent by Nico at Level Up Study Hub. <a href="/privacy.html">Privacy</a>
             </p>
           </form>
         )}

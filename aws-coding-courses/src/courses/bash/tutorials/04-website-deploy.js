@@ -324,7 +324,7 @@ Fill in the three TODOs with what you practiced. The editor marks the file runna
     {
       id: 'real-world',
       kind: 'read',
-      title: 'How the AWS Study Hub deploys',
+      title: 'How Level Up Study Hub deploys',
       minutes: 8,
       body: `The site you're on is deployed by a Bash script very much like yours. Here's the part that publishes the Developer Associate game, slightly shortened:
 

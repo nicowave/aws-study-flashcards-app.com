@@ -1,4 +1,4 @@
-# AWS Study Hub Authentication Fix
+# Level Up Study Hub Authentication Fix
 
 ## 🚨 Issues Found
 
