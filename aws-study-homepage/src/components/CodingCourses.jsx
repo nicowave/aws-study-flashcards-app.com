@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { startCheckout } from '../services/billing';
 import { currentPromotion, salePrice } from '../services/offers';
 import { COURSES, COURSE_PRICE, BUNDLE_PRICE } from '../data/courses';
+import { onThisName } from '../config/auth.config';
 
 export { COURSES };
 
@@ -43,7 +44,7 @@ const CodingCourses = ({ onShowLogin }) => {
       </div>
       <div className="cert-grid">
         {COURSES.map((c) => (
-          <a key={c.id} href={c.url} className="cert-card course-card">
+          <a key={c.id} href={onThisName(c.url)} className="cert-card course-card">
             <div className="cert-card-header">
               <span className="cert-icon course-mark mono" style={{ background: `${c.color}22`, color: c.color }}>{c.mark}</span>
               <span className="cert-level" style={{ color: c.color }}>{c.tutorials} tutorials · about {c.hours} hours</span>

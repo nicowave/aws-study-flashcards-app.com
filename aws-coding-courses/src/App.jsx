@@ -11,8 +11,10 @@ import { hasCourseAccess } from './services/billing';
 import CourseHome from './engine/CourseHome';
 import TutorialPage from './engine/TutorialPage';
 import { currentPromotion } from './services/offers';
+import { onThisName } from './config/auth.config';
 
-const HUB_URL = 'https://aws-study-flashcards-app.com';
+// Written with the old name; onThisName keeps a visitor on the name they opened.
+const HUB_URL = onThisName('https://aws-study-flashcards-app.com');
 
 const useCourseAccess = (user) => {
   const [access, setAccess] = useState(false);
@@ -102,15 +104,15 @@ const Footer = () => (
       <strong>More coding courses</strong>
       <ul>
         {course.siblings.map((s) => (
-          <li key={s.url}>{s.live ? <a href={s.url}>{s.title}</a> : <span>{s.title} <em>(coming soon)</em></span>}</li>
+          <li key={s.url}>{s.live ? <a href={onThisName(s.url)}>{s.title}</a> : <span>{s.title} <em>(coming soon)</em></span>}</li>
         ))}
       </ul>
     </div>
     <div>
       <strong>Certification games</strong>
       <ul>
-        <li><a href="https://developer.aws-study-flashcards-app.com">Developer Associate</a></li>
-        <li><a href="https://cloud.aws-study-flashcards-app.com">Cloud Practitioner</a></li>
+        <li><a href={onThisName('https://developer.aws-study-flashcards-app.com')}>Developer Associate</a></li>
+        <li><a href={onThisName('https://cloud.aws-study-flashcards-app.com')}>Cloud Practitioner</a></li>
         <li><a href={HUB_URL}>All of AWS Study Hub</a></li>
       </ul>
     </div>

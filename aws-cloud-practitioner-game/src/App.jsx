@@ -22,10 +22,12 @@ import UserBadge from './components/UserBadge';
 import SettingsPage from './components/SettingsPage';
 import { PlayIcon, BookIcon, FlashcardIcon } from './components/Icons';
 import { applyAnalyticsPreference } from './services/analytics';
+import { onThisName } from './config/auth.config';
 import './styles/global.css';
 import './components/AuthScreen.css';
 
-const HUB_URL = 'https://aws-study-flashcards-app.com';
+// Written with the old name; onThisName keeps a visitor on the name they opened.
+const HUB_URL = onThisName('https://aws-study-flashcards-app.com');
 const CERT_ID = 'cloud-practitioner';
 
 const shuffleArray = (array) => {

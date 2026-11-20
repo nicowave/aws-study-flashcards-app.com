@@ -3,6 +3,7 @@
 // token's plan/certs claims, set server-side from the Stripe webhook — never
 // client-writable state.
 import { getTokens, decodeJwt, callFunction } from './awsAuth';
+import { onThisName } from '../config/auth.config';
 
 export const BILLING_ENABLED = import.meta.env.VITE_BILLING_ENABLED === 'true';
 
@@ -39,7 +40,9 @@ export const startCheckout = async (plan) => {
 
 /** Opens the Stripe customer portal (manage / cancel / invoices). */
 export const openBillingPortal = async () => {
-  const { data } = await callFunction('createPortalSession');
+  // Come back to the hub on the name the member opened (on the old name that is the old hub, as
+  // before). The server accepts only listed Study Hub addresses and otherwise uses the old hub.
+  const { data } = await callFunction('createPortalSession', { returnUrl: onThisName('https://aws-study-flashcards-app.com') });
   if (data?.url) {
     window.location.assign(data.url);
   } else {

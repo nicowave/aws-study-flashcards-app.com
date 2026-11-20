@@ -1,6 +1,6 @@
 // Readiness check emails, where visitors came from, and unsubscribe links.
 // The backend side is aws-backend/lambda/api/leads.js.
-import { API_BASE_URL } from '../config/auth.config';
+import { API_BASE_URL, isStudyHubAddress } from '../config/auth.config';
 
 const SOURCE_KEY = 'awsHub_source';
 const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign'];
@@ -12,7 +12,7 @@ export const captureSource = () => {
     // Keep the first source of the visit unless a new tracked link was opened
     if (sessionStorage.getItem(SOURCE_KEY) && !q.get('utm_source')) return;
     const source = Object.fromEntries(UTM_KEYS.map((k) => [k, q.get(k) || '']));
-    source.referrer = document.referrer && !document.referrer.includes('aws-study-flashcards-app.com') ? document.referrer : '';
+    source.referrer = document.referrer && !isStudyHubAddress(document.referrer) ? document.referrer : '';
     sessionStorage.setItem(SOURCE_KEY, JSON.stringify(source));
   } catch { /* storage blocked */ }
 };
