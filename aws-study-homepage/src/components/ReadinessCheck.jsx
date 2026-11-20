@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { submitReadiness, unsubscribe, track } from '../services/leads';
 import { currentPromotion } from '../services/offers';
+import { onThisName } from '../config/auth.config';
 import { ArrowRightIcon, TargetIcon, MailIcon } from './Icons';
 import './ReadinessCheck.css';
 
@@ -268,7 +269,7 @@ const ReadinessCheck = () => {
         {step === 'result' && (() => {
           const verdict = verdictFor(pct);
           const share = shareLinks(cert, pct);
-          const studyUrl = `${cert.url}/?utm_source=readiness&utm_medium=web&utm_campaign=study-plan`;
+          const studyUrl = `${onThisName(cert.url)}/?utm_source=readiness&utm_medium=web&utm_campaign=study-plan`;
           return (
             <div className="readiness-result">
               <div className="readiness-eyebrow mono">AWS {cert.name}</div>

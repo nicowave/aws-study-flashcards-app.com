@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { API_BASE_URL } from '../config/auth.config';
+import { API_BASE_URL, onThisName, isStudyHubAddress } from '../config/auth.config';
 
 // Weekly newsletter sign-up (menu and results screens). Same list as the
 // hub's box; the backend is POST /v1/newsletter in aws-backend/lambda/api/leads.js.
@@ -18,7 +18,7 @@ const source = () => {
       utm_source: q.get('utm_source') || '',
       utm_medium: q.get('utm_medium') || '',
       utm_campaign: q.get('utm_campaign') || '',
-      referrer: document.referrer && !document.referrer.includes('aws-study-flashcards-app.com') ? document.referrer : '',
+      referrer: document.referrer && !isStudyHubAddress(document.referrer) ? document.referrer : '',
     };
   } catch {
     return {};
@@ -96,7 +96,7 @@ const NewsletterSignup = () => {
       />
       {error && <p className="newsletter-box-error" role="alert">{error}</p>}
       <p className="newsletter-box-fine">
-        Unsubscribe any time. <a href="https://aws-study-flashcards-app.com/privacy.html">Privacy</a>
+        Unsubscribe any time. <a href={onThisName('https://aws-study-flashcards-app.com/privacy.html')}>Privacy</a>
       </p>
     </form>
   );

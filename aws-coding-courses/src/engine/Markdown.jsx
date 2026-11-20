@@ -5,6 +5,7 @@
 // as the block's label, e.g. ```index.mjs for a file on the learner's computer.
 import React, { useMemo } from 'react';
 import { Marked } from 'marked';
+import { onThisName } from '../config/auth.config';
 
 const escapeHtml = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
@@ -31,7 +32,9 @@ const makeParser = (runLang) => {
           `<div class="code-bar"><span>${escapeHtml(label)}</span><span class="code-actions">${run}<button type="button" class="code-btn copy-code" data-code="${escapeHtml(text)}">Copy</button></span></div>` +
           `<pre><code>${escapeHtml(text)}</code></pre></div>`;
       },
-      link({ href, title, tokens }) {
+      link({ href: written, title, tokens }) {
+        // A link to another Study Hub site stays on the name this page was opened on.
+        const href = onThisName(written);
         const text = this.parser.parseInline(tokens);
         const external = /^https?:\/\//.test(href);
         return `<a href="${escapeHtml(href)}"${title ? ` title="${escapeHtml(title)}"` : ''}${external ? ' target="_blank" rel="noopener noreferrer"' : ''}>${text}</a>`;

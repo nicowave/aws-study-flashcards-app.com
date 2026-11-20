@@ -39,6 +39,7 @@ import {
   KeyIcon,
   UserIcon
 } from './components/Icons';
+import { onThisName } from './config/auth.config';
 import './styles/global.css';
 import './styles/homepage.css';
 
@@ -231,8 +232,8 @@ const UserStatsPanel = ({ userData }) => {
 
   // Cert-specific cards
   const certMeta = [
-    { id: 'ai-practitioner', name: 'AI Practitioner', icon: '\u{1F916}', color: '#58a6ff', url: 'https://ai.aws-study-flashcards-app.com' },
-    { id: 'cloud-practitioner', name: 'Cloud Practitioner', icon: '\u2601\uFE0F', color: '#3fb950', url: 'https://cloud.aws-study-flashcards-app.com' },
+    { id: 'ai-practitioner', name: 'AI Practitioner', icon: '\u{1F916}', color: '#58a6ff', url: onThisName('https://ai.aws-study-flashcards-app.com') },
+    { id: 'cloud-practitioner', name: 'Cloud Practitioner', icon: '\u2601\uFE0F', color: '#3fb950', url: onThisName('https://cloud.aws-study-flashcards-app.com') },
   ];
   const activeCerts = certMeta.filter(cert => progress[cert.id]);
 
@@ -315,7 +316,7 @@ const Hero = () => {
             Am I Ready? Free 10-Question Check
           </a>
           <a
-            href="https://cloud.aws-study-flashcards-app.com"
+            href={onThisName('https://cloud.aws-study-flashcards-app.com')}
             className="btn btn-secondary"
           >
             <CloudIcon size={20} />
@@ -396,7 +397,7 @@ const CertCard = ({ cert }) => {
 
       <div className="cert-actions">
         {isAvailable ? (
-          <a href={cert.url} className="btn btn-card-primary">
+          <a href={onThisName(cert.url)} className="btn btn-card-primary">
             Start Free <ArrowRightIcon size={16} />
           </a>
         ) : (
@@ -613,7 +614,7 @@ const Plans = ({ onShowLogin }) => (
           <li>Full study guides</li>
           <li>Progress saved on this device</li>
         </ul>
-        <a href="https://cloud.aws-study-flashcards-app.com" className="btn btn-card-primary plan-cta">
+        <a href={onThisName('https://cloud.aws-study-flashcards-app.com')} className="btn btn-card-primary plan-cta">
           Try It Now <ArrowRightIcon size={16} />
         </a>
       </div>
@@ -627,7 +628,7 @@ const Plans = ({ onShowLogin }) => (
           <li>Full study guides</li>
           <li>Cloud sync across devices</li>
         </ul>
-        <a href="https://cloud.aws-study-flashcards-app.com" className="btn btn-card-primary plan-cta">
+        <a href={onThisName('https://cloud.aws-study-flashcards-app.com')} className="btn btn-card-primary plan-cta">
           Create Free Account <ArrowRightIcon size={16} />
         </a>
       </div>
@@ -738,14 +739,14 @@ const Footer = () => (
       <div className="footer-links">
         <div className="footer-column">
           <h4>Certifications</h4>
-          <a href="https://cloud.aws-study-flashcards-app.com">Cloud Practitioner</a>
-          <a href="https://ai.aws-study-flashcards-app.com">AI Practitioner</a>
-          <a href="https://architect.aws-study-flashcards-app.com">Solutions Architect</a>
-          <a href="https://developer.aws-study-flashcards-app.com">Developer</a>
+          <a href={onThisName('https://cloud.aws-study-flashcards-app.com')}>Cloud Practitioner</a>
+          <a href={onThisName('https://ai.aws-study-flashcards-app.com')}>AI Practitioner</a>
+          <a href={onThisName('https://architect.aws-study-flashcards-app.com')}>Solutions Architect</a>
+          <a href={onThisName('https://developer.aws-study-flashcards-app.com')}>Developer</a>
         </div>
         <div className="footer-column">
           <h4>Coding courses</h4>
-          {COURSES.map((c) => <a key={c.id} href={c.url}>{c.title}</a>)}
+          {COURSES.map((c) => <a key={c.id} href={onThisName(c.url)}>{c.title}</a>)}
         </div>
         <div className="footer-column">
           <h4>Resources</h4>

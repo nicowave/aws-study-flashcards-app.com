@@ -53,6 +53,14 @@ const ALLOWED_ORIGINS = [
   "http://localhost:5175",
 ];
 
+// Where Stripe sends a buyer or member back: the address the page asked for when
+// it is one of ours, else the old hub. Each name has its own sign-in, so coming
+// back on the name the visitor opened keeps them signed in.
+const returnBaseFor = (requested) => {
+  const r = typeof requested === "string" ? requested : "";
+  return ALLOWED_ORIGINS.find((o) => r === o || r.startsWith(`${o}/`)) ? r.replace(/\/$/, "") : SITE_URL;
+};
+
 // Per-cert plans are ONE-TIME prices; all-access is a yearly subscription.
 const PLAN_PRICES = {
   "all-access": process.env.STRIPE_PRICE_ALL_ACCESS || "",
@@ -342,10 +350,7 @@ async function createCheckoutSession(data, user, stripe) {
     await saveCustomerId(uid, customerId);
   }
 
-  const requestedReturn = typeof data?.returnUrl === "string" ? data.returnUrl : "";
-  const returnBase = ALLOWED_ORIGINS.find((o) => requestedReturn === o || requestedReturn.startsWith(`${o}/`))
-    ? requestedReturn.replace(/\/$/, "")
-    : SITE_URL;
+  const returnBase = returnBaseFor(data?.returnUrl);
 
   // One-time cert prices check out in payment mode; the all-access yearly
   // plan in subscription mode. Derived from the plan (not a Stripe price
@@ -439,13 +444,13 @@ async function createCheckoutSession(data, user, stripe) {
 }
 
 // ---------------------------------------------------------------------------
-// createPortalSession — () -> { url }
+// createPortalSession — ({ returnUrl? }) -> { url }
 // ---------------------------------------------------------------------------
 async function createPortalSession(data, user, stripe) {
   if (!user) throw new CallableError("UNAUTHENTICATED", "Sign in first");
   const customerId = await getCustomerId(user.uid);
   if (!customerId) throw new CallableError("FAILED_PRECONDITION", "No billing account yet");
-  const session = await stripe.billingPortal.sessions.create({ customer: customerId, return_url: SITE_URL });
+  const session = await stripe.billingPortal.sessions.create({ customer: customerId, return_url: returnBaseFor(data?.returnUrl) });
   return { url: session.url };
 }
 
@@ -518,7 +523,7 @@ async function stripeWebhook(event) {
 const CALLABLES = { createCheckoutSession, createPortalSession };
 
 // For aws-backend/test only: lets the tests run checkout against a fake Stripe and table.
-exports._test = { createCheckoutSession };
+exports._test = { createCheckoutSession, createPortalSession };
 
 exports.handler = async (event) => {
   const path = event.rawPath || "";

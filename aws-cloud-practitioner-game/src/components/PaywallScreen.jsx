@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { startCheckout, CERT_PRICE_LABEL } from '../services/billing';
 import { LockIcon, CheckCircleIcon } from './Icons';
 import { certSale } from './PromoBanner';
+import { onThisName } from '../config/auth.config';
 import './PaywallScreen.css';
 
 /**
@@ -67,9 +68,9 @@ const PaywallScreen = ({ certId, certName, onBack }) => {
       <p className="paywall-fine-print">
         Secure payment by Stripe. Applicable sales tax and any card processing fee are shown
         at checkout before you pay. The study guide stays free forever.{' '}
-        <a href="https://aws-study-flashcards-app.com/terms.html" target="_blank" rel="noopener noreferrer">Terms</a>
+        <a href={onThisName('https://aws-study-flashcards-app.com/terms.html')} target="_blank" rel="noopener noreferrer">Terms</a>
         {' · '}
-        <a href="https://aws-study-flashcards-app.com/privacy.html" target="_blank" rel="noopener noreferrer">Privacy</a>
+        <a href={onThisName('https://aws-study-flashcards-app.com/privacy.html')} target="_blank" rel="noopener noreferrer">Privacy</a>
       </p>
     </div>
   );
