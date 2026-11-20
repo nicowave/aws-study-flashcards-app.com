@@ -148,7 +148,7 @@ function renderIssue(issue, unsubscribeUrl) {
     subject: issue.subject,
     text: `${text}\n\n${footerText(unsubscribeUrl)}`,
     html: emailShell(
-      `${preheader}<p style="margin:0 0 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#d9620f">AWS Study Hub · Weekly</p>\n${html}`,
+      `${preheader}<p style="margin:0 0 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#d9620f">Level Up Study Hub · Weekly</p>\n${html}`,
       unsubscribeUrl
     ),
   };
