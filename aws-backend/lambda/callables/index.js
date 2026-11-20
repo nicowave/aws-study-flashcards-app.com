@@ -12,6 +12,7 @@ const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 const { CognitoJwtVerifier } = require("aws-jwt-verify");
+const { PRO_COVERS, alreadyCovered } = require("./coverage");
 
 const TABLE_NAME = process.env.TABLE_NAME;
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}), {
@@ -282,26 +283,36 @@ async function customerExists(stripe, customerId) {
 }
 
 /**
- * True when nobody behind this account has had Pro before, trial or paid.
- * Checks the current customer plus any other Stripe customer with the same
- * email, so deleting the account and signing up again doesn't earn a second
- * free week.
+ * One read of what checkout needs to know about the buyer, so every decision below rests on the
+ * same answer (two separate reads could disagree when one of them fails):
+ *   purchased       one-time plans recorded for this account
+ *   own             this account's own subscriptions as { status, plan } (entitlements come from these)
+ *   hadPro          anyone behind this email has had Pro before, trial or paid: no second free week,
+ *                   even after deleting the account and signing up again
+ *   activeElsewhere Pro is running on another customer with the same email, which happens when one
+ *                   person has two sign-ins (say Google, and email with a password)
  */
-async function proTrialAvailable(stripe, uid, customerId, email) {
-  if ((await purchasedPlans(uid)).has("all-access")) return false;
+async function buyerHistory(stripe, uid, customerId, email) {
+  const purchased = await purchasedPlans(uid);
   const customerIds = new Set([customerId]);
   if (email) {
     const sameEmail = await stripe.customers.list({ email, limit: 10 });
     sameEmail.data.forEach((c) => customerIds.add(c.id));
   }
+  const own = [];
+  let hadPro = purchased.has("all-access");
+  let activeElsewhere = false;
   for (const customer of customerIds) {
     const subs = await stripe.subscriptions.list({ customer, status: "all", limit: 100 });
-    const hadPro = subs.data.some(
-      (sub) => (sub.metadata?.plan || planForPrice(sub.items?.data?.[0]?.price?.id)) === "all-access"
-    );
-    if (hadPro) return false;
+    for (const sub of subs.data) {
+      const plan = sub.metadata?.plan || planForPrice(sub.items?.data?.[0]?.price?.id);
+      if (customer === customerId) own.push({ status: sub.status, plan });
+      if (plan !== "all-access") continue;
+      hadPro = true;
+      if (customer !== customerId && ACTIVE_STATUSES.includes(sub.status)) activeElsewhere = true;
+    }
   }
-  return true;
+  return { purchased, own, hadPro, activeElsewhere };
 }
 
 // ---------------------------------------------------------------------------
@@ -340,15 +351,51 @@ async function createCheckoutSession(data, user, stripe) {
   // plan in subscription mode. Derived from the plan (not a Stripe price
   // lookup) so the restricted API key needs no Prices read permission.
   const mode = plan === "all-access" ? "subscription" : "payment";
-  let trial = false;
-  if (mode === "subscription") {
+
+  let history = null;
+  if (mode === "subscription" || PRO_COVERS.has(plan)) {
     try {
-      trial = await proTrialAvailable(stripe, uid, customerId, user.email);
+      history = await buyerHistory(stripe, uid, customerId, user.email);
     } catch (err) {
-      // A failed lookup must never block a sale: check out without the trial
-      console.error(`[billing] Trial check failed for uid=${uid}:`, err.message);
+      // A failed lookup must never block a sale: check out, without the trial
+      console.error(`[billing] Buyer history lookup failed for uid=${uid}:`, err.message);
     }
   }
+
+  // Never sell Pro, or a certificate Pro includes, to someone who already has it. A page's
+  // sign-in token can be an hour old, so it can still offer "Start Free Trial" to a person just
+  // given Pro. They no longer qualify for the trial, so checkout would charge them at once.
+  if (history && PRO_COVERS.has(plan)) {
+    const covered = alreadyCovered({
+      plan,
+      purchased: history.purchased,
+      subscriptions: history.own,
+      bundles: BUNDLES,
+      activeStatuses: ACTIVE_STATUSES,
+    });
+    if (covered) {
+      try {
+        // Write ENTITLEMENTS now, so the token the site asks for next carries Pro even if the
+        // webhook hasn't run yet
+        await syncCustomerEntitlements(stripe, uid, customerId);
+      } catch (err) {
+        console.error(`[billing] Entitlement sync failed for uid=${uid}:`, err.message);
+      }
+      console.log(`[billing] uid=${uid} already has ${plan}; no checkout`);
+      // Back to the site as if checkout had finished: every site refreshes its token on
+      // ?checkout=success, so access shows up. owned=1 tells it apart from a real sale.
+      return { url: `${returnBase}/?checkout=success&owned=1`, alreadyOwned: true };
+    }
+    if (history.activeElsewhere) {
+      // Pro runs on this person's other sign-in. Selling here would charge them a second time.
+      console.log(`[billing] uid=${uid} has Pro on another sign-in with the same email; no checkout`);
+      throw new CallableError(
+        "FAILED_PRECONDITION",
+        "Pro is already on for this email under your other sign-in. Sign out, then sign in the other way, for example with Google."
+      );
+    }
+  }
+  const trial = mode === "subscription" && history !== null && !history.hadPro;
   const params = {
     mode,
     customer: customerId,
@@ -469,6 +516,9 @@ async function stripeWebhook(event) {
 // Router (API Gateway HTTP API, payload format 2.0)
 // ---------------------------------------------------------------------------
 const CALLABLES = { createCheckoutSession, createPortalSession };
+
+// For aws-backend/test only: lets the tests run checkout against a fake Stripe and table.
+exports._test = { createCheckoutSession };
 
 exports.handler = async (event) => {
   const path = event.rawPath || "";
