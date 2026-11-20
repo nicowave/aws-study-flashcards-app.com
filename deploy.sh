@@ -113,6 +113,13 @@ deploy_hub() {
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
         --cache-control "no-cache,no-store,must-revalidate"
     upload_crawler_files dist "$bucket"
+    # privacy.html and terms.html: short cache too, so a change to the legal text reaches
+    # browsers within an hour (the sync above gives them a year, like the hashed assets)
+    local page
+    for page in dist/*.html(N); do
+        [ "$page" = dist/index.html ] && continue
+        aws s3 cp "$page" "s3://${bucket}/${page#dist/}" --cache-control "max-age=3600,public" --content-type "text/html; charset=utf-8" > /dev/null
+    done
     print_success "Files uploaded to S3"
     
     # Invalidate CloudFront

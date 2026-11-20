@@ -154,7 +154,7 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
                     {avatarInfo.text}
                   </div>
                 )}
-                <span className="user-name-header">{displayName}</span>
+                <span className="user-name-header" title={displayName}>{displayName}</span>
               </button>
               <button className="settings-icon-btn" onClick={onNavigateSettings} title="Settings">
                 <GearIcon size={16} />

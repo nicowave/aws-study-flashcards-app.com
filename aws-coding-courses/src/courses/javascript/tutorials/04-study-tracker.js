@@ -507,7 +507,7 @@ const tutorial = {
   slug: 'study-tracker',
   number: 4,
   title: 'Study tracker with sign-in',
-  situation: 'The flashcard page from Tutorial 1 is a hit, but progress lives in one browser: switch from the office laptop to your phone and it\'s gone. You add accounts with Amazon Cognito, and save each person\'s progress in Amazon DynamoDB through an API with a sign-in check in front of it. These are the same building blocks Level Up Study Hub you\'re using right now runs on.',
+  situation: 'The flashcard page from Tutorial 1 is a hit, but progress lives in one browser: switch from the office laptop to your phone and it\'s gone. You add accounts with Amazon Cognito, and save each person\'s progress in Amazon DynamoDB through an API with a sign-in check in front of it. These are the same building blocks the Level Up Study Hub you\'re using right now runs on.',
   level: 'Advanced',
   hours: 6,
   skills: ['JSON Web Tokens', 'fetch with headers', 'async and await', 'input checks', 'status codes', 'keeping users apart'],
