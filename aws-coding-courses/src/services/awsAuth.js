@@ -1,14 +1,16 @@
 // Sign-in on AWS (Amazon Cognito), shared by every Study Hub site.
 //
 // One sign-in covers all subdomains: the refresh token lives in a cookie on
-// .aws-study-flashcards-app.com, and each site trades it for its own
-// short-lived ID token (cached in localStorage). Signing out anywhere deletes
-// the cookie, which signs you out everywhere.
+// the root domain the page was opened on (.levelupstudyhub.com or
+// .aws-study-flashcards-app.com), and each site trades it for its own
+// short-lived ID token (cached in localStorage). Signing out on any site deletes
+// the cookie, which signs you out of every site on that name (the two names
+// keep separate sessions during the move).
 //
 // Email/password calls Cognito's public API directly (USER_PASSWORD_AUTH, so
 // old Firebase passwords can be checked once on first sign-in). Google uses
 // the hosted sign-in page with the authorization-code flow + PKCE.
-import { AWS_REGION, COGNITO_CLIENT_ID, COGNITO_AUTH_URL, API_BASE_URL, COOKIE_DOMAIN } from '../config/auth.config';
+import { AWS_REGION, COGNITO_CLIENT_ID, COGNITO_AUTH_URL, API_BASE_URL, cookieDomainFor } from '../config/auth.config';
 
 const IDP_URL = `https://cognito-idp.${AWS_REGION}.amazonaws.com/`;
 const SESSION_COOKIE = 'studyHubSession';
@@ -21,8 +23,13 @@ const isLocalhost = () => ['localhost', '127.0.0.1'].includes(window.location.ho
 // ============================================
 // SESSION COOKIE (refresh token, shared across subdomains)
 // ============================================
-const cookieScope = () =>
-  isLocalhost() ? 'path=/; SameSite=Lax' : `domain=${COOKIE_DOMAIN}; path=/; Secure; SameSite=Lax`;
+// The two names never share a session: a cookie is only readable on the
+// root domain that set it, so each name keeps its own sign-in.
+const cookieScope = () => {
+  if (isLocalhost()) return 'path=/; SameSite=Lax';
+  const domain = cookieDomainFor(window.location.hostname);
+  return `${domain ? `domain=${domain}; ` : ''}path=/; Secure; SameSite=Lax`;
+};
 
 const setSessionCookie = (refreshToken) => {
   document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(refreshToken)}; max-age=${SESSION_DAYS * 86400}; ${cookieScope()}`;
