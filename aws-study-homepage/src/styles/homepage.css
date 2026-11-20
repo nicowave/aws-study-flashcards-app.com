@@ -116,6 +116,15 @@
   display: none;
 }
 
+/* The header can now be two rows tall, so a jump from a header link would land the section title under it.
+   Stop 80 px short, as the readiness and newsletter sections already do. */
+.certifications-section,
+.about-section,
+.plans-section,
+.resources-section {
+  scroll-margin-top: 80px;
+}
+
 /* ========================================
    Hero Section
    ======================================== */
