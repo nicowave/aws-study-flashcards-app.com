@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import { certifications } from './src/data/certifications.js'
 import { COURSES, COURSE_PRICE, BUNDLE_PRICE } from './src/data/courses.js'
 import { FAQ } from './src/data/faq.js'
+import { GIS_PAGE, GIS_WHY, GIS_COURSES, GIS_FOR, GIS_FAQ, GIS_DISCLAIMER } from './src/data/gis.js'
+import { fileURLToPath } from 'node:url'
 
 const SITE = 'https://aws-study-flashcards-app.com'
 const live = certifications.filter((c) => c.status === 'available')
@@ -86,6 +88,8 @@ function staticPage() {
         The Developer Path bundle (all four courses plus the Developer – Associate study game) is ${BUNDLE_PRICE} once.</p>
       <ul>${courseItems}
       </ul>
+      <h2>New: GIS courses</h2>
+      <p><a href="/gis/">GIS courses (coming soon)</a>: understand GIS, build open-source web maps, and use GIS in real estate and international development.</p>
       <h2>Questions People Ask</h2>${faqItems}
       <p>Made by <a href="https://nico-tek.com/study-hub">Nico Tek Solutions</a> · <a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a></p>
       <p>Not affiliated with Amazon Web Services. AWS and all related marks are trademarks of Amazon.com, Inc.</p>
@@ -93,19 +97,86 @@ function staticPage() {
   `
 }
 
+// The GIS track page (/gis/): structured data and the crawler copy, from src/data/gis.js.
+function gisStructuredData() {
+  const url = `${SITE}${GIS_PAGE.path}`
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${url}#webpage`,
+        url,
+        name: GIS_PAGE.title,
+        description: GIS_PAGE.description,
+        isPartOf: { '@id': `${SITE}/#website` },
+        publisher: { '@id': 'https://nico-tek.com/#organization' },
+      },
+      {
+        '@type': 'ItemList',
+        name: 'GIS courses (coming soon)',
+        itemListElement: GIS_COURSES.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.title, description: c.blurb })),
+      },
+    ],
+  }
+}
+
+function staticGisPage() {
+  const h = GIS_PAGE.headline
+  const why = GIS_WHY.map((w) => `
+        <li><strong>${esc(w.title)}</strong>: ${esc(w.text)}</li>`).join('')
+  const courses = GIS_COURSES.map((c) => `
+        <li><strong>${esc(c.title)}</strong> (${esc(c.level)}, coming soon): ${esc(c.blurb)} Tools: ${c.tools.map(esc).join(', ')}.</li>`).join('')
+  const forList = GIS_FOR.map((f) => `
+        <li>${esc(f)}</li>`).join('')
+  return `
+    <div class="static-page">
+      <h1>${esc(h.before + h.highlight + h.after)}</h1>
+      <p>${esc(GIS_PAGE.lede)}</p>
+      <h2>Why GIS</h2>
+      <ul>${why}
+      </ul>
+      <h2>The GIS Courses</h2>
+      <ol>${courses}
+      </ol>
+      <h2>Who It Is For</h2>
+      <ul>${forList}
+      </ul>
+      <h2>Questions People Ask</h2>${GIS_FAQ.map(({ q, a }) => `
+      <h3>${esc(q)}</h3>
+      <p>${esc(a)}</p>`).join('')}
+      <p><a href="/">Level Up Study Hub home</a> · <a href="/#courses">Live coding courses</a></p>
+      <p>${esc(GIS_DISCLAIMER)}</p>
+      <p>Made by <a href="https://nico-tek.com/study-hub">Nico Tek Solutions</a> · <a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a></p>
+    </div>
+  `
+}
+
+const ldScript = (data) => `  <script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>\n  </head>`
+
 export default defineConfig({
   plugins: [
     react(),
     {
       name: 'crawlable-page',
-      transformIndexHtml: (html) =>
-        html
-          .replace('</head>', `  <script type="application/ld+json">${JSON.stringify(structuredData()).replace(/</g, '\\u003c')}</script>\n  </head>`)
-          .replace('<div id="root"></div>', `<div id="root">${staticPage()}</div>`),
+      // Each HTML entry gets its own structured data and crawler copy.
+      transformIndexHtml: (html, ctx) => {
+        const gis = /(^|\/)gis\/index\.html$/.test(ctx.filename || ctx.path || '')
+        return html
+          .replaceAll('%HUB_SITE%', SITE)
+          .replace('</head>', ldScript(gis ? gisStructuredData() : structuredData()))
+          .replace('<div id="root"></div>', `<div id="root">${gis ? staticGisPage() : staticPage()}</div>`)
+      },
     },
   ],
   build: {
     rollupOptions: {
+      // Two pages, one app: / (index.html) and /gis/ (gis/index.html, a folder page
+      // the hub's S3 website origin serves at /gis/)
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        gis: fileURLToPath(new URL('./gis/index.html', import.meta.url)),
+      },
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom']

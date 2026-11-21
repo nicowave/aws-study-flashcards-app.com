@@ -311,6 +311,8 @@ export const completeGoogleSignIn = async () => {
   if (!saved || saved.state !== url.searchParams.get('state')) return null;
   sessionStorage.removeItem(OAUTH_KEY);
   window.history.replaceState(null, '', saved.returnTo || import.meta.env.BASE_URL);
+  // Tell the app the address changed (replaceState fires no event): /gis/ renders its own page.
+  window.dispatchEvent(new Event('hub:locationchange'));
 
   if (error) {
     throw Object.assign(new Error('Google sign-in was cancelled'), { code: error });

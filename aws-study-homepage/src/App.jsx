@@ -10,6 +10,8 @@ import Faq from './components/Faq';
 import { currentPromotion, salePrice } from './services/offers';
 import ReadinessCheck from './components/ReadinessCheck';
 import NewsletterSignup from './components/NewsletterSignup';
+import HeroRotator from './components/HeroRotator';
+import GisPage from './components/GisPage';
 import { captureSource } from './services/leads';
 import {
   CloudIcon,
@@ -48,6 +50,32 @@ applyAnalyticsPreference();
 // Remember which tracked link brought this visit (sent with readiness emails)
 captureSource();
 
+// /gis/ is its own page (gis/index.html) but the same app: header, footer and sign-in are shared.
+// Read from the address bar each time, minus the site root ('/' or '/next/' for the test build),
+// because a Google sign-in comes back to the root and then moves the address to the page it left from.
+const BASE = import.meta.env.BASE_URL;
+const pageNow = () => {
+  const p = typeof window === 'undefined' ? '/' : window.location.pathname;
+  return p.startsWith(BASE) ? `/${p.slice(BASE.length)}` : p;
+};
+const isGisPath = () => /^\/gis(\/|\/index\.html)?$/.test(pageNow());
+// Re-renders when awsAuth.js moves the address after a Google sign-in ('hub:locationchange').
+const useIsGisPage = () => {
+  const [gis, setGis] = useState(isGisPath);
+  useEffect(() => {
+    const sync = () => setGis(isGisPath());
+    window.addEventListener('hub:locationchange', sync);
+    window.addEventListener('popstate', sync);
+    return () => {
+      window.removeEventListener('hub:locationchange', sync);
+      window.removeEventListener('popstate', sync);
+    };
+  }, []);
+  return gis;
+};
+// Home-page anchors need the site root in front when we are on another page.
+const homeLink = (hash, onGis) => (onGis ? `${BASE}${hash}` : hash);
+
 // Icon mapping for certifications
 const certIconMap = {
   'cloud-practitioner': CloudIcon,
@@ -82,7 +110,7 @@ const EyeOffIcon = ({ size = 24 }) => (
 );
 
 // Header Component - Now handles both logged in and logged out states
-const Header = ({ onShowLogin, onNavigateSettings }) => {
+const Header = ({ onShowLogin, onNavigateSettings, onGis = false }) => {
   const { user, userData, isAuthenticated, logout } = useAuth();
   const displayName = user?.displayName || user?.email?.split('@')[0] || 'User';
 
@@ -118,11 +146,11 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
           <img src="/brand/level-up-study-hub-horizontal-reverse-animated.svg?v=5" alt="Level Up Study Hub" className="logo-lockup" width="268" height="28" />
         </div>
         <nav className="nav">
-          <a href="#certifications" className="nav-link">Certifications</a>
-          <a href="#courses" className="nav-link">Courses</a>
-          <a href="#about" className="nav-link">About</a>
-          <a href="#plans" className="nav-link">Plans</a>
-          <a href="#resources" className="nav-link">Resources</a>
+          <a href={homeLink('#certifications', onGis)} className="nav-link">Certifications</a>
+          <a href={homeLink('#courses', onGis)} className="nav-link">Courses</a>
+          <a href={homeLink('#about', onGis)} className="nav-link">About</a>
+          <a href={homeLink('#plans', onGis)} className="nav-link">Plans</a>
+          <a href={homeLink('#resources', onGis)} className="nav-link">Resources</a>
           <a
             href="https://aws.amazon.com/certification/"
             target="_blank"
@@ -271,31 +299,8 @@ const Hero = () => {
   return (
     <section className="hero">
       <div className="hero-content">
-        <div className="hero-badge">
-          <TargetIcon size={16} className="badge-icon" />
-          <span className="badge-text mono">New — Developer Associate Now Live</span>
-        </div>
-        <h1 className="hero-title">
-          Pass Your <span className="highlight">AWS Certification</span> First Try
-        </h1>
-        <p className="hero-subtitle">
-          Exam-style practice questions, flashcards, and full-length timed exam simulators
-          for AWS Cloud Practitioner, AI Practitioner, Solutions Architect – Associate, and Developer – Associate.
-          Know you&apos;re ready before you book the real exam.
-        </p>
-        <div className="hero-actions">
-          <a href="#readiness" className="btn btn-primary">
-            <TargetIcon size={20} />
-            Am I Ready? Free 10-Question Check
-          </a>
-          <a
-            href={onThisName('https://cloud.aws-study-flashcards-app.com')}
-            className="btn btn-secondary"
-          >
-            <CloudIcon size={20} />
-            Try It Free — No Account Needed
-          </a>
-        </div>
+        {/* One headline per study track; the AWS one comes first and is the h1 */}
+        <HeroRotator />
         {isAuthenticated && (
           <div className="hero-welcome">
             Welcome back, <strong>{user?.displayName || user?.email?.split('@')[0] || 'Learner'}</strong>! Ready to continue your AWS journey?
@@ -717,6 +722,7 @@ const Footer = () => (
         <div className="footer-column">
           <h4>Coding courses</h4>
           {COURSES.map((c) => <a key={c.id} href={onThisName(c.url)}>{c.title}</a>)}
+          <a href={`${BASE}gis/`}>GIS courses (coming soon)</a>
         </div>
         <div className="footer-column">
           <h4>Resources</h4>
@@ -729,6 +735,7 @@ const Footer = () => (
     <div className="footer-bottom">
       <p className="mono">
         Not affiliated with Amazon Web Services. AWS and all related marks are trademarks of Amazon.com, Inc.
+        {' '}Level Up Study Hub is not affiliated with, endorsed by, or sponsored by Google LLC. Google Cloud and the names of Google Cloud certifications are trademarks of Google LLC, used here only to identify the exams.
       </p>
       <p className="footer-legal-links">
         Made by <a href="https://nico-tek.com/study-hub">Nico Tek Solutions</a>
@@ -1015,6 +1022,7 @@ function HomepageContent() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [currentPage, setCurrentPage] = useState('home');
   const { isAuthenticated } = useAuth();
+  const onGis = useIsGisPage();
 
   // Auto-redirect to home if user logs out while on settings
   useEffect(() => {
@@ -1041,6 +1049,7 @@ function HomepageContent() {
       <Header
         onShowLogin={() => setShowLoginModal(true)}
         onNavigateSettings={handleNavigateSettings}
+        onGis={onGis}
       />
 
       {currentPage === 'settings' && isAuthenticated ? (
@@ -1049,17 +1058,23 @@ function HomepageContent() {
         </main>
       ) : (
         <>
-          <main>
-            <Hero />
-            <ReadinessCheck />
-            <Certifications />
-            <CodingCourses onShowLogin={() => setShowLoginModal(true)} />
-            <About />
-            <Plans onShowLogin={() => setShowLoginModal(true)} />
-            <Faq />
-            <Resources />
-            <NewsletterSignup />
-          </main>
+          {onGis ? (
+            <main>
+              <GisPage />
+            </main>
+          ) : (
+            <main>
+              <Hero />
+              <ReadinessCheck />
+              <Certifications />
+              <CodingCourses onShowLogin={() => setShowLoginModal(true)} />
+              <About />
+              <Plans onShowLogin={() => setShowLoginModal(true)} />
+              <Faq />
+              <Resources />
+              <NewsletterSignup />
+            </main>
+          )}
           <Footer />
         </>
       )}
