@@ -158,6 +158,7 @@ export default defineConfig({
       transformIndexHtml: (html, ctx) => {
         const gis = /(^|\/)gis\/index\.html$/.test(ctx.filename || ctx.path || '')
         return html
+          .replaceAll('%HUB_SITE%', SITE)
           .replace('</head>', ldScript(gis ? gisStructuredData() : structuredData()))
           .replace('<div id="root"></div>', `<div id="root">${gis ? staticGisPage() : staticPage()}</div>`)
       },
