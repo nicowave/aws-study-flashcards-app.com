@@ -38,11 +38,12 @@ export const HERO_SLIDES = [
     track: 'Google Cloud',
     soon: true,
     badge: 'Coming soon: Google Cloud practice exams',
-    before: 'Pass Your ',
-    highlight: 'Google Cloud Certification',
-    after: ' First Try',
+    // Google's naming rules: no colour on Google's name, so the highlight sits on "First Try"
+    before: 'Pass Your Google Cloud Certification ',
+    highlight: 'First Try',
+    after: '',
     subtitle:
-      'Practice games for Cloud Digital Leader, Associate Cloud Engineer, Generative AI Leader and more are in the works, built the same way as our AWS sets.',
+      'Practice games for Cloud Digital Leader, Generative AI Leader, Associate Cloud Engineer and more are in the works, built the same way as our AWS sets.',
     actions: [
       { label: 'Practise AWS Free Today', href: '#certifications', primary: true, icon: 'target' },
     ],

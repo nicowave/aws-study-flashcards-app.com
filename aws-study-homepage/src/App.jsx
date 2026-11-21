@@ -735,7 +735,7 @@ const Footer = () => (
     <div className="footer-bottom">
       <p className="mono">
         Not affiliated with Amazon Web Services. AWS and all related marks are trademarks of Amazon.com, Inc.
-        {' '}Not affiliated with Google LLC. Google Cloud is a trademark of Google LLC.
+        {' '}Level Up Study Hub is not affiliated with, endorsed by, or sponsored by Google LLC. Google Cloud and the names of Google Cloud certifications are trademarks of Google LLC, used here only to identify the exams.
       </p>
       <p className="footer-legal-links">
         Made by <a href="https://nico-tek.com/study-hub">Nico Tek Solutions</a>

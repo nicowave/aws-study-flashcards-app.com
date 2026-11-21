@@ -2527,6 +2527,34 @@
   margin: 0;
 }
 
+.gis-faq {
+  display: grid;
+  gap: 12px;
+}
+
+.gis-faq-item {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+}
+
+.gis-faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.gis-faq-item summary:focus-visible {
+  outline: 2px solid var(--brand-spark);
+  outline-offset: 4px;
+}
+
+.gis-faq-item p {
+  margin-top: 10px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
 .gis-disclaimer {
   margin-top: 32px;
   font-size: 13px;

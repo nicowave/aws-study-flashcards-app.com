@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { certifications } from './src/data/certifications.js'
 import { COURSES, COURSE_PRICE, BUNDLE_PRICE } from './src/data/courses.js'
 import { FAQ } from './src/data/faq.js'
-import { GIS_PAGE, GIS_WHY, GIS_COURSES, GIS_FOR, GIS_DISCLAIMER } from './src/data/gis.js'
+import { GIS_PAGE, GIS_WHY, GIS_COURSES, GIS_FOR, GIS_FAQ, GIS_DISCLAIMER } from './src/data/gis.js'
 import { fileURLToPath } from 'node:url'
 
 const SITE = 'https://aws-study-flashcards-app.com'
@@ -142,6 +142,9 @@ function staticGisPage() {
       <h2>Who It Is For</h2>
       <ul>${forList}
       </ul>
+      <h2>Questions People Ask</h2>${GIS_FAQ.map(({ q, a }) => `
+      <h3>${esc(q)}</h3>
+      <p>${esc(a)}</p>`).join('')}
       <p><a href="/">Level Up Study Hub home</a> · <a href="/#courses">Live coding courses</a></p>
       <p>${esc(GIS_DISCLAIMER)}</p>
       <p>Made by <a href="https://nico-tek.com/study-hub">Nico Tek Solutions</a> · <a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a></p>

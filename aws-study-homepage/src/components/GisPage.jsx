@@ -1,5 +1,5 @@
 import React from 'react';
-import { GIS_PAGE, GIS_WHY, GIS_COURSES, GIS_FOR, GIS_DISCLAIMER } from '../data/gis';
+import { GIS_PAGE, GIS_WHY, GIS_COURSES, GIS_FOR, GIS_FAQ, GIS_DISCLAIMER } from '../data/gis';
 import { COURSES } from '../data/courses';
 import { onThisName } from '../config/auth.config';
 import { ArrowRightIcon, CodeIcon, CheckIcon } from './Icons';
@@ -86,6 +86,18 @@ const GisPage = () => {
             <CodeIcon size={20} />
             See the Live Coding Courses
           </a>
+        </div>
+      </section>
+
+      <section className="gis-section" aria-labelledby="gis-faq-title">
+        <h2 id="gis-faq-title" className="section-title">Questions People Ask</h2>
+        <div className="gis-faq">
+          {GIS_FAQ.map(({ q, a }) => (
+            <details key={q} className="gis-faq-item">
+              <summary>{q}</summary>
+              <p>{a}</p>
+            </details>
+          ))}
         </div>
         <p className="gis-disclaimer">{GIS_DISCLAIMER}</p>
       </section>

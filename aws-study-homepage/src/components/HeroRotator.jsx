@@ -16,14 +16,14 @@ const ICONS = { target: TargetIcon, cloud: CloudIcon, code: CodeIcon, arrow: Arr
 // - A hidden copy of every slide sits in the same grid cell, so the box keeps the height of
 //   the tallest slide and nothing below it jumps. It is aria-hidden and inert.
 // - WCAG 2.2.2 (Pause, Stop, Hide): the Pause button comes first in reading and tab order;
-//   rotation never starts under prefers-reduced-motion, stops by itself after three rounds,
+//   rotation never starts under prefers-reduced-motion, stops by itself after one pass,
 //   and holds while the pointer or keyboard focus is in the slide (not on the controls, so
 //   pressing Play really plays). aria-live stays off while rotating and turns polite only
 //   after a person picks a track or pauses.
 // Slide 1 (AWS) matches the static page in vite.config.js, which crawlers read.
 
-const ADVANCE_MS = 7000;
-const MAX_ROUNDS = 3;
+const ADVANCE_MS = 8000;
+const MAX_ROUNDS = 1; // one pass through the tracks, then it rests on AWS
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -102,7 +102,7 @@ const HeroRotator = () => {
   useLayoutEffect(() => {
     if (first.current) { first.current = false; return; }
     if (prefersReducedMotion()) return;
-    slideRef.current?.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-out' });
+    slideRef.current?.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
   }, [active]);
 
   const pick = (i) => {

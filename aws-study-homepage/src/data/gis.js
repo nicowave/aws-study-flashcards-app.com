@@ -78,5 +78,16 @@ export const GIS_FOR = [
   'Students and NGO staff heading into development or public-sector work',
 ];
 
+// Plain answers, including the two a reader could misread: "GIS professional" is a job,
+// not the GISP credential, and nothing here promises a job or pay.
+export const GIS_FAQ = [
+  { q: 'Can I take a GIS course now?', a: 'Not yet. Every GIS course is coming soon, so there is nothing to buy today. Each course will appear on this page when it opens.' },
+  { q: 'Do I need experience?', a: 'No. Understanding GIS starts from zero. Building Open-Source GIS Web Apps expects JavaScript basics, which our JavaScript course covers.' },
+  { q: 'Which software will I use?', a: 'Mostly free, open-source tools: QGIS, PostGIS, MapLibre and Leaflet, with public data such as OpenStreetMap and census maps.' },
+  { q: 'Do the GIS courses need AWS?', a: 'No. They stand on their own and are not part of the AWS courses.' },
+  { q: 'Will this get me a job or a raise?', a: 'We cannot promise that. The courses teach skills and give you projects to show. Jobs and pay depend on many things we do not control.' },
+  { q: 'Will finishing a course make me a certified GISP?', a: 'No. GISP is a credential that only the GIS Certification Institute (GISCI) awards, after its own exam and portfolio review. Our courses do not award any certification, and we are not affiliated with GISCI.' },
+];
+
 export const GIS_DISCLAIMER =
   'Not affiliated with or endorsed by the World Bank Group, the International Monetary Fund (IMF) or the Inter-American Development Bank (IDB). Their names only describe the kind of work these courses prepare you for. QGIS, PostGIS, MapLibre and Leaflet are open-source projects run by their own communities.';
