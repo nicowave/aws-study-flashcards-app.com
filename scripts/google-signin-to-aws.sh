@@ -38,7 +38,7 @@ if aws secretsmanager describe-secret --secret-id "$SECRET_ID" >/dev/null 2>&1; 
   printf '%s' "$SECRET_JSON" | aws secretsmanager put-secret-value --secret-id "$SECRET_ID" --secret-string file:///dev/stdin >/dev/null
 else
   printf '%s' "$SECRET_JSON" | aws secretsmanager create-secret --name "$SECRET_ID" \
-    --description "AWS Study Hub: Google OAuth client for Cognito sign-in" \
+    --description "Level Up Study Hub: Google OAuth client for Cognito sign-in" \
     --secret-string file:///dev/stdin >/dev/null
 fi
 unset SECRET_JSON

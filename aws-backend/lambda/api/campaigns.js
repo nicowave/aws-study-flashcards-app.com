@@ -37,7 +37,7 @@ const h1 = (text) => `<h1 style="margin:0 0 16px;font-size:24px;line-height:1.25
 const para = (html) => `<p style="margin:0 0 14px;font-size:15px;line-height:1.55">${html}</p>`;
 const callout = (html) =>
   `<p style="margin:16px 0 0;padding:12px 14px;background:#fbe7d6;border-radius:8px;font-size:14px;line-height:1.5;color:#8a3d06">${html}</p>`;
-const signoff = `<p style="margin:20px 0 0;font-size:15px;line-height:1.5">Stuck on something? Reply and ask. I read every one.<br><br>Nico<br><span style="color:#5d6070">AWS Study Hub</span></p>`;
+const signoff = `<p style="margin:20px 0 0;font-size:15px;line-height:1.5">Stuck on something? Reply and ask. I read every one.<br><br>Nico<br><span style="color:#5d6070">Level Up Study Hub</span></p>`;
 const priceLine = (cert) =>
   `<strong>${salePrice(cert)}</strong> <s style="color:#7d808e">${dollars(cert.cents)}</s>`;
 
@@ -72,7 +72,7 @@ ${sale ? `\n${sale}\n` : ''}
 Stuck on something? Reply and ask. I read every one.
 
 Nico
-AWS Study Hub
+Level Up Study Hub
 
 ${footerText('UNSUBSCRIBE_URL')}`;
 
@@ -104,7 +104,7 @@ Unlock it: ${url}
 The discount is applied at checkout, no code needed. Already unlocked it? Thank you, and ignore this one.
 
 Nico
-AWS Study Hub
+Level Up Study Hub
 
 ${footerText('UNSUBSCRIBE_URL')}`;
 
@@ -134,7 +134,7 @@ Unlock it: ${url}
 This is the last sale email. After today it's study tips only.
 
 Nico
-AWS Study Hub
+Level Up Study Hub
 
 ${footerText('UNSUBSCRIBE_URL')}`;
 
