@@ -51,9 +51,30 @@ applyAnalyticsPreference();
 captureSource();
 
 // /gis/ is its own page (gis/index.html) but the same app: header, footer and sign-in are shared.
-const IS_GIS_PAGE = typeof window !== 'undefined' && /^\/gis(\/|$)/.test(window.location.pathname);
-// Home-page anchors need the home path in front when we are on another page.
-const homeLink = (hash) => (IS_GIS_PAGE ? `/${hash}` : hash);
+// Read from the address bar each time, minus the site root ('/' or '/next/' for the test build),
+// because a Google sign-in comes back to the root and then moves the address to the page it left from.
+const BASE = import.meta.env.BASE_URL;
+const pageNow = () => {
+  const p = typeof window === 'undefined' ? '/' : window.location.pathname;
+  return p.startsWith(BASE) ? `/${p.slice(BASE.length)}` : p;
+};
+const isGisPath = () => /^\/gis(\/|\/index\.html)?$/.test(pageNow());
+// Re-renders when awsAuth.js moves the address after a Google sign-in ('hub:locationchange').
+const useIsGisPage = () => {
+  const [gis, setGis] = useState(isGisPath);
+  useEffect(() => {
+    const sync = () => setGis(isGisPath());
+    window.addEventListener('hub:locationchange', sync);
+    window.addEventListener('popstate', sync);
+    return () => {
+      window.removeEventListener('hub:locationchange', sync);
+      window.removeEventListener('popstate', sync);
+    };
+  }, []);
+  return gis;
+};
+// Home-page anchors need the site root in front when we are on another page.
+const homeLink = (hash, onGis) => (onGis ? `${BASE}${hash}` : hash);
 
 // Icon mapping for certifications
 const certIconMap = {
@@ -89,7 +110,7 @@ const EyeOffIcon = ({ size = 24 }) => (
 );
 
 // Header Component - Now handles both logged in and logged out states
-const Header = ({ onShowLogin, onNavigateSettings }) => {
+const Header = ({ onShowLogin, onNavigateSettings, onGis = false }) => {
   const { user, userData, isAuthenticated, logout } = useAuth();
   const displayName = user?.displayName || user?.email?.split('@')[0] || 'User';
 
@@ -125,11 +146,11 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
           <img src="/brand/level-up-study-hub-horizontal-reverse-animated.svg?v=5" alt="Level Up Study Hub" className="logo-lockup" width="268" height="28" />
         </div>
         <nav className="nav">
-          <a href={homeLink('#certifications')} className="nav-link">Certifications</a>
-          <a href={homeLink('#courses')} className="nav-link">Courses</a>
-          <a href={homeLink('#about')} className="nav-link">About</a>
-          <a href={homeLink('#plans')} className="nav-link">Plans</a>
-          <a href={homeLink('#resources')} className="nav-link">Resources</a>
+          <a href={homeLink('#certifications', onGis)} className="nav-link">Certifications</a>
+          <a href={homeLink('#courses', onGis)} className="nav-link">Courses</a>
+          <a href={homeLink('#about', onGis)} className="nav-link">About</a>
+          <a href={homeLink('#plans', onGis)} className="nav-link">Plans</a>
+          <a href={homeLink('#resources', onGis)} className="nav-link">Resources</a>
           <a
             href="https://aws.amazon.com/certification/"
             target="_blank"
@@ -701,7 +722,7 @@ const Footer = () => (
         <div className="footer-column">
           <h4>Coding courses</h4>
           {COURSES.map((c) => <a key={c.id} href={onThisName(c.url)}>{c.title}</a>)}
-          <a href="/gis/">GIS courses (coming soon)</a>
+          <a href={`${BASE}gis/`}>GIS courses (coming soon)</a>
         </div>
         <div className="footer-column">
           <h4>Resources</h4>
@@ -1001,6 +1022,7 @@ function HomepageContent() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [currentPage, setCurrentPage] = useState('home');
   const { isAuthenticated } = useAuth();
+  const onGis = useIsGisPage();
 
   // Auto-redirect to home if user logs out while on settings
   useEffect(() => {
@@ -1027,6 +1049,7 @@ function HomepageContent() {
       <Header
         onShowLogin={() => setShowLoginModal(true)}
         onNavigateSettings={handleNavigateSettings}
+        onGis={onGis}
       />
 
       {currentPage === 'settings' && isAuthenticated ? (
@@ -1035,7 +1058,7 @@ function HomepageContent() {
         </main>
       ) : (
         <>
-          {IS_GIS_PAGE ? (
+          {onGis ? (
             <main>
               <GisPage />
             </main>

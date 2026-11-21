@@ -507,10 +507,16 @@ deploy_next() {
         fi
         [ -d node_modules ] || npm install
         if npx vite build --base=/next/ --outDir dist-next --emptyOutDir > /dev/null; then
-            aws s3 sync dist-next/ "s3://${bucket}/next/" --delete --exclude "index.html" \
+            aws s3 sync dist-next/ "s3://${bucket}/next/" --delete --exclude "index.html" --exclude "*/index.html" \
                 --cache-control "max-age=31536000,public" > /dev/null
             aws s3 cp dist-next/index.html "s3://${bucket}/next/index.html" \
                 --cache-control "no-cache,no-store,must-revalidate" > /dev/null
+            # Folder pages (the hub's gis/index.html) get no-cache too, like deploy_hub
+            local next_page
+            for next_page in dist-next/*/index.html(N); do
+                aws s3 cp "$next_page" "s3://${bucket}/next/${next_page#dist-next/}" \
+                    --cache-control "no-cache,no-store,must-revalidate" --content-type "text/html; charset=utf-8" > /dev/null
+            done
             aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/next/*" > /dev/null
             print_success "${parts[4]}/next/"
         else

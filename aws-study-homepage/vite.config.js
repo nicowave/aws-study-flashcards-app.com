@@ -88,6 +88,8 @@ function staticPage() {
         The Developer Path bundle (all four courses plus the Developer – Associate study game) is ${BUNDLE_PRICE} once.</p>
       <ul>${courseItems}
       </ul>
+      <h2>New: GIS courses</h2>
+      <p><a href="/gis/">GIS courses (coming soon)</a>: understand GIS, build open-source web maps, and use GIS in real estate and international development.</p>
       <h2>Questions People Ask</h2>${faqItems}
       <p>Made by <a href="https://nico-tek.com/study-hub">Nico Tek Solutions</a> · <a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a></p>
       <p>Not affiliated with Amazon Web Services. AWS and all related marks are trademarks of Amazon.com, Inc.</p>

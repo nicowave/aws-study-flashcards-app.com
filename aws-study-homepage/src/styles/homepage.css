@@ -2300,23 +2300,28 @@
 /* ========================================
    Hero rotator: one headline per study track
    ======================================== */
-/* All slides share one grid cell, so the box is as tall as the tallest slide
-   and nothing below it jumps when the headline changes. */
+/* The visible slide and an invisible copy of every slide share one grid cell, so the
+   box is as tall as the tallest slide and nothing below it jumps. The controls come
+   first in the DOM (Pause first for screen readers) but show under the slide. */
+.hero-rotator {
+  display: flex;
+  flex-direction: column;
+}
+
 .hero-slides {
   display: grid;
 }
 
 .hero-slide {
   grid-area: 1 / 1;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 400ms ease, visibility 0s linear 400ms;
 }
 
-.hero-slide.is-active {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 400ms ease, visibility 0s;
+.hero-slide-sizer {
+  visibility: hidden;
+}
+
+.hero-slide > .hero-title {
+  margin-top: 0;
 }
 
 .hero-badge-soon {
@@ -2325,6 +2330,7 @@
 }
 
 .hero-rotator-controls {
+  order: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2372,12 +2378,6 @@
   outline-offset: 2px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-slide,
-  .hero-slide.is-active {
-    transition: none;
-  }
-}
 
 /* ========================================
    GIS track page (/gis/)
@@ -2387,6 +2387,7 @@
 }
 
 .gis-section {
+  scroll-margin-top: 80px; /* same clearance as the home page's anchored sections */
   max-width: 1100px;
   margin: 0 auto;
   padding: 56px 24px;

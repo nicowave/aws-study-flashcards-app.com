@@ -28,7 +28,7 @@ export const HERO_SLIDES = [
     highlight: 'on the Map',
     after: '',
     subtitle:
-      'Learn what GIS is, build web maps with free open-source tools, and use them where maps pay off: real estate, city planning and international development work.',
+      'Learn what GIS is, build web maps with free open-source tools, and use them where maps answer real questions: real estate, city planning and international development work.',
     actions: [
       { label: 'See the GIS Courses', href: '/gis/', primary: true, icon: 'arrow' },
     ],

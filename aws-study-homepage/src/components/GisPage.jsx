@@ -29,7 +29,7 @@ const GisPage = () => {
             {js && (
               <a href={onThisName(js.url)} className="btn btn-secondary">
                 <CodeIcon size={20} />
-                Learn JavaScript for Web Maps Now
+                Start JavaScript Free
               </a>
             )}
           </div>
@@ -54,11 +54,11 @@ const GisPage = () => {
           <h2 id="gis-courses-title" className="section-title">The GIS Courses</h2>
           <p className="section-subtitle">Five courses, from your first map to a web map app. All are being built now.</p>
         </div>
-        <ol className="gis-course-list">
+        <ol className="gis-course-list" role="list">
           {GIS_COURSES.map((c, i) => (
             <li key={c.id} className="gis-course-card">
               <div className="gis-course-top">
-                <span className="gis-course-num mono" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <span className="gis-course-num mono"><span className="sr-only">Course </span>{String(i + 1).padStart(2, '0')}</span>
                 <span className="gis-course-soon mono">Coming soon</span>
               </div>
               <h3 className="gis-course-title">{c.title}</h3>
@@ -75,14 +75,14 @@ const GisPage = () => {
 
       <section className="gis-section" aria-labelledby="gis-for-title">
         <h2 id="gis-for-title" className="section-title">Who It Is For</h2>
-        <ul className="gis-for-list">
+        <ul className="gis-for-list" role="list">
           {GIS_FOR.map((f) => (
             <li key={f}><CheckIcon size={18} /> <span>{f}</span></li>
           ))}
         </ul>
         <div className="gis-next">
           <p>While the GIS courses are built, you can start on the skills they use. Web maps run on JavaScript, and data work runs on Python.</p>
-          <a href="/#courses" className="btn btn-secondary">
+          <a href={`${import.meta.env.BASE_URL}#courses`} className="btn btn-secondary">
             <CodeIcon size={20} />
             See the Live Coding Courses
           </a>
