@@ -15,7 +15,7 @@ const { GetCommand, PutCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb
 const { SESv2Client, SendEmailCommand } = require('@aws-sdk/client-sesv2');
 
 const ses = new SESv2Client({});
-const FROM = 'Nico at AWS Study Hub <nico@nico-tek.com>';
+const FROM = 'Nico at Level Up Study Hub <nico@nico-tek.com>';
 const REPLY_TO = 'nico@nico-tek.com';
 const HUB = 'https://aws-study-flashcards-app.com';
 const ADDRESS = 'Nico Tek Solutions · 5104 Lawton Dr., Bethesda, MD 20816';
@@ -40,12 +40,12 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const clean = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-const FOOTER_NOTE = "You're on the AWS Study Hub email list (one study email a week) because you signed up or took the readiness check on aws-study-flashcards-app.com.";
+const FOOTER_NOTE = "You're on the Level Up Study Hub email list (one study email a week) because you signed up or took the readiness check on aws-study-flashcards-app.com.";
 
 const footerText = (unsubscribeUrl) => `---
 ${FOOTER_NOTE} Unsubscribe: ${unsubscribeUrl}
 ${ADDRESS}
-AWS Study Hub is independent and not affiliated with Amazon Web Services.`;
+Level Up Study Hub is independent and not affiliated with Amazon Web Services.`;
 
 // White card on a warm background, with the unsubscribe footer
 const emailShell = (inner, unsubscribeUrl) => `<!doctype html><html><body style="margin:0;background:#f6f4f1;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1b1d26">
@@ -54,7 +54,7 @@ const emailShell = (inner, unsubscribeUrl) => `<!doctype html><html><body style=
 <tr><td>
 ${inner}
 </td></tr></table>
-<p style="max-width:560px;margin:16px auto 0;font-size:12px;line-height:1.5;color:#7d808e">${FOOTER_NOTE} <a href="${esc(unsubscribeUrl)}" style="color:#7d808e">Unsubscribe</a><br>${esc(ADDRESS)}<br>AWS Study Hub is independent and not affiliated with Amazon Web Services.</p>
+<p style="max-width:560px;margin:16px auto 0;font-size:12px;line-height:1.5;color:#7d808e">${FOOTER_NOTE} <a href="${esc(unsubscribeUrl)}" style="color:#7d808e">Unsubscribe</a><br>${esc(ADDRESS)}<br>Level Up Study Hub is independent and not affiliated with Amazon Web Services.</p>
 </td></tr></table></body></html>`;
 
 const button = (href, label) =>
@@ -140,7 +140,7 @@ ${saleText}
 Reply to this email if you have a question. I read every one.
 
 Nico
-AWS Study Hub
+Level Up Study Hub
 
 ${footerText(unsubscribeUrl)}`;
 
@@ -162,7 +162,7 @@ ${plan.map((p, i) => `<tr><td style="vertical-align:top;padding:6px 12px 6px 0;f
 </table>
 ${button(studyUrl, 'Start day 1')}
 ${saleOn ? '<p style="margin:16px 0 0;padding:12px 14px;background:#fbe7d6;border-radius:8px;font-size:14px;color:#8a3d06"><strong>Halloween deal:</strong> 31% off the full certification game until November 6, already applied at checkout.</p>' : ''}
-<p style="margin:20px 0 0;font-size:15px;line-height:1.5">Reply to this email if you have a question. I read every one.<br><br>Nico<br><span style="color:#5d6070">AWS Study Hub</span></p>
+<p style="margin:20px 0 0;font-size:15px;line-height:1.5">Reply to this email if you have a question. I read every one.<br><br>Nico<br><span style="color:#5d6070">Level Up Study Hub</span></p>
 `, unsubscribeUrl);
 
   return { subject, text, html };
@@ -292,23 +292,23 @@ function buildWelcomeEmail(unsubscribeUrl) {
   const subject = "You're in: one AWS study email a week";
   const text = `You're on the list.
 
-Every Tuesday morning I send one short email to help you pass your AWS certification: an exam trap people fall for, one service explained in plain English, and what's new on AWS Study Hub. That's it.
+Every Tuesday morning I send one short email to help you pass your AWS certification: an exam trap people fall for, one service explained in plain English, and what's new on Level Up Study Hub. That's it.
 
 While you wait for the first one, take the free 10-question readiness check. It shows which exam areas to study first: ${checkUrl}
 
 Reply any time with a question. I read every one.
 
 Nico
-AWS Study Hub
+Level Up Study Hub
 
 ${footerText(unsubscribeUrl)}`;
-  const html = emailShell(`<p style="margin:0 0 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#d9620f">AWS Study Hub · Weekly</p>
+  const html = emailShell(`<p style="margin:0 0 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#d9620f">Level Up Study Hub · Weekly</p>
 <h1 style="margin:0 0 16px;font-size:24px;line-height:1.25">You're on the list</h1>
 <p style="margin:0 0 14px;font-size:15px;line-height:1.55">Every Tuesday morning I send one short email to help you pass your AWS certification:</p>
-<ul style="margin:0 0 16px;padding-left:20px;font-size:15px;line-height:1.6"><li>an exam trap people fall for</li><li>one service explained in plain English</li><li>what's new on AWS Study Hub</li></ul>
+<ul style="margin:0 0 16px;padding-left:20px;font-size:15px;line-height:1.6"><li>an exam trap people fall for</li><li>one service explained in plain English</li><li>what's new on Level Up Study Hub</li></ul>
 <p style="margin:0 0 14px;font-size:15px;line-height:1.55">While you wait for the first one, take the free 10-question readiness check. It shows which exam areas to study first.</p>
 ${button(checkUrl, 'Take the readiness check')}
-<p style="margin:20px 0 0;font-size:15px;line-height:1.5">Reply any time with a question. I read every one.<br><br>Nico<br><span style="color:#5d6070">AWS Study Hub</span></p>`, unsubscribeUrl);
+<p style="margin:20px 0 0;font-size:15px;line-height:1.5">Reply any time with a question. I read every one.<br><br>Nico<br><span style="color:#5d6070">Level Up Study Hub</span></p>`, unsubscribeUrl);
   return { subject, text, html };
 }
 

@@ -1,7 +1,7 @@
 {
   "name": "aws-study-hub-backend",
   "private": true,
-  "description": "CDK app: Cognito + DynamoDB + HTTP API backend for AWS Study Hub (Phase 1)",
+  "description": "CDK app: Cognito + DynamoDB + HTTP API backend for Level Up Study Hub (Phase 1)",
   "scripts": {
     "build": "tsc --noEmit && cdk synth --quiet",
     "synth": "cdk synth",

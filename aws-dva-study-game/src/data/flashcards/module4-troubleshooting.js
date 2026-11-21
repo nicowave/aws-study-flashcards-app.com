@@ -6,8 +6,8 @@ export const module4 = {
   name: 'Troubleshooting & Optimization',
   description: 'CloudWatch, X-Ray, logging, metrics, caching and performance tuning',
   icon: '🔧',
-  color: '#d29922',
-  gradient: 'linear-gradient(135deg, #d29922 0%, #d29922 100%)',
+  color: '#f472b6',
+  gradient: 'linear-gradient(135deg, #f472b6 0%, #f472b6 100%)',
   source: 'DVA-C02 Exam Guide',
   cards: [
     {

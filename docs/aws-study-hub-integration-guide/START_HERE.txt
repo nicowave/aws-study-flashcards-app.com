@@ -1,6 +1,6 @@
 ╔══════════════════════════════════════════════════════════════════╗
 ║                                                                  ║
-║         AWS STUDY HUB - AUTHENTICATION UPDATE PACKAGE            ║
+║        LEVEL UP STUDY HUB - AUTHENTICATION UPDATE PACKAGE        ║
 ║                         Version 1.0.0                            ║
 ║                                                                  ║
 ╚══════════════════════════════════════════════════════════════════╝
@@ -9,7 +9,7 @@
 ══════════════════════════════════════════════════════════════════
 
 This package contains everything you need to add Firebase-based
-authentication with cross-domain persistence to your AWS Study Hub.
+authentication with cross-domain persistence to your Level Up Study Hub.
 
 ┌──────────────────────────────────────────────────────────────────┐
 │ 📄 START HERE - Essential Documentation                          │
@@ -260,7 +260,7 @@ Before going live, test:
    Follow SETUP_INSTRUCTIONS.md and you'll have authentication
         running across all your sites in about an hour.
 
-                   Good luck with your AWS Study Hub!
+                Good luck with your Level Up Study Hub!
 
 ═══════════════════════════════════════════════════════════════════
 

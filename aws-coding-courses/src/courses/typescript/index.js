@@ -37,7 +37,7 @@ $ npx cdk deploy
     { q: 'Do I need an AWS account?', a: 'Not to start. The **Build it** step at the end of each tutorial uses your own free AWS account, and *Start here* shows how to set one up with a budget alert.' },
     { q: 'Will the real AWS projects cost money?', a: 'Almost nothing: everything fits in the AWS Free Tier, and the CDK app has a one-command cleanup. GitHub Actions is free for public repositories.' },
     { q: 'Does this help with the AWS Certified Developer – Associate exam?', a: 'Yes, the deployment part: infrastructure as code, CloudFormation, CI/CD pipelines and least-privilege permissions. Each tutorial ends with exam tips. Pair it with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com).' },
-    { q: 'Is this an official AWS course?', a: 'No. AWS Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
+    { q: 'Is this an official AWS course?', a: 'No. Level Up Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
   ],
   afterCourse: `**Next steps:**
 - Put the CDK app on GitHub with its deploy workflow: it shows you can ship, not just code.

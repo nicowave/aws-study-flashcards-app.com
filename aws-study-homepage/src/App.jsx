@@ -91,10 +91,10 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
     const avatar = userData?.avatar;
     if (avatar) {
       if ((avatar.type === 'emoji') && avatar.value) {
-        return { text: avatar.value, bgColor: avatar.bgColor || '#58a6ff', isImg: false };
+        return { text: avatar.value, bgColor: avatar.bgColor || '#a78bfa', isImg: false };
       }
       if ((avatar.type === 'pattern' || avatar.type === 'image') && avatar.value) {
-        return { imgSrc: avatar.value, bgColor: avatar.bgColor || '#58a6ff', isImg: true };
+        return { imgSrc: avatar.value, bgColor: avatar.bgColor || '#a78bfa', isImg: true };
       }
       if (avatar.bgColor) {
         return { text: (displayName[0] || 'U').toUpperCase(), bgColor: avatar.bgColor, isImg: false };
@@ -113,10 +113,9 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
     <header className="header">
       <div className="header-content">
         <div className="logo">
-          <BookIcon size={28} className="logo-icon" />
-          <span className="logo-text">
-            <span className="logo-aws">AWS</span> Study Hub
-          </span>
+          {/* The Level Up Study Hub lockup. 28 px tall = one third of its 84-unit drawing, so its edges land on whole pixels.
+              The animation lives in the SVG: the meter fills, then a spark sweeps across Study Hub, once per page load (WCAG 2.2.2: an img cannot be paused; still for reduced motion). */}
+          <img src="/brand/level-up-study-hub-horizontal-reverse-animated.svg?v=5" alt="Level Up Study Hub" className="logo-lockup" width="268" height="28" />
         </div>
         <nav className="nav">
           <a href="#certifications" className="nav-link">Certifications</a>
@@ -156,7 +155,7 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
                     {avatarInfo.text}
                   </div>
                 )}
-                <span className="user-name-header">{displayName}</span>
+                <span className="user-name-header" title={displayName}>{displayName}</span>
               </button>
               <button className="settings-icon-btn" onClick={onNavigateSettings} title="Settings">
                 <GearIcon size={16} />
@@ -174,31 +173,6 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
     </header>
   );
 };
-
-// Badge images for hero background banner
-const badgeImages = [
-  'cloud-practitioner', 'ai-practitioner', 'solutions-architect-associate',
-  'developer-associate', 'sysops-administrator', 'data-engineer-associate',
-  'ml-engineer-associate', 'solutions-architect-professional', 'devops-engineer-professional',
-  'security-specialty', 'ml-specialty', 'database-specialty',
-  'advanced-networking-specialty', 'sap-on-aws-specialty'
-];
-
-const BadgeBanner = () => (
-  <div className="badge-banner" aria-hidden="true">
-    <div className="badge-track">
-      {[...badgeImages, ...badgeImages].map((badge, i) => (
-        <img
-          key={i}
-          src={`/badges/${badge}.png`}
-          alt=""
-          className="badge-img"
-          loading="lazy"
-        />
-      ))}
-    </div>
-  </div>
-);
 
 // User Stats Panel (shown inside hero-welcome for signed-in users)
 // Reads from userData.progress — a map of certId -> game stats from the
@@ -232,7 +206,7 @@ const UserStatsPanel = ({ userData }) => {
 
   // Cert-specific cards
   const certMeta = [
-    { id: 'ai-practitioner', name: 'AI Practitioner', icon: '\u{1F916}', color: '#58a6ff', url: onThisName('https://ai.aws-study-flashcards-app.com') },
+    { id: 'ai-practitioner', name: 'AI Practitioner', icon: '\u{1F916}', color: '#a78bfa', url: onThisName('https://ai.aws-study-flashcards-app.com') },
     { id: 'cloud-practitioner', name: 'Cloud Practitioner', icon: '\u2601\uFE0F', color: '#3fb950', url: onThisName('https://cloud.aws-study-flashcards-app.com') },
   ];
   const activeCerts = certMeta.filter(cert => progress[cert.id]);
@@ -296,7 +270,6 @@ const Hero = () => {
 
   return (
     <section className="hero">
-      <BadgeBanner />
       <div className="hero-content">
         <div className="hero-badge">
           <TargetIcon size={16} className="badge-icon" />
@@ -456,7 +429,7 @@ const Certifications = () => (
 const About = () => (
   <section id="about" className="about-section">
     <div className="about-content">
-      <h2 className="section-title">Why AWS Study Hub?</h2>
+      <h2 className="section-title">Why Level Up Study Hub?</h2>
       <div className="features-grid">
         <div className="feature-card">
           <div className="feature-icon">
@@ -727,10 +700,7 @@ const Footer = () => (
     <div className="footer-content">
       <div className="footer-main">
         <div className="footer-brand">
-          <BookIcon size={24} className="logo-icon" />
-          <span className="logo-text">
-            <span className="logo-aws">AWS</span> Study Hub
-          </span>
+          <img src="/brand/level-up-study-hub-horizontal-reverse.svg?v=4" alt="Level Up Study Hub" className="logo-lockup" width="268" height="28" />
         </div>
         <p className="footer-tagline">
           Game-based study tools for AWS certification exams
@@ -775,9 +745,9 @@ const Footer = () => (
 const LoadingScreen = () => (
   <div className="loading-screen-hub">
     <div className="loading-content">
-      <BookIcon size={48} />
+      <img src="/brand/level-up-study-hub-mark-reverse.svg?v=4" alt="" width="48" height="48" />
       <div className="loading-spinner"></div>
-      <p>Loading AWS Study Hub...</p>
+      <p>Loading Level Up Study Hub...</p>
     </div>
   </div>
 );
@@ -903,7 +873,7 @@ const LoginModal = ({ onClose }) => {
           />
         ) : (<>
         <div className="modal-header">
-          <BookIcon size={32} />
+          <img src="/brand/level-up-study-hub-mark-reverse.svg?v=4" alt="" width="32" height="32" />
           <h2>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
           <p>{mode === 'login' ? 'Sign in to sync your progress' : 'Start your AWS journey today'}</p>
         </div>

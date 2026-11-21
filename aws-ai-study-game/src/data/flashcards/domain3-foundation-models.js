@@ -7,8 +7,8 @@ export const domain3 = {
   name: 'Applications of Foundation Models',
   description: 'Foundation model design, prompt engineering, training techniques, and evaluation',
   icon: '🏗️',
-  color: '#E67E22',
-  gradient: 'linear-gradient(135deg, #E67E22 0%, #D35400 100%)',
+  color: '#f472b6',
+  gradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)',
   source: 'AWS Certified AI Practitioner Exam Guide - Domain 3',
   examWeight: '28%',
   cards: [

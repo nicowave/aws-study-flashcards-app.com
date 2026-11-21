@@ -1,4 +1,4 @@
-// AWS sign-in (Amazon Cognito) + API settings for AWS Study Hub.
+// AWS sign-in (Amazon Cognito) + API settings for Level Up Study Hub.
 // None of these are secret: they ship in every app bundle. Override per build
 // with VITE_* variables if the backend is ever redeployed elsewhere.
 

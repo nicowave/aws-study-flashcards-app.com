@@ -1,0 +1,29 @@
+{
+  "id": "/",
+  "name": "Level Up Study Hub",
+  "short_name": "Level Up",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "theme_color": "#0b1220",
+  "background_color": "#0b1220",
+  "icons": [
+    {
+      "src": "/icon-192.png?v=4",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png?v=4",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-maskable-512.png?v=4",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

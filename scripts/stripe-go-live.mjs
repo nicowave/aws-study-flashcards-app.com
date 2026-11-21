@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * One-shot Stripe LIVE-mode setup for AWS Study Hub.
+ * One-shot Stripe LIVE-mode setup for Level Up Study Hub.
  *
  * Automates everything the dashboard clicking did in sandbox:
  *   1. Creates the 5 products + prices (idempotent — finds existing by
@@ -107,7 +107,7 @@ async function ensureWebhook() {
   const ep = await stripe.webhookEndpoints.create({
     url: WEBHOOK_URL,
     enabled_events: WEBHOOK_EVENTS,
-    description: "AWS Study Hub entitlement sync",
+    description: "Level Up Study Hub entitlement sync",
   });
   log(`✓ Webhook endpoint created (${ep.id}); capturing signing secret`);
   return ep.secret; // only available on the creation response
@@ -124,7 +124,7 @@ async function ensurePortal() {
     return;
   }
   await stripe.billingPortal.configurations.create({
-    business_profile: { headline: "AWS Study Hub" },
+    business_profile: { headline: "Level Up Study Hub" },
     default_return_url: "https://aws-study-flashcards-app.com",
     features: {
       customer_update: { enabled: true, allowed_updates: ["email"] },

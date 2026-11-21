@@ -1,7 +1,7 @@
 {
   "name": "aws-study-homepage",
   "version": "1.0.0",
-  "description": "AWS Study Hub - Homepage for AWS Certification Study Materials",
+  "description": "Level Up Study Hub - Homepage for AWS Certification Study Materials",
   "private": true,
   "type": "module",
   "scripts": {

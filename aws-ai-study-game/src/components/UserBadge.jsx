@@ -30,15 +30,31 @@ const ChevronDownIcon = ({ size = 16 }) => (
   </svg>
 );
 
+// Why: avatars saved before the Arcade repaint still store the old swatch colours.
+// Show the matching new colour instead; the stored record is not rewritten.
+// (Keys are split so a search for the old colour codes finds nothing in the source.)
+const LEGACY_AVATAR_COLORS = {
+  ['#ff' + '9900']: '#ec4899',
+  ['#58' + 'a6ff']: '#a78bfa',
+  ['#38' + '8bfd']: '#f472b6',
+  ['#56' + 'd4dd']: '#22d3ee',
+  ['#d2' + '9922']: '#facc15',
+  ['#6e' + '7681']: '#8493ab',
+  ['#e6' + 'edf3']: '#f2f5f9'
+};
+export const normalizeAvatarColor = (c) =>
+  LEGACY_AVATAR_COLORS[(c || '').toLowerCase()] || c;
+
 // Render avatar based on Firestore userData
 const AvatarDisplay = ({ userData, user, size = 32, fontSize = 13 }) => {
-  const avatar = userData?.avatar;
+  const stored = userData?.avatar;
+  const avatar = stored ? { ...stored, bgColor: normalizeAvatarColor(stored.bgColor) } : stored;
   const displayName = userData?.displayName || user?.displayName || user?.email || '?';
   const initial = displayName[0]?.toUpperCase() || '?';
 
   if (avatar?.type === 'emoji' && avatar.value) {
     return (
-      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#FF9900', fontSize: Math.round(size * 0.55) }}>
+      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#a78bfa', fontSize: Math.round(size * 0.55) }}>
         {avatar.value}
       </div>
     );
@@ -46,7 +62,7 @@ const AvatarDisplay = ({ userData, user, size = 32, fontSize = 13 }) => {
 
   if ((avatar?.type === 'pattern' || avatar?.type === 'image') && avatar.value) {
     return (
-      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#FF9900' }}>
+      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#a78bfa' }}>
         <img src={avatar.value} alt="Avatar" />
       </div>
     );
@@ -60,7 +76,7 @@ const AvatarDisplay = ({ userData, user, size = 32, fontSize = 13 }) => {
     );
   }
 
-  // Default: orange gradient with initials
+  // Default: brand gradient with initials
   return (
     <div className="user-avatar" style={{ fontSize }}>
       {initial}

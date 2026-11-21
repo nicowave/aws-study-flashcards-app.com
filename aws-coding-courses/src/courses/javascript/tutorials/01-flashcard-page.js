@@ -607,7 +607,7 @@ const card = {
 card.front
 \`\`\`
 
-\`card.front\` reads one value; \`card.tags.length\` reaches inside. That shape, \`{ id, front, back, hint, tags, difficulty }\`, is the one the AWS Study Hub games use for every flashcard.
+\`card.front\` reads one value; \`card.tags.length\` reaches inside. That shape, \`{ id, front, back, hint, tags, difficulty }\`, is the one the Level Up Study Hub games use for every flashcard.
 
 ### Functions
 

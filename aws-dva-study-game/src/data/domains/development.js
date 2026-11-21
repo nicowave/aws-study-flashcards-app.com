@@ -6,7 +6,7 @@ export const development = {
   name: 'Development with AWS Services',
   icon: '💻',
   weight: '32%',
-  color: '#58a6ff',
+  color: '#a78bfa',
   description: 'Develop code for applications hosted on AWS, Lambda, and data stores',
   questions: [
     // ── Task 1: Develop code for applications hosted on AWS ──

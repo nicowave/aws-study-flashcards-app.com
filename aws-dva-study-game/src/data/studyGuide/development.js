@@ -3,7 +3,7 @@ export const developmentGuide = {
   id: 'development',
   name: 'Development with AWS Services',
   icon: '💻',
-  color: '#58a6ff',
+  color: '#a78bfa',
   weight: '32%',
   description: 'Develop code for applications hosted on AWS, Lambda, and data stores.',
   sections: [

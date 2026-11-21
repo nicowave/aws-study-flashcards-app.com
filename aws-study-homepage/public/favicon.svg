@@ -1,15 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0d1117"/>
-      <stop offset="100%" stop-color="#161b22"/>
-    </linearGradient>
-    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#58a6ff"/>
-      <stop offset="100%" stop-color="#56d4dd"/>
-    </linearGradient>
-  </defs>
-  <rect width="100" height="100" rx="16" fill="url(#bgGrad)"/>
-  <text x="50" y="42" font-family="Arial Black, sans-serif" font-size="24" fill="#ff9900" text-anchor="middle" font-weight="bold">AWS</text>
-  <text x="50" y="72" font-family="Arial, sans-serif" font-size="18" fill="url(#accentGrad)" text-anchor="middle">STUDY</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="#0b1220"/><g transform="translate(0 0) scale(1)"><defs><linearGradient id="lu-run" gradientUnits="userSpaceOnUse" x1="6" y1="90" x2="90" y2="24"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".6" stop-color="#ec4899"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs><path fill="url(#lu-run)" d="M6 24H30V72H66V60H90V90H6Z"/><rect class="lu-k lu-k0" x="66" y="42" width="24" height="18" fill="#3b82f6"/><rect class="lu-k lu-k1" x="66" y="24" width="24" height="18" fill="#38bdf8"/><rect class="lu-k lu-k2" x="66" y="6" width="24" height="18" fill="#67e8f9"/></g></svg>

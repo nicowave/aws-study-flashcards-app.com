@@ -125,8 +125,8 @@ export class StudyHubBackendStack extends cdk.Stack {
       // Sign-up sends a link (like Firebase did), not a code to type in.
       userVerification: {
         emailStyle: cognito.VerificationEmailStyle.LINK,
-        emailSubject: 'Verify your AWS Study Hub email',
-        emailBody: 'Welcome to AWS Study Hub! {##Click here to verify your email##}, then come back and sign in.',
+        emailSubject: 'Verify your Level Up Study Hub email',
+        emailBody: 'Welcome to Level Up Study Hub! {##Click here to verify your email##}, then come back and sign in.',
       },
       standardAttributes: {
         email: { required: true, mutable: true },

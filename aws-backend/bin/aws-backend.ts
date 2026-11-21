@@ -5,7 +5,7 @@ import { StudyHubBackendStack } from '../lib/study-hub-stack';
 const app = new cdk.App();
 
 new StudyHubBackendStack(app, 'StudyHubBackend', {
-  description: 'AWS Study Hub serverless backend: Cognito auth, DynamoDB, HTTP API (Phase 1)',
+  description: 'Level Up Study Hub serverless backend: Cognito auth, DynamoDB, HTTP API (Phase 1)',
   // `cdk deploy` sets the stack's protection to match this value, so it must
   // stay true here or a deploy would quietly switch it off again.
   terminationProtection: true,

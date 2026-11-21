@@ -3,7 +3,7 @@ export const troubleshootingGuide = {
   id: 'troubleshooting',
   name: 'Troubleshooting and Optimization',
   icon: '🔧',
-  color: '#d29922',
+  color: '#f472b6',
   weight: '18%',
   description: 'Root cause analysis, instrumentation for observability, and application performance optimization.',
   sections: [

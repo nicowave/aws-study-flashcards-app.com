@@ -1,4 +1,4 @@
-# AWS Study Hub — Serverless Backend (CDK)
+# Level Up Study Hub — Serverless Backend (CDK)
 
 The AWS-native replacement for the Firebase backend, built to run *on the
 services the site teaches*: Cognito, DynamoDB, Lambda, API Gateway. Deploys

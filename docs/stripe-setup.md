@@ -1,4 +1,4 @@
-# Stripe Setup Runbook — AWS Study Hub
+# Stripe Setup Runbook — Level Up Study Hub
 
 The code (Cloud Functions + homepage wiring) is already in the repo. This
 runbook covers the parts only the account owner can do: creating keys,

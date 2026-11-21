@@ -6,8 +6,8 @@ export const module5 = {
   name: 'Compute Services',
   description: 'EC2, Lambda, ECS, EKS, Fargate, Beanstalk, and more',
   icon: '⚡',
-  color: '#f0883e',
-  gradient: 'linear-gradient(135deg, #f0883e 0%, #d68200 100%)',
+  color: '#f472b6',
+  gradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)',
   source: 'AWS CCP Exam Prep - 175+ Q&A',
   cards: [
     {

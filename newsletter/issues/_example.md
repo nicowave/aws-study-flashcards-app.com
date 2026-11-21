@@ -19,7 +19,7 @@ Wrong. Flexible Retrieval takes minutes to hours. The answer is **S3 Glacier Ins
 
 **Amazon SQS** is a to-do list: one worker takes each message and deletes it when done. **Amazon SNS** is a megaphone: every subscriber hears every message. If the question says "fan out," think SNS (often feeding several SQS queues).
 
-## 3. New on AWS Study Hub
+## 3. New on Level Up Study Hub
 
 The free 10-question readiness check now emails you a 7-day plan built around your weakest exam areas.
 

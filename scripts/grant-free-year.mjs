@@ -222,7 +222,7 @@ if (cmd === 'grant') {
     cancel_at_period_end: true,
     // Lock 2: with no card on file, Stripe cancels instead of trying to bill.
     trial_settings: { end_behavior: { missing_payment_method: 'cancel' } },
-    description: 'Free year of AWS Study Hub Pro from Nicolas Roldos. Ends by itself, never billed.',
+    description: 'Free year of Level Up Study Hub Pro from Nicolas Roldos. Ends by itself, never billed.',
     metadata: { firebaseUID: uid, plan: 'all-access', grant: 'free-year', ...(isTest && { test: 'true' }) },
   }, `free-year-sub-${uid}-${randomUUID()}`) // unique per run, so a re-grant after a revoke works the same day
   console.log(`created subscription ${sub.id}  ${sub.status}  free until ${day(endOf(sub))}  set to end: ${sub.cancel_at_period_end ? 'yes' : 'NO'}`)

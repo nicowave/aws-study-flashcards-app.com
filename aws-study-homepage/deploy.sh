@@ -1,5 +1,5 @@
 #!/bin/bash
-# AWS Study Hub Homepage - Deployment Script
+# Level Up Study Hub Homepage - Deployment Script
 # Uses existing infrastructure
 
 set -e
@@ -14,7 +14,7 @@ DISTRIBUTION_ID="E3D126UT3L72OL"
 WEBSITE_URL="https://aws-study-flashcards-app.com"
 
 echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}AWS Study Hub - Homepage Deployment${NC}"
+echo -e "${GREEN}Level Up Study Hub - Homepage Deployment${NC}"
 echo -e "${GREEN}========================================${NC}"
 
 # Install dependencies

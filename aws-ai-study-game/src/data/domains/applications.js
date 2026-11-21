@@ -4,8 +4,8 @@ export const domain3 = {
   name: 'Applications of Foundation Models',
   weight: '28%',
   icon: '🚀',
-  color: '#00CED1',
-  gradient: 'linear-gradient(135deg, #00CED1 0%, #20B2AA 100%)',
+  color: '#22d3ee',
+  gradient: 'linear-gradient(135deg, #22d3ee 0%, #20B2AA 100%)',
   questions: [
     {
       id: 'd3q1',

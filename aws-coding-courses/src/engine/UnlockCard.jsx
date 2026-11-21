@@ -64,7 +64,7 @@ const UnlockCard = ({ course, user, onSignIn, returnPath, compact = false }) => 
         </div>
       )}
       {error && <p className="unlock-error">{error}</p>}
-      <p className="unlock-fine">Secure payment through Stripe. One sign-in works across every AWS Study Hub site.{live ? ' The discount is applied at checkout automatically.' : ''}</p>
+      <p className="unlock-fine">Secure payment through Stripe. One sign-in works across every Level Up Study Hub site.{live ? ' The discount is applied at checkout automatically.' : ''}</p>
     </div>
   );
 };

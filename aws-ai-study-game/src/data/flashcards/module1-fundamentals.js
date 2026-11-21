@@ -8,8 +8,8 @@ export const flashcardDecks = {
     name: 'Fundamentals of ML and AI',
     description: 'Core concepts of AI, ML, Deep Learning, and Generative AI',
     icon: '🧠',
-    color: '#FF6B35',
-    gradient: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)',
+    color: '#f472b6',
+    gradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)',
     source: 'AWS Skill Builder - Fundamentals of Machine Learning and Artificial Intelligence',
     cards: [
       {

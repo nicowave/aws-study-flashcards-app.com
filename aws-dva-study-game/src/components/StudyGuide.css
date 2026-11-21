@@ -73,7 +73,7 @@
 .study-domain-card:hover {
   border-color: transparent;
   transform: translateY(-4px);
-  box-shadow: var(--md-shadow-3), 0 0 25px rgba(86, 156, 214, 0.15);
+  box-shadow: var(--md-shadow-3), 0 0 25px rgba(139, 92, 246, 0.15);
 }
 
 .study-domain-card:hover::before {
@@ -180,7 +180,7 @@
   font-weight: 600;
   font-family: 'JetBrains Mono', monospace;
   flex-shrink: 0;
-  color: #fff;
+  color: var(--brand-ink);
 }
 
 /* TOC Sidebar */
@@ -367,8 +367,8 @@
 
 /* AWS Service Callout */
 .study-block-service {
-  background: rgba(255, 153, 0, 0.06);
-  border: 1px solid rgba(255, 153, 0, 0.2);
+  background: rgba(236, 72, 153, 0.06);
+  border: 1px solid rgba(236, 72, 153, 0.2);
   border-radius: var(--md-radius-md);
   padding: 14px 18px;
   margin-bottom: 14px;
@@ -386,7 +386,7 @@
 .study-service-name {
   font-size: 14px;
   font-weight: 600;
-  color: #ff9900;
+  color: var(--md-secondary);
   margin-bottom: 4px;
 }
 
@@ -398,8 +398,8 @@
 
 /* Exam Tip */
 .study-block-examtip {
-  background: rgba(220, 220, 170, 0.06);
-  border: 1px solid rgba(220, 220, 170, 0.2);
+  background: rgba(210, 153, 34, 0.06);
+  border: 1px solid rgba(210, 153, 34, 0.2);
   border-radius: var(--md-radius-md);
   padding: 14px 18px;
   margin-bottom: 14px;

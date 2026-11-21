@@ -507,7 +507,7 @@ const tutorial = {
   slug: 'study-tracker',
   number: 4,
   title: 'Study tracker with sign-in',
-  situation: 'The flashcard page from Tutorial 1 is a hit, but progress lives in one browser: switch from the office laptop to your phone and it\'s gone. You add accounts with Amazon Cognito, and save each person\'s progress in Amazon DynamoDB through an API with a sign-in check in front of it. These are the same building blocks the AWS Study Hub you\'re using right now runs on.',
+  situation: 'The flashcard page from Tutorial 1 is a hit, but progress lives in one browser: switch from the office laptop to your phone and it\'s gone. You add accounts with Amazon Cognito, and save each person\'s progress in Amazon DynamoDB through an API with a sign-in check in front of it. These are the same building blocks the Level Up Study Hub you\'re using right now runs on.',
   level: 'Advanced',
   hours: 6,
   skills: ['JSON Web Tokens', 'fetch with headers', 'async and await', 'input checks', 'status codes', 'keeping users apart'],
@@ -844,7 +844,7 @@ The risk is **cross-site scripting**: if an attacker gets any script onto your p
         if (!/expired|sign in/i.test(expired.message || '')) return 'Back at sign-in. Tell them why: showSignIn(\'Your session expired. Sign in again.\').';
         return true;
       },
-      success: 'Sign in, call the API with the token, and recover when it runs out: that\'s the whole sign-in story of a real web app. The AWS Study Hub does exactly this, with the AWS Amplify library refreshing tokens in the background.',
+      success: 'Sign in, call the API with the token, and recover when it runs out: that\'s the whole sign-in story of a real web app. Level Up Study Hub does exactly this, with the AWS Amplify library refreshing tokens in the background.',
     },
     {
       id: 'exam-tips',

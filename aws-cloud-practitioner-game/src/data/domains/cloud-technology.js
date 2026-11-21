@@ -6,7 +6,7 @@ export const cloudTechnology = {
   name: 'Cloud Technology & Services',
   icon: '⚙️',
   weight: '34%',
-  color: '#58a6ff',
+  color: '#a78bfa',
   description: 'AWS services for compute, storage, networking, databases, and other core services',
   questions: [
     {

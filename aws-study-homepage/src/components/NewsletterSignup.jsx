@@ -80,7 +80,7 @@ const NewsletterSignup = () => {
             />
             {error && <p className="newsletter-error" role="alert">{error}</p>}
             <p className="newsletter-fine">
-              From Nico at AWS Study Hub. Unsubscribe any time. <a href="/privacy.html">Privacy</a>
+              From Nico at Level Up Study Hub. Unsubscribe any time. <a href="/privacy.html">Privacy</a>
             </p>
           </form>
         )}

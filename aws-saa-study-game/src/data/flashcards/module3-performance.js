@@ -6,8 +6,8 @@ export const module3 = {
   name: 'Performance & Scale',
   description: 'Storage, compute, database, and network performance',
   icon: '⚡',
-  color: '#58a6ff',
-  gradient: 'linear-gradient(135deg, #58a6ff 0%, #58a6ff 100%)',
+  color: '#a78bfa',
+  gradient: 'linear-gradient(135deg, #a78bfa 0%, #a78bfa 100%)',
   source: 'SAA-C03 Exam Guide',
   cards: [
     {

@@ -1,4 +1,4 @@
-# AWS Study Hub — CLAUDE.md
+# Level Up Study Hub — CLAUDE.md
 
 Multi-app AWS certification study platform. Owner: Nico (Nico Tek Solutions).
 Keep answers direct, no fluff.

@@ -1,10 +1,10 @@
-// Site Configuration for AWS Study Hub
+// Site Configuration for Level Up Study Hub
 // All sites share the same Firebase project for unified authentication
 // IMPORTANT: All sites must be on the same root domain for cookie sharing
 
 export const SITES = {
   hub: {
-    name: 'AWS Study Hub',
+    name: 'Level Up Study Hub',
     url: 'https://aws-study-flashcards-app.com',
     domain: 'aws-study-flashcards-app.com'
   },

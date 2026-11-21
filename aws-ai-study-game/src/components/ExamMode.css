@@ -90,7 +90,7 @@
 }
 
 .exam-primary-btn {
-  background: var(--md-primary);
+  background: var(--brand-run);
   color: var(--md-on-primary);
   border: none;
   border-radius: var(--md-radius-md);
@@ -160,7 +160,7 @@
 
 .exam-submit-btn {
   background: var(--md-success);
-  color: #1e1e1e;
+  color: var(--brand-ink);
   border: none;
   border-radius: var(--md-radius-md);
   padding: 8px 18px;
@@ -188,7 +188,7 @@
 
 .exam-confirm-yes {
   background: var(--md-success);
-  color: #1e1e1e;
+  color: var(--brand-ink);
   border: none;
   font-weight: 600;
 }
@@ -225,7 +225,7 @@
 }
 
 .palette-cell.current {
-  outline: 2px solid var(--md-secondary);
+  outline: 2px solid var(--brand-spark);
   outline-offset: 1px;
 }
 
