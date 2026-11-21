@@ -10,6 +10,8 @@ import Faq from './components/Faq';
 import { currentPromotion, salePrice } from './services/offers';
 import ReadinessCheck from './components/ReadinessCheck';
 import NewsletterSignup from './components/NewsletterSignup';
+import HeroRotator from './components/HeroRotator';
+import GisPage from './components/GisPage';
 import { captureSource } from './services/leads';
 import {
   CloudIcon,
@@ -47,6 +49,11 @@ import './styles/homepage.css';
 applyAnalyticsPreference();
 // Remember which tracked link brought this visit (sent with readiness emails)
 captureSource();
+
+// /gis/ is its own page (gis/index.html) but the same app: header, footer and sign-in are shared.
+const IS_GIS_PAGE = typeof window !== 'undefined' && /^\/gis(\/|$)/.test(window.location.pathname);
+// Home-page anchors need the home path in front when we are on another page.
+const homeLink = (hash) => (IS_GIS_PAGE ? `/${hash}` : hash);
 
 // Icon mapping for certifications
 const certIconMap = {
@@ -118,11 +125,11 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
           <img src="/brand/level-up-study-hub-horizontal-reverse-animated.svg?v=5" alt="Level Up Study Hub" className="logo-lockup" width="268" height="28" />
         </div>
         <nav className="nav">
-          <a href="#certifications" className="nav-link">Certifications</a>
-          <a href="#courses" className="nav-link">Courses</a>
-          <a href="#about" className="nav-link">About</a>
-          <a href="#plans" className="nav-link">Plans</a>
-          <a href="#resources" className="nav-link">Resources</a>
+          <a href={homeLink('#certifications')} className="nav-link">Certifications</a>
+          <a href={homeLink('#courses')} className="nav-link">Courses</a>
+          <a href={homeLink('#about')} className="nav-link">About</a>
+          <a href={homeLink('#plans')} className="nav-link">Plans</a>
+          <a href={homeLink('#resources')} className="nav-link">Resources</a>
           <a
             href="https://aws.amazon.com/certification/"
             target="_blank"
@@ -271,31 +278,8 @@ const Hero = () => {
   return (
     <section className="hero">
       <div className="hero-content">
-        <div className="hero-badge">
-          <TargetIcon size={16} className="badge-icon" />
-          <span className="badge-text mono">New — Developer Associate Now Live</span>
-        </div>
-        <h1 className="hero-title">
-          Pass Your <span className="highlight">AWS Certification</span> First Try
-        </h1>
-        <p className="hero-subtitle">
-          Exam-style practice questions, flashcards, and full-length timed exam simulators
-          for AWS Cloud Practitioner, AI Practitioner, Solutions Architect – Associate, and Developer – Associate.
-          Know you&apos;re ready before you book the real exam.
-        </p>
-        <div className="hero-actions">
-          <a href="#readiness" className="btn btn-primary">
-            <TargetIcon size={20} />
-            Am I Ready? Free 10-Question Check
-          </a>
-          <a
-            href={onThisName('https://cloud.aws-study-flashcards-app.com')}
-            className="btn btn-secondary"
-          >
-            <CloudIcon size={20} />
-            Try It Free — No Account Needed
-          </a>
-        </div>
+        {/* One headline per study track; the AWS one comes first and is the h1 */}
+        <HeroRotator />
         {isAuthenticated && (
           <div className="hero-welcome">
             Welcome back, <strong>{user?.displayName || user?.email?.split('@')[0] || 'Learner'}</strong>! Ready to continue your AWS journey?
@@ -717,6 +701,7 @@ const Footer = () => (
         <div className="footer-column">
           <h4>Coding courses</h4>
           {COURSES.map((c) => <a key={c.id} href={onThisName(c.url)}>{c.title}</a>)}
+          <a href="/gis/">GIS courses (coming soon)</a>
         </div>
         <div className="footer-column">
           <h4>Resources</h4>
@@ -729,6 +714,7 @@ const Footer = () => (
     <div className="footer-bottom">
       <p className="mono">
         Not affiliated with Amazon Web Services. AWS and all related marks are trademarks of Amazon.com, Inc.
+        {' '}Not affiliated with Google LLC. Google Cloud is a trademark of Google LLC.
       </p>
       <p className="footer-legal-links">
         Made by <a href="https://nico-tek.com/study-hub">Nico Tek Solutions</a>
@@ -1049,17 +1035,23 @@ function HomepageContent() {
         </main>
       ) : (
         <>
-          <main>
-            <Hero />
-            <ReadinessCheck />
-            <Certifications />
-            <CodingCourses onShowLogin={() => setShowLoginModal(true)} />
-            <About />
-            <Plans onShowLogin={() => setShowLoginModal(true)} />
-            <Faq />
-            <Resources />
-            <NewsletterSignup />
-          </main>
+          {IS_GIS_PAGE ? (
+            <main>
+              <GisPage />
+            </main>
+          ) : (
+            <main>
+              <Hero />
+              <ReadinessCheck />
+              <Certifications />
+              <CodingCourses onShowLogin={() => setShowLoginModal(true)} />
+              <About />
+              <Plans onShowLogin={() => setShowLoginModal(true)} />
+              <Faq />
+              <Resources />
+              <NewsletterSignup />
+            </main>
+          )}
           <Footer />
         </>
       )}

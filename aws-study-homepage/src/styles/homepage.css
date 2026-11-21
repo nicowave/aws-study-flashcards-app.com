@@ -2296,3 +2296,245 @@
 .bundle-card p { margin: 0; max-width: 60ch; }
 .sale-pill { display: inline-block; background: var(--brand-pop); color: var(--brand-ink); font-weight: 700; font-size: 0.78rem; padding: 3px 10px; border-radius: 999px; margin: 6px 0; }
 .promo-banner { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; padding: 8px 16px; background: linear-gradient(90deg, rgba(139, 92, 246, 0.22), rgba(236, 72, 153, 0.22), rgba(34, 211, 238, 0.22)), var(--surface-base); color: var(--text-primary); font-size: 0.9rem; text-align: center; }
+
+/* ========================================
+   Hero rotator: one headline per study track
+   ======================================== */
+/* All slides share one grid cell, so the box is as tall as the tallest slide
+   and nothing below it jumps when the headline changes. */
+.hero-slides {
+  display: grid;
+}
+
+.hero-slide {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 400ms ease, visibility 0s linear 400ms;
+}
+
+.hero-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 400ms ease, visibility 0s;
+}
+
+.hero-badge-soon {
+  border-color: var(--accent-tertiary);
+  color: var(--text-primary);
+}
+
+.hero-rotator-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: -24px 0 40px;
+}
+
+.hero-rotator-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.hero-rotator-play,
+.hero-rotator-tab {
+  font: inherit;
+  font-size: 13px;
+  min-height: 32px;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--surface-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.hero-rotator-play:hover,
+.hero-rotator-tab:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+}
+
+.hero-rotator-tab.is-active {
+  color: var(--brand-ink);
+  background: var(--brand-spark);
+  border-color: var(--brand-spark);
+  font-weight: 700;
+}
+
+.hero-rotator-play:focus-visible,
+.hero-rotator-tab:focus-visible {
+  outline: 2px solid var(--brand-spark);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide,
+  .hero-slide.is-active {
+    transition: none;
+  }
+}
+
+/* ========================================
+   GIS track page (/gis/)
+   ======================================== */
+.gis-hero {
+  padding-bottom: 64px;
+}
+
+.gis-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 56px 24px;
+}
+
+.gis-section > .section-title {
+  margin-bottom: 24px;
+}
+
+/* One left edge on this page: every section title starts at the column edge */
+.gis-section .section-header {
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+.gis-section .section-subtitle {
+  margin: 0;
+  max-width: none;
+}
+
+.gis-why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.gis-why-card,
+.gis-course-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.gis-why-card h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.gis-why-card p,
+.gis-course-blurb,
+.gis-next p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.gis-course-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.gis-course-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.gis-course-num {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.gis-course-soon {
+  font-size: 12px;
+  padding: 2px 10px;
+  border: 1px solid var(--accent-tertiary);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+}
+
+.gis-course-title {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.gis-course-level {
+  font-size: 13px;
+  color: var(--accent-tertiary);
+  margin-bottom: 12px;
+}
+
+.gis-course-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.gis-tool {
+  font-size: 12px;
+  padding: 2px 8px;
+  background: var(--surface-elevated);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.gis-for-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px;
+  display: grid;
+  gap: 12px;
+}
+
+.gis-for-list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--text-secondary);
+}
+
+.gis-for-list svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--status-success);
+}
+
+.gis-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+}
+
+.gis-next p {
+  flex: 1 1 320px;
+  margin: 0;
+}
+
+.gis-disclaimer {
+  margin-top: 32px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .gis-course-list {
+    grid-template-columns: 1fr;
+  }
+}

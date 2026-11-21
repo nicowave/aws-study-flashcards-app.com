@@ -107,11 +107,19 @@ deploy_hub() {
     aws s3 sync dist/ "s3://${bucket}/" \
         --delete \
         --exclude "index.html" \
+        --exclude "*/index.html" \
         --exclude "next/*" \
         --cache-control "max-age=31536000,public"
-    
+
     aws s3 cp dist/index.html "s3://${bucket}/index.html" \
         --cache-control "no-cache,no-store,must-revalidate"
+    # Folder pages (gis/index.html, served at /gis/) name hashed assets too, so they get
+    # no-cache like the home page; the sync above skipped them so they never get a year
+    local folder_page
+    for folder_page in dist/*/index.html(N); do
+        [[ "$folder_page" == dist/next/* ]] && continue
+        aws s3 cp "$folder_page" "s3://${bucket}/${folder_page#dist/}" --cache-control "no-cache,no-store,must-revalidate" --content-type "text/html; charset=utf-8" > /dev/null
+    done
     upload_crawler_files dist "$bucket"
     # privacy.html and terms.html: short cache too, so a change to the legal text reaches
     # browsers within an hour (the sync above gives them a year, like the hashed assets)
