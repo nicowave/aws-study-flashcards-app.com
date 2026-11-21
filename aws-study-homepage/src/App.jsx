@@ -114,8 +114,8 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
       <div className="header-content">
         <div className="logo">
           {/* The Level Up Study Hub lockup. 28 px tall = one third of its 84-unit drawing, so its edges land on whole pixels.
-              The animation lives in the SVG: the meter fills, then a spark sweeps across Study Hub, every 4 s (still for reduced motion). */}
-          <img src="/brand/level-up-study-hub-horizontal-reverse-animated.svg?v=4" alt="Level Up Study Hub" className="logo-lockup" width="268" height="28" />
+              The animation lives in the SVG: the meter fills, then a spark sweeps across Study Hub, once per page load (WCAG 2.2.2: an img cannot be paused; still for reduced motion). */}
+          <img src="/brand/level-up-study-hub-horizontal-reverse-animated.svg?v=5" alt="Level Up Study Hub" className="logo-lockup" width="268" height="28" />
         </div>
         <nav className="nav">
           <a href="#certifications" className="nav-link">Certifications</a>
