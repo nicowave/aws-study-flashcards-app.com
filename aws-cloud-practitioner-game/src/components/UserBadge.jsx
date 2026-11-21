@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { GearIcon, StatsIcon } from './Icons';
+import { fixAvatarColor } from './avatarColors';
 import './UserBadge.css';
 
 const CheckmarkIcon = ({ size = 16 }) => (
@@ -38,7 +39,7 @@ const AvatarDisplay = ({ userData, user, size = 32, fontSize = 13 }) => {
 
   if (avatar?.type === 'emoji' && avatar.value) {
     return (
-      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#FF9900', fontSize: Math.round(size * 0.55) }}>
+      <div className="user-avatar" style={{ backgroundColor: fixAvatarColor(avatar.bgColor) || '#a78bfa', fontSize: Math.round(size * 0.55) }}>
         {avatar.value}
       </div>
     );
@@ -46,7 +47,7 @@ const AvatarDisplay = ({ userData, user, size = 32, fontSize = 13 }) => {
 
   if ((avatar?.type === 'pattern' || avatar?.type === 'image') && avatar.value) {
     return (
-      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor || '#FF9900' }}>
+      <div className="user-avatar" style={{ backgroundColor: fixAvatarColor(avatar.bgColor) || '#a78bfa' }}>
         <img src={avatar.value} alt="Avatar" />
       </div>
     );
@@ -54,13 +55,13 @@ const AvatarDisplay = ({ userData, user, size = 32, fontSize = 13 }) => {
 
   if (avatar?.type === 'initials' && avatar.bgColor) {
     return (
-      <div className="user-avatar" style={{ backgroundColor: avatar.bgColor, fontSize }}>
+      <div className="user-avatar" style={{ backgroundColor: fixAvatarColor(avatar.bgColor), fontSize }}>
         {initial}
       </div>
     );
   }
 
-  // Default: orange gradient with initials
+  // Default: violet-to-pink gradient with initials
   return (
     <div className="user-avatar" style={{ fontSize }}>
       {initial}

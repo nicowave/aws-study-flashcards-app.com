@@ -203,6 +203,11 @@
   outline: none;
 }
 
+.flashcard:focus-visible {
+  outline: 2px solid var(--brand-spark);
+  outline-offset: 3px;
+}
+
 .flashcard-inner {
   position: relative;
   width: 100%;
@@ -283,13 +288,13 @@
 
 .flashcard-hint-btn {
   background: transparent;
-  color: var(--md-warning);
-  border: 1px dashed var(--md-warning);
+  color: var(--md-accent);
+  border: 1px dashed var(--md-accent);
   cursor: pointer;
 }
 
 .flashcard-hint {
-  color: var(--md-warning);
+  color: var(--md-accent);
   border: 1px solid transparent;
 }
 

@@ -14,7 +14,7 @@
   font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--aws-orange);
+  color: var(--accent-secondary);
   margin-bottom: 10px;
 }
 .newsletter-title { font-size: 28px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 10px; text-wrap: balance; }
@@ -31,9 +31,9 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
 }
-.newsletter-row input:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-glow); }
+.newsletter-row input:focus { outline: none; border-color: var(--brand-spark); box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.2); }
 .newsletter-hp { position: absolute; left: -10000px; width: 1px; height: 1px; opacity: 0; }
-.newsletter-error { color: #f85149; margin-top: 10px; font-size: 14px; }
+.newsletter-error { color: var(--status-error); margin-top: 10px; font-size: 14px; }
 .newsletter-fine { color: var(--text-muted); font-size: 12px; margin-top: 12px; }
 .newsletter-fine a { color: var(--text-muted); }
 

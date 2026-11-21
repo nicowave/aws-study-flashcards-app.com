@@ -3,7 +3,7 @@ export const domain1Guide = {
   id: 'domain1',
   name: 'Fundamentals of AI and ML',
   icon: '\u{1F9E0}',
-  color: '#FF6B35',
+  color: '#f472b6',
   weight: '20%',
   description: 'Core AI and ML concepts, the machine learning pipeline, common algorithms, and key AWS services for traditional ML workloads.',
   sections: [

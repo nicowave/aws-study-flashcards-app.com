@@ -4,8 +4,8 @@ export const domain1 = {
   name: 'Fundamentals of AI and ML',
   weight: '20%',
   icon: '🧠',
-  color: '#FF6B35',
-  gradient: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)',
+  color: '#f472b6',
+  gradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)',
   questions: [
     {
       id: 'd1q1',

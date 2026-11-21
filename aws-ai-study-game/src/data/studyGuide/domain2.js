@@ -3,7 +3,7 @@ export const domain2Guide = {
   id: 'domain2',
   name: 'Fundamentals of Generative AI',
   icon: '\u2728',
-  color: '#7B68EE',
+  color: '#a78bfa',
   weight: '24%',
   description: 'Foundation models, transformer architecture, generative AI concepts, Amazon Bedrock, and model training approaches.',
   sections: [

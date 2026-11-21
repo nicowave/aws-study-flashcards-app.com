@@ -3,7 +3,7 @@ export const domain5Guide = {
   id: 'domain5',
   name: 'Security, Compliance, and Governance for AI',
   icon: '\u{1F512}',
-  color: '#DC143C',
+  color: '#f87171',
   weight: '14%',
   description: 'Security best practices, compliance frameworks, and governance strategies for AI workloads on AWS.',
   sections: [

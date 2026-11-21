@@ -7,7 +7,7 @@ export const domain4 = {
   name: 'Guidelines for Responsible AI',
   description: 'Responsible AI development, transparency, and explainability',
   icon: '⚖️',
-  color: '#E74C3C',
+  color: '#f87171',
   gradient: 'linear-gradient(135deg, #E74C3C 0%, #C0392B 100%)',
   source: 'AWS Certified AI Practitioner Exam Guide - Domain 4',
   examWeight: '14%',

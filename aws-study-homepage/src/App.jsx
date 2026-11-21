@@ -91,10 +91,10 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
     const avatar = userData?.avatar;
     if (avatar) {
       if ((avatar.type === 'emoji') && avatar.value) {
-        return { text: avatar.value, bgColor: avatar.bgColor || '#58a6ff', isImg: false };
+        return { text: avatar.value, bgColor: avatar.bgColor || '#a78bfa', isImg: false };
       }
       if ((avatar.type === 'pattern' || avatar.type === 'image') && avatar.value) {
-        return { imgSrc: avatar.value, bgColor: avatar.bgColor || '#58a6ff', isImg: true };
+        return { imgSrc: avatar.value, bgColor: avatar.bgColor || '#a78bfa', isImg: true };
       }
       if (avatar.bgColor) {
         return { text: (displayName[0] || 'U').toUpperCase(), bgColor: avatar.bgColor, isImg: false };
@@ -114,7 +114,7 @@ const Header = ({ onShowLogin, onNavigateSettings }) => {
       <div className="header-content">
         <div className="logo">
           {/* The Level Up Study Hub lockup. 28 px tall = one third of its 84-unit drawing, so its edges land on whole pixels. */}
-          <img src="/brand/level-up-study-hub-horizontal-reverse.svg" alt="Level Up Study Hub" className="logo-lockup" width="262" height="28" />
+          <img src="/brand/level-up-study-hub-horizontal-reverse-animated.svg" alt="Level Up Study Hub" className="logo-lockup" width="268" height="28" />
         </div>
         <nav className="nav">
           <a href="#certifications" className="nav-link">Certifications</a>
@@ -205,7 +205,7 @@ const UserStatsPanel = ({ userData }) => {
 
   // Cert-specific cards
   const certMeta = [
-    { id: 'ai-practitioner', name: 'AI Practitioner', icon: '\u{1F916}', color: '#58a6ff', url: onThisName('https://ai.aws-study-flashcards-app.com') },
+    { id: 'ai-practitioner', name: 'AI Practitioner', icon: '\u{1F916}', color: '#a78bfa', url: onThisName('https://ai.aws-study-flashcards-app.com') },
     { id: 'cloud-practitioner', name: 'Cloud Practitioner', icon: '\u2601\uFE0F', color: '#3fb950', url: onThisName('https://cloud.aws-study-flashcards-app.com') },
   ];
   const activeCerts = certMeta.filter(cert => progress[cert.id]);
@@ -699,7 +699,7 @@ const Footer = () => (
     <div className="footer-content">
       <div className="footer-main">
         <div className="footer-brand">
-          <img src="/brand/level-up-study-hub-horizontal-reverse.svg" alt="Level Up Study Hub" className="logo-lockup" width="262" height="28" />
+          <img src="/brand/level-up-study-hub-horizontal-reverse.svg?v=3" alt="Level Up Study Hub" className="logo-lockup" width="268" height="28" />
         </div>
         <p className="footer-tagline">
           Game-based study tools for AWS certification exams
@@ -744,7 +744,7 @@ const Footer = () => (
 const LoadingScreen = () => (
   <div className="loading-screen-hub">
     <div className="loading-content">
-      <img src="/brand/level-up-study-hub-mark-reverse.svg" alt="" width="48" height="48" />
+      <img src="/brand/level-up-study-hub-mark-reverse.svg?v=3" alt="" width="48" height="48" />
       <div className="loading-spinner"></div>
       <p>Loading Level Up Study Hub...</p>
     </div>
@@ -872,7 +872,7 @@ const LoginModal = ({ onClose }) => {
           />
         ) : (<>
         <div className="modal-header">
-          <img src="/brand/level-up-study-hub-mark-reverse.svg" alt="" width="32" height="32" />
+          <img src="/brand/level-up-study-hub-mark-reverse.svg?v=3" alt="" width="32" height="32" />
           <h2>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
           <p>{mode === 'login' ? 'Sign in to sync your progress' : 'Start your AWS journey today'}</p>
         </div>

@@ -20,8 +20,8 @@
 }
 
 .guest-banner-cta {
-  background: var(--md-primary);
-  color: var(--md-on-primary);
+  background: var(--brand-run);
+  color: var(--brand-ink);
   border: none;
   border-radius: var(--md-radius-sm);
   padding: 7px 14px;
@@ -33,7 +33,7 @@
 }
 
 .guest-banner-cta:hover {
-  filter: brightness(1.15);
+  filter: brightness(1.08);
 }
 
 .guest-upsell {
@@ -84,8 +84,8 @@
 }
 
 .guest-upsell-primary {
-  background: var(--md-primary);
-  color: var(--md-on-primary);
+  background: var(--brand-run);
+  color: var(--brand-ink);
   border: none;
   border-radius: var(--md-radius-md);
   padding: 12px 26px;
@@ -96,7 +96,7 @@
 }
 
 .guest-upsell-primary:hover {
-  filter: brightness(1.15);
+  filter: brightness(1.08);
 }
 
 .guest-upsell-secondary {

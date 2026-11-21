@@ -3,7 +3,7 @@ export const domain3Guide = {
   id: 'domain3',
   name: 'Applications of Foundation Models',
   icon: '\u{1F680}',
-  color: '#00CED1',
+  color: '#22d3ee',
   weight: '28%',
   description: 'Prompt engineering, RAG, Bedrock agents, model customization, evaluation metrics, and AWS AI services for real-world applications.',
   sections: [

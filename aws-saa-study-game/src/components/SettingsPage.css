@@ -152,7 +152,7 @@
 
 .inline-edit-save {
   background: var(--md-primary);
-  color: #fff;
+  color: var(--md-on-primary);
   border: none;
   width: 30px;
   height: 30px;
@@ -166,7 +166,8 @@
 }
 
 .inline-edit-save:hover {
-  background: #4080b0;
+  background: var(--md-primary);
+  filter: brightness(1.08);
 }
 
 .inline-edit-save:disabled {
@@ -221,7 +222,7 @@
   justify-content: center;
   font-size: 2rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--brand-ink);
   border: 3px solid var(--md-border);
   overflow: hidden;
   position: relative;
@@ -274,7 +275,7 @@
 
 .avatar-tab.active {
   background: var(--md-primary);
-  color: #fff;
+  color: var(--md-on-primary);
 }
 
 /* Avatar Tab Content */
@@ -311,7 +312,7 @@
 
 .emoji-option.selected {
   border-color: var(--md-primary);
-  background: rgba(86, 156, 214, 0.1);
+  background: rgba(139, 92, 246, 0.1);
 }
 
 /* Color Swatches */
@@ -388,7 +389,7 @@
 
 .upload-dropzone:hover {
   border-color: var(--md-primary);
-  background: rgba(86, 156, 214, 0.1);
+  background: rgba(139, 92, 246, 0.1);
 }
 
 .upload-dropzone svg {
@@ -408,7 +409,7 @@
 /* Save Avatar Button */
 .save-avatar-btn {
   background: var(--md-primary);
-  color: #fff;
+  color: var(--md-on-primary);
   border: none;
   padding: 10px 24px;
   border-radius: var(--md-radius-md);
@@ -419,7 +420,8 @@
 }
 
 .save-avatar-btn:hover {
-  background: #4080b0;
+  background: var(--md-primary);
+  filter: brightness(1.08);
   transform: translateY(-1px);
 }
 
@@ -463,8 +465,8 @@
 
 .settings-input:focus {
   outline: none;
-  border-color: var(--md-primary);
-  box-shadow: 0 0 0 2px rgba(86, 156, 214, 0.1);
+  border-color: var(--brand-spark);
+  box-shadow: 0 0 0 2px rgba(103, 232, 249, 0.2);
 }
 
 .settings-input::placeholder {
@@ -474,7 +476,7 @@
 .password-submit-btn {
   align-self: flex-start;
   background: var(--md-primary);
-  color: #fff;
+  color: var(--md-on-primary);
   border: none;
   padding: 10px 20px;
   border-radius: var(--md-radius-md);
@@ -486,7 +488,8 @@
 }
 
 .password-submit-btn:hover {
-  background: #4080b0;
+  background: var(--md-primary);
+  filter: brightness(1.08);
 }
 
 .password-submit-btn:disabled {
@@ -563,7 +566,7 @@
 
 .toggle-switch input:checked + .toggle-slider:before {
   transform: translateX(22px);
-  background-color: #fff;
+  background-color: var(--brand-ink);
 }
 
 /* ============================================
@@ -618,7 +621,7 @@
 .delete-btn {
   align-self: flex-start;
   background: #f85149;
-  color: #fff;
+  color: var(--brand-ink);
   border: none;
   padding: 10px 20px;
   border-radius: var(--md-radius-md);
@@ -629,7 +632,7 @@
 }
 
 .delete-btn:hover {
-  background: #da3633;
+  background: #ff6b6b;
 }
 
 .delete-btn:disabled {

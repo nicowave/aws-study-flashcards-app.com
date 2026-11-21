@@ -6,9 +6,9 @@
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
-  background: #3a1f05;
-  color: #ffd8a8;
-  border: 1px solid #f28c28;
+  background: color-mix(in srgb, var(--brand-pop) 14%, var(--md-surface));
+  color: var(--md-on-surface);
+  border: 1px solid var(--brand-pop);
   border-radius: var(--md-radius-md);
   padding: 8px 16px;
   margin: 0 auto 16px;

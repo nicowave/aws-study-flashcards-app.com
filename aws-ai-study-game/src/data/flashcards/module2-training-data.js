@@ -6,8 +6,8 @@ export const module2 = {
   name: 'ML Training Process & Data Types',
   description: 'Data preparation, structured vs unstructured data, and learning paradigms',
   icon: '📊',
-  color: '#00CED1',
-  gradient: 'linear-gradient(135deg, #00CED1 0%, #20B2AA 100%)',
+  color: '#22d3ee',
+  gradient: 'linear-gradient(135deg, #22d3ee 0%, #20B2AA 100%)',
   source: 'AWS Skill Builder - Certified AI Practitioner Course #1',
   cards: [
     {

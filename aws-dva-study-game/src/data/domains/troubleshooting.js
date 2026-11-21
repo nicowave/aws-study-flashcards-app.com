@@ -6,7 +6,7 @@ export const troubleshooting = {
   name: 'Troubleshooting and Optimization',
   icon: '🔧',
   weight: '18%',
-  color: '#d29922',
+  color: '#f472b6',
   description: 'Root cause analysis, instrumentation for observability, and application performance optimization',
   questions: [
     {

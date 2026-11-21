@@ -5,7 +5,7 @@ export const costOptimizedGuide = {
   id: 'cost-optimized',
   name: 'Design Cost-Optimized Architectures',
   icon: '💰',
-  color: '#d29922',
+  color: '#f472b6',
   weight: '20%',
   description: 'How to choose the cheapest storage, compute, database and network designs that still meet the requirements, and the tools that track and control AWS spend.',
   sections: [

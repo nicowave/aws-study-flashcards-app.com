@@ -20,7 +20,7 @@
 }
 
 .guest-banner-cta {
-  background: var(--md-primary);
+  background: var(--brand-run);
   color: var(--md-on-primary);
   border: none;
   border-radius: var(--md-radius-sm);
@@ -84,7 +84,7 @@
 }
 
 .guest-upsell-primary {
-  background: var(--md-primary);
+  background: var(--brand-run);
   color: var(--md-on-primary);
   border: none;
   border-radius: var(--md-radius-md);

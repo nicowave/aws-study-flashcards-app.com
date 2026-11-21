@@ -3,7 +3,7 @@ export const highPerformingGuide = {
   id: 'high-performing',
   name: 'Design High-Performing Architectures',
   icon: '⚡',
-  color: '#58a6ff',
+  color: '#a78bfa',
   weight: '24%',
   description: 'Choose and tune storage, compute, databases, networking, and data pipelines so a workload meets its performance and scaling targets. Most questions give you a bottleneck and ask which service or setting removes it.',
   sections: [
