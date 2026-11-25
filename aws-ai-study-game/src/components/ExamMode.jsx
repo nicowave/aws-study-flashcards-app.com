@@ -9,6 +9,7 @@ import {
   FlagIcon
 } from './Icons';
 import ShareScore from './ShareScore';
+import SourceLinks from './SourceLinks';
 import './ExamMode.css';
 
 // ---- Per-app configuration ----
@@ -513,7 +514,12 @@ const ExamMode = ({ onExit }) => {
               ))}
               {answers[i] === null && <div className="exam-review-skipped">You left this question unanswered.</div>}
             </div>
-            {q.explanation && <div className="exam-review-explanation">{q.explanation}</div>}
+            {q.explanation && (
+              <div className="exam-review-explanation">
+                {q.explanation}
+                <SourceLinks sources={q.sources} compact />
+              </div>
+            )}
           </div>
         ))}
       </div>
