@@ -3,7 +3,7 @@ import { render, screen, within, act, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import { useAuth } from './context/AuthContext';
-import { getPlan, startCheckout, openBillingPortal, PRO_TRIAL_DAYS } from './services/billing';
+import { getPlan, getProTrialStatus, startCheckout, openBillingPortal, PRO_TRIAL_DAYS } from './services/billing';
 import { certifications, categories } from './data/certifications';
 import { COURSES } from './data/courses';
 import { GIS_PAGE } from './data/gis';
@@ -27,6 +27,7 @@ vi.mock('./services/billing', async (importOriginal) => {
     get PRO_PRICE_LABEL() { return billing.label; },
     PRO_TRIAL_DAYS: days,
     getPlan: vi.fn(),
+    getProTrialStatus: vi.fn(),
     startCheckout: vi.fn(),
     openBillingPortal: vi.fn(),
   };
@@ -118,6 +119,7 @@ beforeEach(() => {
   billing.label = '$39/yr';
   setAuth();
   vi.mocked(getPlan).mockReset().mockResolvedValue(null);
+  vi.mocked(getProTrialStatus).mockReset().mockResolvedValue(true); // a first-time buyer unless a test says otherwise
   vi.mocked(startCheckout).mockReset();
   vi.mocked(openBillingPortal).mockReset();
   at(promo.end + MINUTE); // outside any sale unless a test says otherwise
@@ -337,8 +339,9 @@ describe('App', () => {
         signIn();
         vi.mocked(startCheckout).mockReturnValue(new Promise(() => {})); // redirecting
         render(<App />);
-        await act(async () => {}); // getPlan resolves
+        await act(async () => {}); // getPlan, then the trial status, resolve
         expect(getPlan).toHaveBeenCalledWith({ forceRefresh: false });
+        expect(getProTrialStatus).toHaveBeenCalledTimes(1);
         expect(within(proCard()).getByText(`First ${PRO_TRIAL_DAYS} days free`)).toBeInTheDocument();
         const button = within(proCard()).getByRole('button', { name: /start free trial/i });
         await userEvent.click(button);
@@ -370,6 +373,37 @@ describe('App', () => {
         await userEvent.click(again);
         expect(startCheckout).toHaveBeenCalledTimes(2);
         expect(within(proCard()).queryByText(/could not start checkout/i)).not.toBeInTheDocument();
+      });
+
+      // The server gives the free week only to people who never had Pro; the card must not
+      // promise it to a former member, who checkout charges from day one
+      it('does not promise the trial to someone who had Pro before: "Get Pro" and a clear note', async () => {
+        signIn();
+        vi.mocked(getProTrialStatus).mockResolvedValue(false);
+        vi.mocked(startCheckout).mockReturnValue(new Promise(() => {}));
+        render(<App />);
+        await act(async () => {});
+        expect(proCard()).not.toHaveTextContent(/days free|free trial|card required/i);
+        expect(proCard()).toHaveTextContent(/had Pro before.*no free week.*starts today/i);
+        await userEvent.click(within(proCard()).getByRole('button', { name: /get pro/i }));
+        expect(startCheckout).toHaveBeenCalledWith('all-access');
+      });
+
+      it('does not promise the trial while the answer is unknown (lookup failed)', async () => {
+        signIn();
+        vi.mocked(getProTrialStatus).mockResolvedValue(null);
+        render(<App />);
+        await act(async () => {});
+        expect(proCard()).not.toHaveTextContent(/days free|free trial|card required|had Pro before/i);
+        expect(within(proCard()).getByRole('button', { name: /get pro/i })).toBeEnabled();
+      });
+
+      it("never asks for the trial status of a Pro member", async () => {
+        signIn();
+        vi.mocked(getPlan).mockResolvedValue('pro');
+        render(<App />);
+        await within(proCard()).findByText('Your Plan');
+        expect(getProTrialStatus).not.toHaveBeenCalled();
       });
 
       it('refreshes the plan from a fresh token when coming back from checkout', async () => {
@@ -549,6 +583,22 @@ describe('App', () => {
       const cloud = within(welcome).getByRole('link', { name: /cloud practitioner/i });
       expect(cloud).toHaveTextContent('Lvl 2 · 90%');
       expect(cloud).toHaveAttribute('href', onNewName(certifications.find((c) => c.id === 'cloud-practitioner').url));
+    });
+
+    // Regression: the panel once had cards for AI and Cloud Practitioner only, so Solutions
+    // Architect and Developer progress counted toward the totals but never got a card
+    it('gives every live cert the learner has played its own progress card', () => {
+      const live = certifications.filter((c) => c.status === 'available');
+      const progress = Object.fromEntries(live.map((c) => [c.id, { xp: 150, totalAnswered: 4, totalCorrect: 3 }]));
+      signIn({ userData: { isGuest: false, progress } });
+      render(<App />);
+      const welcome = screen.getByText(/welcome back,/i);
+      for (const c of live) {
+        const short = c.name.replace(/^AWS Certified /, '');
+        const card = within(welcome).getByRole('link', { name: new RegExp(short.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) });
+        expect(card).toHaveTextContent('Lvl 2 · 75%');
+        expect(card).toHaveAttribute('href', onNewName(c.url));
+      }
     });
 
     it('shows no stats panel for a member who has not played yet', () => {

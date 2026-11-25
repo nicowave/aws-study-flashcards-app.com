@@ -4,7 +4,7 @@ import { certifications, categories } from './data/certifications';
 import SettingsPage from './components/SettingsPage';
 import ForgotPassword from './components/ForgotPassword';
 import { applyAnalyticsPreference } from './services/analytics';
-import { BILLING_ENABLED, PRO_PRICE_LABEL, PRO_TRIAL_DAYS, getPlan, startCheckout, openBillingPortal } from './services/billing';
+import { BILLING_ENABLED, PRO_PRICE_LABEL, PRO_TRIAL_DAYS, getPlan, getProTrialStatus, startCheckout, openBillingPortal } from './services/billing';
 import CodingCourses, { COURSES, PromoBanner } from './components/CodingCourses';
 import Faq from './components/Faq';
 import { currentPromotion, salePrice } from './services/offers';
@@ -232,11 +232,11 @@ const UserStatsPanel = ({ userData }) => {
     ? Math.round((totalCorrect / totalAnswered) * 100)
     : 0;
 
-  // Cert-specific cards
-  const certMeta = [
-    { id: 'ai-practitioner', name: 'AI Practitioner', icon: '\u{1F916}', color: '#a78bfa', url: onThisName('https://ai.aws-study-flashcards-app.com') },
-    { id: 'cloud-practitioner', name: 'Cloud Practitioner', icon: '\u2601\uFE0F', color: '#3fb950', url: onThisName('https://cloud.aws-study-flashcards-app.com') },
-  ];
+  // One card per live cert the learner has progress in. Built from the cert data (each game saves
+  // progress under its cert id), so a new cert gets its card without touching this list.
+  const certMeta = certifications
+    .filter((c) => c.status === 'available')
+    .map((c) => ({ id: c.id, name: c.name.replace(/^AWS Certified /, ''), icon: c.icon, color: c.color, url: onThisName(c.url) }));
   const activeCerts = certMeta.filter(cert => progress[cert.id]);
 
   return (
@@ -488,17 +488,27 @@ const About = () => (
 const ProPlanCard = ({ onShowLogin }) => {
   const { isAuthenticated } = useAuth();
   const [plan, setPlan] = useState(null);
+  // Signed in: does checkout give this person the free week? (true / false / null = unknown yet)
+  const [trial, setTrial] = useState(null);
   const [busy, setBusy] = useState(false);
   const [billingError, setBillingError] = useState('');
 
   useEffect(() => {
+    let live = true;
     if (BILLING_ENABLED && isAuthenticated) {
       // Refresh claims when returning from checkout so the new plan shows up
       const fromCheckout = new URLSearchParams(window.location.search).get('checkout') === 'success';
-      getPlan({ forceRefresh: fromCheckout }).then(setPlan);
+      getPlan({ forceRefresh: fromCheckout }).then((p) => {
+        if (!live) return;
+        setPlan(p);
+        // Only people without Pro are offered it; ask the server whether they'd get the trial
+        if (p !== 'pro') getProTrialStatus().then((t) => live && setTrial(t));
+      });
     } else {
       setPlan(null);
+      setTrial(null);
     }
+    return () => { live = false; };
   }, [isAuthenticated]);
 
   const handleUpgrade = async () => {
@@ -526,7 +536,10 @@ const ProPlanCard = ({ onShowLogin }) => {
   };
 
   const sale = liveSale();
-  const offerTrial = BILLING_ENABLED && plan !== 'pro';
+  // Signed out, the card shows the trial ("One free trial per person"); signed in, only when the
+  // server says checkout would give it, so a former Pro member is never promised a free week
+  const offerTrial = BILLING_ENABLED && plan !== 'pro' && (!isAuthenticated || trial === true);
+  const hadProBefore = BILLING_ENABLED && isAuthenticated && plan !== 'pro' && trial === false;
   return (
     <div className={`plan-card ${BILLING_ENABLED ? 'plan-featured' : 'plan-dimmed'}`}>
       {BILLING_ENABLED && plan === 'pro' && <div className="plan-badge">Your Plan</div>}
@@ -560,12 +573,15 @@ const ProPlanCard = ({ onShowLogin }) => {
         </button>
       ) : isAuthenticated ? (
         <button className="btn btn-card-primary plan-cta" onClick={handleUpgrade} disabled={busy}>
-          {busy ? 'Redirecting…' : 'Start Free Trial'} {!busy && <ArrowRightIcon size={16} />}
+          {busy ? 'Redirecting…' : offerTrial ? 'Start Free Trial' : 'Get Pro'} {!busy && <ArrowRightIcon size={16} />}
         </button>
       ) : (
         <button className="btn btn-card-primary plan-cta" onClick={onShowLogin}>
           Sign In to Start Free Trial
         </button>
+      )}
+      {hadProBefore && (
+        <p className="plan-trial-note">You've had Pro before, so there's no free week this time: Pro starts today.</p>
       )}
       {billingError && <p className="plan-error">{billingError}</p>}
     </div>

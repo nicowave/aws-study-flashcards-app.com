@@ -302,7 +302,8 @@ async function customerExists(stripe, customerId) {
  */
 async function buyerHistory(stripe, uid, customerId, email) {
   const purchased = await purchasedPlans(uid);
-  const customerIds = new Set([customerId]);
+  // An account that never reached checkout has no customer of its own yet (proTrialStatus)
+  const customerIds = new Set(customerId ? [customerId] : []);
   if (email) {
     const sameEmail = await stripe.customers.list({ email, limit: 10 });
     sameEmail.data.forEach((c) => customerIds.add(c.id));
@@ -444,6 +445,24 @@ async function createCheckoutSession(data, user, stripe) {
 }
 
 // ---------------------------------------------------------------------------
+// proTrialStatus — () -> { trialAvailable: true | false | null }
+// What the Pro card may promise a signed-in person: the free week only if checkout would give it,
+// by the same rule (buyerHistory: nobody behind this account or email has had Pro). null when the
+// lookup fails; checkout gives no trial then either, so the card shouldn't promise one.
+// ---------------------------------------------------------------------------
+async function proTrialStatus(data, user, stripe) {
+  if (!user) throw new CallableError("UNAUTHENTICATED", "Sign in first");
+  try {
+    const customerId = await getCustomerId(user.uid);
+    const history = await buyerHistory(stripe, user.uid, customerId, user.email);
+    return { trialAvailable: !history.hadPro };
+  } catch (err) {
+    console.error(`[billing] Trial status lookup failed for uid=${user.uid}:`, err.message);
+    return { trialAvailable: null };
+  }
+}
+
+// ---------------------------------------------------------------------------
 // createPortalSession — ({ returnUrl? }) -> { url }
 // ---------------------------------------------------------------------------
 async function createPortalSession(data, user, stripe) {
@@ -520,10 +539,10 @@ async function stripeWebhook(event) {
 // ---------------------------------------------------------------------------
 // Router (API Gateway HTTP API, payload format 2.0)
 // ---------------------------------------------------------------------------
-const CALLABLES = { createCheckoutSession, createPortalSession };
+const CALLABLES = { createCheckoutSession, createPortalSession, proTrialStatus };
 
 // For aws-backend/test only: lets the tests run checkout against a fake Stripe and table.
-exports._test = { createCheckoutSession, createPortalSession };
+exports._test = { createCheckoutSession, createPortalSession, proTrialStatus };
 
 exports.handler = async (event) => {
   const path = event.rawPath || "";

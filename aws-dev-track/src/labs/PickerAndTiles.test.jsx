@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ProtocolPickerLab, TileMathLab } from './PickerAndTiles';
@@ -85,6 +85,38 @@ describe('ProtocolPickerLab', () => {
     expect(screen.getByText('Not that one.')).toBeInTheDocument();
     expect(screen.queryByText('Right.')).not.toBeInTheDocument();
     expect(score()).toBe('score 0/1');
+  });
+
+  // Regression: the options were written with the right one always second, so "always pick
+  // the second button" scored 8/8. They are shuffled now, so the position comes from the
+  // shuffle, not from how the scenario was typed.
+  it('shuffles the options, so the right answer is not always in the same place', () => {
+    const rightPosition = () => {
+      const { answer } = expectedFor(questionText());
+      return choiceButtons().findIndex((b) => answer.test(b.textContent));
+    };
+    // Math.random() = 0 makes Fisher-Yates move the second option to the front
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const first = render(<ProtocolPickerLab />);
+    expect(rightPosition()).toBe(0);
+    first.unmount();
+    // Just under 1 leaves every option in place: the right one is second, as written
+    Math.random.mockReturnValue(0.999);
+    render(<ProtocolPickerLab />);
+    expect(rightPosition()).toBe(1);
+  });
+
+  it('shows every option of each scenario exactly once after the shuffle', async () => {
+    const user = userEvent.setup();
+    render(<ProtocolPickerLab />);
+    const [, total] = position();
+    for (let k = 1; k <= total; k++) {
+      const labels = choiceButtons().map((b) => b.textContent);
+      expect(labels).toHaveLength(4);
+      expect(new Set(labels).size).toBe(4);
+      await user.click(choiceButtons()[0]);
+      await user.click(screen.getByRole('button', { name: 'Next scenario' }));
+    }
   });
 });
 

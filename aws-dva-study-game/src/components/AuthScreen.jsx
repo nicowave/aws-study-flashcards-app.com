@@ -53,13 +53,14 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
 
     const { username, email, password, confirmPassword } = formData;
 
-    // Validation
-    if (!username.trim()) {
+    // Validation. Sign-in uses only email and password, so the username is asked for (and
+    // checked) only when creating an account.
+    if (!isLogin && !username.trim()) {
       setFormError('Username is required');
       return;
     }
 
-    if (username.length < 3) {
+    if (!isLogin && username.length < 3) {
       setFormError('Username must be at least 3 characters');
       return;
     }
@@ -171,7 +172,8 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
-          {/* Username Field */}
+          {/* Username Field (sign-up only: sign-in never uses it) */}
+          {!isLogin && (
           <div className="form-group">
             <label htmlFor="username">
               <UserIcon size={18} />
@@ -188,6 +190,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
               disabled={loading}
             />
           </div>
+          )}
 
           {/* Email Field - REQUIRED */}
           <div className="form-group">
