@@ -34,6 +34,14 @@ npx cdk bootstrap        # once per account/region
 npm run deploy
 ```
 
+Run `npm install` again after every `git pull` that changes `package.json`.
+`cdk.json` runs the project's own `node_modules/.bin/ts-node` (TypeScript 5),
+so without it the deploy stops with "ts-node: No such file or directory".
+It used to say `npx ts-node`, which quietly downloaded the newest ts-node and
+TypeScript 7 when `node_modules` was missing; TypeScript 7 has no JavaScript
+API, and ts-node crashed with "Cannot read properties of undefined (reading
+'fileExists')".
+
 Outputs to note for Phase 2: `UserPoolId`, `UserPoolClientId`,
 `HostedUiBaseUrl`, `ApiUrl`.
 
