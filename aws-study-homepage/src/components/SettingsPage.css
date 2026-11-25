@@ -495,6 +495,65 @@
 }
 
 /* ============================================
+   PLAN & BILLING
+   ============================================ */
+.billing-plan,
+.billing-status {
+  margin: 0 0 12px;
+  color: var(--text-secondary, inherit);
+}
+
+.billing-unlocks p {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+}
+
+.billing-unlocks ul {
+  margin: 0 0 14px;
+  padding-left: 20px;
+}
+
+.billing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.billing-btn {
+  background: var(--brand-run);
+  color: var(--brand-ink);
+  border: 1px solid transparent;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.billing-btn.secondary {
+  background: transparent;
+  color: inherit;
+  border-color: var(--border-color, rgba(255, 255, 255, 0.2));
+}
+
+.billing-btn:hover {
+  filter: brightness(1.08);
+}
+
+.billing-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.billing-note {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ============================================
    SECTION 4: ANALYTICS
    ============================================ */
 .analytics-toggle-row {

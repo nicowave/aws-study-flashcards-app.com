@@ -1,8 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App.jsx';
 import { getAllDecks, getAllCards, getExamTrapCards } from './data/devTrackCards.js';
+
+// Pretend the page was opened on the new name, so we can see the hub link goes through onThisName.
+vi.mock('./config/auth.config.js', async (importOriginal) => ({
+  ...(await importOriginal()),
+  onThisName: (url) => url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com'),
+}));
 
 const setup = () => {
   const user = userEvent.setup();
@@ -17,11 +23,12 @@ const sectionHeading = () => screen.getAllByRole('heading', { level: 2 })[0].tex
 const openTab = (user, name) => user.click(tab(name));
 
 describe('App: shell and tabs', () => {
-  it('shows the title and links back to the Study Hub', () => {
+  it('shows the title and links back to the Study Hub on the name the page was opened on', () => {
     setup();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Dev Track');
     const hub = screen.getByRole('link', { name: 'Level Up Study Hub' });
-    expect(new URL(hub.getAttribute('href')).hostname).toBe('aws-study-flashcards-app.com');
+    // Through onThisName: a visitor on levelupstudyhub.com stays there and keeps that name's sign-in
+    expect(new URL(hub.getAttribute('href')).hostname).toBe('levelupstudyhub.com');
   });
 
   it('opens on the study guide tab', () => {

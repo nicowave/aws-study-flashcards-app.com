@@ -31,6 +31,24 @@ export const getPlan = async ({ forceRefresh = false } = {}) => {
   }
 };
 
+/**
+ * The signed-in user's plan and one-time unlocks from ID token claims (set by the pre-token Lambda):
+ * { plan: 'pro' | null, certs: ['developer-associate', 'bash-for-aws', ...] }, or null when the
+ * token can't be read.
+ */
+export const getEntitlements = async ({ forceRefresh = false } = {}) => {
+  try {
+    const tokens = await getTokens({ forceRefresh });
+    if (!tokens) return null;
+    const claims = decodeJwt(tokens.idToken);
+    const certs = typeof claims.certs === 'string' ? claims.certs.split(',').map((c) => c.trim()).filter(Boolean) : [];
+    return { plan: claims.plan || null, certs };
+  } catch (err) {
+    console.warn('[billing] Failed to read entitlements:', err.message);
+    return null;
+  }
+};
+
 /** Starts Stripe Checkout for the given plan and redirects the browser. */
 export const startCheckout = async (plan = 'all-access') => {
   // Come back to the name the buyer paid on; the server accepts only listed Study Hub addresses.

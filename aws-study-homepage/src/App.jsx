@@ -1059,6 +1059,12 @@ function HomepageContent() {
     window.scrollTo(0, 0);
   };
 
+  // Settings → "See plans": back to the homepage, at the plans section
+  const handleSeePlans = () => {
+    setCurrentPage('home');
+    setTimeout(() => document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' }), 0);
+  };
+
   return (
     <div className="app">
       <PromoBanner />
@@ -1070,7 +1076,7 @@ function HomepageContent() {
 
       {currentPage === 'settings' && isAuthenticated ? (
         <main>
-          <SettingsPage onBack={handleBackToHome} />
+          <SettingsPage onBack={handleBackToHome} onSeePlans={handleSeePlans} />
         </main>
       ) : (
         <>
