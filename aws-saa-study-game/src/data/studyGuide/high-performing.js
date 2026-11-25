@@ -10,9 +10,14 @@ export const highPerformingGuide = {
     {
       id: 'perfs1',
       title: 'Block and Object Storage Performance',
+      sources: [
+        { title: 'Performance design patterns for Amazon S3 – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance-design-patterns.html', checked: '2026-11-25' },
+        { title: 'Amazon EBS volume types – Amazon EBS', url: 'https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html', checked: '2026-11-25' },
+        { title: 'Data persistence for Amazon EC2 instance store volumes – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-store-lifetime.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Start every storage question by naming the access pattern: random small I/O (databases), large sequential reads and writes (logs, big data), shared file access, or object access over HTTP. The pattern picks the storage family; the constraint (latency, throughput, durability, cost) picks the option inside it.' },
-        { type: 'awsService', name: 'Amazon S3', description: 'Object storage with strong read-after-write consistency. Request throughput scales per prefix, at least 3,500 PUT/COPY/POST/DELETE and 5,500 GET/HEAD requests per second per partitioned prefix, so spreading keys across prefixes multiplies throughput.' },
+        { type: 'awsService', name: 'Amazon S3', description: 'Object storage with strong read-after-write consistency. Request throughput scales per prefix, at least 3,500 PUT/COPY/POST/DELETE or 11,000 GET/HEAD requests per second per partitioned prefix, so spreading keys across prefixes multiplies throughput.' },
         { type: 'bulletList', title: 'S3 performance techniques', items: [
           'Multipart upload: uploads parts in parallel and retries only failed parts. Recommended above 100 MB and required above 5 GB, the single PUT limit.',
           'S3 Transfer Acceleration: clients upload to the nearest edge location and data travels the AWS backbone to the bucket. Use it for long-distance uploads to a single bucket.',
@@ -33,6 +38,11 @@ export const highPerformingGuide = {
     {
       id: 'perfs2',
       title: 'File, Hybrid, and Data Transfer Storage',
+      sources: [
+        { title: 'Amazon EFS performance specifications – Amazon Elastic File System', url: 'https://docs.aws.amazon.com/efs/latest/ug/performance.html', checked: '2026-11-25' },
+        { title: 'Help Me Choose An Amazon FSx File System | Amazon Web Services', url: 'https://aws.amazon.com/fsx/when-to-choose-fsx/', checked: '2026-11-25' },
+        { title: 'What is AWS DataSync? – AWS DataSync', url: 'https://docs.aws.amazon.com/datasync/latest/userguide/what-is-datasync.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Shared file systems are chosen by protocol and by the system being replaced. Hybrid services are chosen by whether the data needs ongoing access from on premises (Storage Gateway) or a one-time or scheduled move (DataSync).' },
         { type: 'awsService', name: 'Amazon EFS', description: 'Managed, elastic NFS file system for Linux that thousands of instances, containers, and Lambda functions can mount at once across AZs. Storage grows and shrinks automatically and lifecycle policies move cold files to cheaper storage classes.' },
@@ -41,7 +51,7 @@ export const highPerformingGuide = {
           { label: 'Provisioned', description: 'You set a fixed throughput independent of storage size. Best for steady, known high throughput on a small file system.' },
           { label: 'Bursting', description: 'Throughput scales with the amount of data stored, using burst credits. Can throttle small file systems with heavy use.' }
         ]},
-        { type: 'keyTerm', term: 'EFS performance modes', definition: 'General Purpose (default and recommended for almost all workloads, lowest latency) and Max I/O (higher aggregate parallelism for very large, highly parallel workloads, at higher latency).' },
+        { type: 'keyTerm', term: 'EFS performance modes', definition: 'General Purpose (the default, lowest latency, and what AWS now recommends for all file systems) and Max I/O (a previous-generation mode for highly parallel workloads that tolerate higher latency; not available with Elastic throughput or One Zone file systems).' },
         { type: 'table', headers: ['FSx option', 'Protocols', 'Choose it when'], rows: [
           ['FSx for Windows File Server', 'SMB', 'Windows applications need Active Directory integration, NTFS permissions, or DFS namespaces'],
           ['FSx for Lustre', 'Lustre (POSIX)', 'HPC, ML training, or media rendering needs massive parallel throughput, often linked to an S3 bucket'],
@@ -60,6 +70,11 @@ export const highPerformingGuide = {
     {
       id: 'perfs3',
       title: 'High-Performing and Elastic Compute',
+      sources: [
+        { title: 'Placement strategies for your placement groups – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-strategies.html', checked: '2026-11-25' },
+        { title: 'Lambda quotas – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html', checked: '2026-11-25' },
+        { title: 'Improving startup performance with Lambda SnapStart – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Compute questions ask you to pick the right instance family, place instances for the network pattern, and scale capacity at the right time. Serverless and container options trade control for lower operational overhead.' },
         { type: 'bulletList', title: 'EC2 instance families', items: [
@@ -68,12 +83,12 @@ export const highPerformingGuide = {
           'Memory optimized (R, X): in-memory databases and caches, real-time big data.',
           'Storage optimized (I, D): high local IOPS or throughput from instance store.',
           'Accelerated computing (P, G, Trn, Inf): GPU or custom chips for ML and graphics.',
-          'Graviton (instance types ending in g, such as m7g): AWS Arm processors with better price performance for Linux workloads that can run on Arm.'
+          'Graviton (a g after the generation number, such as m7g or c7gn): AWS Arm processors with better price performance for Linux workloads that can run on Arm.'
         ]},
         { type: 'comparison', title: 'Placement groups', items: [
           { label: 'Cluster', description: 'Instances packed close together in one AZ for the lowest latency and highest bandwidth. Use for tightly coupled HPC and MPI. A single AZ means lower availability.' },
           { label: 'Spread', description: 'Each instance on distinct hardware, up to seven running instances per AZ per group. Use for a small number of critical instances.' },
-          { label: 'Partition', description: 'Instances split into partitions that do not share racks, up to seven partitions per AZ. Use for large, rack-aware distributed systems such as HDFS, Cassandra, and Kafka.' }
+          { label: 'Partition', description: 'Instances split into partitions that do not share racks, up to seven partitions per AZ. Use for large, rack-aware distributed systems such as HDFS, HBase, and Cassandra.' }
         ]},
         { type: 'keyTerm', term: 'Enhanced networking and EFA', definition: 'Enhanced networking with the Elastic Network Adapter (ENA) gives higher bandwidth, more packets per second, and lower latency. Elastic Fabric Adapter (EFA) adds OS-bypass for HPC and ML frameworks such as MPI and NCCL. Combine EFA with a cluster placement group for tightly coupled workloads.' },
         { type: 'bulletList', title: 'EC2 Auto Scaling policies', items: [
@@ -93,7 +108,7 @@ export const highPerformingGuide = {
           { label: 'Amazon ECS', description: 'AWS-native container orchestration. Simplest path for teams without Kubernetes requirements.' },
           { label: 'Amazon EKS', description: 'Managed Kubernetes. Choose when the team already uses Kubernetes or needs portability of Kubernetes tooling.' },
           { label: 'AWS Fargate', description: 'Serverless compute for ECS or EKS tasks; no instances to patch or scale. Lowest operational overhead.' },
-          { label: 'AWS Batch', description: 'Queues and runs batch jobs on right-sized EC2, Spot, or Fargate capacity. Use for long-running jobs that exceed the 15-minute Lambda limit.' }
+          { label: 'AWS Batch', description: 'Queues and runs batch jobs on right-sized EC2, Spot, or Fargate capacity. Use for long-running jobs that exceed the 30-minute Lambda limit (raised from 15 min; older material may still say 15).' }
         ]},
         { type: 'examTip', text: '"Least operational overhead for containers" means Fargate. "Lowest latency between nodes" means a cluster placement group, plus EFA for MPI. "Slow Java cold starts without paying for idle capacity" means SnapStart, while "guaranteed warm capacity" means provisioned concurrency.' }
       ]
@@ -101,13 +116,18 @@ export const highPerformingGuide = {
     {
       id: 'perfs4',
       title: 'High-Performing Databases and Caching',
+      sources: [
+        { title: 'Amazon Aurora endpoint connections – Amazon Aurora', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Endpoints.html', checked: '2026-11-25' },
+        { title: 'Improving data access with secondary indexes in DynamoDB – Amazon DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SecondaryIndexes.html', checked: '2026-11-25' },
+        { title: 'Caching strategies for Memcached – Amazon ElastiCache', url: 'https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Pick the engine that fits the data model first, then scale it. Relational workloads scale reads with replicas and connections with RDS Proxy; key-value workloads scale with DynamoDB partition design; repeated reads scale with a cache.' },
         { type: 'table', headers: ['Feature', 'Amazon RDS', 'Amazon Aurora'], rows: [
           ['Engines', 'MySQL, PostgreSQL, MariaDB, Oracle, SQL Server, Db2', 'MySQL- and PostgreSQL-compatible'],
           ['Storage', 'EBS volumes per instance', 'Shared cluster volume, six copies across three AZs, grows automatically'],
           ['Read scaling', 'Read replicas with asynchronous replication', 'Up to 15 Aurora Replicas behind a reader endpoint, low replica lag'],
-          ['Variable load', 'Choose and resize instance classes', 'Aurora Serverless v2 scales capacity in fine-grained ACU increments'],
+          ['Variable load', 'Choose and resize instance classes', 'Aurora Serverless v2 (now just "Aurora Serverless" in the docs) scales capacity in half-ACU increments'],
           ['Global', 'Cross-Region read replicas', 'Aurora Global Database with fast cross-Region replication']
         ]},
         { type: 'keyTerm', term: 'RDS Proxy', definition: 'A managed connection pool for RDS and Aurora. It absorbs connection storms from Lambda or many app servers, reuses connections, and speeds up failover by keeping client connections open.' },
@@ -139,11 +159,16 @@ export const highPerformingGuide = {
     {
       id: 'perfs5',
       title: 'High-Performing and Scalable Networks',
+      sources: [
+        { title: 'Differences between CloudFront Functions and Lambda@Edge – Amazon CloudFront', url: 'https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/edge-functions-choosing.html', checked: '2026-11-25' },
+        { title: 'AWS Global Accelerator FAQs – Amazon Web Services', url: 'https://aws.amazon.com/global-accelerator/faqs/', checked: '2026-11-25' },
+        { title: 'AWS PrivateLink – Building a Scalable and Secure Multi-VPC AWS Network Infrastructure', url: 'https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/aws-privatelink.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Network questions are about getting users to the application quickly (edge services), connecting sites to AWS predictably (hybrid links), and connecting VPCs at scale (hub-and-spoke or service endpoints).' },
         { type: 'awsService', name: 'Amazon CloudFront', description: 'Content delivery network that caches content at edge locations. Origins include S3, ALB, EC2, and custom HTTP servers. Use cache policies to control the cache key and Origin Shield to further reduce origin load.' },
         { type: 'comparison', title: 'CloudFront Functions vs Lambda@Edge', items: [
-          { label: 'CloudFront Functions', description: 'Lightweight JavaScript on viewer request and response events, sub-millisecond, no network calls, lowest cost. Header and URL rewrites, redirects, cache key normalization.' },
+          { label: 'CloudFront Functions', description: 'Lightweight JavaScript on viewer request and response events, sub-millisecond, lowest cost, and at most one network call per invocation (to an origin on the same distribution). Header and URL rewrites, redirects, cache key normalization.' },
           { label: 'Lambda@Edge', description: 'Node.js or Python on viewer and origin events, longer execution, network and request body access. Use for calls to external services or heavier logic.' }
         ]},
         { type: 'awsService', name: 'AWS Global Accelerator', description: 'Two static anycast IP addresses that bring TCP and UDP traffic onto the AWS backbone at the nearest edge location and route it to healthy Regional endpoints (NLB, ALB, EC2, Elastic IP). No caching. Fast failover that does not depend on DNS.' },
@@ -161,8 +186,13 @@ export const highPerformingGuide = {
     {
       id: 'perfs6',
       title: 'Data Ingestion, Transformation, and Analytics',
+      sources: [
+        { title: 'What is Amazon Data Firehose? – Amazon Data Firehose', url: 'https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html', checked: '2026-11-25' },
+        { title: 'Using crawlers to populate the Data Catalog – AWS Glue', url: 'https://docs.aws.amazon.com/glue/latest/dg/add-crawler.html', checked: '2026-11-25' },
+        { title: 'What is AWS Quick? – AWS Quick', url: 'https://docs.aws.amazon.com/quick/latest/userguide/what-is.html', checked: '2026-11-25' }
+      ],
       content: [
-        { type: 'paragraph', text: 'Analytics pipelines have three stages: ingest (Kinesis, Firehose, MSK, DataSync), transform and catalog (Glue, EMR, Flink), and query or visualize (Athena, Redshift, QuickSight). The exam asks you to pick the managed option that meets the latency and operational overhead constraints.' },
+        { type: 'paragraph', text: 'Analytics pipelines have three stages: ingest (Kinesis, Firehose, MSK, DataSync), transform and catalog (Glue, EMR, Flink), and query or visualize (Athena, Redshift, AWS Quick Sight). The exam asks you to pick the managed option that meets the latency and operational overhead constraints.' },
         { type: 'comparison', title: 'Streaming services', items: [
           { label: 'Kinesis Data Streams', description: 'Real-time stream with custom consumers, ordering per partition key, replay within the retention period, and enhanced fan-out for dedicated per-consumer throughput. Provisioned (shards) or on-demand capacity.' },
           { label: 'Amazon Data Firehose', description: 'Fully managed delivery to S3, Redshift, OpenSearch, Splunk, and HTTP endpoints. Buffers by size or time (near real time), with optional Lambda transformation and Parquet or ORC conversion.' },
@@ -176,7 +206,7 @@ export const highPerformingGuide = {
           ['Redshift Spectrum', 'Redshift queries on external tables in S3', 'Joining warehouse tables with data lake files without loading them'],
           ['Amazon EMR', 'Managed Spark, Hive, Presto, and Hadoop', 'Large custom big data processing with framework control'],
           ['AWS Lake Formation', 'Builds and governs data lakes on S3', 'Central fine-grained permissions (table, column, row) across analytics services'],
-          ['Amazon QuickSight', 'Serverless BI dashboards', 'Business users need interactive dashboards on these sources']
+          ['AWS Quick Sight (formerly Amazon QuickSight)', 'Serverless BI dashboards, part of AWS Quick', 'Business users need interactive dashboards on these sources']
         ]},
         { type: 'bulletList', title: 'Make data lake queries fast and cheap', items: [
           'Store data in columnar formats such as Parquet or ORC so queries read only the needed columns.',
