@@ -12,6 +12,11 @@ export const secureArchitecturesGuide = {
     {
       id: 'secs1',
       title: 'IAM Fundamentals and Policy Evaluation',
+      sources: [
+        { title: 'Policy evaluation logic – AWS Identity and Access Management', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html', checked: '2026-11-25' },
+        { title: 'Permissions boundaries for IAM entities – AWS Identity and Access Management', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html', checked: '2026-11-25' },
+        { title: 'Root user best practices for your AWS account – AWS Identity and Access Management', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/root-user-best-practices.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'AWS Identity and Access Management (IAM) decides whether every API request is allowed. The exam expects you to pick the option that uses temporary credentials, grants least privilege, and needs the least ongoing maintenance. Long-term access keys are almost never the right answer.' },
         { type: 'keyTerm', term: 'IAM Role', definition: 'An identity with permissions but no long-term credentials. Users, applications, and AWS services assume a role and receive temporary credentials from AWS STS. EC2 instances get a role through an instance profile; Lambda functions and ECS tasks get one through their execution or task role.' },
@@ -42,6 +47,11 @@ export const secureArchitecturesGuide = {
     {
       id: 'secs2',
       title: 'Multi-account Governance and Federation',
+      sources: [
+        { title: 'Service control policies (SCPs) – AWS Organizations', url: 'https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html', checked: '2026-11-25' },
+        { title: 'Control behavior and guidance – AWS Control Tower', url: 'https://docs.aws.amazon.com/controltower/latest/controlreference/control-behavior.html', checked: '2026-11-25' },
+        { title: 'What is IAM Identity Center? – AWS IAM Identity Center', url: 'https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Most exam scenarios involve many accounts. AWS Organizations groups accounts into organizational units (OUs) and applies guardrails, IAM Identity Center gives workforce users single sign-on, and STS role assumption connects accounts securely.' },
         { type: 'awsService', name: 'AWS Organizations', description: 'Central management of multiple accounts with consolidated billing, OUs, and policies. Service control policies (SCPs) cap what principals in member accounts can do; resource control policies (RCPs) cap what can be done to resources such as S3 buckets and KMS keys, including by principals outside the organization.' },
@@ -67,6 +77,11 @@ export const secureArchitecturesGuide = {
     {
       id: 'secs3',
       title: 'Network Security in the VPC',
+      sources: [
+        { title: 'Control subnet traffic with network access control lists – Amazon Virtual Private Cloud', url: 'https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html', checked: '2026-11-25' },
+        { title: 'NAT gateway basics – Amazon Virtual Private Cloud', url: 'https://docs.aws.amazon.com/vpc/latest/userguide/nat-gateway-basics.html', checked: '2026-11-25' },
+        { title: 'Gateway endpoints for Amazon S3 – Amazon Virtual Private Cloud', url: 'https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Network controls are layered: route tables decide where traffic can go, network ACLs filter at the subnet edge, and security groups filter at each network interface. Private subnets, NAT, and VPC endpoints keep workloads off the public internet.' },
         { type: 'table', headers: ['Feature', 'Security Group', 'Network ACL'], rows: [
@@ -76,8 +91,8 @@ export const secureArchitecturesGuide = {
           ['Evaluation', 'All rules evaluated together', 'Lowest rule number first, first match wins'],
           ['Typical use', 'Least-privilege access between tiers, referencing other security groups', 'Blocking specific IP ranges for a whole subnet']
         ]},
-        { type: 'keyTerm', term: 'Public vs Private Subnet', definition: 'A public subnet has a route to an internet gateway. A private subnet does not; its instances reach the internet outbound through a NAT gateway in a public subnet, and cannot be reached from the internet.' },
-        { type: 'keyTerm', term: 'NAT Gateway', definition: 'Managed outbound-only IPv4 internet access for private subnets. A zonal NAT gateway lives in one Availability Zone, so for high availability deploy one per AZ and route each private subnet to the NAT gateway in its own AZ. For IPv6 outbound-only traffic, use an egress-only internet gateway.' },
+        { type: 'keyTerm', term: 'Public vs Private Subnet', definition: 'A public subnet has a route to an internet gateway. A private subnet does not; its instances reach the internet outbound through a NAT gateway, and cannot be reached from the internet.' },
+        { type: 'keyTerm', term: 'NAT Gateway', definition: 'Managed outbound-only IPv4 internet access for private subnets. A zonal NAT gateway lives in one public subnet in one Availability Zone, so for high availability deploy one per AZ and route each private subnet to the NAT gateway in its own AZ. A regional NAT gateway needs no public subnet and expands across AZs automatically. For IPv6 outbound-only traffic, use an egress-only internet gateway.' },
         { type: 'comparison', title: 'Gateway Endpoint vs Interface Endpoint', items: [
           { label: 'Gateway endpoint', description: 'Only for Amazon S3 and DynamoDB. Added as a target in route tables. No hourly or data charge. Not usable from on premises or peered VPCs. Control access with endpoint policies and bucket policy conditions such as aws:SourceVpce.' },
           { label: 'Interface endpoint (PrivateLink)', description: 'For most AWS services, SaaS partners, and your own endpoint services. Creates ENIs with private IPs, protected by security groups. Private DNS lets default SDK hostnames resolve privately. Hourly plus per-GB charges; reachable over VPN and Direct Connect.' }
@@ -90,6 +105,11 @@ export const secureArchitecturesGuide = {
     {
       id: 'secs4',
       title: 'Protecting Applications and Detecting Threats',
+      sources: [
+        { title: 'What are AWS WAF, AWS Shield Advanced, AWS Shield network security director and AWS Firewall Manager? – AWS WAF Developer Guide', url: 'https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html', checked: '2026-11-25' },
+        { title: 'AWS Shield Advanced capabilities and options – AWS WAF Developer Guide', url: 'https://docs.aws.amazon.com/waf/latest/developerguide/ddos-advanced-summary-capabilities.html', checked: '2026-11-25' },
+        { title: 'AWS Systems Manager Parameter Store – AWS Systems Manager', url: 'https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Above the network layer, the exam tests edge protection (WAF and Shield), application authentication (Cognito and API Gateway authorizers), secret storage, and the managed detection services. Each detection service has a narrow job; match the keyword in the question to the service.' },
         { type: 'awsService', name: 'AWS WAF', description: 'Layer 7 web application firewall for CloudFront, ALB, API Gateway, AppSync, and Cognito user pools. Web ACLs use AWS managed rule groups (SQL injection, XSS, known bad inputs, bot control), IP sets, geo match, and rate-based rules.' },
@@ -101,7 +121,7 @@ export const secureArchitecturesGuide = {
           ['Amazon GuardDuty', 'Threat detection from CloudTrail, VPC Flow Logs, DNS logs, plus optional S3, EKS, RDS, Lambda, malware, and runtime protection', 'Compromised instance, crypto mining, unusual API calls'],
           ['Amazon Inspector', 'Continuous vulnerability scanning of EC2, ECR container images, and Lambda functions', 'CVEs, software vulnerabilities, network exposure'],
           ['Amazon Macie', 'Discovers sensitive data such as PII in S3 and reports bucket security posture', 'PII in S3, sensitive data discovery'],
-          ['AWS Security Hub', 'Aggregates findings across accounts and runs automated best-practice checks (AWS Foundational Security Best Practices, CIS)', 'Single pane of glass, security posture'],
+          ['AWS Security Hub CSPM', 'Aggregates findings across accounts and runs automated best-practice checks against standards (AWS Foundational Security Best Practices, CIS); the unified Security Hub correlates CSPM, GuardDuty, Inspector, and Macie findings', 'Single pane of glass, security posture'],
           ['Amazon Detective', 'Builds behavior graphs to investigate the root cause of findings', 'Investigate, root cause analysis']
         ]},
         { type: 'comparison', title: 'Cognito User Pools vs Identity Pools', items: [
@@ -115,7 +135,7 @@ export const secureArchitecturesGuide = {
           'API keys and usage plans are for throttling and quotas, not for authentication.'
         ]},
         { type: 'comparison', title: 'Secrets Manager vs Parameter Store', items: [
-          { label: 'AWS Secrets Manager', description: 'Purpose-built for secrets: automatic rotation (managed for RDS, Aurora, Redshift, and DocumentDB), cross-Region replication, fine-grained resource policies. Charged per secret per month plus API calls.' },
+          { label: 'AWS Secrets Manager', description: 'Purpose-built for secrets: automatic rotation (managed rotation for RDS, Aurora, DocumentDB, and Redshift admin credentials; Lambda rotation functions for other secrets), cross-Region replication, fine-grained resource policies. Charged per secret per month plus API calls.' },
           { label: 'Systems Manager Parameter Store', description: 'Hierarchical configuration and SecureString parameters encrypted with KMS. Standard parameters have no extra charge. No built-in rotation, so use it for configuration and secrets that do not need rotation.' }
         ]},
         { type: 'examTip', text: 'Read for the decisive keyword: "rotate automatically" is Secrets Manager, "SQL injection" or "rate limit" is WAF, "DDoS response team" or "cost protection" is Shield Advanced, "PII in S3" is Macie, "CVE" is Inspector, and "aggregate findings" is Security Hub.' }
@@ -124,19 +144,24 @@ export const secureArchitecturesGuide = {
     {
       id: 'secs5',
       title: 'Encryption and Key Management',
+      sources: [
+        { title: 'AWS KMS keys – AWS Key Management Service', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html', checked: '2026-11-25' },
+        { title: 'Rotate AWS KMS keys – AWS Key Management Service', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html', checked: '2026-11-25' },
+        { title: 'What is AWS CloudHSM? – AWS CloudHSM', url: 'https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'AWS Key Management Service (KMS) is the default answer for encryption keys. Know the key types, how key policies control access, how envelope encryption works, and when a requirement forces CloudHSM instead.' },
         { type: 'table', headers: ['Key Type', 'Who Controls It', 'Key Policy Editable', 'Cross-account Use', 'Rotation'], rows: [
           ['AWS owned key', 'AWS, used internally by services', 'No (not visible)', 'Not applicable', 'Managed by AWS'],
           ['AWS managed key (aws/service)', 'AWS on your behalf', 'No', 'No', 'Automatic, yearly'],
-          ['Customer managed key', 'You', 'Yes', 'Yes, via key policy plus IAM', 'Optional automatic, configurable period, or on demand']
+          ['Customer managed key', 'You', 'Yes', 'Yes, via key policy (or an AWS RAM share) plus IAM', 'Optional automatic, configurable period, or on demand']
         ]},
         { type: 'keyTerm', term: 'Key Policy', definition: 'The resource-based policy on every KMS key and the primary way to control access to it. IAM policies only work for a key if its key policy allows the account to delegate access through IAM. Grants provide temporary, scoped permissions, often used by AWS services.' },
         { type: 'keyTerm', term: 'Envelope Encryption', definition: 'KMS GenerateDataKey returns a plaintext data key and the same key encrypted under a KMS key. Data is encrypted locally with the plaintext key, which is then discarded; the encrypted data key is stored with the data. The KMS Encrypt API only accepts small payloads, so large data always uses envelope encryption.' },
         { type: 'keyTerm', term: 'Multi-Region Keys', definition: 'A set of interoperable KMS keys in different Regions with the same key ID and key material. Data encrypted in one Region can be decrypted in another without a cross-Region call, which suits disaster recovery and global applications. Each replica has its own key policy.' },
         { type: 'awsService', name: 'AWS CloudHSM', description: 'Dedicated, single-tenant, FIPS-validated hardware security modules in your VPC. You manage the users and keys and AWS has no access to key material. Supports PKCS#11, JCE, and Microsoft CNG for workloads such as Oracle TDE, SSL/TLS offload, and certificate authorities. Can back a KMS custom key store.' },
         { type: 'comparison', title: 'Encryption at Rest vs in Transit', items: [
-          { label: 'At rest', description: 'Turn on KMS-integrated encryption for EBS (including encryption by default), RDS and Aurora, DynamoDB, S3, EFS, and backups. RDS encryption must be chosen at creation; to encrypt an existing instance, copy a snapshot with encryption and restore it.' },
+          { label: 'At rest', description: 'Turn on KMS-integrated encryption for EBS (including encryption by default), RDS and Aurora, DynamoDB, S3, EFS, and backups. RDS encryption must be chosen at creation; to encrypt an existing instance, copy a snapshot with encryption and restore it, or use a blue/green deployment with an encrypted green environment.' },
           { label: 'In transit', description: 'Use TLS everywhere: ACM certificates on ALB, CloudFront, and API Gateway, enforce HTTPS with aws:SecureTransport in bucket policies, and require SSL connections to databases.' }
         ]},
         { type: 'awsService', name: 'AWS Certificate Manager (ACM)', description: 'Provisions free public TLS certificates for integrated services and renews them automatically with DNS validation. Certificates are Regional; CloudFront requires certificates in us-east-1. Imported third-party certificates are not renewed by ACM.' },
@@ -146,11 +171,16 @@ export const secureArchitecturesGuide = {
     {
       id: 'secs6',
       title: 'S3 Data Protection, Backups, and Compliance',
+      sources: [
+        { title: 'Protecting data with server-side encryption – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html', checked: '2026-11-25' },
+        { title: 'Locking objects with Object Lock – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html', checked: '2026-11-25' },
+        { title: 'AWS Backup Vault Lock – AWS Backup', url: 'https://docs.aws.amazon.com/aws-backup/latest/devguide/vault-lock.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'S3 security combines access controls (policies, Block Public Access, Object Ownership), encryption, and immutability. Compliance scenarios add AWS Backup, CloudTrail, and AWS Config for retention, audit, and continuous evaluation.' },
         { type: 'bulletList', title: 'S3 access controls:', items: [
           'Bucket policies: resource-based JSON policies for cross-account access, enforcing HTTPS (aws:SecureTransport), restricting to a VPC endpoint (aws:SourceVpce), or requiring an organization (aws:PrincipalOrgID).',
-          'S3 Block Public Access: account-level or bucket-level setting that overrides any public ACL or policy; enabled by default on new buckets.',
+          'S3 Block Public Access: organization-, account-, bucket-, or access point-level setting that overrides any public ACL or policy; enabled by default on new buckets.',
           'Object Ownership set to bucket owner enforced: disables ACLs so the bucket owner owns every object; the default for new buckets.',
           'Presigned URLs: temporary access to a private object for a limited time, signed by a principal that has permission.',
           'S3 Access Points: separate access policies per application or team on a shared bucket.'
@@ -159,7 +189,7 @@ export const secureArchitecturesGuide = {
           ['SSE-S3', 'Amazon S3', 'Default for all new objects; no key management or per-use audit needed'],
           ['SSE-KMS', 'AWS KMS (AWS managed or customer managed key)', 'Need key policy control, CloudTrail audit of key use, or separation of duties; add S3 Bucket Keys to reduce KMS cost'],
           ['DSSE-KMS', 'AWS KMS', 'Compliance requires two independent layers of server-side encryption'],
-          ['SSE-C', 'Customer, supplied with every request over HTTPS', 'Keys must be managed outside AWS while S3 performs the encryption'],
+          ['SSE-C', 'Customer, supplied with every request over HTTPS', 'Keys must be managed outside AWS while S3 performs the encryption; disabled by default on new buckets since April 2026, so enable it explicitly'],
           ['Client-side encryption', 'Customer or KMS through the encryption SDK', 'Data must be encrypted before it leaves the application']
         ]},
         { type: 'comparison', title: 'S3 Object Lock Modes', items: [
