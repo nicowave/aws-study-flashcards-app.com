@@ -1,9 +1,9 @@
 import { useState } from 'react'
 
 const CHAIN = [
-  { role: 'Leaf (server) cert', subject: 'api.example.com', issuer: "Let's Encrypt R11", proves: 'This server holds the private key for api.example.com.' },
-  { role: 'Intermediate CA', subject: "Let's Encrypt R11", issuer: 'ISRG Root X1', proves: "Let's Encrypt is allowed to issue certs, vouched for by the root." },
-  { role: 'Root CA', subject: 'ISRG Root X1', issuer: 'ISRG Root X1 (self-signed)', proves: 'Shipped inside your OS/browser trust store. Trust starts here, by fiat.' },
+  { role: 'Leaf (server) cert', subject: 'api.example.com', issuer: "Let's Encrypt R11", valid: '90 days, auto-renewed', proves: 'This server holds the private key for api.example.com.' },
+  { role: 'Intermediate CA', subject: "Let's Encrypt R11", issuer: 'ISRG Root X1', valid: '2024-03-13 to 2027-03-12 (3 years)', proves: "Let's Encrypt is allowed to issue certs, vouched for by the root." },
+  { role: 'Root CA', subject: 'ISRG Root X1', issuer: 'ISRG Root X1 (self-signed)', valid: '2015-06-04 to 2035-06-04 (20 years)', proves: 'Shipped inside your OS/browser trust store. Trust starts here, by fiat.' },
 ]
 
 const STEPS = [
@@ -19,7 +19,8 @@ export default function TlsLab() {
   const [step, setStep] = useState(0)
   const [mtls, setMtls] = useState(false)
 
-  const broken = scenario === 'selfsigned' ? 1 : scenario === 'expired' ? 0 : scenario === 'hostname' ? 0 : -1
+  // index of the cert that fails verification: in all three broken scenarios it is the leaf
+  const broken = scenario === 'good' ? -1 : 0
   const verdict = {
     good: { cls: 'ok', text: 'Chain verified. Padlock. The CA vouched that this server controls this hostname.' },
     selfsigned: { cls: 'bad', text: 'No trusted issuer. Encryption would still work, but nobody vouched for who this is. Browser warns.' },
@@ -55,7 +56,7 @@ export default function TlsLab() {
               <dl>
                 <dt>subject</dt><dd>{subj}</dd>
                 <dt>issuer</dt><dd>{issuer}</dd>
-                <dt>valid</dt><dd>{scenario === 'expired' && i === 0 ? '2026-05-01 to 2026-07-30 (expired)' : '90 days, auto-renewed'}</dd>
+                <dt>valid</dt><dd>{scenario === 'expired' && i === 0 ? '2026-05-01 to 2026-07-30 (expired)' : c.valid}</dd>
               </dl>
               <p style={{ fontSize: 13, marginTop: 8, color: 'var(--ink-soft)' }}>{c.proves}</p>
             </div>

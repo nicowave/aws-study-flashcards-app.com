@@ -1,9 +1,19 @@
 // Tiny localStorage helpers for quiz progress and exam history. Every access is guarded:
 // storage can be unavailable (private mode, blocked site data) and the app must still work.
+// Saved data can also parse but have the wrong shape (an older version, a hand edit):
+// each field the fallback defines keeps the fallback's value unless the saved one is the same kind.
+const kindOf = (v) => (Array.isArray(v) ? 'array' : v === null ? 'null' : typeof v)
+
 export const load = (key, fallback) => {
   try {
     const raw = localStorage.getItem(key)
-    return raw ? { ...fallback, ...JSON.parse(raw) } : fallback
+    const saved = raw ? JSON.parse(raw) : null
+    if (kindOf(saved) !== 'object') return fallback
+    const out = { ...fallback, ...saved }
+    for (const k of Object.keys(fallback)) {
+      if (kindOf(out[k]) !== kindOf(fallback[k])) out[k] = fallback[k]
+    }
+    return out
   } catch {
     return fallback
   }

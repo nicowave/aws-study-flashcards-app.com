@@ -34,6 +34,13 @@ describe('store: load', () => {
     expect(loaded.attempts).toEqual([]);
   });
 
+  it('replaces saved fields whose shape does not match the fallback, keeping the rest', () => {
+    localStorage.setItem(KEY, JSON.stringify({ xp: 5, best: null, attempts: 'oops' }));
+    expect(load(KEY, FALLBACK)).toEqual({ ...FALLBACK, xp: 5 });
+    localStorage.setItem(KEY, JSON.stringify([1, 2]));
+    expect(load(KEY, FALLBACK)).toEqual(FALLBACK);
+  });
+
   it('returns the fallback when storage cannot be read (private mode, blocked site data)', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('SecurityError'); });
     expect(load(KEY, FALLBACK)).toEqual(FALLBACK);

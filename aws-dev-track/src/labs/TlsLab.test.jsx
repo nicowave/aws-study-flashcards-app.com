@@ -144,10 +144,8 @@ describe('TlsLab chain verification', () => {
     for (const name of Object.values(ROLES)) expect(card(name)).not.toHaveClass('verified');
   });
 
-  // BUG: in the self-signed scenario the red "broken" marker goes on the Intermediate CA card
-  // (TlsLab.jsx: `scenario === 'selfsigned' ? 1`), which the same scenario greys out as not part
-  // of the chain. The cert that fails is the leaf: it signed itself and isn't in the trust store.
-  it.fails('self-signed: the leaf, not the intermediate, is marked as the cert that failed', async () => {
+  // Regression: self-signed used to mark the (greyed-out) intermediate as broken; the self-signed leaf is what fails.
+  it('self-signed: the leaf, not the intermediate, is marked as the cert that failed', async () => {
     const user = userEvent.setup();
     render(<TlsLab />);
     await pick(user, 'Self-signed cert');
@@ -156,10 +154,8 @@ describe('TlsLab chain verification', () => {
     expect(card(ROLES.intermediate)).not.toHaveClass('broken');
   });
 
-  // BUG: every card's "valid" row says "90 days, auto-renewed", including the intermediate and
-  // the root. Only the Let's Encrypt leaf is short-lived; intermediates last years and roots
-  // (ISRG Root X1) decades, which is why the root can sit in the OS trust store.
-  it.fails('only the leaf is described as a 90-day auto-renewed cert', () => {
+  // Regression: intermediate and root used to say "90 days, auto-renewed"; they now show multi-year validity.
+  it('only the leaf is described as a 90-day auto-renewed cert', () => {
     render(<TlsLab />);
     expect(cert(ROLES.leaf).valid).toMatch(/90 days/);
     expect(cert(ROLES.intermediate).valid).not.toMatch(/90 days|auto-renewed/);

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import HandshakeLab from './labs/HandshakeLab.jsx'
 import TlsLab from './labs/TlsLab.jsx'
 import DnsLab from './labs/DnsLab.jsx'
@@ -76,7 +76,7 @@ function Guide() {
   return (
     <section className="lab guide">
       <header><h2>Reference: the acronyms behind cloud APIs and device fleets</h2><p className="lead">What it is, what it costs, when you pick the alternative. A one-page cheat sheet for when you are at the keyboard.</p></header>
-      <dl>{G.map(([k, v]) => <><dt key={k}>{k}</dt><dd key={k + 'd'}>{v}</dd></>)}</dl>
+      <dl>{G.map(([k, v]) => <Fragment key={k}><dt>{k}</dt><dd>{v}</dd></Fragment>)}</dl>
       <h2>Commands that make each one visible</h2>
       <pre>{`sudo tcpdump -i any port 5001                 # TCP handshake flags
 openssl s_client -connect host:443             # TLS chain

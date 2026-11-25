@@ -110,11 +110,8 @@ describe('PracticeExam: intro', () => {
     expect(screen.getByRole('button', { name: 'Start exam' })).toBeInTheDocument();
   });
 
-  // BUG (robustness): store.load only guards against unreadable JSON. Saved history that parses
-  // but has the wrong shape (here attempts is not a list) crashes the intro with
-  // "slice(...).reverse is not a function" instead of starting fresh.
-  it.fails('survives saved history whose attempts is not a list', () => {
-    vi.spyOn(console, 'error').mockImplementation(() => {}); // keep React's crash report out of the log
+  // Regression: wrong-shaped saved history (attempts not a list) used to crash the intro; load now checks each field's shape.
+  it('survives saved history whose attempts is not a list', () => {
     localStorage.setItem('dev-track-exam-history', JSON.stringify({ attempts: 'oops' }));
     setup();
     expect(screen.getByRole('button', { name: 'Start exam' })).toBeInTheDocument();

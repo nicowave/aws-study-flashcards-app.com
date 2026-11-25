@@ -187,10 +187,8 @@ describe('TileMathLab', () => {
     expect(pre()).toContain(`~${(40075 / 4096).toFixed(3)} km`);
   });
 
-  // BUG: lon 180 is the antimeridian (the same meridian as -180), but floor((180+180)/360·n)
-  // gives x = n, a column that doesn't exist (valid x is 0..n-1). The URL shown is a 404 tile.
-  // Real tile code wraps or clamps x to 0..n-1.
-  it.fails('lon 180 gives a real column (0..n-1), not x = n', () => {
+  // Regression: lon 180 used to give x = n (a 404 tile); longitude now wraps, so 180 is column 0 like -180.
+  it('lon 180 gives a real column (0..n-1), not x = n', () => {
     render(<TileMathLab />);
     setInputs({ lon: 180, lat: 0, z: 3 });
     const { x } = readTile();
@@ -198,11 +196,8 @@ describe('TileMathLab', () => {
     expect(x).toBeLessThan(8);
   });
 
-  // BUG: Web Mercator stops at ±85.0511°. Past that the formula gives y < 0 (north) or
-  // y >= n (south), and at ±90 it gives -Infinity/Infinity, so the lab prints tile URLs
-  // like /3/4/-1.png or /3/4/Infinity.png. It should clamp latitude to ±85.0511 (or say
-  // the point is off the map).
-  it.fails('latitudes beyond the Mercator limit still give a real row (0..n-1)', () => {
+  // Regression: latitudes past ±85.0511° used to give y < 0, y >= n or ±Infinity; latitude and y are now clamped.
+  it('latitudes beyond the Mercator limit still give a real row (0..n-1)', () => {
     render(<TileMathLab />);
     for (const lat of [86, 90, -86, -90]) {
       setInputs({ lon: 0, lat, z: 3 });

@@ -237,4 +237,11 @@ describe('QuizGame: saved progress', () => {
     expect(stats()).toMatchObject({ level: 1, accuracy: '0%', bestStreak: 0, xpInLevel: 0 });
     for (const t of topics) expect(topicButton(t)).toHaveTextContent('best –');
   });
+
+  it('starts fresh for fields whose saved value has the wrong shape', () => {
+    localStorage.setItem('dev-track-quiz', JSON.stringify({ xp: 'lots', bestStreak: 4, answered: [], correct: null, best: null }));
+    setup();
+    expect(stats()).toMatchObject({ level: 1, accuracy: '0%', bestStreak: 4, xpInLevel: 0 });
+    for (const t of topics) expect(topicButton(t)).toHaveTextContent('best –');
+  });
 });

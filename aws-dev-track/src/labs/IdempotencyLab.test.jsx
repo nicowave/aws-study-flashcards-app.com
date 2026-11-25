@@ -118,12 +118,8 @@ describe('IdempotencyLab', () => {
     expect(screen.getByText(/ConditionExpression="attribute_not_exists\(event_id\)"/)).toBeInTheDocument();
   });
 
-  // BUG: "Deliver new event" cycles through three fixed events, so the 4th "new" event reuses
-  // the first event's id but is logged as "first delivery". In naive mode it's flagged a
-  // DUPLICATE, in idempotent mode it's rejected as "already processed": a new event and a
-  // retry become indistinguishable, which is the opposite of what the lab teaches
-  // (event ids are unique per event; only retries repeat them).
-  it.fails('"Deliver new event" always delivers an event id the handler has not seen', async () => {
+  // Regression: the 4th "new" event used to reuse the 1st event's id; new events now get fresh ids, only retries repeat one.
+  it('"Deliver new event" always delivers an event id the handler has not seen', async () => {
     const user = userEvent.setup();
     render(<IdempotencyLab />);
     for (let k = 0; k < 4; k++) await user.click(btn('Deliver new event'));

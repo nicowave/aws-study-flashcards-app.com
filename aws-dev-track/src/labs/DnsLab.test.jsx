@@ -18,10 +18,8 @@ const stepToEnd = async (user) => {
 
 describe('DnsLab', () => {
   // Must stay first: React prints each missing-key warning only once per component per run.
-  // BUG: the record-type list maps to bare fragments (<>…</>) with the keys on <dt>/<dd>
-  // inside them, so React warns "Each child in a list should have a unique key prop".
-  // Fix: <Fragment key={k}>.
-  it.fails('renders without React key warnings', () => {
+  // Regression: the record-type list used keyless bare fragments (React key warning); it now uses <Fragment key>.
+  it('renders without React key warnings', () => {
     const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
     render(<DnsLab />);
     const keyWarnings = errors.mock.calls.filter((args) => String(args[0]).includes('unique "key"'));
@@ -141,10 +139,8 @@ describe('DnsLab', () => {
     expect(def('NS')).toMatch(/authoritative/);
   });
 
-  // BUG: the TLD hop always says a.gtld-servers.net. Those servers run .com and .net only;
-  // .org, .io, .uk etc. have their own operators' name servers. Type sensors.example.org and
-  // the lab claims the .org TLD is served by a.gtld-servers.net.
-  it.fails('does not name the .com/.net gTLD servers for a .org name', () => {
+  // Regression: the TLD hop used to name a.gtld-servers.net (.com/.net only) for every TLD, .org included.
+  it('does not name the .com/.net gTLD servers for a .org name', () => {
     render(<DnsLab />);
     setName('sensors.example.org');
     fireEvent.click(btn('First lookup'));
@@ -152,12 +148,8 @@ describe('DnsLab', () => {
     expect(hops()[3].querySelector('small').textContent).not.toBe('a.gtld-servers.net');
   });
 
-  // BUG: "Look up again (cached)" always shows a cache hit, even for a name the resolver has
-  // never resolved (rename after the first lookup, or press it before any lookup). A resolver
-  // can only answer from cache what it fetched within the last TTL seconds; a new name is a
-  // cache miss and walks the tree. (There is also no clock: the lab never expires the entry
-  // after the TTL; the "cached" button is the only way to see a hit.)
-  it.fails('a name that was never looked up is not served from cache', async () => {
+  // Regression: "Look up again (cached)" used to hit the cache for never-resolved names; now only resolved names hit.
+  it('a name that was never looked up is not served from cache', async () => {
     const user = userEvent.setup();
     render(<DnsLab />);
     await user.click(btn('First lookup'));
