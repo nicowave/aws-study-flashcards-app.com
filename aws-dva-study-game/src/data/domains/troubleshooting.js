@@ -19,7 +19,10 @@ export const troubleshooting = {
         'Enable CORS on the resource and then redeploy the stage'
       ],
       correctAnswer: 1,
-      explanation: 'With a Lambda proxy integration, API Gateway expects the function to return a JSON object containing statusCode, optional headers, and body as a string; any other shape is a malformed response and produces a 502. A timeout would surface as a 504, concurrency limits cause throttling rather than a successful invocation, and CORS settings only affect browser preflight and response headers, not the response format.'
+      explanation: 'With a Lambda proxy integration, API Gateway expects the function to return a JSON object containing statusCode, optional headers, and body as a string; any other shape is a malformed response and produces a 502. A timeout would surface as a 504, concurrency limits cause throttling rather than a successful invocation, and CORS settings only affect browser preflight and response headers, not the response format.',
+      sources: [
+        { title: 'Lambda proxy integrations in API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb2',
@@ -31,7 +34,11 @@ export const troubleshooting = {
         'Switch the method from a proxy to a non-proxy Lambda integration'
       ],
       correctAnswer: 2,
-      explanation: 'A 504 means API Gateway gave up waiting on the integration; the REST API integration timeout defaults to 29 seconds regardless of the Lambda timeout. Returning 202 immediately and processing asynchronously (for example through SQS or an asynchronous invocation) with a status endpoint keeps the API responsive. Raising the Lambda timeout does not change the API Gateway timeout, caching does not help a long-running write operation, and the integration type does not affect the timeout.'
+      explanation: 'A 504 means API Gateway gave up waiting on the integration; the REST API integration timeout defaults to 29 seconds regardless of the Lambda timeout (Regional and private APIs can request a higher limit, which may lower the account throttle quota, but long work still belongs off the request path). Returning 202 immediately and processing asynchronously (for example through SQS or an asynchronous invocation) with a status endpoint keeps the API responsive. Raising the Lambda timeout does not change the API Gateway timeout, caching does not help a long-running write operation, and the integration type does not affect the timeout.',
+      sources: [
+        { title: 'Quotas for configuring and running a REST API in API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-execution-service-limits-table.html', checked: '2026-11-25' },
+        { title: 'Gateway response types for API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/supported-gateway-response-types.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb3',
@@ -43,7 +50,11 @@ export const troubleshooting = {
         'Requests exceed the usage plan rate or burst limit for the key'
       ],
       correctAnswer: 3,
-      explanation: 'HTTP 429 Too Many Requests from API Gateway means a throttling limit (stage, method, or usage plan rate and burst) or a usage plan quota was exceeded, so the request never reached the backend. Rejected authorizer tokens and missing API keys return 401 or 403, and integration timeouts return 504. Clients should retry with exponential backoff and jitter, or the usage plan limits should be raised.'
+      explanation: 'HTTP 429 Too Many Requests from API Gateway means a throttling limit (stage, method, or usage plan rate and burst) or a usage plan quota was exceeded, so the request never reached the backend. Rejected authorizer tokens and missing API keys return 401 or 403, and integration timeouts return 504. Clients should retry with exponential backoff and jitter, or the usage plan limits should be raised.',
+      sources: [
+        { title: 'Gateway response types for API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/supported-gateway-response-types.html', checked: '2026-11-25' },
+        { title: 'Throttle requests to your REST APIs for better throughput in API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb4',
@@ -55,7 +66,10 @@ export const troubleshooting = {
         'The backend Lambda function threw an unhandled runtime exception'
       ],
       correctAnswer: 0,
-      explanation: 'On a REST API, "Missing Authentication Token" with a 403 commonly means the request did not match any deployed resource and method, for example a typo in the path or changes that were never deployed to the stage. Throttling returns 429, a backend exception returns 502 through a proxy integration, and logging permissions on the execution role do not change the API response.'
+      explanation: 'On a REST API, "Missing Authentication Token" with a 403 commonly means the request did not match any deployed resource and method, for example a typo in the path or changes that were never deployed to the stage. Throttling returns 429, a backend exception returns 502 through a proxy integration, and logging permissions on the execution role do not change the API response.',
+      sources: [
+        { title: 'Gateway response types for API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/supported-gateway-response-types.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb5',
@@ -67,7 +81,11 @@ export const troubleshooting = {
         'Increase the ephemeral storage size of the function'
       ],
       correctAnswer: 1,
-      explanation: 'Max Memory Used equal to the configured memory size followed by the runtime being killed is the signature of an out-of-memory failure, so the fix is to raise the memory setting (or stream the file instead of loading it whole). A timeout would log "Task timed out", provisioned concurrency only removes cold starts, and ephemeral storage is the /tmp disk, which is separate from memory.'
+      explanation: 'Max Memory Used equal to the configured memory size followed by the runtime being killed is the signature of an out-of-memory failure, so the fix is to raise the memory setting (or stream the file instead of loading it whole). A timeout would log "Task timed out", provisioned concurrency only removes cold starts, and ephemeral storage is the /tmp disk, which is separate from memory.',
+      sources: [
+        { title: 'Troubleshoot execution issues in Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/troubleshooting-execution.html', checked: '2026-11-25' },
+        { title: 'Viewing CloudWatch logs for Lambda Event Functions', url: 'https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb6',
@@ -79,7 +97,10 @@ export const troubleshooting = {
         'A dead-letter queue on the batch-processing function'
       ],
       correctAnswer: 0,
-      explanation: 'Both functions share the Regional account concurrency pool, so the batch function can starve the order function. Reserved concurrency sets aside capacity that only the order function can use (and also caps it). Memory and timeout do not affect concurrency, tracing only adds visibility, and a DLQ on the noisy function does not free up concurrency for the other one.'
+      explanation: 'Both functions share the Regional account concurrency pool, so the batch function can starve the order function. Reserved concurrency sets aside capacity that only the order function can use (and also caps it). Memory and timeout do not affect concurrency, tracing only adds visibility, and a DLQ on the noisy function does not free up concurrency for the other one.',
+      sources: [
+        { title: 'Configuring reserved concurrency for an Event Function', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb7',
@@ -91,7 +112,11 @@ export const troubleshooting = {
         'Append a random suffix to spread writes across key values'
       ],
       correctAnswer: 3,
-      explanation: 'This is a hot partition: one key value receives more writes than a single partition can absorb, even though table-level capacity is unused. Write sharding (adding a calculated or random suffix to the key) distributes writes across partitions. Adding capacity does not fix a per-partition limit, a GSI with the same key inherits the same hot spot, and DAX is a write-through cache that still sends every write to the table.'
+      explanation: 'This is a hot partition: one key value receives more writes than a single partition can absorb, even though table-level capacity is unused. Write sharding (adding a calculated or random suffix to the key) distributes writes across partitions. Adding capacity does not fix a per-partition limit, a GSI with the same key inherits the same hot spot, and DAX is a write-through cache that still sends every write to the table.',
+      sources: [
+        { title: 'Using write sharding to distribute workloads evenly in your DynamoDB table', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-sharding.html', checked: '2026-11-25' },
+        { title: 'CloudWatch contributor insights for DynamoDB: How it works', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/contributorinsights_HowItWorks.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb8',
@@ -103,7 +128,10 @@ export const troubleshooting = {
         'Reduce the message retention period configured on the queue'
       ],
       correctAnswer: 1,
-      explanation: 'When processing outlasts the visibility timeout, the message becomes visible again and another worker receives it, causing duplicate processing. Setting the visibility timeout longer than the processing time (or extending it with ChangeMessageVisibility) fixes this. Long polling only reduces empty receives, FIFO deduplication only drops duplicate sends within its deduplication window, and retention controls how long unconsumed messages are kept.'
+      explanation: 'When processing outlasts the visibility timeout, the message becomes visible again and another worker receives it, causing duplicate processing. Setting the visibility timeout longer than the processing time (or extending it with ChangeMessageVisibility) fixes this. Long polling only reduces empty receives, FIFO deduplication only drops duplicate sends within its deduplication window, and retention controls how long unconsumed messages are kept.',
+      sources: [
+        { title: 'Amazon SQS visibility timeout', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb9',
@@ -115,7 +143,10 @@ export const troubleshooting = {
         'Filter X-Ray traces for calls made against the Amazon EC2 API'
       ],
       correctAnswer: 0,
-      explanation: 'CloudTrail records management API calls, including the identity, time, source IP and parameters, and its event history keeps the last 90 days of management events by default. VPC Flow Logs show the effect on traffic but not who changed the rule, Trusted Advisor flags risky configurations without an audit trail, and X-Ray traces application requests, not control-plane changes.'
+      explanation: 'CloudTrail records management API calls, including the identity, time, source IP and parameters, and its event history keeps the last 90 days of management events by default. VPC Flow Logs show the effect on traffic but not who changed the rule, Trusted Advisor flags risky configurations without an audit trail, and X-Ray traces application requests, not control-plane changes.',
+      sources: [
+        { title: 'Working with CloudTrail event history', url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/view-cloudtrail-events.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb10',
@@ -127,7 +158,11 @@ export const troubleshooting = {
         'fields @duration | sort @timestamp asc | limit 20'
       ],
       correctAnswer: 2,
-      explanation: 'Lambda writes one REPORT line per invocation, and Logs Insights discovers @duration from it, so filtering on REPORT and sorting by @duration descending gives the slowest invocations. Matching the text "slow" depends on the application logging that word, the stats query returns hourly averages rather than individual invocations, and sorting by timestamp returns the oldest lines, not the slowest.'
+      explanation: 'Lambda writes one REPORT line per invocation, and Logs Insights discovers @duration from it, so filtering on REPORT and sorting by @duration descending gives the slowest invocations. Matching the text "slow" depends on the application logging that word, the stats query returns hourly averages rather than individual invocations, and sorting by timestamp returns the oldest lines, not the slowest.',
+      sources: [
+        { title: 'Supported logs and discovered fields', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_AnalyzeLogData-discoverable-fields.html', checked: '2026-11-25' },
+        { title: 'Sample queries – CloudWatch Logs Insights', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax-examples.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb11',
@@ -139,7 +174,11 @@ export const troubleshooting = {
         'Add the customer tier as an annotation on the segment'
       ],
       correctAnswer: 3,
-      explanation: 'Annotations are indexed key-value pairs that can be used in filter expressions such as annotation.tier = "premium". Metadata can hold any object but is not indexed, so it cannot be searched. Sampling rules only decide which requests are recorded, and a log field helps in Logs Insights but not in X-Ray trace filtering.'
+      explanation: 'Annotations are indexed key-value pairs that can be used in filter expressions such as annotation[tier] = "premium". Metadata can hold any object but is not indexed, so it cannot be searched. Sampling rules only decide which requests are recorded, and a log field helps in Logs Insights but not in X-Ray trace filtering.',
+      sources: [
+        { title: 'AWS X-Ray concepts', url: 'https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html', checked: '2026-11-25' },
+        { title: 'Using filter expressions', url: 'https://docs.aws.amazon.com/xray/latest/devguide/xray-console-filters.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb12',
@@ -151,7 +190,10 @@ export const troubleshooting = {
         'Enable detailed CloudWatch metrics on the API Gateway stage'
       ],
       correctAnswer: 0,
-      explanation: 'X-Ray sampling rules are managed centrally, and the SDKs and collectors poll for them, so a new rule matching /checkout with a 100 percent fixed rate and a higher priority takes effect without a deployment. The default rule records the first request each second plus 5 percent of additional requests. Metadata does not change sampling, the daemon buffer does not decide what is sampled, and detailed stage metrics produce metrics, not traces.'
+      explanation: 'X-Ray sampling rules are managed centrally, and the SDKs and collectors poll for them, so a new rule matching /checkout with a 100 percent fixed rate and a higher priority takes effect without a deployment. The default rule records the first request each second plus 5 percent of additional requests. Metadata does not change sampling, the daemon buffer does not decide what is sampled, and detailed stage metrics produce metrics, not traces.',
+      sources: [
+        { title: 'Configuring sampling rules', url: 'https://docs.aws.amazon.com/xray/latest/devguide/xray-console-sampling.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb13',
@@ -163,7 +205,10 @@ export const troubleshooting = {
         'Write the metrics to the logs in CloudWatch embedded metric format'
       ],
       correctAnswer: 3,
-      explanation: 'Embedded metric format (EMF) is a JSON log structure that CloudWatch parses asynchronously into metrics with the declared dimensions, so the handler makes no metric API calls and the detailed values remain queryable in the logs. Calling PutMetricData per order adds latency and API cost, a word-count metric filter cannot carry the order value and tenant dimensions cleanly, and an extra queue and function adds needless moving parts.'
+      explanation: 'Embedded metric format (EMF) is a JSON log structure that CloudWatch parses asynchronously into metrics with the declared dimensions, so the handler makes no metric API calls and the detailed values remain queryable in the logs. Calling PutMetricData per order adds latency and API cost, a word-count metric filter cannot carry the order value and tenant dimensions cleanly, and an extra queue and function adds needless moving parts.',
+      sources: [
+        { title: 'Embedding metrics within logs', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb14',
@@ -175,7 +220,11 @@ export const troubleshooting = {
         'Increase the retention period of each log group to one full year'
       ],
       correctAnswer: 1,
-      explanation: 'Generating a correlation ID at the edge (or reusing the API Gateway request ID or the X-Ray trace ID), passing it in a header, and writing it into every structured JSON log line lets one Logs Insights query across several log groups return the whole request path. A shared log stream breaks concurrency and still has no join key, OpenSearch adds cost without solving correlation, and longer retention keeps more data without making it easier to link.'
+      explanation: 'Generating a correlation ID at the edge (or reusing the API Gateway request ID or the X-Ray trace ID), passing it in a header, and writing it into every structured JSON log line lets one Logs Insights query across several log groups return the whole request path. A shared log stream breaks concurrency and still has no join key, OpenSearch adds cost without solving correlation, and longer retention keeps more data without making it easier to link.',
+      sources: [
+        { title: 'Analyzing log data with CloudWatch Logs Insights', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html', checked: '2026-11-25' },
+        { title: 'Logger - Powertools for AWS Lambda (Python)', url: 'https://docs.aws.amazon.com/powertools/python/latest/core/logger/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb15',
@@ -187,7 +236,10 @@ export const troubleshooting = {
         'Enable X-Ray tracing on the API Gateway stage instead of Lambda'
       ],
       correctAnswer: 2,
-      explanation: 'With active tracing, Lambda runs the X-Ray integration for you, but the execution role still needs xray:PutTraceSegments and xray:PutTelemetryRecords, which the AWSXRayDaemonWriteAccess managed policy provides. Lambda does not need a separately installed daemon, UDP 2000 is the daemon port on hosts you manage and is not a security group issue here, and stage tracing adds API Gateway segments but cannot fix the denied Lambda calls.'
+      explanation: 'With active tracing, Lambda runs the X-Ray integration for you, but the execution role still needs xray:PutTraceSegments and xray:PutTelemetryRecords, which the AWSXRayDaemonWriteAccess managed policy provides. Lambda does not need a separately installed daemon, UDP 2000 is the daemon port on hosts you manage and is not a security group issue here, and stage tracing adds API Gateway segments but cannot fix the denied Lambda calls.',
+      sources: [
+        { title: 'Visualize Lambda Event Function invocations using AWS X-Ray', url: 'https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb16',
@@ -199,7 +251,11 @@ export const troubleshooting = {
         'AWS Distro for OpenTelemetry (ADOT) with its collector'
       ],
       correctAnswer: 3,
-      explanation: 'ADOT is the AWS-supported distribution of OpenTelemetry, so the same instrumentation and collector can export traces to X-Ray, metrics to CloudWatch, and data to other OpenTelemetry-compatible backends. The X-Ray daemon only relays X-Ray segments, subscription filters stream logs rather than instrument code, and Synthetics canaries test endpoints from the outside instead of instrumenting the service.'
+      explanation: 'ADOT is the AWS-supported distribution of OpenTelemetry, so the same instrumentation and collector can export traces to X-Ray, metrics to CloudWatch, and data to other OpenTelemetry-compatible backends. The X-Ray daemon only relays X-Ray segments and has been in maintenance mode (security fixes only) since February 25, 2026, subscription filters stream logs rather than instrument code, and Synthetics canaries test endpoints from the outside instead of instrumenting the service.',
+      sources: [
+        { title: 'Instrumenting your application for AWS X-Ray', url: 'https://docs.aws.amazon.com/xray/latest/devguide/xray-instrumenting-your-app.html', checked: '2026-11-25' },
+        { title: 'X-Ray SDK and Daemon Support timeline', url: 'https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-daemon-timeline.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb17',
@@ -211,7 +267,11 @@ export const troubleshooting = {
         'An X-Ray sampling rule that records every sign-in request'
       ],
       correctAnswer: 1,
-      explanation: 'Synthetics canaries run scripted Node.js or Python browser and API tests on a schedule, so they exercise multi-step flows continuously and can trigger alarms when steps fail, regardless of real traffic. RUM depends on real users being present, Route 53 health checks only test a single endpoint response, and X-Ray sampling records traffic that already exists rather than generating it.'
+      explanation: 'Synthetics canaries run scripted Node.js, Python or Java tests of APIs and browser flows on a schedule, so they exercise multi-step flows continuously and can trigger alarms when steps fail, regardless of real traffic. RUM depends on real users being present, Route 53 health checks only test a single endpoint response, and X-Ray sampling records traffic that already exists rather than generating it.',
+      sources: [
+        { title: 'Synthetic monitoring (canaries)', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Synthetics_Canaries.html', checked: '2026-11-25' },
+        { title: 'CloudWatch RUM', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb18',
@@ -223,7 +283,11 @@ export const troubleshooting = {
         'The CloudWatch agent packaged with each function as a custom layer'
       ],
       correctAnswer: 0,
-      explanation: 'Powertools for AWS Lambda provides Logger (structured JSON with Lambda context and cold start), Tracer (X-Ray annotations and subcalls), and Metrics (EMF) utilities through decorators and a small amount of code. Saved queries only read logs, Lambda Insights collects system-level metrics such as memory and CPU without application metrics or structured logs, and the CloudWatch agent is designed for servers, not Lambda.'
+      explanation: 'Powertools for AWS Lambda provides Logger (structured JSON with Lambda context and cold start), Tracer (X-Ray annotations and subcalls), and Metrics (EMF) utilities through decorators and a small amount of code. Saved queries only read logs, Lambda Insights collects system-level metrics such as memory and CPU without application metrics or structured logs, and the CloudWatch agent is designed for servers, not Lambda.',
+      sources: [
+        { title: 'Homepage - Powertools for AWS Lambda (Python)', url: 'https://docs.aws.amazon.com/powertools/python/latest/', checked: '2026-11-25' },
+        { title: 'Lambda Insights', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Lambda-Insights.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb19',
@@ -235,7 +299,10 @@ export const troubleshooting = {
         'Use a metric math expression over the standard-resolution metric data'
       ],
       correctAnswer: 0,
-      explanation: 'A custom metric published through PutMetricData with StorageResolution set to 1 is a high-resolution metric, and alarms on high-resolution metrics can use periods as short as 10 seconds. Detailed monitoring only changes EC2 built-in metrics to one-minute intervals, standard-resolution metrics are aggregated to one minute however often they are sent, and metric math cannot add resolution that the data does not have.'
+      explanation: 'A custom metric published through PutMetricData with StorageResolution set to 1 is a high-resolution metric, and alarms on high-resolution metrics can use periods as short as 10 seconds. Detailed monitoring applies only to EC2\'s own metrics (mainly one-minute periods), not to custom metrics, standard-resolution metrics are aggregated to one minute however often they are sent, and metric math cannot add resolution that the data does not have.',
+      sources: [
+        { title: 'Publish custom metrics (PutMetricData / EMF)', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb20',
@@ -247,7 +314,11 @@ export const troubleshooting = {
         'Enable API Gateway caching on the stage with a suitable TTL'
       ],
       correctAnswer: 3,
-      explanation: 'Stage-level caching on a REST API returns cached responses for identical requests without invoking Lambda, and the TTL (default 300 seconds, maximum 3600) can match the hourly change rate with no code changes. DAX still requires Lambda invocations and a client change, provisioned concurrency only removes cold starts, and HTTP APIs do not offer built-in response caching.'
+      explanation: 'Stage-level caching on a REST API returns cached responses for identical requests without invoking Lambda, and the TTL (default 300 seconds, maximum 3600) can match the hourly change rate with no code changes. DAX still requires Lambda invocations and a client change, provisioned concurrency only removes cold starts, and HTTP APIs do not offer built-in response caching.',
+      sources: [
+        { title: 'Cache settings for REST APIs in API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html', checked: '2026-11-25' },
+        { title: 'Choose between REST APIs and HTTP APIs', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb21',
@@ -259,7 +330,10 @@ export const troubleshooting = {
         'A higher provisioned read capacity setting on the table'
       ],
       correctAnswer: 2,
-      explanation: 'DAX is an in-memory, API-compatible cache for DynamoDB that serves eventually consistent reads in microseconds; the application swaps in the DAX client and keeps the same calls. ElastiCache can be as fast but requires writing caching logic, global tables add Regions for availability rather than cache reads, and more read capacity reduces throttling but keeps single-digit millisecond latency.'
+      explanation: 'DAX is an in-memory, API-compatible cache for DynamoDB that serves eventually consistent reads in microseconds; the application swaps in the DAX client and keeps the same calls. ElastiCache can be as fast but requires writing caching logic, global tables add Regions for availability rather than cache reads, and more read capacity reduces throttling but keeps single-digit millisecond latency.',
+      sources: [
+        { title: 'In-memory acceleration with DynamoDB Accelerator (DAX)', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb22',
@@ -271,7 +345,10 @@ export const troubleshooting = {
         'Move the image-processing libraries into a Lambda layer'
       ],
       correctAnswer: 0,
-      explanation: 'Lambda allocates CPU in proportion to memory, so a CPU-bound function often runs faster, and sometimes cheaper, with more memory. AWS Lambda Power Tuning, an open-source Step Functions state machine, invokes the function at several memory sizes and charts duration against cost. A longer timeout hides the problem, provisioned concurrency only removes cold starts, and layers change packaging, not performance.'
+      explanation: 'Lambda allocates CPU in proportion to memory, so a CPU-bound function often runs faster, and sometimes cheaper, with more memory. AWS Lambda Power Tuning, an open-source Step Functions state machine, invokes the function at several memory sizes and charts duration against cost. A longer timeout hides the problem, provisioned concurrency only removes cold starts, and layers change packaging, not performance.',
+      sources: [
+        { title: 'Configure Lambda Event Function memory', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb23',
@@ -283,7 +360,10 @@ export const troubleshooting = {
         'Move the initialization code from global scope into the handler'
       ],
       correctAnswer: 1,
-      explanation: 'Provisioned concurrency keeps execution environments initialized, and Application Auto Scaling scheduled actions can raise it before a predictable peak and lower it afterward to control cost. Reserved concurrency only guarantees and caps capacity without pre-warming, more memory shortens but does not remove cold starts, and moving initialization into the handler makes every invocation slower. Lambda SnapStart is another way to cut Java cold starts, but it was not among the choices.'
+      explanation: 'Provisioned concurrency keeps execution environments initialized, and Application Auto Scaling scheduled actions can raise it before a predictable peak and lower it afterward to control cost. Reserved concurrency only guarantees and caps capacity without pre-warming, more memory shortens but does not remove cold starts, and moving initialization into the handler makes every invocation slower. Lambda SnapStart is another way to cut Java cold starts, but it was not among the choices.',
+      sources: [
+        { title: 'Configuring provisioned concurrency for an Event Function', url: 'https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb24',
@@ -295,7 +375,11 @@ export const troubleshooting = {
         'Store the uploads in an S3 Express One Zone directory bucket'
       ],
       correctAnswer: 2,
-      explanation: 'Transfer Acceleration routes uploads over the CloudFront edge network to the bucket, speeding long-distance transfers, and multipart upload sends parts in parallel so a failure only retries the affected part. Replication copies objects after they arrive, API Gateway and Lambda payload limits make them unsuitable for multi-gigabyte files, and Express One Zone targets low latency within a single Availability Zone, not global uploads.'
+      explanation: 'Transfer Acceleration routes uploads over the CloudFront edge network to the bucket, speeding long-distance transfers, and multipart upload sends parts in parallel so a failure only retries the affected part. Replication copies objects after they arrive, API Gateway and Lambda payload limits make them unsuitable for multi-gigabyte files, and Express One Zone targets low latency within a single Availability Zone, not global uploads.',
+      sources: [
+        { title: 'Configuring fast, secure file transfers using Amazon S3 Transfer Acceleration', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html', checked: '2026-11-25' },
+        { title: 'Uploading and copying objects using multipart upload in Amazon S3', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb25',
@@ -307,7 +391,11 @@ export const troubleshooting = {
         'Place the database in the same subnet as the Lambda function'
       ],
       correctAnswer: 1,
-      explanation: 'Creating SDK clients and connections in the initialization code lets warm invocations reuse them, cutting per-request latency, and RDS Proxy pools and shares database connections so a burst of concurrent functions does not exhaust the database. More memory or timeout does not reduce connection churn, provisioned concurrency alone still lets each environment hold its own connection, and subnet placement does not limit connection counts.'
+      explanation: 'Creating SDK clients and connections in the initialization code lets warm invocations reuse them, cutting per-request latency, and RDS Proxy pools and shares database connections so a burst of concurrent functions does not exhaust the database. More memory or timeout does not reduce connection churn, provisioned concurrency alone still lets each environment hold its own connection, and subnet placement does not limit connection counts.',
+      sources: [
+        { title: 'Best practices for working with AWS Lambda Event Functions', url: 'https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html', checked: '2026-11-25' },
+        { title: 'Using AWS Lambda with Amazon RDS', url: 'https://docs.aws.amazon.com/lambda/latest/dg/services-rds.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'trb26',
@@ -319,7 +407,11 @@ export const troubleshooting = {
         'Configure a delivery delay of several minutes on the queue'
       ],
       correctAnswer: 2,
-      explanation: 'Long polling (ReceiveMessageWaitTimeSeconds or WaitTimeSeconds up to 20 seconds) keeps the request open until a message arrives, sharply reducing empty responses and request charges; receiving up to 10 messages per call reduces requests further. A zero visibility timeout causes duplicate processing, content-based deduplication is a FIFO send feature, and a delivery delay postpones messages without reducing empty receives.'
+      explanation: 'Long polling (ReceiveMessageWaitTimeSeconds or WaitTimeSeconds up to 20 seconds) keeps the request open until a message arrives, sharply reducing empty responses and request charges; receiving up to 10 messages per call reduces requests further. A zero visibility timeout causes duplicate processing, content-based deduplication is a FIFO send feature, and a delivery delay postpones messages without reducing empty receives.',
+      sources: [
+        { title: 'Amazon SQS short and long polling', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html', checked: '2026-11-25' },
+        { title: 'ReceiveMessage – Amazon SQS API Reference', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html', checked: '2026-11-25' }
+      ]
     }
   ]
 };

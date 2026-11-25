@@ -10,11 +10,16 @@ export const troubleshootingGuide = {
     {
       id: 'trbs1',
       title: 'Root Cause Analysis with CloudWatch',
+      sources: [
+        { title: 'Supported logs and discovered fields', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_AnalyzeLogData-discoverable-fields.html', checked: '2026-11-25' },
+        { title: 'Using Amazon CloudWatch alarms', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Alarms.html', checked: '2026-11-25' },
+        { title: 'Types of metrics for Lambda Event Functions', url: 'https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Most troubleshooting questions start with a symptom (errors, slowness, duplicates) and ask which signal will reveal the cause. CloudWatch holds three of the signals you will reach for first: logs, metrics and alarms. Learn to read them before you reach for a fix.' },
         { type: 'awsService', name: 'Amazon CloudWatch Logs', description: 'Central store for application and service logs, organized into log groups and log streams. Lambda writes to a log group per function by default. Metric filters turn log patterns into metrics, subscription filters stream logs to Lambda, Data Firehose or OpenSearch, and Live Tail shows events as they arrive.' },
-        { type: 'keyTerm', term: 'CloudWatch Logs Insights', definition: 'An interactive query language over one or more log groups. Core commands are fields, filter, stats, sort, limit and parse. For Lambda it discovers fields from the REPORT line such as @duration, @maxMemoryUsed and @initDuration, so "filter @type = \"REPORT\" | sort @duration desc | limit 20" lists the slowest invocations.' },
-        { type: 'keyTerm', term: 'CloudWatch alarm', definition: 'Watches a single metric or a metric math expression and moves between OK, ALARM and INSUFFICIENT_DATA. Actions can notify SNS, scale an Auto Scaling group or run an EC2 action. Composite alarms combine several alarms to reduce noise, and anomaly detection alarms compare a metric to a learned band.' },
+        { type: 'keyTerm', term: 'CloudWatch Logs Insights', definition: 'An interactive query language over one or more log groups. Core commands are fields, filter, stats, sort, limit and parse. For Lambda it discovers fields from the REPORT line such as @duration, @billedDuration and @maxMemoryUsed, so "filter @type = \"REPORT\" | sort @duration desc | limit 20" lists the slowest invocations.' },
+        { type: 'keyTerm', term: 'CloudWatch alarm', definition: 'A metric alarm watches a single metric or a metric math expression and moves between OK, ALARM and INSUFFICIENT_DATA. Actions can notify SNS, scale an Auto Scaling group or run an EC2 action. Composite alarms combine several alarms to reduce noise, anomaly detection alarms compare a metric to a learned band, and log alarms evaluate a scheduled Logs Insights query.' },
         { type: 'table', headers: ['Lambda symptom', 'Where it shows', 'Usual fix'], rows: [
           ['Timeout', '"Task timed out after N seconds" in the log; Duration near the timeout', 'Find the slow dependency (X-Ray), then raise the timeout or make the work asynchronous'],
           ['Out of memory', 'REPORT shows Max Memory Used equal to Memory Size, then the runtime is killed', 'Increase memory or stream data instead of loading it whole'],
@@ -34,6 +39,11 @@ export const troubleshootingGuide = {
     {
       id: 'trbs2',
       title: 'Reading Error Signals Across Services',
+      sources: [
+        { title: 'Gateway response types for API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/supported-gateway-response-types.html', checked: '2026-11-25' },
+        { title: 'Troubleshooting throttling in Amazon DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TroubleshootingThrottling.html', checked: '2026-11-25' },
+        { title: 'Amazon SQS visibility timeout', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'The exam often hands you an HTTP status code, an exception name or a duplicate-processing complaint and expects you to name the cause. Memorize what each signal usually means and which service produced it.' },
         { type: 'table', headers: ['API Gateway code', 'Usual meaning', 'First thing to check'], rows: [
@@ -41,7 +51,7 @@ export const troubleshootingGuide = {
           ['403 Forbidden', 'Denied by IAM auth, a resource policy, AWS WAF or an invalid API key; on REST APIs "Missing Authentication Token" usually means the path or method does not exist in the deployed stage', 'URL path, deployment to the stage, policies and keys'],
           ['429 Too Many Requests', 'Stage, method or usage plan throttling, or a usage plan quota was hit', 'Usage plan rate, burst and quota; client retries with backoff'],
           ['502 Bad Gateway', 'The integration returned something API Gateway could not use, e.g. a Lambda proxy response without statusCode and a string body, or an unhandled function error', 'Function return format and function errors'],
-          ['504 Gateway Timeout', 'The integration did not respond within the integration timeout (29 seconds by default for REST APIs)', 'Slow backend; move long work to an asynchronous pattern']
+          ['504 Gateway Timeout', 'The integration did not respond within the integration timeout (29 seconds by default for REST APIs; Regional and private APIs can request more)', 'Slow backend; move long work to an asynchronous pattern']
         ]},
         { type: 'keyTerm', term: 'ProvisionedThroughputExceededException', definition: 'DynamoDB rejected reads or writes beyond the capacity a table, index or partition can serve. If table-level consumption is well below provisioned capacity, the cause is a hot partition key. Use Contributor Insights for DynamoDB to find the hot keys, then redesign the key or shard writes. AWS SDKs retry these errors with exponential backoff automatically.' },
         { type: 'keyTerm', term: 'SQS visibility timeout', definition: 'The time a received message stays hidden from other consumers. If processing takes longer, the message reappears and is processed again. Set it above the processing time or extend it with ChangeMessageVisibility. For Lambda event source mappings, AWS recommends at least six times the function timeout. Use a dead-letter queue with maxReceiveCount for messages that keep failing.' },
@@ -57,11 +67,16 @@ export const troubleshootingGuide = {
     {
       id: 'trbs3',
       title: 'Distributed Tracing with X-Ray and OpenTelemetry',
+      sources: [
+        { title: 'AWS X-Ray concepts', url: 'https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html', checked: '2026-11-25' },
+        { title: 'Configuring sampling rules', url: 'https://docs.aws.amazon.com/xray/latest/devguide/xray-console-sampling.html', checked: '2026-11-25' },
+        { title: 'X-Ray SDK and Daemon Support timeline', url: 'https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-daemon-timeline.html', checked: '2026-11-25' }
+      ],
       content: [
-        { type: 'paragraph', text: 'Tracing follows one request across API Gateway, Lambda, containers and AWS SDK calls so you can see which hop is slow or failing. X-Ray stores and visualizes the traces; you send data with the X-Ray SDKs or with OpenTelemetry through AWS Distro for OpenTelemetry (ADOT).' },
+        { type: 'paragraph', text: 'Tracing follows one request across API Gateway, Lambda, containers and AWS SDK calls so you can see which hop is slow or failing. X-Ray stores and visualizes the traces; you send data with the X-Ray SDKs or with OpenTelemetry through AWS Distro for OpenTelemetry (ADOT). The X-Ray SDKs and daemon entered maintenance mode (security fixes only) on February 25, 2026, and AWS recommends migrating to OpenTelemetry.' },
         { type: 'keyTerm', term: 'Trace, segment and subsegment', definition: 'A trace is one request end to end, tied together by the trace ID in the X-Amzn-Trace-Id header. Each service records a segment for its work. Subsegments break a segment into downstream calls (DynamoDB, HTTP APIs, SQL) or code blocks. Calls to services that are not instrumented appear as inferred nodes in the trace map.' },
         { type: 'comparison', title: 'Annotations vs metadata', items: [
-          { label: 'Annotations', description: 'Indexed key-value pairs with string, number or boolean values. Use them in filter expressions and X-Ray groups, e.g. annotation.customer_tier = "premium".' },
+          { label: 'Annotations', description: 'Indexed key-value pairs with string, number or boolean values. Use them in filter expressions and X-Ray groups, e.g. annotation[customer_tier] = "premium".' },
           { label: 'Metadata', description: 'Any value or object, not indexed. Use it for debugging context that you read inside a trace but never search on.' }
         ]},
         { type: 'keyTerm', term: 'Sampling rules', definition: 'Decide which requests are recorded, to control cost and overhead. The default rule records the first request each second plus 5 percent of additional requests. Custom rules match on service name, host, HTTP method, URL path and more, with a priority, a reservoir and a fixed rate. Rules live in X-Ray and are fetched by the SDKs and collectors, so changing them needs no redeploy.' },
@@ -72,7 +87,7 @@ export const troubleshootingGuide = {
           'ECS and EKS: run the daemon or ADOT collector as a sidecar or DaemonSet and grant the task or pod role X-Ray write permissions',
           'Instrument the AWS SDK and HTTP clients so downstream calls appear as subsegments'
         ]},
-        { type: 'awsService', name: 'AWS Distro for OpenTelemetry (ADOT)', description: 'AWS-supported distribution of the OpenTelemetry SDKs and collector. One vendor-neutral instrumentation can export traces to X-Ray, metrics to CloudWatch and data to other OpenTelemetry backends. AWS steers new instrumentation toward OpenTelemetry, while the X-Ray SDK concepts still appear on the exam.' },
+        { type: 'awsService', name: 'AWS Distro for OpenTelemetry (ADOT)', description: 'AWS-supported distribution of the OpenTelemetry SDKs and collector. One vendor-neutral instrumentation can export traces to X-Ray, metrics to CloudWatch and data to other OpenTelemetry backends. AWS recommends it for new instrumentation now that the X-Ray SDKs and daemon are in maintenance mode, while the X-Ray SDK concepts still appear on the exam.' },
         { type: 'awsService', name: 'CloudWatch Application Signals', description: 'Application performance monitoring built on OpenTelemetry instrumentation. It discovers services, shows latency, error and fault rates per operation, and lets you define service level objectives. It extends the earlier ServiceLens idea of joining traces, metrics and logs in one service map.' },
         { type: 'examTip', text: 'If a question says engineers must "filter" or "search" traces by a business value, the answer is an annotation, not metadata. If it says "trace more requests without redeploying", the answer is a sampling rule. If traces are missing from Lambda, check active tracing and the execution role permissions.' }
       ]
@@ -80,6 +95,11 @@ export const troubleshootingGuide = {
     {
       id: 'trbs4',
       title: 'Instrumenting Code for Observability',
+      sources: [
+        { title: 'Publish custom metrics (PutMetricData / EMF)', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html', checked: '2026-11-25' },
+        { title: 'Embedding metrics within logs', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html', checked: '2026-11-25' },
+        { title: 'Synthetic monitoring (canaries)', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Synthetics_Canaries.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Good instrumentation makes the next incident short. The exam expects you to know how to emit logs that can be queried, metrics that can be alarmed on, and tests that catch breakage before customers do.' },
         { type: 'keyTerm', term: 'Structured logging', definition: 'Log one JSON object per event with consistent fields such as level, message, request ID and correlation ID. Logs Insights discovers JSON fields automatically, so you can filter and aggregate on them. Lambda can emit its own logs as JSON and filter by log level through its logging configuration.' },
@@ -94,11 +114,11 @@ export const troubleshootingGuide = {
           'Each unique combination of dimensions is its own metric; you retrieve exactly the combination you published',
           'Standard resolution is 1 minute; high resolution (StorageResolution = 1) goes down to 1 second, and alarms on it can use periods as short as 10 seconds',
           'Keep high-cardinality values such as user IDs in logs, not in dimensions',
-          'Default EC2 metrics have no memory or disk space data; detailed monitoring only shortens the interval from 5 minutes to 1 minute'
+          'Default EC2 metrics have no memory or disk space data; detailed monitoring shortens the default interval from 5 minutes to 1 minute (metric categories can add GPU and 10-second CPU metrics) but adds no memory metrics'
         ]},
         { type: 'awsService', name: 'Powertools for AWS Lambda', description: 'Open-source toolkit for Python, TypeScript, Java and .NET. Logger gives structured JSON logs with Lambda context and cold start flags, Tracer wraps X-Ray, and Metrics writes EMF. Other utilities cover idempotency, batch processing and parameters.' },
         { type: 'comparison', title: 'Testing from the outside', items: [
-          { label: 'CloudWatch Synthetics canaries', description: 'Scripted Node.js or Python tests that run on a schedule against APIs and multi-step browser flows. They catch breakage even when no users are active.' },
+          { label: 'CloudWatch Synthetics canaries', description: 'Scripted Node.js, Python or Java tests that run on a schedule against APIs and multi-step browser flows. They catch breakage even when no users are active.' },
           { label: 'CloudWatch RUM', description: 'Collects performance and error data from real user browser sessions. Only reports what real users actually do.' },
           { label: 'Route 53 health checks', description: 'Checks one endpoint for a healthy response, mainly to drive DNS failover. Cannot script a multi-step flow.' }
         ]},
@@ -108,6 +128,11 @@ export const troubleshootingGuide = {
     {
       id: 'trbs5',
       title: 'Optimizing Performance and Cost',
+      sources: [
+        { title: 'Cache settings for REST APIs in API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html', checked: '2026-11-25' },
+        { title: 'Configuring reserved concurrency for an Event Function', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html', checked: '2026-11-25' },
+        { title: 'Configure Lambda Event Function memory', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Optimization questions name a goal (lower latency, higher throughput, lower cost) and a constraint (fewest code changes, least operational overhead). Pick the feature closest to the bottleneck the scenario describes.' },
         { type: 'table', headers: ['Cache', 'Where it sits', 'Choose it when'], rows: [
