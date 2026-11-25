@@ -12,7 +12,11 @@ export const domain1 = {
       question: 'An email provider has millions of historical messages, each labeled by users as "spam" or "not spam," and wants to train a model to classify incoming mail. Which ML approach fits this scenario?',
       options: ['Unsupervised learning', 'Reinforcement learning', 'Supervised learning', 'Self-supervised learning'],
       correct: 2,
-      explanation: 'Supervised learning trains a model on examples that already carry the correct answer — here, the spam/not-spam labels. Unsupervised learning applies when no labels exist, and reinforcement learning trains an agent through rewards for sequential decisions, not from a labeled dataset.'
+      explanation: 'Supervised learning trains a model on examples that already carry the correct answer — here, the spam/not-spam labels. Unsupervised learning applies when no labels exist, and reinforcement learning trains an agent through rewards for sequential decisions, not from a labeled dataset.',
+      sources: [
+        { title: 'Supervised vs Unsupervised Learning – AWS', url: 'https://aws.amazon.com/compare/the-difference-between-machine-learning-supervised-and-unsupervised/', checked: '2026-11-25' },
+        { title: 'What is Reinforcement Learning? – AWS', url: 'https://aws.amazon.com/what-is/reinforcement-learning/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q2',
@@ -24,40 +28,59 @@ export const domain1 = {
         'Deep learning is a subset of AI but sits entirely outside of machine learning'
       ],
       correct: 0,
-      explanation: 'AI is the broad discipline of machines performing tasks that require intelligence; ML is the subset of AI where systems learn patterns from data instead of following explicit rules; deep learning is the subset of ML built on multi-layer neural networks. The other options invert or break this nesting.'
+      explanation: 'AI is the broad discipline of machines performing tasks that require intelligence; ML is the subset of AI where systems learn patterns from data instead of following explicit rules; deep learning is the subset of ML built on multi-layer neural networks. The other options invert or break this nesting.',
+      sources: [
+        { title: 'What is Machine Learning? – AWS', url: 'https://aws.amazon.com/what-is/machine-learning/', checked: '2026-11-25' },
+        { title: 'What is Deep Learning? – AWS', url: 'https://aws.amazon.com/what-is/deep-learning/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q3',
       question: 'A small development team with no ML expertise wants to add image moderation and sentiment analysis to its app as quickly as possible. Which approach best meets this requirement?',
       options: [
-        'Train and deploy custom models with Amazon SageMaker',
+        'Train and deploy custom models with Amazon SageMaker AI',
         'Provision EC2 instances with AWS Deep Learning AMIs and build models there',
         'Develop a distributed Spark ML pipeline on Amazon EMR',
         'Call pre-trained AWS AI services such as Amazon Rekognition and Amazon Comprehend'
       ],
       correct: 3,
-      explanation: 'AWS AI services like Rekognition (image analysis) and Comprehend (sentiment and text analysis) expose pre-trained models through simple APIs, so teams without ML expertise get results immediately. SageMaker, Deep Learning AMIs, and EMR all require the team to build, train, and manage models themselves — slower and demanding skills they lack.'
+      explanation: 'AWS AI services like Rekognition (image analysis) and Comprehend (sentiment and text analysis) expose pre-trained models through simple APIs, so teams without ML expertise get results immediately. SageMaker AI, Deep Learning AMIs, and EMR all require the team to build, train, and manage models themselves — slower and demanding skills they lack.',
+      sources: [
+        { title: 'What is Amazon Rekognition? – Amazon Rekognition Developer Guide', url: 'https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Comprehend? – Amazon Comprehend Developer Guide', url: 'https://docs.aws.amazon.com/comprehend/latest/dg/what-is.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q4',
       question: 'A trained model is deployed behind an API and returns predictions for new transactions it has never seen before. In ML terminology, what is this prediction phase called?',
       options: ['Training', 'Inference', 'Feature engineering', 'Hyperparameter tuning'],
       correct: 1,
-      explanation: 'Inference is using an already-trained model to generate predictions on new, unseen data. Training is the earlier phase where the model learns from data, feature engineering prepares input data, and hyperparameter tuning adjusts settings that control how training runs.'
+      explanation: 'Inference is using an already-trained model to generate predictions on new, unseen data. Training is the earlier phase where the model learns from data, feature engineering prepares input data, and hyperparameter tuning adjusts settings that control how training runs.',
+      sources: [
+        { title: 'What is Inferencing? – AWS', url: 'https://aws.amazon.com/what-is/inferencing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q5',
       question: 'A manufacturer wants to automatically detect visual defects in photos of products on an assembly line. Which neural network architecture is the standard choice for this image-analysis task?',
       options: ['Convolutional neural network (CNN)', 'Recurrent neural network (RNN)', 'Generative adversarial network (GAN)', 'Single-layer feed-forward network'],
       correct: 0,
-      explanation: 'CNNs use convolutional layers to learn spatial hierarchies of features (edges, textures, shapes), making them the standard architecture for image classification and defect detection. RNNs are built for sequential data like text or time series, GANs are a training setup for generating data rather than classifying it, and a single-layer network cannot learn the complex visual features required.'
+      explanation: 'CNNs use convolutional layers to learn spatial hierarchies of features (edges, textures, shapes), making them the standard architecture for image classification and defect detection. RNNs are built for sequential data like text or time series, GANs are a training setup for generating data rather than classifying it, and a single-layer network cannot learn the complex visual features required.',
+      sources: [
+        { title: 'What is Computer Vision? – AWS', url: 'https://aws.amazon.com/what-is/computer-vision/', checked: '2026-11-25' },
+        { title: 'What is RNN? – AWS', url: 'https://aws.amazon.com/what-is/recurrent-neural-network/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q6',
       question: 'During training, a model fits the noise and outliers in its training set so closely that it fails to generalize to examples it has not seen. Which term describes this condition?',
       options: ['Underfitting', 'Data leakage', 'Overfitting', 'Concept drift'],
       correct: 2,
-      explanation: 'Overfitting is when a model memorizes training data — including its noise — instead of learning generalizable patterns, so performance on new data suffers. Underfitting is the opposite (too simple to capture patterns at all), data leakage means test information contaminated training, and concept drift is when real-world data changes after deployment.'
+      explanation: 'Overfitting is when a model memorizes training data — including its noise — instead of learning generalizable patterns, so performance on new data suffers. Underfitting is the opposite (too simple to capture patterns at all), data leakage means test information contaminated training, and concept drift is when real-world data changes after deployment.',
+      sources: [
+        { title: 'What is Overfitting? – AWS', url: 'https://aws.amazon.com/what-is/overfitting/', checked: '2026-11-25' },
+        { title: 'Splits and data leakage – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/ml-operations-planning/splits-leakage.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q7',
@@ -69,35 +92,53 @@ export const domain1 = {
         'It is a compressed version of a larger model optimized to run on edge devices'
       ],
       correct: 1,
-      explanation: 'Foundation models are pre-trained on vast, broad datasets and then adapted to many different tasks through prompting or fine-tuning — the opposite of a model built for a single task. Rules-based systems don\'t learn from data at all, and compressed edge models describe distillation or quantization, not foundation models.'
+      explanation: 'Foundation models are pre-trained on vast, broad datasets and then adapted to many different tasks through prompting or fine-tuning — the opposite of a model built for a single task. Rules-based systems don\'t learn from data at all, and compressed edge models describe distillation or quantization, not foundation models.',
+      sources: [
+        { title: 'What are Foundation Models? – AWS', url: 'https://aws.amazon.com/what-is/foundation-models/', checked: '2026-11-25' },
+        { title: 'Customize your model to improve its performance for your use case – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q8',
       question: 'Before training a model, a data scientist converts raw timestamps into "day of week" and "hour of day" columns and combines two fields into a spending ratio. Which ML process does this describe?',
       options: ['Hyperparameter tuning', 'Data labeling', 'Model evaluation', 'Feature engineering'],
       correct: 3,
-      explanation: 'Feature engineering transforms raw data into input features that better represent the underlying problem, which often improves model accuracy more than algorithm changes. Data labeling assigns target answers to examples, hyperparameter tuning adjusts training settings, and model evaluation measures performance after training.'
+      explanation: 'Feature engineering transforms raw data into input features that better represent the underlying problem, which often improves model accuracy more than algorithm changes. Data labeling assigns target answers to examples, hyperparameter tuning adjusts training settings, and model evaluation measures performance after training.',
+      sources: [
+        { title: 'What is Feature Engineering? – AWS', url: 'https://aws.amazon.com/what-is/feature-engineering/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q9',
       question: 'A telecom company wants a customer-service bot that can understand both spoken and typed requests, such as "check my bill balance," and respond conversationally. Which AWS service is designed for building this?',
       options: ['Amazon Lex', 'Amazon Polly', 'Amazon Transcribe', 'Amazon Comprehend'],
       correct: 0,
-      explanation: 'Amazon Lex is the managed service for building conversational interfaces, combining automatic speech recognition with natural language understanding to handle both voice and text — it powers the same technology as Alexa. Polly only converts text to speech, Transcribe only converts speech to text, and Comprehend analyzes text but cannot manage a conversation.'
+      explanation: 'Amazon Lex is the managed service for building conversational interfaces, combining automatic speech recognition with natural language understanding to handle both voice and text, and it is powered by the same technology as Alexa. Polly only converts text to speech, Transcribe only converts speech to text, and Comprehend analyzes text but cannot manage a conversation.',
+      sources: [
+        { title: 'What is Amazon Lex V2? – Amazon Lex V2 Developer Guide', url: 'https://docs.aws.amazon.com/lexv2/latest/dg/what-is.html', checked: '2026-11-25' },
+        { title: 'Amazon Lex – AWS', url: 'https://aws.amazon.com/lex/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q10',
       question: 'A news app wants to read its articles aloud to users in natural-sounding voices across multiple languages. Which AWS service should it use?',
       options: ['Amazon Transcribe', 'Amazon Translate', 'Amazon Polly', 'Amazon Lex'],
       correct: 2,
-      explanation: 'Amazon Polly converts text into lifelike speech using neural text-to-speech, with many voices and languages available. Transcribe does the reverse (speech to text), Translate converts text between languages but produces no audio, and Lex builds conversational bots rather than narrating content.'
+      explanation: 'Amazon Polly converts text into lifelike speech using neural text-to-speech, with many voices and languages available. Transcribe does the reverse (speech to text), Translate converts text between languages but produces no audio, and Lex builds conversational bots rather than narrating content.',
+      sources: [
+        { title: 'What Is Amazon Polly? – Amazon Polly Developer Guide', url: 'https://docs.aws.amazon.com/polly/latest/dg/what-is.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Transcribe? – Amazon Transcribe Developer Guide', url: 'https://docs.aws.amazon.com/transcribe/latest/dg/what-is.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q11',
       question: 'A data science team needs a single managed platform to prepare data, train and tune custom models, deploy them to endpoints, and monitor them in production. Which AWS service provides this end-to-end ML lifecycle?',
-      options: ['Amazon Bedrock', 'Amazon SageMaker', 'Amazon Comprehend', 'AWS Glue'],
+      options: ['Amazon Bedrock', 'Amazon SageMaker AI', 'Amazon Comprehend', 'AWS Glue'],
       correct: 1,
-      explanation: 'Amazon SageMaker is the fully managed platform covering the entire custom ML lifecycle — data preparation, training, tuning, deployment, and monitoring. Bedrock provides API access to pre-built foundation models rather than a custom-model training platform, Comprehend is a pre-trained NLP service, and Glue handles data integration and ETL, not model building.'
+      explanation: 'Amazon SageMaker AI (named Amazon SageMaker until December 2024) is the fully managed platform covering the entire custom ML lifecycle — data preparation, training, tuning, deployment, and monitoring. Bedrock provides API access to pre-built foundation models rather than a custom-model training platform, Comprehend is a pre-trained NLP service, and Glue handles data integration and ETL, not model building.',
+      sources: [
+        { title: 'What is Amazon SageMaker AI? – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q12',
@@ -109,35 +150,54 @@ export const domain1 = {
         'Batch inference that processes the full dataset in one scheduled job'
       ],
       correct: 3,
-      explanation: 'Batch inference is designed for scoring large datasets on a schedule: compute spins up for the job, processes everything with high throughput, and shuts down, so nothing is paid for idle time. An always-on real-time endpoint bills 24/7 for a job that runs once nightly, and invoking millions of individual real-time requests adds cost and overhead with no benefit when latency doesn\'t matter.'
+      explanation: 'Batch inference is designed for scoring large datasets on a schedule: compute spins up for the job, processes everything with high throughput, and shuts down, so nothing is paid for idle time. An always-on real-time endpoint bills 24/7 for a job that runs once nightly, and invoking millions of individual real-time requests adds cost and overhead with no benefit when latency doesn\'t matter.',
+      sources: [
+        { title: 'Batch transform for inference with Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/batch-transform.html', checked: '2026-11-25' },
+        { title: 'Deploy models for inference – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q13',
       question: 'Months after deployment, a model\'s predictions become less accurate as customer behavior shifts away from the patterns in its training data. Which SageMaker capability detects this kind of data drift and quality degradation in production?',
       options: ['SageMaker Model Monitor', 'SageMaker Data Wrangler', 'SageMaker Feature Store', 'SageMaker Autopilot'],
       correct: 0,
-      explanation: 'SageMaker Model Monitor continuously watches deployed models, detecting data drift, model quality degradation, bias drift, and feature attribution changes, and can alert the team to retrain. Data Wrangler prepares data before training, Feature Store manages and serves features, and Autopilot builds models automatically — none of them monitor production behavior.'
+      explanation: 'SageMaker Model Monitor continuously watches deployed models, detecting data drift, model quality degradation, bias drift, and feature attribution changes, and can alert the team to retrain. (Model Monitor is no longer open to new customers; existing customers keep using it, and AWS points new customers to open-source SageMaker AI monitoring solutions with Amazon CloudWatch.) Data Wrangler prepares data before training, Feature Store manages and serves features, and Autopilot builds models automatically — none of them monitor production behavior.',
+      sources: [
+        { title: 'Data and model quality monitoring with Amazon SageMaker Model Monitor – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html', checked: '2026-11-25' },
+        { title: 'Amazon SageMaker Model Monitor availability change – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor-availability-change.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q14',
       question: 'A resume-screening model must balance two errors: advancing unqualified candidates (false positives) and rejecting qualified ones (false negatives). The team wants a single metric that accounts for both. Which should they use?',
       options: ['Accuracy', 'Recall', 'F1 score', 'Precision'],
       correct: 2,
-      explanation: 'The F1 score is the harmonic mean of precision and recall, so it penalizes a model that is weak on either false positives or false negatives — exactly the single balanced metric the team wants. Precision alone ignores missed qualified candidates, recall alone ignores false alarms, and accuracy can look strong while hiding poor performance on the smaller class.'
+      explanation: 'The F1 score is the harmonic mean of precision and recall, so it penalizes a model that is weak on either false positives or false negatives — exactly the single balanced metric the team wants. Precision alone ignores missed qualified candidates, recall alone ignores false alarms, and accuracy can look strong while hiding poor performance on the smaller class.',
+      sources: [
+        { title: 'Metrics and validation – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/autopilot-metrics-validation.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q15',
       question: 'A video-streaming service wants to show each user a "Recommended for You" row that updates in real time based on viewing behavior, without building a recommendation engine from scratch. Which AWS service is purpose-built for this?',
       options: ['Amazon Kendra', 'Amazon Personalize', 'Amazon Forecast', 'Amazon Comprehend'],
       correct: 1,
-      explanation: 'Amazon Personalize is the managed service for real-time personalized recommendations, using the same technology developed for Amazon.com and requiring no ML expertise. Kendra is intelligent enterprise search, Forecast predicts future time-series values like demand, and Comprehend analyzes text — none of them generate per-user recommendations.'
+      explanation: 'Amazon Personalize is the fully managed ML service for personalized recommendations that adapt in real time to how users engage. Kendra is intelligent enterprise search, Forecast predicts future time-series values like demand, and Comprehend analyzes text — none of them generate per-user recommendations.',
+      sources: [
+        { title: 'What is Amazon Personalize? – Amazon Personalize Developer Guide', url: 'https://docs.aws.amazon.com/personalize/latest/dg/what-is-personalize.html', checked: '2026-11-25' },
+        { title: 'Amazon Personalize – AWS', url: 'https://aws.amazon.com/personalize/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q16',
       question: 'An e-commerce company wants a managed ML service to score online activities such as new account signups and payments for fraud risk in real time. Which AWS service is purpose-built for this?',
       options: ['Amazon Macie', 'Amazon GuardDuty', 'Amazon Inspector', 'Amazon Fraud Detector'],
       correct: 3,
-      explanation: 'Amazon Fraud Detector uses ML to score online activities like payments and account creation for fraud risk in real time, adapting to new fraud patterns faster than static rules. Macie discovers sensitive data in S3, GuardDuty detects threats against AWS accounts and workloads, and Inspector scans workloads for software vulnerabilities — all security services, but none score business transactions for fraud.'
+      explanation: 'Amazon Fraud Detector uses ML to score online activities like payments and account creation for fraud risk in real time, with no ML expertise needed. Note: it is no longer open to new customers (since November 7, 2025); existing customers keep using it, and AWS points new customers to SageMaker AI, AutoGluon and AWS WAF. Macie discovers sensitive data in S3, GuardDuty detects threats against AWS accounts and workloads, and Inspector scans workloads for software vulnerabilities — all security services, but none score business transactions for fraud.',
+      sources: [
+        { title: 'What is Amazon Fraud Detector? – Amazon Fraud Detector User Guide', url: 'https://docs.aws.amazon.com/frauddetector/latest/ug/what-is-frauddetector.html', checked: '2026-11-25' },
+        { title: 'Amazon Fraud Detector – AWS', url: 'https://aws.amazon.com/fraud-detector/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q17',
@@ -149,7 +209,10 @@ export const domain1 = {
         'Supervised learning with a regression algorithm'
       ],
       correct: 2,
-      explanation: 'With no labels or predefined categories, this is unsupervised learning — clustering algorithms like K-means discover natural groupings in the data. Classification and regression are supervised methods that require labeled examples, and reinforcement learning applies to sequential decision-making with rewards, not segmentation.'
+      explanation: 'With no labels or predefined categories, this is unsupervised learning — clustering algorithms like K-means discover natural groupings in the data. Classification and regression are supervised methods that require labeled examples, and reinforcement learning applies to sequential decision-making with rewards, not segmentation.',
+      sources: [
+        { title: 'Supervised vs Unsupervised Learning – AWS', url: 'https://aws.amazon.com/compare/the-difference-between-machine-learning-supervised-and-unsupervised/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q18',
@@ -161,14 +224,20 @@ export const domain1 = {
         'Anomaly detection, because unusual prices must be flagged'
       ],
       correct: 0,
-      explanation: 'Predicting a continuous numeric value (a dollar amount) is regression. Classification predicts discrete categories, clustering groups unlabeled data, and anomaly detection flags outliers — none of them output a precise continuous value.'
+      explanation: 'Predicting a continuous numeric value (a dollar amount) is regression. Classification predicts discrete categories, clustering groups unlabeled data, and anomaly detection flags outliers — none of them output a precise continuous value.',
+      sources: [
+        { title: 'Supervised vs Unsupervised Learning – AWS', url: 'https://aws.amazon.com/compare/the-difference-between-machine-learning-supervised-and-unsupervised/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q19',
       question: 'A bank\'s fraud model must catch as many fraudulent transactions as possible, even if that means flagging some legitimate ones for manual review. Which evaluation metric should the team prioritize?',
       options: ['Precision', 'Accuracy', 'Recall', 'Inference latency'],
       correct: 2,
-      explanation: 'Recall measures the fraction of actual fraud cases the model catches — prioritizing it minimizes missed fraud (false negatives). Precision would minimize false alarms instead, and accuracy is misleading when fraud is rare because a model that flags nothing can still score high.'
+      explanation: 'Recall measures the fraction of actual fraud cases the model catches — prioritizing it minimizes missed fraud (false negatives). Precision would minimize false alarms instead, and accuracy is misleading when fraud is rare because a model that flags nothing can still score high.',
+      sources: [
+        { title: 'Metrics and validation – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/autopilot-metrics-validation.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q20',
@@ -180,7 +249,10 @@ export const domain1 = {
         'To store production inference requests for future retraining'
       ],
       correct: 1,
-      explanation: 'The validation set is used during development to tune hyperparameters and choose between candidate models. The test set is held back for the final unbiased performance estimate, and the training set is what the model actually learns from.'
+      explanation: 'The validation set is used during development to tune hyperparameters and choose between candidate models. The test set is held back for the final unbiased performance estimate, and the training set is what the model actually learns from.',
+      sources: [
+        { title: 'Splits and data leakage – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/ml-operations-planning/splits-leakage.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q21',
@@ -192,7 +264,10 @@ export const domain1 = {
         'Raise the classification threshold until accuracy improves'
       ],
       correct: 1,
-      explanation: 'The large gap between training and new-data performance is overfitting. Regularization, more (and more diverse) training data, and simpler models all reduce it. Increasing complexity or training longer usually makes overfitting worse, and removing the test set only hides the problem.'
+      explanation: 'The large gap between training and new-data performance is overfitting. Regularization, more (and more diverse) training data, and simpler models all reduce it. Increasing complexity or training longer usually makes overfitting worse, and removing the test set only hides the problem.',
+      sources: [
+        { title: 'What is Overfitting? – AWS', url: 'https://aws.amazon.com/what-is/overfitting/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q22',
@@ -204,21 +279,32 @@ export const domain1 = {
         'ML is only applicable to image and text data, not tabular data'
       ],
       correct: 1,
-      explanation: 'When the correct output is defined exactly by known rules, a deterministic rules-based implementation is simpler, cheaper, and always correct. ML is suited to problems where patterns must be learned from data — using it here adds cost and error for no benefit. ML handles numeric and tabular data fine, so the other objections are false.'
+      explanation: 'When the correct output is defined exactly by known rules, a deterministic rules-based implementation is simpler, cheaper, and always correct. ML is suited to problems where patterns must be learned from data — using it here adds cost and error for no benefit. ML handles numeric and tabular data fine, so the other objections are false.',
+      sources: [
+        { title: 'When to Use Machine Learning – Amazon Machine Learning Developer Guide', url: 'https://docs.aws.amazon.com/machine-learning/latest/dg/when-to-use-machine-learning.html', checked: '2026-11-25' },
+        { title: 'MLCOST02-BP01 Identify if machine learning is the right solution – Machine Learning Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp01.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q23',
       question: 'A team has 100,000 unlabeled product images and needs high-quality labels to train a classifier. Which AWS service manages human labeling workflows, including workforce options and automated labeling?',
       options: ['Amazon Rekognition', 'SageMaker Ground Truth', 'Amazon Textract', 'SageMaker Model Monitor'],
       correct: 1,
-      explanation: 'SageMaker Ground Truth manages data-labeling jobs with human workforces (Mechanical Turk, vendors, or your own team) and can auto-label a portion of data to cut costs. Rekognition analyzes images with pre-trained models but doesn\'t create training labels, Textract extracts document text, and Model Monitor watches production models.'
+      explanation: 'SageMaker Ground Truth manages data-labeling jobs with human workforces (a vendor workforce from AWS Marketplace or your own private team) and its automated data labeling can label part of the data to cut cost and time. Rekognition analyzes images with pre-trained models but doesn\'t create training labels, Textract extracts document text, and Model Monitor watches production models. Note: Ground Truth is no longer open to new customers; existing customers can keep using it, and exam questions may still name it.',
+      sources: [
+        { title: 'Training data labeling using humans with Amazon SageMaker Ground Truth – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/sms.html', checked: '2026-11-25' },
+        { title: 'Automate data labeling – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/sms-automated-labeling.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q24',
       question: 'A developer wants to deploy a common ML solution quickly using pre-trained open-source models and one-click fine-tuning, without building from scratch. Which SageMaker capability should they use?',
       options: ['SageMaker JumpStart', 'SageMaker Ground Truth', 'SageMaker Clarify', 'SageMaker Feature Store'],
       correct: 0,
-      explanation: 'SageMaker JumpStart is a hub of pre-trained models and solution templates that can be deployed or fine-tuned with minimal effort. Ground Truth handles labeling, Clarify handles bias detection and explainability, and Feature Store manages ML features — none of them provide ready-to-deploy models.'
+      explanation: 'SageMaker JumpStart is a hub of pre-trained models and solution templates that can be deployed or fine-tuned with minimal effort. Ground Truth handles labeling, Clarify handles bias detection and explainability, and Feature Store manages ML features — none of them provide ready-to-deploy models.',
+      sources: [
+        { title: 'SageMaker JumpStart pretrained models – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/studio-jumpstart.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q25',
@@ -230,7 +316,10 @@ export const domain1 = {
         'Switch to unsupervised learning since labels are insufficient'
       ],
       correct: 1,
-      explanation: 'Transfer learning reuses features a model already learned from a large general dataset, so a small labeled dataset is enough to fine-tune it for a specialized task. Duplicating images adds no new information (and encourages overfitting), and abandoning the labels wastes the most valuable part of the data.'
+      explanation: 'Transfer learning reuses features a model already learned from a large general dataset, so a small labeled dataset is enough to fine-tune it for a specialized task. Duplicating images adds no new information (and encourages overfitting), and abandoning the labels wastes the most valuable part of the data.',
+      sources: [
+        { title: 'What is Transfer Learning? – AWS', url: 'https://aws.amazon.com/what-is/transfer-learning/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q26',
@@ -242,7 +331,11 @@ export const domain1 = {
         'Detecting spam using a labeled email dataset'
       ],
       correct: 2,
-      explanation: 'Reinforcement learning trains an agent through trial and error using rewards and penalties — the approach behind AWS DeepRacer. Demand prediction is supervised regression, topic grouping is unsupervised clustering, and spam detection is supervised classification.'
+      explanation: 'Reinforcement learning trains an agent through trial and error using rewards and penalties — the approach behind DeepRacer (now offered as the open-source DeepRacer on AWS). Demand prediction is supervised regression, topic grouping is unsupervised clustering, and spam detection is supervised classification.',
+      sources: [
+        { title: 'What is Reinforcement Learning? – AWS', url: 'https://aws.amazon.com/what-is/reinforcement-learning/', checked: '2026-11-25' },
+        { title: 'DeepRacer – AWS', url: 'https://aws.amazon.com/deepracer/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q27',
@@ -254,7 +347,10 @@ export const domain1 = {
         'The model is overfitting to the fraud class'
       ],
       correct: 1,
-      explanation: 'With severe class imbalance, accuracy rewards ignoring the minority class entirely. Precision, recall, and F1 score reveal that this model catches zero fraud. The dataset size isn\'t the issue, and the model isn\'t overfitting to fraud — it never predicts fraud at all.'
+      explanation: 'With severe class imbalance, accuracy rewards ignoring the minority class entirely. Precision, recall, and F1 score reveal that this model catches zero fraud. The dataset size isn\'t the issue, and the model isn\'t overfitting to fraud — it never predicts fraud at all.',
+      sources: [
+        { title: 'Metrics and validation – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/autopilot-metrics-validation.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q28',
@@ -266,14 +362,21 @@ export const domain1 = {
         'Multi-model endpoints on GPU instances'
       ],
       correct: 2,
-      explanation: 'SageMaker Serverless Inference automatically provisions compute per request and scales to zero when idle, so you pay only for actual usage — ideal for intermittent, unpredictable traffic. A permanent endpoint bills for idle time, and nightly batch jobs can\'t serve on-demand requests.'
+      explanation: 'SageMaker Serverless Inference automatically provisions compute per request and scales to zero when idle, so you pay only for actual usage — ideal for intermittent, unpredictable traffic. A permanent endpoint bills for idle time, and nightly batch jobs can\'t serve on-demand requests.',
+      sources: [
+        { title: 'Deploy models with Amazon SageMaker Serverless Inference – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html', checked: '2026-11-25' },
+        { title: 'Deploy models for inference – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q29',
       question: 'Which metric is most appropriate for evaluating a regression model that predicts delivery times?',
       options: ['F1 score', 'Root Mean Squared Error (RMSE)', 'Confusion matrix', 'Recall'],
       correct: 1,
-      explanation: 'RMSE measures the average magnitude of prediction errors for continuous values, making it a standard regression metric. F1, recall, and confusion matrices evaluate classification models, which predict categories rather than continuous quantities.'
+      explanation: 'RMSE measures the average magnitude of prediction errors for continuous values, making it a standard regression metric. F1, recall, and confusion matrices evaluate classification models, which predict categories rather than continuous quantities.',
+      sources: [
+        { title: 'Metrics and validation – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/autopilot-metrics-validation.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd1q30',
@@ -285,7 +388,11 @@ export const domain1 = {
         'Amazon Kendra for indexing the deployment documentation'
       ],
       correct: 0,
-      explanation: 'SageMaker Pipelines is the MLOps service for defining automated, repeatable workflows covering data preparation, training, evaluation, and deployment. CloudTrail only audits API calls, and Polly (text-to-speech) and Kendra (enterprise search) are unrelated to workflow automation.'
+      explanation: 'SageMaker Pipelines is the MLOps service for defining automated, repeatable workflows covering data preparation, training, evaluation, and deployment. CloudTrail only audits API calls, and Polly (text-to-speech) and Kendra (enterprise search) are unrelated to workflow automation.',
+      sources: [
+        { title: 'Pipelines – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/pipelines.html', checked: '2026-11-25' },
+        { title: 'What is MLOps? – AWS', url: 'https://aws.amazon.com/what-is/mlops/', checked: '2026-11-25' }
+      ]
     }
   ]
 };
@@ -304,42 +411,66 @@ export const domain2 = {
       question: 'A startup wants to add a generative AI chat feature using foundation models from providers such as Anthropic, Meta, and Amazon, accessed through one managed API without provisioning any infrastructure. Which AWS service should it use?',
       options: ['Amazon Bedrock', 'Amazon SageMaker Ground Truth', 'Amazon Comprehend', 'Amazon Kendra'],
       correct: 0,
-      explanation: 'Amazon Bedrock is the fully managed, serverless service that exposes foundation models from multiple providers through a single API for building generative AI applications. Ground Truth is a data-labeling service, Comprehend is pre-trained NLP analysis (sentiment, entities), and Kendra is intelligent enterprise search — none of them provide foundation model access.'
+      explanation: 'Amazon Bedrock is the fully managed, serverless service that exposes foundation models from multiple providers through a single API for building generative AI applications. Ground Truth is a data-labeling service, Comprehend is pre-trained NLP analysis (sentiment, entities), and Kendra is intelligent enterprise search — none of them provide foundation model access.',
+      sources: [
+        { title: 'Overview – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock – AWS Documentation', url: 'https://aws.amazon.com/documentation-overview/bedrock/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q2',
       question: 'To improve a chatbot\'s answers, an analyst rewrites the instructions, adds example inputs and outputs, and specifies the desired response format — all without running any training job. What is this practice called?',
       options: ['Fine-tuning', 'Continued pre-training', 'Prompt engineering', 'Feature engineering'],
       correct: 2,
-      explanation: 'Prompt engineering is the practice of crafting the model\'s input — instructions, examples, and format constraints — to steer its output without changing the model itself. Fine-tuning and continued pre-training both run training jobs that modify model weights, and feature engineering is a traditional-ML data-preparation step, not a prompting technique.'
+      explanation: 'Prompt engineering is the practice of crafting the model\'s input — instructions, examples, and format constraints — to steer its output without changing the model itself. Fine-tuning and continued pre-training both run training jobs that modify model weights, and feature engineering is a traditional-ML data-preparation step, not a prompting technique.',
+      sources: [
+        { title: 'What is prompt engineering? – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-prompt-engineering.html', checked: '2026-11-25' },
+        { title: 'Prompt engineering concepts – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q3',
       question: 'An HR chatbot answers employee questions by first searching a knowledge base of company policies for relevant passages, then inserting those passages into the model\'s prompt before generating a response. What is this architecture called?',
       options: ['Parameter-efficient fine-tuning', 'Retrieval Augmented Generation (RAG)', 'Chain-of-thought prompting', 'Continued pre-training'],
       correct: 1,
-      explanation: 'RAG augments the model\'s prompt with relevant documents retrieved at query time, letting it answer from knowledge outside its training data without any retraining. Fine-tuning and continued pre-training modify model weights through training, and chain-of-thought prompting elicits step-by-step reasoning but retrieves nothing.'
+      explanation: 'RAG augments the model\'s prompt with relevant documents retrieved at query time, letting it answer from knowledge outside its training data without any retraining. Fine-tuning and continued pre-training modify model weights through training, and chain-of-thought prompting elicits step-by-step reasoning but retrieves nothing.',
+      sources: [
+        { title: 'What is RAG? – AWS', url: 'https://aws.amazon.com/what-is/retrieval-augmented-generation/', checked: '2026-11-25' },
+        { title: 'Key terminology – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/key-definitions.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q4',
       question: 'A team building a RAG application needs an AWS service that can store document embeddings and run vector similarity (k-NN) searches over them. Which service fits this requirement?',
       options: ['Amazon Athena', 'Amazon DynamoDB', 'Amazon Redshift', 'Amazon OpenSearch Service'],
       correct: 3,
-      explanation: 'Amazon OpenSearch Service supports k-NN vector search, making it a common choice for storing and querying embeddings in RAG architectures (and it backs Bedrock Knowledge Bases via OpenSearch Serverless). Athena runs SQL over data in S3, DynamoDB is a key-value/document store, and Redshift is a data warehouse — none is designed around vector similarity search.'
+      explanation: 'Amazon OpenSearch Service supports k-NN vector search, making it a common choice for storing and querying embeddings in RAG architectures (and OpenSearch Serverless is one of the vector stores Bedrock Knowledge Bases can use). Athena runs SQL over data in S3, DynamoDB is a key-value/document store, and Redshift is a data warehouse — none is designed around vector similarity search.',
+      sources: [
+        { title: 'k-Nearest Neighbor (k-NN) search in Amazon OpenSearch Service – Amazon OpenSearch Service Developer Guide', url: 'https://docs.aws.amazon.com/opensearch-service/latest/developerguide/knn.html', checked: '2026-11-25' },
+        { title: 'Prerequisites for using a vector store you created for a knowledge base – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-setup.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q5',
       question: 'A coding assistant confidently describes an SDK function that does not actually exist in the library. Which term describes this LLM behavior?',
       options: ['Hallucination', 'Model drift', 'Underfitting', 'Prompt injection'],
       correct: 0,
-      explanation: 'Hallucination is when a model generates fluent, plausible-sounding content that is factually wrong or invented — like a nonexistent function. Model drift is performance degradation as real-world data changes, underfitting is a model too simple to learn its training data, and prompt injection is an attack where malicious input overrides the model\'s instructions.'
+      explanation: 'Hallucination is when a model generates fluent, plausible-sounding content that is factually wrong or invented — like a nonexistent function. Model drift is performance degradation as real-world data changes, underfitting is a model too simple to learn its training data, and prompt injection is an attack where malicious input overrides the model\'s instructions.',
+      sources: [
+        { title: 'What Are AI Hallucinations? – AWS', url: 'https://aws.amazon.com/what-is/ai-hallucinations/', checked: '2026-11-25' },
+        { title: 'Safeguard your generative AI workloads from prompt injections – AWS Security Blog', url: 'https://aws.amazon.com/blogs/security/safeguard-your-generative-ai-workloads-from-prompt-injections/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q6',
       question: 'A healthcare company has thousands of labeled prompt-and-response pairs from its specialty and wants a foundation model\'s weights permanently adapted so it excels at this domain. Which customization approach does this describe?',
       options: ['Prompt engineering with templates', 'Retrieval Augmented Generation', 'Fine-tuning the foundation model', 'Zero-shot prompting'],
       correct: 2,
-      explanation: 'Fine-tuning continues training a pre-trained model on labeled domain examples, updating its weights so the specialization is built into the model itself. Prompt engineering and zero-shot prompting only shape the input and change nothing permanently, while RAG supplies external knowledge at query time and deliberately leaves the weights untouched.'
+      explanation: 'Fine-tuning continues training a pre-trained model on labeled domain examples, updating its weights so the specialization is built into the model itself. Prompt engineering and zero-shot prompting only shape the input and change nothing permanently, while RAG supplies external knowledge at query time and deliberately leaves the weights untouched.',
+      sources: [
+        { title: 'Customize your model to improve its performance for your use case – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html', checked: '2026-11-25' },
+        { title: 'Key terminology – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/key-definitions.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q7',
@@ -351,35 +482,52 @@ export const domain2 = {
         'A checkpoint of the model\'s weights saved during the training run'
       ],
       correct: 1,
-      explanation: 'LLMs split text into tokens — words, subwords, or characters — and both context limits and usage-based pricing are measured in these units. Tokens are unrelated to authentication credentials, compute-time billing, or training checkpoints.'
+      explanation: 'LLMs split text into tokens — words, subwords, or characters — and both context limits and usage-based pricing are measured in these units. Tokens are unrelated to authentication credentials, compute-time billing, or training checkpoints.',
+      sources: [
+        { title: 'Key terminology – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/key-definitions.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q8',
       question: 'A team steers a foundation model\'s output style by including a handful of worked examples directly in each request, with no training job and no change to the model\'s weights. Which technique is this?',
       options: ['Full fine-tuning', 'Continued pre-training', 'Model distillation', 'In-context learning with few-shot examples'],
       correct: 3,
-      explanation: 'In-context (few-shot) learning conditions the model on examples supplied in the prompt itself, adapting its behavior for that request without touching its weights. Fine-tuning and continued pre-training are training jobs that do update weights, and distillation trains a smaller model to imitate a larger one.'
+      explanation: 'In-context (few-shot) learning conditions the model on examples supplied in the prompt itself, adapting its behavior for that request without touching its weights. Fine-tuning and continued pre-training are training jobs that do update weights, and distillation trains a smaller model to imitate a larger one.',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q9',
       question: 'Before indexing a 500-page manual for a RAG system, a team splits it into passages of a few hundred tokens each so they can be embedded and retrieved individually. What is this preprocessing step called?',
       options: ['Chunking', 'Tokenization', 'Quantization', 'Normalization'],
       correct: 0,
-      explanation: 'Chunking breaks large documents into smaller pieces that embed well, retrieve precisely, and fit within the model\'s context window — a core step in RAG pipelines. Tokenization is the model\'s own splitting of text into tokens, quantization compresses model weights to lower precision, and normalization standardizes data values.'
+      explanation: 'Chunking breaks large documents into smaller pieces that embed well, retrieve precisely, and fit within the model\'s context window — a core step in RAG pipelines. Tokenization is the model\'s own splitting of text into tokens, quantization compresses model weights to lower precision, and normalization standardizes data values.',
+      sources: [
+        { title: 'How content chunking works for knowledge bases – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/kb-chunking.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q10',
       question: 'A retail app represents every product description as a list of numbers so that items with similar meaning end up numerically close together, even when they share no keywords. What are these numerical representations called?',
       options: ['Tokens', 'Hyperparameters', 'Embeddings', 'Checkpoints'],
       correct: 2,
-      explanation: 'Embeddings are vector representations of data that capture semantic meaning, so similar concepts land close together in vector space — the basis for semantic search and recommendations. Tokens are the text units a model processes, hyperparameters are training configuration settings, and checkpoints are saved model states.'
+      explanation: 'Embeddings are vector representations of data that capture semantic meaning, so similar concepts land close together in vector space — the basis for semantic search and recommendations. Tokens are the text units a model processes, hyperparameters are training configuration settings, and checkpoints are saved model states.',
+      sources: [
+        { title: 'What is Embedding? – AWS', url: 'https://aws.amazon.com/what-is/embeddings-in-machine-learning/', checked: '2026-11-25' },
+        { title: 'Key terminology – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/key-definitions.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q11',
       question: 'A design team generates marketing images with a model that starts from pure random noise and progressively removes it until a coherent image emerges. Which type of generative model works this way?',
       options: ['Generative adversarial network (GAN)', 'Diffusion model', 'Recurrent neural network (RNN)', 'Variational autoencoder (VAE)'],
       correct: 1,
-      explanation: 'Diffusion models learn to reverse a gradual noise-adding process, generating images by iterative denoising — the approach behind Stable Diffusion and Amazon Titan Image Generator. GANs generate through a generator-discriminator competition, VAEs decode from a learned latent space, and RNNs are sequence models, not image generators.'
+      explanation: 'Diffusion models learn to reverse a gradual noise-adding process, generating images by iterative denoising — the approach behind Stable Diffusion. GANs generate through a generator-discriminator competition, VAEs decode from a learned latent space, and RNNs are sequence models, not image generators.',
+      sources: [
+        { title: 'What is Generative AI? – AWS', url: 'https://aws.amazon.com/what-is/generative-ai/', checked: '2026-11-25' },
+        { title: 'What is Stable Diffusion? – AWS', url: 'https://aws.amazon.com/what-is/stable-diffusion/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q12',
@@ -391,28 +539,42 @@ export const domain2 = {
         'Data selection → Model selection → Pre-training → Fine-tuning → Evaluation → Deployment → Feedback'
       ],
       correct: 3,
-      explanation: 'The lifecycle starts with selecting data and a model architecture, then pre-training on broad data, fine-tuning for the target use, evaluating, deploying, and gathering feedback that drives further iteration. The other orders are wrong because pre-training cannot precede data selection, and evaluation must happen before deployment, not after.'
+      explanation: 'The lifecycle starts with selecting data and a model architecture, then pre-training on broad data, fine-tuning for the target use, evaluating, deploying, and gathering feedback that drives further iteration. The other orders are wrong because pre-training cannot precede data selection, and evaluation must happen before deployment, not after.',
+      sources: [
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner (AIF-C01) Exam Guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q13',
       question: 'A support app lets customers upload a photo of a broken part and type a question about it, and the model interprets both the image and the text to produce an answer. Which type of model enables this?',
       options: ['A multimodal model', 'An embedding model', 'A diffusion model', 'A text-only large language model'],
       correct: 0,
-      explanation: 'Multimodal models process (and can generate) more than one type of data — here, image plus text input. An embedding model outputs vectors rather than answers, a diffusion model generates images from noise, and a text-only LLM cannot interpret the uploaded photo at all.'
+      explanation: 'Multimodal models process (and can generate) more than one type of data — here, image plus text input. An embedding model outputs vectors rather than answers, a diffusion model generates images from noise, and a text-only LLM cannot interpret the uploaded photo at all.',
+      sources: [
+        { title: 'What are Foundation Models? – AWS', url: 'https://aws.amazon.com/what-is/foundation-models/', checked: '2026-11-25' },
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner (AIF-C01) Exam Guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q14',
       question: 'A team wants to adapt a large foundation model to its domain but cannot afford the compute to update all of the model\'s billions of weights. Which approach trains only a small number of parameters while freezing the rest?',
       options: ['Full fine-tuning', 'Pre-training from scratch', 'Parameter-Efficient Fine-Tuning (PEFT), such as LoRA', 'Reinforcement learning from human feedback (RLHF)'],
       correct: 2,
-      explanation: 'PEFT techniques like LoRA freeze the original weights and train only a small set of added or selected parameters, achieving domain adaptation at a fraction of the cost of full fine-tuning. Full fine-tuning updates every weight, pre-training from scratch is the most expensive option of all, and RLHF is an alignment technique, not a cost-reduction method.'
+      explanation: 'PEFT techniques like LoRA freeze the original weights and train only a small set of added or selected parameters, achieving domain adaptation at a fraction of the cost of full fine-tuning. Full fine-tuning updates every weight, pre-training from scratch is the most expensive option of all, and RLHF is an alignment technique, not a cost-reduction method.',
+      sources: [
+        { title: 'SFT on Nova 1.0 – Amazon Nova User Guide', url: 'https://docs.aws.amazon.com/nova/latest/userguide/nova-sft-1.html', checked: '2026-11-25' },
+        { title: 'What is RLHF? – AWS', url: 'https://aws.amazon.com/what-is/reinforcement-learning-from-human-feedback/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q15',
       question: 'A development team wants an AI assistant inside their IDE that suggests code completions, generates functions from natural-language comments, and scans code for security vulnerabilities. Which AWS service provides this?',
       options: ['Amazon SageMaker Canvas', 'Amazon Q Developer', 'AWS CodeDeploy', 'Amazon Kendra'],
       correct: 1,
-      explanation: 'Amazon Q Developer is the generative AI coding assistant that provides inline code suggestions, generates code from natural-language prompts, and scans for security issues directly in the IDE. SageMaker Canvas is a no-code ML model builder, CodeDeploy automates application deployments, and Kendra is enterprise document search.'
+      explanation: 'Amazon Q Developer is the generative AI coding assistant that provides inline code suggestions, generates code from natural-language prompts, and scans for security issues directly in the IDE. SageMaker Canvas is a no-code ML model builder, CodeDeploy automates application deployments, and Kendra is enterprise document search. Note: AWS ends support for the Q Developer IDE plugins on April 30, 2027 and points developers to Kiro, which the current exam guide also lists.',
+      sources: [
+        { title: 'What is Amazon Q Developer? – Amazon Q Developer User Guide', url: 'https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q16',
@@ -424,19 +586,27 @@ export const domain2 = {
         'Generative adversarial network (GAN)'
       ],
       correct: 1,
-      explanation: 'The transformer architecture uses self-attention to weigh relationships between all tokens in a sequence at once, enabling the parallel training that made today\'s LLMs possible. CNNs dominate image tasks, RNNs process sequences step-by-step and struggle with long dependencies, and GANs are a training setup for generative image models.'
+      explanation: 'The transformer architecture uses self-attention to weigh relationships between all tokens in a sequence at once, enabling the parallel training that made today\'s LLMs possible. CNNs dominate image tasks, RNNs process sequences step-by-step and struggle with long dependencies, and GANs are a training setup for generative image models.',
+      sources: [
+        { title: 'What are Transformers? – AWS', url: 'https://aws.amazon.com/what-is/transformers-in-artificial-intelligence/', checked: '2026-11-25' },
+        { title: 'What is LLM? – AWS', url: 'https://aws.amazon.com/what-is/large-language-model/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q17',
-      question: 'A user pastes a 300-page contract into a chatbot and the model ignores most of the document. What is the most likely cause?',
+      question: 'A user pastes a 3,000-page collection of contracts into a chatbot, and the answers reflect only part of the material. What is the most likely cause?',
       options: [
         'The model\'s temperature is set too high',
-        'The document exceeds the model\'s context window, so tokens beyond the limit are not processed',
+        'The input exceeds the model\'s context window, so not all of it can be processed in one request',
         'The model was not fine-tuned on legal vocabulary',
         'The embeddings for legal text are of low quality'
       ],
       correct: 1,
-      explanation: 'Every model has a fixed context window — a maximum number of tokens it can process per request. Input beyond that limit is simply not seen. Temperature affects randomness, not capacity; fine-tuning and embedding quality would degrade answer quality, not cause wholesale ignoring of most of the text.'
+      explanation: 'Every model has a fixed context window — a maximum number of tokens it can handle per request. Even a 1-million-token window holds only about 2,500 pages, so content beyond the limit is dropped from the window instead of being processed. Temperature affects randomness, not capacity; fine-tuning and embedding quality would degrade answer quality, not leave part of the input unread.',
+      sources: [
+        { title: 'Claude by Anthropic – Models in Amazon Bedrock', url: 'https://aws.amazon.com/bedrock/anthropic/', checked: '2026-11-25' },
+        { title: 'Context window overflow: Breaking the barrier – AWS Security Blog', url: 'https://aws.amazon.com/blogs/security/context-window-overflow-breaking-the-barrier/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q18',
@@ -448,7 +618,11 @@ export const domain2 = {
         'Fine-tuning a model on the company\'s style guide'
       ],
       correct: 0,
-      explanation: 'Embeddings map text into vectors where semantically similar phrases land close together, so meaning is matched rather than exact words. Synonym lists cannot scale to all phrasings, temperature is an inference-randomness parameter, and style-guide fine-tuning doesn\'t address retrieval.'
+      explanation: 'Embeddings map text into vectors where semantically similar phrases land close together, so meaning is matched rather than exact words. Synonym lists cannot scale to all phrasings, temperature is an inference-randomness parameter, and style-guide fine-tuning doesn\'t address retrieval.',
+      sources: [
+        { title: 'What is Embedding? – AWS', url: 'https://aws.amazon.com/what-is/embeddings-in-machine-learning/', checked: '2026-11-25' },
+        { title: 'What is a Vector Database? – AWS', url: 'https://aws.amazon.com/what-is/vector-databases/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q19',
@@ -460,7 +634,10 @@ export const domain2 = {
         'Enable response streaming'
       ],
       correct: 1,
-      explanation: 'Temperature near 0 makes the model almost always pick the highest-probability token, minimizing run-to-run variation. High top-p widens the sampling pool (more variety), max tokens only caps length, and streaming changes delivery, not content.'
+      explanation: 'Temperature near 0 makes the model almost always pick the highest-probability token, minimizing run-to-run variation. High top-p widens the sampling pool (more variety), max tokens only caps length, and streaming changes delivery, not content.',
+      sources: [
+        { title: 'Influence response generation with inference parameters – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q20',
@@ -472,14 +649,20 @@ export const domain2 = {
         'The number of parallel responses generated per request'
       ],
       correct: 2,
-      explanation: 'Top-p restricts sampling to the smallest set of tokens whose combined probability reaches the threshold p, cutting off the unlikely tail. It does not limit response length (max tokens does that), and it has nothing to do with training-data access or parallel generation.'
+      explanation: 'Top-p restricts sampling to the smallest set of tokens whose combined probability reaches the threshold p, cutting off the unlikely tail. It does not limit response length (max tokens does that), and it has nothing to do with training-data access or parallel generation.',
+      sources: [
+        { title: 'Influence response generation with inference parameters – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q21',
       question: 'A product team wants to cap the cost and length of each chatbot reply. Which inference parameter directly does this?',
       options: ['Temperature', 'Top-k', 'Maximum output tokens', 'Presence penalty'],
       correct: 2,
-      explanation: 'Output cost scales with tokens generated, so setting a maximum output token limit directly bounds both response length and spend. Temperature and top-k shape randomness, and presence penalties discourage repetition — none of them cap length.'
+      explanation: 'Output cost scales with tokens generated, so setting a maximum output token limit directly bounds both response length and spend. Temperature and top-k shape randomness, and presence penalties discourage repetition — none of them cap length.',
+      sources: [
+        { title: 'Influence response generation with inference parameters – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q22',
@@ -491,7 +674,10 @@ export const domain2 = {
         'Chain-of-thought prompting'
       ],
       correct: 0,
-      explanation: 'Stop sequences tell the model to stop generating the moment a given string (like a closing brace or delimiter) appears. Temperature affects randomness, context window affects input capacity, and chain-of-thought changes reasoning style — none of them terminate output at a marker.'
+      explanation: 'Stop sequences tell the model to stop generating the moment a given string (like a closing brace or delimiter) appears. Temperature affects randomness, context window affects input capacity, and chain-of-thought changes reasoning style — none of them terminate output at a marker.',
+      sources: [
+        { title: 'Influence response generation with inference parameters – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q23',
@@ -503,7 +689,11 @@ export const domain2 = {
         'Increasing the maximum token limit'
       ],
       correct: 0,
-      explanation: 'Streaming returns tokens incrementally, so users see the answer forming immediately even though total generation time is unchanged. Temperature does not affect speed, and the other options don\'t address perceived latency.'
+      explanation: 'Streaming returns tokens incrementally, so users see the answer forming immediately even though total generation time is unchanged. Temperature does not affect speed, and the other options don\'t address perceived latency.',
+      sources: [
+        { title: 'ConverseStream – Amazon Bedrock API Reference', url: 'https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ConverseStream.html', checked: '2026-11-25' },
+        { title: 'Architecting generative AI applications for production – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/preprod-architecting.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q24',
@@ -515,7 +705,11 @@ export const domain2 = {
         'Retrieval Augmented Generation over the papers'
       ],
       correct: 1,
-      explanation: 'Continued pre-training extends a model\'s self-supervised training on unlabeled domain text — exactly what a large raw corpus supports. Fine-tuning needs labeled input-output pairs, few-shot prompting can\'t instill deep domain knowledge, and RAG retrieves facts at query time rather than teaching the model the domain.'
+      explanation: 'Continued pre-training extends a model\'s self-supervised training on unlabeled domain text — exactly what a large raw corpus supports. Fine-tuning needs labeled input-output pairs, few-shot prompting can\'t instill deep domain knowledge, and RAG retrieves facts at query time rather than teaching the model the domain.',
+      sources: [
+        { title: 'Amazon Bedrock FAQs – AWS', url: 'https://aws.amazon.com/bedrock/faqs/', checked: '2026-11-25' },
+        { title: 'GENOPS05-BP01 Learn when to customize models – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genops05-bp01.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q25',
@@ -527,7 +721,11 @@ export const domain2 = {
         'RAG guarantees the model will never produce an incorrect answer'
       ],
       correct: 1,
-      explanation: 'With RAG, knowledge lives in a searchable index that can be refreshed cheaply whenever docs change; fine-tuned knowledge is frozen in the weights and requires retraining to update. RAG reduces but does not eliminate wrong answers, and it deliberately does not modify model weights.'
+      explanation: 'With RAG, knowledge lives in a searchable index that can be refreshed cheaply whenever docs change; fine-tuned knowledge is frozen in the weights and requires retraining to update. RAG reduces but does not eliminate wrong answers, and it deliberately does not modify model weights.',
+      sources: [
+        { title: 'What is RAG? – AWS', url: 'https://aws.amazon.com/what-is/retrieval-augmented-generation/', checked: '2026-11-25' },
+        { title: 'GENOPS05-BP01 Learn when to customize models – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genops05-bp01.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q26',
@@ -539,7 +737,11 @@ export const domain2 = {
         'Remove the system prompt to give the model more freedom'
       ],
       correct: 0,
-      explanation: 'Hallucinations are best mitigated by grounding: retrieving real source documents and instructing the model to answer only from them, with citations users can verify. Higher temperature increases fabrication risk, and longer outputs or fewer instructions do nothing to anchor claims in real sources.'
+      explanation: 'Hallucinations are best mitigated by grounding: retrieving real source documents and instructing the model to answer only from them, with citations users can verify. Higher temperature increases fabrication risk, and longer outputs or fewer instructions do nothing to anchor claims in real sources.',
+      sources: [
+        { title: 'What Are AI Hallucinations? – AWS', url: 'https://aws.amazon.com/what-is/ai-hallucinations/', checked: '2026-11-25' },
+        { title: 'Use contextual grounding check to filter hallucinations in responses – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-contextual-grounding-check.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q27',
@@ -551,7 +753,11 @@ export const domain2 = {
         'Brainstorming names for a new product'
       ],
       correct: 2,
-      explanation: 'Generative models are probabilistic and can produce plausible-but-wrong numbers, so exact regulated calculations should be done with deterministic code. Drafting, summarizing, and brainstorming tolerate variation and benefit from generation.'
+      explanation: 'Generative models are probabilistic and can produce plausible-but-wrong numbers, so exact regulated calculations should be done with deterministic code. Drafting, summarizing, and brainstorming tolerate variation and benefit from generation.',
+      sources: [
+        { title: 'What is Generative AI? – AWS', url: 'https://aws.amazon.com/what-is/generative-ai/', checked: '2026-11-25' },
+        { title: 'Content Domain 1: Fundamentals of AI and ML – AWS Certified AI Practitioner (AIF-C01) Exam Guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain1.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q28',
@@ -563,7 +769,10 @@ export const domain2 = {
         'Adding chain-of-thought prompting to every request'
       ],
       correct: 0,
-      explanation: 'Model choice should match task complexity — for simple classification, a smaller model is faster and dramatically cheaper while meeting accuracy needs. Temperature doesn\'t change speed, a second region doubles cost, and chain-of-thought increases token usage.'
+      explanation: 'Model choice should match task complexity — for simple classification, a smaller model is faster and dramatically cheaper while meeting accuracy needs. Temperature doesn\'t change speed, a second region doubles cost, and chain-of-thought increases token usage.',
+      sources: [
+        { title: 'Architecting generative AI applications for production – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/preprod-architecting.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q29',
@@ -575,7 +784,11 @@ export const domain2 = {
         'Spot pricing for foundation models'
       ],
       correct: 1,
-      explanation: 'Provisioned Throughput reserves dedicated model capacity for consistent, high-volume workloads (and is also required for serving custom fine-tuned models). On-demand suits variable or low volume, and there is no spot pricing for Bedrock models.'
+      explanation: 'Provisioned Throughput reserves dedicated model capacity for consistent, high-volume workloads (it can also serve custom models, some of which now also support on-demand deployment). On-demand suits variable or low volume, and there is no spot pricing for Bedrock models.',
+      sources: [
+        { title: 'Increase model invocation capacity with Provisioned Throughput in Amazon Bedrock – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html', checked: '2026-11-25' },
+        { title: 'Deploy a custom model for on-demand inference – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/deploy-custom-model-on-demand.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q30',
@@ -587,7 +800,11 @@ export const domain2 = {
         'It guarantees identical outputs across all supported models'
       ],
       correct: 1,
-      explanation: 'Bedrock\'s core value is one managed, serverless API over many providers\' foundation models (Amazon, Anthropic, Meta, and others), letting teams swap and evaluate models without provisioning infrastructure. It is not free, does not fine-tune automatically, and different models naturally produce different outputs.'
+      explanation: 'Bedrock\'s core value is one managed, serverless API over many providers\' foundation models (Amazon, Anthropic, Meta, and others), letting teams swap and evaluate models without provisioning infrastructure. It is not free, does not fine-tune automatically, and different models naturally produce different outputs.',
+      sources: [
+        { title: 'Amazon Bedrock – AWS Documentation', url: 'https://aws.amazon.com/documentation-overview/bedrock/', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock Pricing – AWS', url: 'https://aws.amazon.com/bedrock/pricing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q31',
@@ -599,7 +816,11 @@ export const domain2 = {
         'Two identical models vote on which output is more accurate'
       ],
       correct: 0,
-      explanation: 'GANs pit a generator against a discriminator in an adversarial game — the generator improves by trying to fool the discriminator. Reversing added noise describes diffusion models, and reward maximization describes reinforcement learning.'
+      explanation: 'GANs pit a generator against a discriminator in an adversarial game — the generator improves by trying to fool the discriminator. Reversing added noise describes diffusion models, and reward maximization describes reinforcement learning.',
+      sources: [
+        { title: 'What is a GAN? – AWS', url: 'https://aws.amazon.com/what-is/gan/', checked: '2026-11-25' },
+        { title: 'What is Generative AI? – AWS', url: 'https://aws.amazon.com/what-is/generative-ai/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q32',
@@ -611,14 +832,22 @@ export const domain2 = {
         'Running the model on dedicated hardware'
       ],
       correct: 0,
-      explanation: 'Grounding means anchoring generated content in authoritative source data — typically via retrieval — so responses reflect and can cite real information. It is the main defense against hallucination; it is unrelated to determinism settings, response length, or hardware.'
+      explanation: 'Grounding means anchoring generated content in authoritative source data — typically via retrieval — so responses reflect and can cite real information. It is the main defense against hallucination; it is unrelated to determinism settings, response length, or hardware.',
+      sources: [
+        { title: 'Use contextual grounding check to filter hallucinations in responses – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-contextual-grounding-check.html', checked: '2026-11-25' },
+        { title: 'What Are AI Hallucinations? – AWS', url: 'https://aws.amazon.com/what-is/ai-hallucinations/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q33',
-      question: 'Employees need an AI assistant that answers questions using the company\'s internal wikis, SharePoint, and Salesforce data, with per-user access controls. Which AWS service is purpose-built for this?',
-      options: ['Amazon Q Business', 'Amazon Polly', 'Amazon Rekognition', 'AWS Glue'],
+      question: 'Employees need an AI assistant that answers questions using the company\'s Confluence wikis, SharePoint sites, and Amazon S3 documents, with per-user access controls. Which AWS service is purpose-built for this?',
+      options: ['AWS Quick', 'Amazon Polly', 'Amazon Rekognition', 'AWS Glue'],
       correct: 0,
-      explanation: 'Amazon Q Business is the managed enterprise assistant that connects to company data sources (SharePoint, Salesforce, S3, and more) and respects existing user permissions when answering. Polly is text-to-speech, Rekognition is image analysis, and Glue is data integration.'
+      explanation: 'AWS Quick is the managed AI assistant for work that connects to company data through knowledge bases (Confluence, SharePoint, S3, and more) and checks each user\'s permissions so they only see answers from content they can access. Amazon Q Business did the same job but is no longer open to new customers; AWS points them to Quick, which the current exam guide lists. Polly is text-to-speech, Rekognition is image analysis, and Glue is data integration.',
+      sources: [
+        { title: 'Data access integrations – AWS Quick User Guide', url: 'https://docs.aws.amazon.com/quick/latest/userguide/data-access-integrations.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Q Business? – Amazon Q Business User Guide', url: 'https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/what-is.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q34',
@@ -630,7 +859,11 @@ export const domain2 = {
         'Per API call regardless of request size'
       ],
       correct: 1,
-      explanation: 'On-demand pricing charges per token — both the tokens you send (input) and the tokens the model generates (output), usually at different rates. This is why long prompts and verbose outputs raise costs. Billing is not flat-rate, per-call, or raw GPU-seconds for managed on-demand inference.'
+      explanation: 'On-demand pricing charges per token — both the tokens you send (input) and the tokens the model generates (output), usually at different rates. This is why long prompts and verbose outputs raise costs. Billing is not flat-rate, per-call, or raw GPU-seconds for managed on-demand inference.',
+      sources: [
+        { title: 'Amazon Bedrock Pricing – AWS', url: 'https://aws.amazon.com/bedrock/pricing/', checked: '2026-11-25' },
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner (AIF-C01) Exam Guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q35',
@@ -642,19 +875,27 @@ export const domain2 = {
         'Token-based billing forces varied outputs'
       ],
       correct: 1,
-      explanation: 'LLMs generate by sampling from predicted token probabilities, so identical prompts can yield different wordings. Weights are frozen at inference time and context windows don\'t shrink. Lowering temperature (and pinning other sampling parameters) reduces the variation.'
+      explanation: 'LLMs generate by sampling from predicted token probabilities, so identical prompts can yield different wordings. Weights are frozen at inference time and context windows don\'t shrink. Lowering temperature (and pinning other sampling parameters) reduces the variation.',
+      sources: [
+        { title: 'Influence response generation with inference parameters – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html', checked: '2026-11-25' },
+        { title: 'Key terminology – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/key-definitions.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd2q36',
       question: 'When selecting a foundation model for a new application, which set of factors is most relevant to compare?',
       options: [
-        'Modality support, context window size, quality on the target task, latency, cost, and licensing terms',
+        'Modality support, context window size, quality on the target task, latency, cost, and compliance requirements',
         'The model\'s release date and the length of its name',
         'Only the parameter count — larger is always better',
         'Only the price per token — cheapest is always best'
       ],
       correct: 0,
-      explanation: 'Model selection balances capability (task quality, modalities, context length) against operational constraints (latency, cost, license/data-use terms). Parameter count alone doesn\'t guarantee task fit, and choosing purely on price ignores whether outputs are usable.'
+      explanation: 'Model selection balances capability (task quality, modalities, context length) against operational constraints (latency, cost, compliance). Parameter count alone doesn\'t guarantee task fit, and choosing purely on price ignores whether outputs are usable.',
+      sources: [
+        { title: 'GENPERF02-BP03 Select and customize the appropriate model for your use case – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genperf02-bp03.html', checked: '2026-11-25' },
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner (AIF-C01) Exam Guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' }
+      ]
     }
   ]
 };

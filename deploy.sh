@@ -244,6 +244,13 @@ deploy_ai() {
         npm install
     fi
     print_success "Dependencies ready"
+
+    # Every question, card and guide section must cite an official AWS page checked within a year.
+    # (An older node_modules may predate vitest, so install it if it's missing.)
+    [ -x node_modules/.bin/vitest ] || npm install
+    print_step "Checking every question, card and guide section cites an official AWS source..."
+    npm test
+    print_success "Sources check passed"
     
     # Build
     print_step "Building ${site_name}..."

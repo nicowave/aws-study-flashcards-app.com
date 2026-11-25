@@ -1,6 +1,7 @@
 // Flashcard data organized by module/topic
 // Each card has front (question/term) and back (answer/definition)
 // Cards can include optional hints, tags, and difficulty levels
+// Sources: official AWS documentation, linked on each card
 
 export const domain3 = {
   id: 'domain3',
@@ -9,7 +10,7 @@ export const domain3 = {
   icon: '🏗️',
   color: '#f472b6',
   gradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)',
-  source: 'AWS Certified AI Practitioner Exam Guide - Domain 3',
+  source: 'Official AWS documentation (linked on each card)',
   examWeight: '28%',
   cards: [
     // Task Statement 3.1: Design considerations for FM applications
@@ -20,6 +21,10 @@ export const domain3 = {
       hint: 'Task, size, cost, latency, accuracy, compliance',
       tags: ['model-selection', 'design-considerations', 'foundation-models'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Content Domain 3: Applications of Foundation Models – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain3.html', checked: '2026-11-25' },
+        { title: 'Evaluate the performance of Amazon Bedrock resources – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/evaluation.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     {
@@ -29,24 +34,36 @@ export const domain3 = {
       hint: 'Bigger = smarter but slower and costlier',
       tags: ['model-selection', 'model-size', 'tradeoffs'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'GENCOST01-BP01 Right-size model selection to optimize inference costs – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gencost01-bp01.html', checked: '2026-11-25' },
+        { title: 'Customize a model with distillation in Amazon Bedrock – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/model-distillation.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     {
       id: 'd3c3',
       front: 'What is the temperature parameter in foundation model inference?',
-      back: 'Temperature controls the randomness/creativity of model outputs.\n\n• Low temperature (e.g., 0.1) - More deterministic, focused, and consistent responses. Best for factual/analytical tasks.\n• High temperature (e.g., 0.9) - More random, creative, and diverse responses. Best for creative writing and brainstorming.\n• Temperature 0 - Nearly deterministic (greedy decoding)\n• Temperature 1 - Standard sampling\n\nKey: Temperature does NOT affect model knowledge, only output distribution.',
+      back: 'Temperature controls the randomness/creativity of model outputs.\n\n• Low temperature (e.g., 0.1) - More deterministic, focused, and consistent responses. Best for factual/analytical tasks.\n• High temperature (e.g., 0.9) - More random, creative, and diverse responses. Best for creative writing and brainstorming.\n• Temperature at or near 0 - Most deterministic (the model almost always picks the most likely next token)\n• Allowed ranges and defaults differ by model - check each model\'s inference parameters\n\nKey: Temperature does NOT affect model knowledge, only output distribution.',
       hint: 'Controls randomness of output',
       tags: ['inference-parameters', 'temperature', 'model-configuration'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Influence response generation with inference parameters – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html', checked: '2026-11-25' },
+        { title: 'Inference request parameters and response fields for foundation models – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     {
       id: 'd3c4',
       front: 'How do input/output length limits affect FM application design?',
-      back: 'Context window and token limits impact design:\n\n• Input length (context window) - Maximum tokens the model can process at once. Affects how much context you can provide.\n• Output length (max tokens) - Maximum tokens the model can generate in a response.\n\nDesign implications:\n• Long documents may need chunking strategies\n• Summarization tasks need sufficient output length\n• RAG helps overcome context window limits\n• Larger context windows cost more per request\n• Prompt caching can reduce costs for repeated prefixes',
+      back: 'Context window and token limits impact design:\n\n• Input length (context window) - Maximum tokens the model can process at once. Affects how much context you can provide.\n• Output length (max tokens) - Maximum tokens the model can generate in a response.\n\nDesign implications:\n• Long documents may need chunking strategies\n• Summarization tasks need sufficient output length\n• RAG helps overcome context window limits\n• More input and output tokens cost more (on-demand pricing is per token)\n• Prompt caching can reduce costs for repeated prefixes',
       hint: 'Token limits shape your architecture',
       tags: ['inference-parameters', 'context-window', 'token-limits'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Influence response generation with inference parameters – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html', checked: '2026-11-25' },
+        { title: 'Prompt caching for faster model inference – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     {
@@ -56,6 +73,10 @@ export const domain3 = {
       hint: 'Retrieve first, then generate',
       tags: ['rag', 'retrieval-augmented-generation', 'design-pattern'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'What is RAG? - Retrieval-Augmented Generation AI Explained', url: 'https://aws.amazon.com/what-is/retrieval-augmented-generation/', checked: '2026-11-25' },
+        { title: 'Prompt engineering concepts – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     {
@@ -65,33 +86,49 @@ export const domain3 = {
       hint: 'Enterprise knowledge at scale',
       tags: ['rag', 'business-applications', 'use-cases'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'What is RAG? - Retrieval-Augmented Generation AI Explained', url: 'https://aws.amazon.com/what-is/retrieval-augmented-generation/', checked: '2026-11-25' },
+        { title: 'Retrieve data and generate AI responses with Amazon Bedrock Knowledge Bases – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     {
       id: 'd3c7',
       front: 'What is Amazon Bedrock Knowledge Bases?',
-      back: 'A fully managed RAG service in Amazon Bedrock that connects FMs to your data sources.\n\nFeatures:\n• Automatic data ingestion and chunking\n• Vector embedding generation\n• Managed vector store integration\n• Automatic retrieval and context injection\n• Source citations in responses\n\nSupported sources:\n• Amazon S3 documents\n• Web crawlers\n• Confluence, SharePoint, Salesforce\n\nBenefit: Build RAG applications without managing infrastructure.',
+      back: 'A fully managed RAG service in Amazon Bedrock that connects FMs to your data sources.\n\nFeatures:\n• Automatic data ingestion and chunking\n• Vector embedding generation\n• Managed Knowledge Base (Bedrock runs ingestion, indexing and storage) or your own vector store (e.g. OpenSearch Serverless, Aurora, Neptune)\n• Automatic retrieval and context injection\n• Source citations in responses\n\nSupported sources (Managed Knowledge Base):\n• Amazon S3 documents\n• Web Crawler\n• Confluence, SharePoint, Google Drive, OneDrive\n\nBenefit: Build RAG applications without managing infrastructure.',
       hint: 'Managed RAG on Bedrock',
       tags: ['amazon-bedrock', 'knowledge-bases', 'rag', 'aws-service'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Retrieve data and generate AI responses with Amazon Bedrock Knowledge Bases – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html', checked: '2026-11-25' },
+        { title: 'How Amazon Bedrock knowledge bases work – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/kb-how-it-works.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     {
       id: 'd3c8',
       front: 'What is a vector database and why is it important for RAG?',
-      back: 'A vector database stores data as high-dimensional numerical vectors (embeddings) and enables fast similarity search.\n\nWhy it matters for RAG:\n• Converts text/images into embeddings\n• Finds semantically similar content quickly\n• Powers the "retrieval" step in RAG\n• Enables nearest-neighbor search at scale\n\nAWS vector database options:\n• Amazon OpenSearch Service\n• Amazon Aurora (pgvector)\n• Amazon Neptune (graph + vector)\n• Amazon RDS for PostgreSQL (pgvector)',
+      back: 'A vector database stores data as high-dimensional numerical vectors (embeddings) and enables fast similarity search.\n\nWhy it matters for RAG:\n• Converts text/images into embeddings\n• Finds semantically similar content quickly\n• Powers the "retrieval" step in RAG\n• Enables nearest-neighbor search at scale\n\nAWS vector database options:\n• Amazon OpenSearch Service\n• Amazon Aurora PostgreSQL (pgvector)\n• Amazon Neptune Analytics (graph + vector)\n• Amazon RDS for PostgreSQL (pgvector)',
       hint: 'Stores and searches embeddings',
       tags: ['vector-database', 'embeddings', 'rag'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Choosing a vector database for your generative AI applications – AWS Decision Guides', url: 'https://docs.aws.amazon.com/decision-guides/latest/decision-guides/vector-database-guide.html', checked: '2026-11-25' },
+        { title: 'Vector database options – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/choosing-an-aws-vector-database-for-rag-use-cases/vector-db-options.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     {
       id: 'd3c9',
       front: 'Which AWS services support vector database capabilities for RAG?',
-      back: 'AWS vector database services:\n\n• Amazon OpenSearch Service - Full-text and vector search, k-NN plugin, scalable, commonly used with Bedrock\n• Amazon Aurora PostgreSQL - pgvector extension, familiar SQL interface, transactional workloads\n• Amazon Neptune - Graph database with vector search, relationship-rich data\n• Amazon RDS for PostgreSQL - pgvector extension, cost-effective for smaller workloads\n\nChoose based on:\n• Existing infrastructure\n• Scale requirements\n• Query patterns (SQL vs. graph vs. search)',
+      back: 'AWS vector database services:\n\n• Amazon OpenSearch Service - Full-text, vector and hybrid search, scalable, commonly used with Bedrock Knowledge Bases\n• Amazon Aurora PostgreSQL - pgvector extension, familiar SQL interface, transactional workloads\n• Amazon Neptune Analytics - Graph database with vector search, relationship-rich data (GraphRAG)\n• Amazon RDS for PostgreSQL - pgvector extension, managed and pay-per-use\n\nChoose based on:\n• Existing infrastructure\n• Scale requirements\n• Query patterns (SQL vs. graph vs. search)',
       hint: 'OpenSearch, Aurora, Neptune, RDS',
       tags: ['vector-database', 'aws-service', 'opensearch', 'aurora', 'neptune'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Choosing a vector database for your generative AI applications – AWS Decision Guides', url: 'https://docs.aws.amazon.com/decision-guides/latest/decision-guides/vector-database-guide.html', checked: '2026-11-25' },
+        { title: 'Vector database options – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/choosing-an-aws-vector-database-for-rag-use-cases/vector-db-options.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     {
@@ -101,15 +138,23 @@ export const domain3 = {
       hint: 'Prompt engineering is cheapest, pre-training is costliest',
       tags: ['cost-tradeoffs', 'customization', 'fine-tuning', 'rag'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'GENOPS05-BP01 Learn when to customize models – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genops05-bp01.html', checked: '2026-11-25' },
+        { title: 'What are Foundation Models? - Foundation Models in Generative AI Explained', url: 'https://aws.amazon.com/what-is/foundation-models/', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     {
       id: 'd3c11',
       front: 'What are Amazon Bedrock Agents?',
-      back: 'Amazon Bedrock Agents enable FMs to execute multi-step tasks by orchestrating API calls and actions.\n\nCapabilities:\n• Break complex tasks into steps\n• Call external APIs and Lambda functions\n• Query knowledge bases for context\n• Maintain conversation state\n• Chain reasoning across steps\n\nComponents:\n• Instructions - Define agent behavior\n• Action groups - APIs the agent can call\n• Knowledge bases - Data sources for RAG\n\nUse case: Automate workflows like booking travel, processing orders, or managing IT tickets.',
+      back: 'Amazon Bedrock Agents enable FMs to execute multi-step tasks by orchestrating API calls and actions.\n\nCapabilities:\n• Break complex tasks into steps\n• Call external APIs and Lambda functions\n• Query knowledge bases for context\n• Maintain conversation state\n• Chain reasoning across steps\n\nComponents:\n• Instructions - Define agent behavior\n• Action groups - APIs the agent can call\n• Knowledge bases - Data sources for RAG\n\nUse case: Automate workflows like booking travel, processing orders, or managing IT tickets.\n\nNote: Bedrock Agents is now "Amazon Bedrock Agents Classic" and closed to new customers since July 30, 2026. New agents are built on Amazon Bedrock AgentCore. Exam material may still say Bedrock Agents.',
       hint: 'FMs that take actions via APIs',
       tags: ['amazon-bedrock', 'agents', 'agentic-ai', 'aws-service'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Automate tasks in your application using AI agents – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock Agents Classic maintenance mode – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/agents-classic-maintenance-mode.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     {
@@ -119,6 +164,10 @@ export const domain3 = {
       hint: 'Autonomous AI with tool access',
       tags: ['agentic-ai', 'model-context-protocol', 'agents'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What is Agentic AI? - Agentic AI Explained', url: 'https://aws.amazon.com/what-is/agentic-ai/', checked: '2026-11-25' },
+        { title: 'Unlocking the power of Model Context Protocol (MCP) on AWS – AWS Machine Learning Blog', url: 'https://aws.amazon.com/blogs/machine-learning/unlocking-the-power-of-model-context-protocol-mcp-on-aws/', checked: '2026-11-25' }
+      ],
       taskStatement: '3.1'
     },
     // Task Statement 3.2: Prompt engineering techniques
@@ -129,15 +178,23 @@ export const domain3 = {
       hint: 'Context, instruction, input, output format',
       tags: ['prompt-engineering', 'prompt-structure', 'basics'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' },
+        { title: 'Design a prompt – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/design-a-prompt.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     {
       id: 'd3c14',
       front: 'What are negative prompts?',
-      back: 'Instructions that tell the model what NOT to include or do in its response.\n\nExamples:\n• "Do not include technical jargon"\n• "Avoid listing more than 5 items"\n• "Do not make up information"\n• In image generation: "no blurry, no watermarks"\n\nBenefits:\n• Reduces unwanted content\n• Improves output precision\n• Especially useful in image generation to exclude undesired elements\n\nBest practice: Combine positive instructions with negative constraints for best results.',
+      back: 'Instructions that tell the model what NOT to include or do in its response.\n\nExamples:\n• "Do not include technical jargon"\n• "Avoid listing more than 5 items"\n• "Do not make up information"\n• In image generation: a separate negative prompt such as "blurry, watermark" (list what to exclude, without words like "no")\n\nBenefits:\n• Reduces unwanted content\n• Improves output precision\n• Especially useful in image generation to exclude undesired elements\n\nBest practice: Combine positive instructions with negative constraints for best results.',
       hint: 'Tell the model what to avoid',
       tags: ['prompt-engineering', 'negative-prompts', 'techniques'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Negative prompts – Amazon Nova User Guide', url: 'https://docs.aws.amazon.com/nova/latest/userguide/prompting-image-negative.html', checked: '2026-11-25' },
+        { title: 'Amazon Nova Canvas prompting best practices – Amazon Nova User Guide', url: 'https://docs.aws.amazon.com/nova/latest/userguide/prompting-image-generation.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     {
@@ -147,15 +204,23 @@ export const domain3 = {
       hint: 'Internal knowledge representation',
       tags: ['prompt-engineering', 'latent-space', 'model-internals'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What is Generative AI? - Gen AI Explained', url: 'https://aws.amazon.com/what-is/generative-ai/', checked: '2026-11-25' },
+        { title: 'Prompt engineering concepts – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     {
       id: 'd3c16',
       front: 'What is prompt routing?',
-      back: 'A technique that directs user prompts to the most appropriate model or processing pipeline based on the request type.\n\nHow it works:\n• Classifies incoming prompts by category, complexity, or domain\n• Routes to specialized models or agents\n• Optimizes cost and performance\n\nExamples:\n• Simple questions → smaller, cheaper model\n• Complex reasoning → larger, more capable model\n• Code tasks → code-specialized model\n\nAWS: Amazon Bedrock supports intelligent routing across multiple FMs.',
+      back: 'A technique that directs user prompts to the most appropriate model or processing pipeline based on the request type.\n\nHow it works:\n• Classifies incoming prompts by category, complexity, or domain\n• Routes to specialized models or agents\n• Optimizes cost and performance\n\nExamples:\n• Simple questions → smaller, cheaper model\n• Complex reasoning → larger, more capable model\n• Code tasks → code-specialized model\n\nAWS: Amazon Bedrock intelligent prompt routing sends each request to a suitable model within the same model family.',
       hint: 'Send prompts to the right model',
       tags: ['prompt-engineering', 'prompt-routing', 'optimization'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Understanding intelligent prompt routing in Amazon Bedrock – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-routing.html', checked: '2026-11-25' },
+        { title: 'GENCOST01-BP01 Right-size model selection to optimize inference costs – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gencost01-bp01.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     {
@@ -165,6 +230,9 @@ export const domain3 = {
       hint: 'No examples provided',
       tags: ['prompt-engineering', 'zero-shot', 'techniques'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     {
@@ -174,15 +242,22 @@ export const domain3 = {
       hint: 'One example provided',
       tags: ['prompt-engineering', 'single-shot', 'techniques'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' },
+        { title: 'Content Domain 3: Applications of Foundation Models – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain3.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     {
       id: 'd3c19',
       front: 'What is few-shot prompting?',
-      back: 'Providing multiple examples (typically 2-5) before asking the model to perform the task.\n\nExample:\nReview: "Amazing quality!" → Positive\nReview: "Terrible experience." → Negative\nReview: "It works okay." → Neutral\nReview: "Waste of money." → ?\n\nBenefits:\n• Establishes clear patterns\n• Improves consistency of outputs\n• Teaches format, style, and reasoning\n• Reduces ambiguity\n\nTradeoff: Uses more tokens (higher cost), but improves accuracy for complex tasks.',
+      back: 'Providing a few examples (input-output pairs) before asking the model to perform the task.\n\nExample:\nReview: "Amazing quality!" → Positive\nReview: "Terrible experience." → Negative\nReview: "It works okay." → Neutral\nReview: "Waste of money." → ?\n\nBenefits:\n• Establishes clear patterns\n• Improves consistency of outputs\n• Teaches format, style, and reasoning\n• Reduces ambiguity\n\nTradeoff: Uses more tokens (higher cost), but improves accuracy for complex tasks.',
       hint: 'Multiple examples provided',
       tags: ['prompt-engineering', 'few-shot', 'techniques'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     {
@@ -192,6 +267,10 @@ export const domain3 = {
       hint: 'Think step by step',
       tags: ['prompt-engineering', 'chain-of-thought', 'techniques'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What is Prompt Engineering? - AI Prompt Engineering Explained', url: 'https://aws.amazon.com/what-is/prompt-engineering/', checked: '2026-11-25' },
+        { title: 'Design a prompt – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/design-a-prompt.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     {
@@ -201,6 +280,10 @@ export const domain3 = {
       hint: 'Reusable prompt structures with variables',
       tags: ['prompt-engineering', 'prompt-templates', 'best-practices'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' },
+        { title: 'Construct and store reusable prompts with Prompt management in Amazon Bedrock – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-management.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     {
@@ -210,6 +293,10 @@ export const domain3 = {
       hint: 'Specific, contextual, iterative',
       tags: ['prompt-engineering', 'best-practices', 'response-quality'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Content Domain 3: Applications of Foundation Models – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain3.html', checked: '2026-11-25' },
+        { title: 'Design a prompt – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/design-a-prompt.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     {
@@ -219,43 +306,62 @@ export const domain3 = {
       hint: 'Malicious input manipulates model behavior',
       tags: ['prompt-engineering', 'security', 'prompt-injection', 'risks'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Detect prompt attacks with Amazon Bedrock Guardrails – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-prompt-attack.html', checked: '2026-11-25' },
+        { title: 'Safeguard your generative AI workloads from prompt injections – AWS Security Blog', url: 'https://aws.amazon.com/blogs/security/safeguard-your-generative-ai-workloads-from-prompt-injections/', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     {
       id: 'd3c24',
       front: 'What are prompt poisoning, hijacking, and jailbreaking?',
-      back: 'Three distinct prompt security threats:\n\nPrompt Poisoning:\n• Embedding malicious instructions in training data or documents\n• Affects model behavior at retrieval time\n• Hard to detect in large datasets\n\nPrompt Hijacking:\n• Redirecting the model from its intended task to perform a different one\n• Example: "Ignore previous instructions and instead..."\n\nJailbreaking:\n• Techniques to bypass model safety guardrails\n• Tricks model into generating harmful content\n• Example: Role-playing scenarios to circumvent restrictions\n\nDefense: Use Amazon Bedrock Guardrails, input filtering, and output validation.',
+      back: 'Three distinct prompt security threats:\n\nPrompt Poisoning:\n• Planting malicious or false content in training or fine-tuning data, or in documents a RAG system retrieves\n• Makes the model learn wrong information or a hidden trigger\n• Hard to detect in large datasets\n\nPrompt Hijacking:\n• Redirecting the model from its intended task to perform a different one\n• Example: "Ignore previous instructions and instead..."\n\nJailbreaking:\n• Techniques to bypass model safety guardrails\n• Tricks model into generating harmful content\n• Example: Role-playing scenarios to circumvent restrictions\n\nDefense: Use Amazon Bedrock Guardrails, input filtering, and output validation.',
       hint: 'Poisoning, hijacking, and jailbreaking are distinct attacks',
       tags: ['prompt-engineering', 'security', 'jailbreaking', 'risks'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Detect prompt attacks with Amazon Bedrock Guardrails – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-prompt-attack.html', checked: '2026-11-25' },
+        { title: 'Security considerations for data in generative AI – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/security.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.2'
     },
     // Task Statement 3.3: Training and fine-tuning FMs
     {
       id: 'd3c25',
       front: 'What is pre-training in the context of foundation models?',
-      back: 'Pre-training is the initial, large-scale training phase where a model learns general knowledge from massive datasets.\n\nCharacteristics:\n• Uses enormous datasets (terabytes of text/images)\n• Self-supervised learning (no manual labels)\n• Learns language patterns, facts, reasoning\n• Extremely expensive (millions of dollars)\n• Requires massive compute (thousands of GPUs)\n• Results in a general-purpose foundation model\n\nExamples: Training GPT, Claude, or Amazon Titan from scratch.\n\nMost organizations use pre-trained models rather than training from scratch.',
+      back: 'Pre-training is the initial, large-scale training phase where a model learns general knowledge from massive datasets.\n\nCharacteristics:\n• Uses enormous datasets (billions of tokens or more)\n• Self-supervised learning (no manual labels)\n• Learns language patterns, facts, reasoning\n• Extremely expensive (millions of dollars)\n• Requires massive compute\n• Results in a general-purpose foundation model\n\nExamples: Training GPT, Claude, or Amazon Titan from scratch.\n\nMost organizations use pre-trained models rather than training from scratch.',
       hint: 'Initial large-scale training from scratch',
       tags: ['pre-training', 'training', 'foundation-models'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'What are Foundation Models? - Foundation Models in Generative AI Explained', url: 'https://aws.amazon.com/what-is/foundation-models/', checked: '2026-11-25' }
+      ],
       taskStatement: '3.3'
     },
     {
       id: 'd3c26',
       front: 'What is fine-tuning a foundation model?',
-      back: 'Fine-tuning adapts a pre-trained model to a specific task or domain by training it further on a smaller, labeled dataset.\n\nProcess:\n1. Start with a pre-trained FM\n2. Prepare task-specific labeled data\n3. Train on new data with lower learning rate\n4. Model specializes while retaining general knowledge\n\nBenefits:\n• Much cheaper than pre-training\n• Smaller dataset required\n• Improves performance on specific tasks\n• Retains base model capabilities\n\nAWS: Amazon Bedrock Custom Model Training supports fine-tuning.',
+      back: 'Fine-tuning adapts a pre-trained model to a specific task or domain by training it further on a smaller, labeled dataset.\n\nProcess:\n1. Start with a pre-trained FM\n2. Prepare task-specific labeled data\n3. Train further on the new data (model parameters are adjusted)\n4. Model specializes while retaining general knowledge\n\nBenefits:\n• Much cheaper than pre-training\n• Smaller dataset required\n• Improves performance on specific tasks\n• Retains base model capabilities\n\nAWS: Amazon Bedrock model customization supports supervised fine-tuning (labeled data) and reinforcement fine-tuning.',
       hint: 'Adapt a pre-trained model to your task',
       tags: ['fine-tuning', 'training', 'customization'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Customize your model to improve its performance for your use case – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html', checked: '2026-11-25' },
+        { title: 'What is Transfer Learning? - Transfer Learning in Machine Learning Explained', url: 'https://aws.amazon.com/what-is/transfer-learning/', checked: '2026-11-25' }
+      ],
       taskStatement: '3.3'
     },
     {
       id: 'd3c27',
       front: 'What is continuous pre-training (domain adaptation pre-training)?',
-      back: 'Continuing the pre-training process on domain-specific unlabeled data to expand the model\'s knowledge in a particular area.\n\nDifference from fine-tuning:\n• Uses unlabeled data (not task-specific labels)\n• Teaches the model new domain vocabulary and concepts\n• Broader adaptation than fine-tuning\n\nUse cases:\n• Medical domain - train on clinical literature\n• Legal domain - train on legal documents\n• Finance - train on financial reports\n\nCost: More expensive than fine-tuning but cheaper than pre-training from scratch.\n\nAWS: Supported via Amazon Bedrock continued pre-training.',
+      back: 'Continuing the pre-training process on domain-specific unlabeled data to expand the model\'s knowledge in a particular area.\n\nDifference from fine-tuning:\n• Uses unlabeled data (not task-specific labels)\n• Teaches the model new domain vocabulary and concepts\n• Broader adaptation than fine-tuning\n\nUse cases:\n• Medical domain - train on clinical literature\n• Legal domain - train on legal documents\n• Finance - train on financial reports\n\nCost: More expensive than fine-tuning but cheaper than pre-training from scratch.\n\nAWS: Amazon Bedrock offers continued pre-training for supported base models (for example, Amazon Titan models).',
       hint: 'Extend pre-training with domain-specific data',
       tags: ['continuous-pre-training', 'domain-adaptation', 'training'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Amazon Bedrock FAQs', url: 'https://aws.amazon.com/bedrock/faqs/', checked: '2026-11-25' },
+        { title: 'GENOPS05-BP01 Learn when to customize models – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genops05-bp01.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.3'
     },
     {
@@ -265,6 +371,10 @@ export const domain3 = {
       hint: 'Train a small model to mimic a large one',
       tags: ['distillation', 'training', 'optimization'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Customize a model with distillation in Amazon Bedrock – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/model-distillation.html', checked: '2026-11-25' },
+        { title: 'Customize your model to improve its performance for your use case – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.3'
     },
     {
@@ -274,6 +384,9 @@ export const domain3 = {
       hint: 'Train model to follow instructions better',
       tags: ['instruction-tuning', 'fine-tuning', 'alignment'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Fine-tune a large language model (LLM) using prompt instructions – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/jumpstart-foundation-models-fine-tuning-instruction-based.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.3'
     },
     {
@@ -283,6 +396,9 @@ export const domain3 = {
       hint: 'Apply knowledge from one task to another',
       tags: ['transfer-learning', 'training', 'fine-tuning'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What is Transfer Learning? - Transfer Learning in Machine Learning Explained', url: 'https://aws.amazon.com/what-is/transfer-learning/', checked: '2026-11-25' }
+      ],
       taskStatement: '3.3'
     },
     {
@@ -292,6 +408,10 @@ export const domain3 = {
       hint: 'Clean, relevant, high-quality training data',
       tags: ['data-curation', 'data-preparation', 'fine-tuning'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'An introduction to preparing your own dataset for LLM training – AWS Machine Learning Blog', url: 'https://aws.amazon.com/blogs/machine-learning/an-introduction-to-preparing-your-own-dataset-for-llm-training/', checked: '2026-11-25' },
+        { title: 'GENSEC06-BP01 Implement data purification filters for model training workflows – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gensec06-bp01.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.3'
     },
     {
@@ -301,6 +421,10 @@ export const domain3 = {
       hint: 'Responsible data management and accurate labels',
       tags: ['data-governance', 'data-labeling', 'compliance'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Securing generative AI: data, compliance, and privacy considerations – AWS Security Blog', url: 'https://aws.amazon.com/blogs/security/securing-generative-ai-data-compliance-and-privacy-considerations/', checked: '2026-11-25' },
+        { title: 'An introduction to preparing your own dataset for LLM training – AWS Machine Learning Blog', url: 'https://aws.amazon.com/blogs/machine-learning/an-introduction-to-preparing-your-own-dataset-for-llm-training/', checked: '2026-11-25' }
+      ],
       taskStatement: '3.3'
     },
     {
@@ -310,15 +434,22 @@ export const domain3 = {
       hint: 'Quality, quantity, and balance all matter',
       tags: ['dataset-size', 'representativeness', 'data-preparation'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Fine-tune Amazon Nova models with supervised fine-tuning – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/nova-2-sft-data-prep.html', checked: '2026-11-25' },
+        { title: 'An introduction to preparing your own dataset for LLM training – AWS Machine Learning Blog', url: 'https://aws.amazon.com/blogs/machine-learning/an-introduction-to-preparing-your-own-dataset-for-llm-training/', checked: '2026-11-25' }
+      ],
       taskStatement: '3.3'
     },
     {
       id: 'd3c34',
       front: 'What is Reinforcement Learning from Human Feedback (RLHF)?',
-      back: 'A training technique that uses human preferences to align model outputs with human values and expectations.\n\nProcess:\n1. Generate multiple model responses\n2. Human evaluators rank/rate the responses\n3. Train a reward model on human preferences\n4. Use reinforcement learning to optimize the FM against the reward model\n\nBenefits:\n• Aligns model with human values\n• Reduces harmful outputs\n• Improves helpfulness and honesty\n• More nuanced than rule-based filtering\n\nUsed by: Most leading FMs (Claude, GPT, etc.) use RLHF for alignment.',
+      back: 'A training technique that uses human preferences to align model outputs with human values and expectations.\n\nProcess:\n1. Generate multiple model responses\n2. Human evaluators rank/rate the responses\n3. Train a reward model on human preferences\n4. Use reinforcement learning to optimize the FM against the reward model\n\nBenefits:\n• Aligns model with human values\n• Reduces harmful outputs\n• Improves helpfulness and honesty\n• More nuanced than rule-based filtering\n\nUsed throughout generative AI, including large language models (LLMs), to align outputs with human goals.',
       hint: 'Humans teach the model what good looks like',
       tags: ['rlhf', 'alignment', 'training', 'human-feedback'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What is RLHF? - Reinforcement Learning from Human Feedback Explained', url: 'https://aws.amazon.com/what-is/reinforcement-learning-from-human-feedback/', checked: '2026-11-25' }
+      ],
       taskStatement: '3.3'
     },
     {
@@ -328,25 +459,35 @@ export const domain3 = {
       hint: 'Prompt examples vs. updating model weights',
       tags: ['in-context-learning', 'fine-tuning', 'comparison'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' },
+        { title: 'GENOPS05-BP01 Learn when to customize models – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genops05-bp01.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.3'
     },
     // Task Statement 3.4: Foundation model evaluation metrics
     {
       id: 'd3c36',
       front: 'What is BLEU (Bilingual Evaluation Understudy)?',
-      back: 'A metric for evaluating machine translation quality by comparing generated translations to reference translations.\n\nMeasures:\n• Precision of n-grams (1-4 grams)\n• Brevity penalty for short outputs\n• Score: 0-100 (higher is better)\n\nLimitations:\n• Doesn\'t capture meaning perfectly\n• Multiple correct translations possible\n\nUse case: Translation tasks',
+      back: 'A metric for evaluating machine translation quality by comparing generated translations to reference translations.\n\nMeasures:\n• Precision of n-gram (word sequence) matches between generated and reference text\n• Higher score = closer to the reference translations\n\nLimitations:\n• Doesn\'t capture meaning perfectly\n• Multiple correct translations possible\n\nUse case: Translation tasks',
       hint: 'Translation quality metric',
       tags: ['metrics', 'bleu', 'translation'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Evaluating your SageMaker AI-trained model – Amazon Nova User Guide', url: 'https://docs.aws.amazon.com/nova/latest/nova2-userguide/nova-model-evaluation.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.4'
     },
     {
       id: 'd3c37',
       front: 'What is BERTScore?',
-      back: 'A semantic similarity metric that uses contextual embeddings from BERT to evaluate text generation.\n\nAdvantages over ROUGE/BLEU:\n• Captures semantic meaning, not just word overlap\n• Handles paraphrasing better\n• More aligned with human judgment\n\nMeasures:\n• Precision, Recall, F1 of embeddings\n• Context-aware matching\n\nUse case: Any text generation task',
+      back: 'A semantic similarity metric that uses contextual embeddings from BERT to evaluate text generation.\n\nAdvantages over ROUGE/BLEU:\n• Captures semantic meaning, not just word overlap\n• Handles paraphrasing better\n• More linguistic flexibility than word-matching metrics\n\nMeasures:\n• Cosine similarity of embeddings from a BERT-family model\n• Context-aware matching\n\nUse case: Text generation tasks such as summarization and question answering',
       hint: 'Semantic similarity using embeddings',
       tags: ['metrics', 'bertscore', 'evaluation'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Accuracy – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-accuracy-evaluation.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.4'
     },
     {
@@ -356,6 +497,9 @@ export const domain3 = {
       hint: 'Measure business impact, not just accuracy',
       tags: ['business-objectives', 'evaluation', 'metrics'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Content Domain 3: Applications of Foundation Models – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain3.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.4'
     },
     {
@@ -365,15 +509,23 @@ export const domain3 = {
       hint: 'Manual expert assessment',
       tags: ['evaluation', 'human-evaluation', 'quality'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Evaluating quality and reliability in generated outputs – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-experimenting-quality.html', checked: '2026-11-25' },
+        { title: 'Evaluate the performance of Amazon Bedrock resources – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/evaluation.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.4'
     },
     {
       id: 'd3c40',
       front: 'What are Benchmark Datasets in foundation model evaluation?',
-      back: 'Standardized test datasets used to compare model performance:\n\nExamples:\n• MMLU (Massive Multitask Language Understanding)\n• HellaSwag (Common sense reasoning)\n• TruthfulQA (Factual accuracy)\n• HumanEval (Code generation)\n• LAMBADA (Text prediction)\n\nBenefits:\n• Consistent comparison\n• Reproducible results\n• Industry standards\n• Automated testing',
+      back: 'Standardized test datasets used to compare model performance:\n\nExamples:\n• MMLU (Massive Multitask Language Understanding)\n• BBH - Big Bench Hard (Advanced reasoning)\n• MATH (Mathematical problem solving)\n• HumanEval (Code generation)\n\nBenefits:\n• Consistent comparison\n• Reproducible results\n• Industry standards\n• Automated testing',
       hint: 'Standardized test sets',
       tags: ['benchmarks', 'evaluation', 'testing'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Evaluating your SageMaker AI-trained model – Amazon Nova User Guide', url: 'https://docs.aws.amazon.com/nova/latest/nova2-userguide/nova-model-evaluation.html', checked: '2026-11-25' },
+        { title: 'Evaluate the performance of Amazon Bedrock resources – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/evaluation.html', checked: '2026-11-25' }
+      ],
       taskStatement: '3.4'
     }
   ]

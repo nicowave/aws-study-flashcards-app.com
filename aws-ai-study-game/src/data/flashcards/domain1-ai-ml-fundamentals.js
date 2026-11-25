@@ -1,6 +1,7 @@
 // Flashcard data organized by module/topic
 // Each card has front (question/term) and back (answer/definition)
 // Cards can include optional hints, tags, and difficulty levels
+// Sources: official AWS documentation, linked on each card
 
 export const domain1 = {
   id: 'domain1',
@@ -9,17 +10,20 @@ export const domain1 = {
   icon: '🤖',
   color: '#3498DB',
   gradient: 'linear-gradient(135deg, #3498DB 0%, #2980B9 100%)',
-  source: 'AWS Certified AI Practitioner Exam Guide - Domain 1',
+  source: 'Official AWS documentation (linked on each card)',
   examWeight: '20%',
   cards: [
       // Task Statement 1.1: Define basic AI concepts and terminology
       {
         id: 'd1c1',
         front: 'What is Artificial Intelligence (AI)?',
-        back: 'A broad field encompassing the development of intelligent systems capable of performing tasks that typically require human intelligence.\n\nIncludes:\n• Perception\n• Reasoning\n• Learning\n• Problem-solving\n• Decision-making',
+        back: 'A broad field encompassing the development of intelligent systems capable of performing tasks that typically require human intelligence.\n\nIncludes:\n• Perception\n• Learning\n• Problem-solving\n• Decision-making',
         hint: 'Umbrella term for intelligent systems',
         tags: ['ai', 'core-concept', 'fundamentals'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'What is AI? – AWS', url: 'https://aws.amazon.com/what-is/artificial-intelligence/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -29,6 +33,9 @@ export const domain1 = {
         hint: 'Learning from data',
         tags: ['ml', 'core-concept', 'fundamentals'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'What is Machine Learning? – AWS', url: 'https://aws.amazon.com/what-is/machine-learning/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -38,15 +45,22 @@ export const domain1 = {
         hint: 'Multi-layered neural networks',
         tags: ['deep-learning', 'neural-networks', 'fundamentals'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'What is Deep Learning? – AWS', url: 'https://aws.amazon.com/what-is/deep-learning/', checked: '2026-11-25' },
+          { title: 'What is Amazon Rekognition? – Amazon Rekognition Developer Guide', url: 'https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
         id: 'd1c4',
         front: 'What are Neural Networks?',
-        back: 'Computing systems inspired by biological neural networks in the human brain.\n\nComponents:\n• Neurons - processing units\n• Layers - input, hidden, output\n• Connections - weighted links between neurons\n• Activation Functions - determine neuron output',
+        back: 'Computing systems inspired by biological neural networks in the human brain.\n\nComponents:\n• Neurons (nodes) - processing units that apply math to their inputs\n• Layers - input, hidden, output\n• Connections - weighted links between neurons\n• Weights - a higher weight gives a node more influence on the next one',
         hint: 'Brain-inspired computing',
         tags: ['neural-networks', 'deep-learning'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'What is a Neural Network? – AWS', url: 'https://aws.amazon.com/what-is/neural-network/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -56,6 +70,9 @@ export const domain1 = {
         hint: 'Teaching computers to "see"',
         tags: ['computer-vision', 'ai-applications'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'What is Computer Vision? – AWS', url: 'https://aws.amazon.com/what-is/computer-vision/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -65,15 +82,22 @@ export const domain1 = {
         hint: 'Understanding human language',
         tags: ['nlp', 'ai-applications'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'What is Natural Language Processing? – AWS', url: 'https://aws.amazon.com/what-is/nlp/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
         id: 'd1c7',
         front: 'What is a Large Language Model (LLM)?',
-        back: 'A type of AI model trained on massive amounts of text data to understand and generate human-like text.\n\nCharacteristics:\n• Billions of parameters\n• General-purpose language understanding\n• Can perform various NLP tasks\n• Foundation for chatbots, content generation\n\nExamples: GPT, Claude, Amazon Titan',
+        back: 'A type of AI model trained on massive amounts of text data to understand and generate human-like text.\n\nCharacteristics:\n• Billions of parameters\n• General-purpose language understanding\n• Can perform various NLP tasks\n• Foundation for chatbots, content generation\n\nExamples: GPT, Claude, Amazon Nova',
         hint: 'Massive text-trained models',
         tags: ['llm', 'nlp', 'foundation-models'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'What is LLM? – Large Language Models Explained – AWS', url: 'https://aws.amazon.com/what-is/large-language-model/', checked: '2026-11-25' },
+          { title: 'Models at a glance – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -83,6 +107,10 @@ export const domain1 = {
         hint: 'Process vs. Output',
         tags: ['core-concept', 'terminology'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Overview of machine learning with Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-mlconcepts.html', checked: '2026-11-25' },
+          { title: 'What is Machine Learning? – AWS', url: 'https://aws.amazon.com/what-is/machine-learning/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -92,6 +120,9 @@ export const domain1 = {
         hint: 'Learning from data',
         tags: ['training', 'ml-lifecycle'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'Overview of machine learning with Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-mlconcepts.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -101,6 +132,10 @@ export const domain1 = {
         hint: 'Making predictions with trained model',
         tags: ['inference', 'ml-lifecycle'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'Overview of machine learning with Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-mlconcepts.html', checked: '2026-11-25' },
+          { title: 'What is Machine Learning? – AWS', url: 'https://aws.amazon.com/what-is/machine-learning/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -110,6 +145,10 @@ export const domain1 = {
         hint: 'Systematic unfairness',
         tags: ['bias', 'responsible-ai', 'fairness'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'What Is AI Bias? – AWS', url: 'https://aws.amazon.com/what-is/ai-bias/', checked: '2026-11-25' },
+          { title: 'What is Machine Learning? – AWS', url: 'https://aws.amazon.com/what-is/machine-learning/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -119,6 +158,10 @@ export const domain1 = {
         hint: 'Equitable treatment for all',
         tags: ['fairness', 'responsible-ai', 'ethics'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Responsible AI – AWS', url: 'https://aws.amazon.com/ai/responsible-ai/', checked: '2026-11-25' },
+          { title: 'What Is AI Bias? – AWS', url: 'https://aws.amazon.com/what-is/ai-bias/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -128,6 +171,9 @@ export const domain1 = {
         hint: 'Memorizing vs. learning',
         tags: ['overfitting', 'model-performance'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'What is Overfitting? – AWS', url: 'https://aws.amazon.com/what-is/overfitting/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -137,6 +183,10 @@ export const domain1 = {
         hint: 'Too simple to learn',
         tags: ['underfitting', 'model-performance'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'What is Overfitting? – AWS', url: 'https://aws.amazon.com/what-is/overfitting/', checked: '2026-11-25' },
+          { title: 'What is Machine Learning? – AWS', url: 'https://aws.amazon.com/what-is/machine-learning/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -146,6 +196,10 @@ export const domain1 = {
         hint: 'Data with answers',
         tags: ['data-types', 'supervised-learning'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'Supervised vs Unsupervised Learning – AWS', url: 'https://aws.amazon.com/compare/the-difference-between-machine-learning-supervised-and-unsupervised/', checked: '2026-11-25' },
+          { title: 'What is Data Labeling? – AWS', url: 'https://aws.amazon.com/what-is/data-labeling/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -155,6 +209,9 @@ export const domain1 = {
         hint: 'Data without answers',
         tags: ['data-types', 'unsupervised-learning'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'Supervised vs Unsupervised Learning – AWS', url: 'https://aws.amazon.com/compare/the-difference-between-machine-learning-supervised-and-unsupervised/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -164,6 +221,10 @@ export const domain1 = {
         hint: 'Organized in tables',
         tags: ['data-types', 'structured-data'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'What is Structured Data? – AWS', url: 'https://aws.amazon.com/what-is/structured-data/', checked: '2026-11-25' },
+          { title: 'Structured Data vs Unstructured Data – AWS', url: 'https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -173,6 +234,9 @@ export const domain1 = {
         hint: 'No predefined format',
         tags: ['data-types', 'unstructured-data'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'Structured Data vs Unstructured Data – AWS', url: 'https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -182,6 +246,10 @@ export const domain1 = {
         hint: 'Different data formats',
         tags: ['data-types', 'modalities'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Built-in algorithms and pretrained models in Amazon SageMaker – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/algos.html', checked: '2026-11-25' },
+          { title: 'Content Domain 1: Fundamentals of AI and ML – AWS Certified AI Practitioner (AIF-C01) Exam Guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain1.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       {
@@ -191,6 +259,10 @@ export const domain1 = {
         hint: 'Supervised, Unsupervised, Reinforcement',
         tags: ['learning-paradigms', 'ml-fundamentals'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'What is Machine Learning? – AWS', url: 'https://aws.amazon.com/what-is/machine-learning/', checked: '2026-11-25' },
+          { title: 'What is Reinforcement Learning? – AWS', url: 'https://aws.amazon.com/what-is/reinforcement-learning/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.1'
       },
       // Task Statement 1.2: Identify practical use cases for AI
@@ -201,6 +273,10 @@ export const domain1 = {
         hint: 'Consider costs, requirements, and alternatives',
         tags: ['use-cases', 'business-decisions'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Content Domain 1: Fundamentals of AI and ML – AWS Certified AI Practitioner (AIF-C01) Exam Guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain1.html', checked: '2026-11-25' },
+          { title: 'What is Machine Learning? – AWS', url: 'https://aws.amazon.com/what-is/machine-learning/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
@@ -210,6 +286,10 @@ export const domain1 = {
         hint: 'Predicting numbers/amounts',
         tags: ['regression', 'ml-techniques', 'supervised-learning'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'Built-in algorithms and pretrained models in Amazon SageMaker – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/algos.html', checked: '2026-11-25' },
+          { title: 'Supervised vs Unsupervised Learning – AWS', url: 'https://aws.amazon.com/compare/the-difference-between-machine-learning-supervised-and-unsupervised/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
@@ -219,15 +299,23 @@ export const domain1 = {
         hint: 'Predicting categories/labels',
         tags: ['classification', 'ml-techniques', 'supervised-learning'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'Built-in algorithms and pretrained models in Amazon SageMaker – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/algos.html', checked: '2026-11-25' },
+          { title: 'Supervised vs Unsupervised Learning – AWS', url: 'https://aws.amazon.com/compare/the-difference-between-machine-learning-supervised-and-unsupervised/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
         id: 'd1c24',
         front: 'What ML technique is used for finding GROUPS in unlabeled data?',
-        back: 'Clustering - groups similar data points together without predefined labels.\n\nExamples:\n• Customer segmentation\n• Document categorization\n• Anomaly detection\n• Image compression\n• Market basket analysis',
+        back: 'Clustering - groups similar data points together without predefined labels.\n\nExamples:\n• Customer segmentation\n• Document categorization\n• Grouping network traffic types to flag potential security incidents\n\nNote: market basket analysis ("bought X, also bought Y") is association rule learning, not clustering',
         hint: 'Finding natural groupings',
         tags: ['clustering', 'ml-techniques', 'unsupervised-learning'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'Built-in algorithms and pretrained models in Amazon SageMaker – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/algos.html', checked: '2026-11-25' },
+          { title: 'Supervised vs Unsupervised Learning – AWS', url: 'https://aws.amazon.com/compare/the-difference-between-machine-learning-supervised-and-unsupervised/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
@@ -237,6 +325,10 @@ export const domain1 = {
         hint: 'Speech → Text conversion',
         tags: ['aws-services', 'transcribe', 'speech'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'What is Amazon Transcribe? – Amazon Transcribe Developer Guide', url: 'https://docs.aws.amazon.com/transcribe/latest/dg/what-is.html', checked: '2026-11-25' },
+          { title: 'Custom vocabularies – Amazon Transcribe Developer Guide', url: 'https://docs.aws.amazon.com/transcribe/latest/dg/custom-vocabulary.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
@@ -246,15 +338,23 @@ export const domain1 = {
         hint: 'Language translation service',
         tags: ['aws-services', 'translate', 'nlp'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Supported languages and language codes – Amazon Translate Developer Guide', url: 'https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html', checked: '2026-11-25' },
+          { title: 'How Amazon Translate works – Amazon Translate Developer Guide', url: 'https://docs.aws.amazon.com/translate/latest/dg/how-it-works.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
         id: 'd1c27',
         front: 'What AWS service analyzes text to extract insights?',
-        back: 'Amazon Comprehend - Natural language processing service.\n\nCapabilities:\n• Sentiment analysis\n• Entity recognition (people, places, dates)\n• Key phrase extraction\n• Language detection\n• Topic modeling\n• PII detection\n\nUse cases: Customer feedback analysis, document classification',
+        back: 'Amazon Comprehend - Natural language processing service.\n\nCapabilities:\n• Sentiment analysis\n• Entity recognition (people, places, dates)\n• Key phrase extraction\n• Language detection\n• Topic modeling (no longer available to new customers)\n• PII detection\n\nUse cases: Customer feedback analysis, document classification',
         hint: 'Text understanding and insights',
         tags: ['aws-services', 'comprehend', 'nlp'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'What is Amazon Comprehend? – Amazon Comprehend Developer Guide', url: 'https://docs.aws.amazon.com/comprehend/latest/dg/what-is.html', checked: '2026-11-25' },
+          { title: 'Topic modeling – Amazon Comprehend Developer Guide', url: 'https://docs.aws.amazon.com/comprehend/latest/dg/topic-modeling.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       // Task Statement 1.3: Describe the ML development lifecycle
@@ -265,6 +365,10 @@ export const domain1 = {
         hint: 'From data to production model',
         tags: ['ml-lifecycle', 'ml-pipeline', 'mlops'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Well-Architected machine learning lifecycle – Machine Learning Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/machine-learning-lifecycle.html', checked: '2026-11-25' },
+          { title: 'What is MLOps? – AWS', url: 'https://aws.amazon.com/what-is/mlops/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.3'
       },
       {
@@ -274,6 +378,10 @@ export const domain1 = {
         hint: 'DevOps for Machine Learning',
         tags: ['mlops', 'ml-lifecycle', 'operations'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Content Domain 1: Fundamentals of AI and ML – AWS Certified AI Practitioner (AIF-C01) Exam Guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain1.html', checked: '2026-11-25' },
+          { title: 'What is MLOps? – AWS', url: 'https://aws.amazon.com/what-is/mlops/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.3'
       },
       // Additional Task Statement 1.2 cards — AWS AI services, inferencing, models, metrics, and applications
@@ -284,6 +392,10 @@ export const domain1 = {
         hint: 'Chatbot builder service',
         tags: ['aws-services', 'lex', 'nlp', 'chatbots'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'What is Amazon Lex V2? – Amazon Lex V2 Developer Guide', url: 'https://docs.aws.amazon.com/lexv2/latest/dg/what-is.html', checked: '2026-11-25' },
+          { title: 'Built-in slot types – Amazon Lex V2 Developer Guide', url: 'https://docs.aws.amazon.com/lexv2/latest/dg/built-in-slots.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
@@ -293,24 +405,40 @@ export const domain1 = {
         hint: 'Text-to-speech service',
         tags: ['aws-services', 'polly', 'speech', 'tts'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'What Is Amazon Polly? – Amazon Polly Developer Guide', url: 'https://docs.aws.amazon.com/polly/latest/dg/what-is.html', checked: '2026-11-25' },
+          { title: 'How Amazon Polly works – Amazon Polly Developer Guide', url: 'https://docs.aws.amazon.com/polly/latest/dg/how-text-to-speech-works.html', checked: '2026-11-25' },
+          { title: 'Managing lexicons – Amazon Polly Developer Guide', url: 'https://docs.aws.amazon.com/polly/latest/dg/managing-lexicons.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
         id: 'd1c32',
         front: 'What is Amazon SageMaker AI?',
-        back: 'A fully managed AWS platform for building, training, and deploying ML models at scale.\n\nKey capabilities:\n• Jupyter notebooks for exploration\n• Built-in algorithms and framework support\n• Managed training infrastructure\n• One-click model deployment\n• AutoML with SageMaker Autopilot\n• Ground Truth for data labeling\n\nCovers the ENTIRE ML lifecycle from data prep to production',
+        back: 'A fully managed AWS platform for building, training, and deploying ML models at scale.\n\nKey capabilities:\n• Jupyter notebooks for exploration\n• Built-in algorithms and framework support\n• Managed training infrastructure\n• One-click model deployment\n• AutoML with SageMaker Autopilot (its UI now lives in SageMaker Canvas)\n• Ground Truth for data labeling (no longer open to new customers)\n\nCovers the ENTIRE ML lifecycle from data prep to production',
         hint: 'End-to-end ML platform',
         tags: ['aws-services', 'sagemaker', 'ml-platform'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'What is Amazon SageMaker AI? – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html', checked: '2026-11-25' },
+          { title: 'Amazon SageMaker AI Features – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/whatis-features.html', checked: '2026-11-25' },
+          { title: 'SageMaker Autopilot – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/autopilot-automate-model-development.html', checked: '2026-11-25' },
+          { title: 'Training data labeling using humans with Amazon SageMaker Ground Truth – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/sms.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
         id: 'd1c33',
         front: 'What are SageMaker Data Wrangler, Feature Store, and Model Monitor?',
-        back: 'Three SageMaker components for the ML lifecycle:\n\nData Wrangler:\n• Visual data preparation and transformation\n• 300+ built-in data transforms\n• Reduces data prep time from weeks to minutes\n\nFeature Store:\n• Centralized repository for ML features\n• Supports online (real-time) and offline (batch) access\n• Enables feature reuse across teams and models\n\nModel Monitor:\n• Detects data drift and model quality degradation\n• Automated alerts for anomalies\n• Tracks bias and feature attribution over time',
+        back: 'Three SageMaker components for the ML lifecycle:\n\nData Wrangler (now part of SageMaker Canvas):\n• Visual and natural-language data preparation\n• 300+ built-in data transforms\n• Reduces data prep time from weeks to minutes\n\nFeature Store:\n• Centralized repository for ML features\n• Supports online (real-time) and offline (batch) access\n• Enables feature reuse across teams and models\n\nModel Monitor (no longer open to new customers; existing customers can keep using it):\n• Detects data drift and model quality degradation\n• Automated alerts for anomalies\n• Tracks bias and feature attribution over time',
         hint: 'Data prep, feature storage, and monitoring tools',
         tags: ['aws-services', 'sagemaker', 'data-wrangler', 'feature-store', 'model-monitor'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Prepare data for machine learning – Amazon SageMaker Data Wrangler – AWS', url: 'https://aws.amazon.com/sagemaker/ai/data-wrangler/', checked: '2026-11-25' },
+          { title: 'Create, store, and share features with Feature Store – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/feature-store.html', checked: '2026-11-25' },
+          { title: 'Data and model quality monitoring with Amazon SageMaker Model Monitor – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.3'
       },
       {
@@ -320,15 +448,23 @@ export const domain1 = {
         hint: 'All-at-once vs. on-demand predictions',
         tags: ['inference', 'batch', 'real-time', 'deployment'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Batch transform for inference with Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/batch-transform.html', checked: '2026-11-25' },
+          { title: 'Real-time inference – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
         id: 'd1c35',
         front: 'What is the difference between using a Pre-Trained Model and training a Custom Model?',
-        back: 'Pre-Trained (Open Source) Models:\n• Ready to use out of the box\n• Faster time to value\n• Lower cost to start\n• May lack domain-specific accuracy\n• Examples: Hugging Face models, BERT, ResNet\n\nCustom Models:\n• Trained on YOUR specific data\n• Higher accuracy for your domain\n• Requires data, compute, and ML expertise\n• Longer development time\n\nHybrid approach: Fine-tune a pre-trained model on custom data',
+        back: 'Pre-Trained (Open Source) Models:\n• Ready to use out of the box\n• Faster time to value\n• Lower cost to start\n• May lack domain-specific accuracy\n• Examples: BERT, YOLO, MobileNet (e.g., from SageMaker JumpStart)\n\nCustom Models:\n• Trained on YOUR specific data\n• Higher accuracy for your domain\n• Requires data, compute, and ML expertise\n• Longer development time\n\nHybrid approach: Fine-tune a pre-trained model on custom data',
         hint: 'Ready-made vs. built-from-scratch',
         tags: ['pre-trained-models', 'custom-models', 'model-selection'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Built-in algorithms and pretrained models in Amazon SageMaker – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/algos.html', checked: '2026-11-25' },
+          { title: 'MLCOST02-BP02 Perform a tradeoff analysis between custom and pre-trained models – Machine Learning Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp02.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
@@ -338,15 +474,22 @@ export const domain1 = {
         hint: 'Provider-managed vs. you-managed deployment',
         tags: ['deployment', 'managed-services', 'self-hosted', 'api'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'What is Amazon Rekognition? – Amazon Rekognition Developer Guide', url: 'https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html', checked: '2026-11-25' },
+          { title: 'Deploy models for inference – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
         id: 'd1c37',
         front: 'What are Accuracy, AUC, and F1 Score in model evaluation?',
-        back: 'Key model performance metrics:\n\nAccuracy:\n• Percentage of correct predictions overall\n• Can be misleading with imbalanced classes\n\nAUC (Area Under the ROC Curve):\n• Measures ability to distinguish between classes\n• Ranges from 0.5 (random) to 1.0 (perfect)\n• Robust to class imbalance\n\nF1 Score:\n• Harmonic mean of Precision and Recall\n• Balances false positives and false negatives\n• Ideal when both precision and recall matter',
+        back: 'Key model performance metrics:\n\nAccuracy:\n• Percentage of correct predictions overall\n• Can be misleading with imbalanced classes\n\nAUC (Area Under the ROC Curve):\n• Measures ability to distinguish between classes\n• Ranges from 0 to 1: 0.5 = no better than random, 1.0 = perfect\n• Aggregates performance across all classification thresholds\n\nF1 Score:\n• Harmonic mean of Precision and Recall\n• Balances false positives and false negatives\n• Ideal when both precision and recall matter',
         hint: 'How well does the model predict?',
         tags: ['model-evaluation', 'metrics', 'accuracy', 'auc', 'f1-score'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Metrics and validation – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/autopilot-metrics-validation.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.3'
       },
       {
@@ -356,6 +499,9 @@ export const domain1 = {
         hint: 'Beyond model accuracy — measuring business value',
         tags: ['business-metrics', 'roi', 'cost', 'evaluation'],
         difficulty: 'intermediate',
+        sources: [
+          { title: 'Content Domain 1: Fundamentals of AI and ML – AWS Certified AI Practitioner (AIF-C01) Exam Guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain1.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
@@ -365,24 +511,36 @@ export const domain1 = {
         hint: 'Suggesting items users might like',
         tags: ['ai-applications', 'recommendations', 'personalization'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'What is Amazon Personalize? – Amazon Personalize Developer Guide', url: 'https://docs.aws.amazon.com/personalize/latest/dg/what-is-personalize.html', checked: '2026-11-25' },
+          { title: 'Selecting the right metadata to build high-performing recommendation models with Amazon Personalize – AWS Machine Learning Blog', url: 'https://aws.amazon.com/blogs/machine-learning/selecting-the-right-metadata-to-build-high-performing-recommendation-models-with-amazon-personalize/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
         id: 'd1c40',
         front: 'How is Fraud Detection used as an AI/ML application?',
-        back: 'AI/ML detects fraudulent activity by identifying unusual patterns in data.\n\nTechniques used:\n• Anomaly detection (unsupervised)\n• Classification (supervised — fraud vs. legitimate)\n• Real-time scoring of transactions\n\nExamples:\n• Credit card fraud detection\n• Insurance claim fraud\n• Account takeover prevention\n\nAWS Service: Amazon Fraud Detector\n\nKey advantage: ML adapts to new fraud patterns faster than rule-based systems',
+        back: 'AI/ML detects fraudulent activity by identifying unusual patterns in data.\n\nTechniques used:\n• Anomaly detection (unsupervised)\n• Classification (supervised — fraud vs. legitimate)\n• Real-time scoring of transactions\n\nExamples:\n• Credit card fraud detection\n• Insurance claim fraud\n• Account takeover prevention\n\nAWS Service: Amazon Fraud Detector (no longer open to new customers since November 7, 2025; AWS suggests SageMaker AI, AutoGluon or AWS WAF instead)\n\nKey advantage: ML adapts to new fraud patterns faster than rule-based systems',
         hint: 'Catching suspicious activity with ML',
         tags: ['ai-applications', 'fraud-detection', 'anomaly-detection'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'What is Amazon Fraud Detector? – Amazon Fraud Detector User Guide', url: 'https://docs.aws.amazon.com/frauddetector/latest/ug/what-is-frauddetector.html', checked: '2026-11-25' },
+          { title: 'What is Machine Learning? – AWS', url: 'https://aws.amazon.com/what-is/machine-learning/', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       },
       {
         id: 'd1c41',
         front: 'How is Forecasting used as an AI/ML application?',
-        back: 'AI/ML predicts future values based on historical time-series data.\n\nUse cases:\n• Demand forecasting (inventory planning)\n• Revenue and sales projections\n• Resource capacity planning\n• Energy consumption prediction\n\nAWS Service: Amazon Forecast\n\nKey advantage: ML captures complex seasonal patterns, trends, and external factors that traditional methods miss',
+        back: 'AI/ML predicts future values based on historical time-series data.\n\nUse cases:\n• Demand forecasting (inventory planning)\n• Revenue and sales projections\n• Resource capacity planning\n• Energy consumption prediction\n\nAWS Service: Amazon SageMaker Canvas time-series forecasting (Amazon Forecast is no longer available to new customers)\n\nKey advantage: ML captures complex seasonal patterns, trends, and external factors that traditional methods miss',
         hint: 'Predicting the future with historical data',
         tags: ['ai-applications', 'forecasting', 'time-series'],
         difficulty: 'beginner',
+        sources: [
+          { title: 'What Is Amazon Forecast? – Amazon Forecast Developer Guide', url: 'https://docs.aws.amazon.com/forecast/latest/dg/what-is-forecast.html', checked: '2026-11-25' },
+          { title: 'Time Series Forecasts in Amazon SageMaker Canvas – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/canvas-time-series.html', checked: '2026-11-25' }
+        ],
         taskStatement: '1.2'
       }
     ]

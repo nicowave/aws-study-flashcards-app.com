@@ -30,5 +30,5 @@ jobs:
     - run: npm install
     - run: npm run build
     # Every question, card and guide section must cite an official AWS page
-    - if: contains(fromJSON('["aws-cloud-practitioner-game","aws-saa-study-game","aws-dva-study-game"]'), matrix.app)
+    - if: contains(fromJSON('["aws-cloud-practitioner-game","aws-saa-study-game","aws-dva-study-game","aws-ai-study-game"]'), matrix.app)
       run: npm test

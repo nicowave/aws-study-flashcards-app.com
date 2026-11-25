@@ -10,6 +10,11 @@ export const domain1Guide = {
     {
       id: 'd1s1',
       title: 'Types of Machine Learning',
+      sources: [
+        { title: 'What is Machine Learning? – AWS', url: 'https://aws.amazon.com/what-is/machine-learning/', checked: '2026-11-25' },
+        { title: 'Supervised vs Unsupervised Learning – AWS', url: 'https://aws.amazon.com/compare/the-difference-between-machine-learning-supervised-and-unsupervised/', checked: '2026-11-25' },
+        { title: 'What is Reinforcement Learning? – AWS', url: 'https://aws.amazon.com/what-is/reinforcement-learning/', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Machine learning is a subset of artificial intelligence where systems learn patterns from data rather than being explicitly programmed. There are three primary paradigms, each suited to different types of problems and data availability.' },
         { type: 'keyTerm', term: 'Supervised Learning', definition: 'The model learns from labeled data — each training example includes both the input and the desired output. The model finds patterns that map inputs to outputs, then generalizes to unseen data. Used when you have historical labeled examples.' },
@@ -27,6 +32,11 @@ export const domain1Guide = {
     {
       id: 'd1s2',
       title: 'The Machine Learning Pipeline',
+      sources: [
+        { title: 'Well-Architected machine learning lifecycle – Machine Learning Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/machine-learning-lifecycle.html', checked: '2026-11-25' },
+        { title: 'What is Amazon SageMaker AI? – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html', checked: '2026-11-25' },
+        { title: 'Amazon SageMaker Canvas – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/canvas.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Building an ML model is not just about training — it is a multi-stage pipeline that starts with understanding the problem and ends with monitoring the deployed model. Each stage has specific considerations that affect model quality.' },
         { type: 'numberedList', title: 'ML Pipeline Stages:', items: [
@@ -41,7 +51,7 @@ export const domain1Guide = {
         ]},
         { type: 'keyTerm', term: 'Feature Engineering', definition: 'The process of selecting, transforming, or creating input variables that improve model performance. Examples include one-hot encoding categorical variables, normalizing numerical features, or creating interaction features.' },
         { type: 'keyTerm', term: 'Data Drift', definition: 'When the statistical properties of the input data change over time compared to the data the model was trained on. This can degrade model accuracy and requires retraining.' },
-        { type: 'awsService', name: 'Amazon SageMaker', description: 'Fully managed service that covers the entire ML pipeline — from data labeling (Ground Truth) and notebook-based exploration (Studio) to training, tuning, and deploying models at scale. Supports built-in algorithms, custom code, and popular frameworks.' },
+        { type: 'awsService', name: 'Amazon SageMaker AI', description: 'Fully managed ML service (renamed from Amazon SageMaker in December 2024) that covers the entire ML pipeline — from data labeling (Ground Truth, now closed to new customers) and notebook-based exploration (Studio) to training, tuning, and deploying models at scale. Supports built-in algorithms, custom code, and popular frameworks.' },
         { type: 'awsService', name: 'Amazon SageMaker Canvas', description: 'A no-code ML tool that allows business analysts to build and use ML models without writing any code. Provides a visual, point-and-click interface for the entire ML workflow.' },
         { type: 'examTip', text: 'Know all stages of the ML pipeline. The exam may ask which stage addresses a specific problem — for example, handling missing values is data preprocessing, while selecting the right input variables is feature engineering.' }
       ]
@@ -49,6 +59,10 @@ export const domain1Guide = {
     {
       id: 'd1s3',
       title: 'Classification, Regression, and Clustering',
+      sources: [
+        { title: 'Built-in algorithms and pretrained models in Amazon SageMaker – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/algos.html', checked: '2026-11-25' },
+        { title: 'Metrics and validation – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/autopilot-metrics-validation.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'These are the three most fundamental task types in machine learning. Understanding when to apply each is essential for the exam.' },
         { type: 'keyTerm', term: 'Classification', definition: 'Predicting a discrete category or class label. The output is one of a finite set of classes. Examples: spam/not-spam (binary), sentiment analysis (multi-class), image recognition (multi-class).' },
@@ -64,6 +78,11 @@ export const domain1Guide = {
     {
       id: 'd1s4',
       title: 'Neural Networks and Deep Learning',
+      sources: [
+        { title: 'What is a Neural Network? – AWS', url: 'https://aws.amazon.com/what-is/neural-network/', checked: '2026-11-25' },
+        { title: 'What is Deep Learning? – AWS', url: 'https://aws.amazon.com/what-is/deep-learning/', checked: '2026-11-25' },
+        { title: 'What is RNN? – AWS', url: 'https://aws.amazon.com/what-is/recurrent-neural-network/', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Neural networks are computing systems inspired by the biological neural networks in the brain. They consist of layers of interconnected nodes (neurons) that process information. Deep learning refers to neural networks with many layers (deep architectures) that can learn complex patterns.' },
         { type: 'keyTerm', term: 'Neural Network', definition: 'A model composed of layers of nodes: an input layer, one or more hidden layers, and an output layer. Each connection has a weight that is adjusted during training. The network learns by propagating errors backward (backpropagation) and updating weights to minimize the loss function.' },
@@ -82,6 +101,10 @@ export const domain1Guide = {
     {
       id: 'd1s5',
       title: 'Overfitting and Underfitting',
+      sources: [
+        { title: 'What is Overfitting? – AWS', url: 'https://aws.amazon.com/what-is/overfitting/', checked: '2026-11-25' },
+        { title: 'Stop Training Jobs Early – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-early-stopping.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'One of the most important concepts in ML is the balance between a model that is too simple (underfitting) and one that is too complex (overfitting). This tradeoff is known as the bias-variance tradeoff.' },
         { type: 'keyTerm', term: 'Overfitting', definition: 'When a model performs well on training data but poorly on new, unseen data. The model has memorized the training data including its noise and outliers, rather than learning the underlying pattern. Characterized by high variance and low bias.' },
@@ -97,13 +120,17 @@ export const domain1Guide = {
           'Ensembling — Combine multiple models (bagging, boosting) to reduce variance'
         ]},
         { type: 'keyTerm', term: 'K-Fold Cross-Validation', definition: 'A technique that splits the dataset into K equal subsets (folds). The model is trained K times, each time using K-1 folds for training and 1 fold for validation. The results are averaged to get a more robust performance estimate.' },
-        { type: 'awsService', name: 'Amazon SageMaker', description: 'Provides built-in automatic model tuning (hyperparameter optimization) and real-time training metrics that help detect overfitting. SageMaker can automatically stop training when specified metrics stop improving.' },
+        { type: 'awsService', name: 'Amazon SageMaker AI', description: 'Provides built-in automatic model tuning (hyperparameter optimization) and real-time training metrics that help detect overfitting. SageMaker can automatically stop training when specified metrics stop improving.' },
         { type: 'examTip', text: 'If a model has high training accuracy but low test accuracy, it is overfitting. If both training and test accuracy are low, it is underfitting. Know the prevention techniques — regularization, early stopping, and cross-validation are the most commonly tested.' }
       ]
     },
     {
       id: 'd1s6',
       title: 'Model Evaluation Metrics',
+      sources: [
+        { title: 'Metrics and validation – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/autopilot-metrics-validation.html', checked: '2026-11-25' },
+        { title: 'Binary Model Insights – Amazon Machine Learning', url: 'https://docs.aws.amazon.com/machine-learning/latest/dg/binary-model-insights.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Choosing the right evaluation metric depends on the type of ML task and the business requirements. A model that optimizes for one metric may perform poorly on another.' },
         { type: 'keyTerm', term: 'Accuracy', definition: 'The percentage of correct predictions out of all predictions. Simple but can be misleading with imbalanced classes — a model predicting "not fraud" for every transaction would have 99%+ accuracy if fraud is rare.' },
@@ -125,18 +152,23 @@ export const domain1Guide = {
     {
       id: 'd1s7',
       title: 'AWS AI and ML Services Overview',
+      sources: [
+        { title: 'Machine Learning (ML) and Artificial Intelligence (AI) – Overview of Amazon Web Services', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/machine-learning.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Kendra? – Amazon Kendra', url: 'https://docs.aws.amazon.com/kendra/latest/dg/what-is-kendra.html', checked: '2026-11-25' },
+        { title: 'Topic modeling – Amazon Comprehend', url: 'https://docs.aws.amazon.com/comprehend/latest/dg/topic-modeling.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'AWS offers a three-tier stack for AI/ML: AI Services (pre-built, no ML expertise needed), ML Services (tools for ML practitioners), and ML Frameworks & Infrastructure (for researchers and advanced users). The exam focuses heavily on AI Services and SageMaker.' },
         { type: 'awsService', name: 'Amazon Rekognition', description: 'Computer vision service that analyzes images and video. Detects objects, faces, text, scenes, and activities. Can perform facial comparison, content moderation, and celebrity recognition. No ML expertise required.' },
-        { type: 'awsService', name: 'Amazon Comprehend', description: 'Natural language processing (NLP) service that extracts insights from text. Performs sentiment analysis, entity recognition, key phrase extraction, language detection, and topic modeling.' },
+        { type: 'awsService', name: 'Amazon Comprehend', description: 'Natural language processing (NLP) service that extracts insights from text. Performs sentiment analysis, entity recognition, key phrase extraction, language detection, and topic modeling (topic modeling is no longer available to new customers).' },
         { type: 'awsService', name: 'Amazon Polly', description: 'Text-to-speech service that converts text into lifelike speech. Supports multiple languages and voices, including neural text-to-speech for the most natural sound.' },
         { type: 'awsService', name: 'Amazon Transcribe', description: 'Automatic speech recognition (ASR) service that converts speech to text. Supports real-time and batch transcription, custom vocabulary, speaker identification, and automatic content redaction.' },
-        { type: 'awsService', name: 'Amazon Translate', description: 'Neural machine translation service for language translation. Supports 75+ languages, custom terminology, and real-time or batch translation.' },
+        { type: 'awsService', name: 'Amazon Translate', description: 'Neural machine translation service for language translation. Supports more than 70 languages, custom terminology, and real-time or batch translation.' },
         { type: 'awsService', name: 'Amazon Lex', description: 'Service for building conversational chatbots with automatic speech recognition and natural language understanding. Powers the same technology behind Alexa.' },
         { type: 'awsService', name: 'Amazon Textract', description: 'Document analysis service that extracts text, handwriting, tables, and forms from scanned documents. Goes beyond simple OCR by understanding document structure.' },
-        { type: 'awsService', name: 'Amazon Kendra', description: 'Intelligent enterprise search service powered by ML. Provides natural language search across multiple data sources with relevant, accurate answers.' },
+        { type: 'awsService', name: 'Amazon Kendra', description: 'Intelligent enterprise search service powered by ML. Provides natural language search across multiple data sources with relevant, accurate answers. Kendra is no longer open to new customers; AWS points new projects to Amazon Bedrock Knowledge Bases for similar capabilities.' },
         { type: 'awsService', name: 'Amazon Personalize', description: 'ML service for building real-time personalized recommendations. Used for product recommendations, personalized search results, and customized content.' },
-        { type: 'examTip', text: 'Know which AWS service matches which use case: Rekognition = images/video, Comprehend = text analysis/NLP, Polly = text-to-speech, Transcribe = speech-to-text, Translate = languages, Lex = chatbots, Textract = documents/forms, Kendra = enterprise search, Personalize = recommendations.' }
+        { type: 'examTip', text: 'Know which AWS service matches which use case: Rekognition = images/video, Comprehend = text analysis/NLP, Polly = text-to-speech, Transcribe = speech-to-text, Translate = languages, Lex = chatbots, Textract = documents/forms, Kendra = enterprise search (closed to new customers; Bedrock Knowledge Bases is the suggested alternative), Personalize = recommendations.' }
       ]
     }
   ]
