@@ -169,6 +169,11 @@ export default defineConfig({
       },
     },
   ],
+  // Tests run in jsdom, a simulated browser, so components can render without a real one
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.js'],
+  },
   build: {
     rollupOptions: {
       // Two pages, one app: / (index.html) and /gis/ (gis/index.html, a folder page

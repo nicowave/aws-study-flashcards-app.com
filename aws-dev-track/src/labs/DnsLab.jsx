@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 
 const RECORDS = {
   A: 'name to an IPv4 address. The workhorse.',
@@ -15,16 +15,24 @@ export default function DnsLab() {
   const [ttl, setTtl] = useState(300)
   const [step, setStep] = useState(-1)
   const [cached, setCached] = useState(false)
+  const [resolved, setResolved] = useState(() => new Set()) // names the resolver has walked the tree for (its cache)
 
   const parts = name.toLowerCase().split('.').filter(Boolean)
   const tld = parts[parts.length - 1] || 'com'
   const zone = parts.slice(-2).join('.')
+  const key = parts.join('.') // DNS names are case-insensitive
+  // Verisign's a..m.gtld-servers.net serve only .com and .net; every other TLD has its own operator.
+  const tldServer = tld === 'com' || tld === 'net' ? 'a.gtld-servers.net' : `the .${tld} TLD servers`
+
+  const walk = () => { setResolved(r => new Set(r).add(key)); setCached(false); setStep(0) }
+  // A resolver can only answer from cache a name it has already resolved; anything else is a miss.
+  const again = () => { if (resolved.has(key)) { setCached(true); setStep(0) } else walk() }
 
   const hops = [
     { who: 'Your laptop', ip: 'stub resolver', say: `"Who is ${name}?" Checks its own cache first.` },
     { who: 'Recursive resolver', ip: '8.8.8.8 or your ISP', say: cached ? `Cache hit (TTL not expired). Answers immediately. No further hops.` : `Cache miss. Starts walking the tree from the top.` },
     { who: 'Root server', ip: 'a.root-servers.net', say: `"I don't know ${name}, but .${tld} is handled by these TLD servers."` },
-    { who: `.${tld} TLD server`, ip: `a.gtld-servers.net`, say: `"I don't know the host, but ${zone} is served by these name servers." (the NS records you set at your registrar)` },
+    { who: `.${tld} TLD server`, ip: tldServer, say: `"I don't know the host, but ${zone} is served by these name servers." (the NS records you set at your registrar)` },
     { who: 'Authoritative (Route 53)', ip: 'ns-1234.awsdns-12.org', say: `"${name} is A 54.23.11.9, TTL ${ttl}s." Only this server actually knows.` },
     { who: 'Recursive resolver', ip: 'caches it', say: `Stores the answer for ${ttl} seconds and returns it to your laptop. Next lookup inside that window never leaves the resolver.` },
   ]
@@ -39,8 +47,8 @@ export default function DnsLab() {
       <div className="row">
         <input type="text" value={name} onChange={e => { setName(e.target.value); setStep(-1) }} style={{ minWidth: 280 }} className="mono" />
         <label className="toggle">TTL <input type="number" value={ttl} min="1" onChange={e => setTtl(+e.target.value)} style={{ width: 80 }} /> s</label>
-        <button className="btn" onClick={() => { setCached(false); setStep(0) }}>First lookup</button>
-        <button className="btn secondary" onClick={() => { setCached(true); setStep(0) }}>Look up again (cached)</button>
+        <button className="btn" onClick={walk}>First lookup</button>
+        <button className="btn secondary" onClick={again}>Look up again (cached)</button>
         <button className="btn secondary" onClick={() => setStep(s => Math.min(visible.length - 1, s + 1))} disabled={step < 0 || step >= visible.length - 1}>Next hop</button>
       </div>
       <ol className="trace">
@@ -56,7 +64,7 @@ export default function DnsLab() {
       </div>
       <h3>Record types you will get asked about</h3>
       <dl style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '4px 12px', fontSize: 14 }}>
-        {Object.entries(RECORDS).map(([k, v]) => <><dt key={k} className="mono" style={{ fontWeight: 600 }}>{k}</dt><dd key={k + 'd'} style={{ margin: 0, color: 'var(--ink-soft)' }}>{v}</dd></>)}
+        {Object.entries(RECORDS).map(([k, v]) => <Fragment key={k}><dt className="mono" style={{ fontWeight: 600 }}>{k}</dt><dd style={{ margin: 0, color: 'var(--ink-soft)' }}>{v}</dd></Fragment>)}
       </dl>
       <pre>{`dig +trace ${name}          # watch the root -> TLD -> Route 53 walk
 dig ${name} +noall +answer  # just the answer and its TTL

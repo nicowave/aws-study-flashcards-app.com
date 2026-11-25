@@ -38,11 +38,18 @@ export function ProtocolPickerLab() {
   )
 }
 
+// Web Mercator ends at ±85.05112878° (atan(sinh(π))), where the map becomes a square.
+const MAX_LAT = (Math.atan(Math.sinh(Math.PI)) * 180) / Math.PI
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
+
 function lonLatToTile(lon, lat, z) {
   const n = 2 ** z
-  const x = Math.floor(((lon + 180) / 360) * n)
-  const latR = (lat * Math.PI) / 180
-  const y = Math.floor(((1 - Math.log(Math.tan(latR) + 1 / Math.cos(latR)) / Math.PI) / 2) * n)
+  // Longitude wraps, as on slippy-map tile servers: 180 is the same meridian as -180 (column 0).
+  const wrappedLon = ((((lon + 180) % 360) + 360) % 360) - 180
+  const x = clamp(Math.floor(((wrappedLon + 180) / 360) * n), 0, n - 1)
+  // Latitude does not wrap: clamp to the Mercator limit, then clamp y against float rounding at the edge.
+  const latR = (clamp(lat, -MAX_LAT, MAX_LAT) * Math.PI) / 180
+  const y = clamp(Math.floor(((1 - Math.log(Math.tan(latR) + 1 / Math.cos(latR)) / Math.PI) / 2) * n), 0, n - 1)
   return { x, y, n }
 }
 

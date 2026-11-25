@@ -107,6 +107,13 @@ deploy_hub() {
         npm install
     fi
     print_success "Dependencies ready"
+
+    # Component tests and the readiness data check (it compares the "Am I ready?" questions with
+    # the games' current wording; if it fails, run: node scripts/build-readiness.mjs)
+    ensure_deps  # a pull may have added test libraries since the last install
+    print_step "Running the hub's tests..."
+    npm test
+    print_success "Tests passed"
     
     # Build
     print_step "Building ${site_name}..."

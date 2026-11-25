@@ -33,7 +33,13 @@ const split = (domains) => {
   const raw = weights.map((w) => (w / sum) * PER_CHECK);
   const counts = raw.map((r) => Math.max(1, Math.floor(r)));
   while (counts.reduce((a, b) => a + b, 0) < PER_CHECK) {
-    const i = raw.map((r, j) => r - counts[j]).reduce((best, v, j, arr) => (v > arr[best] ? j : best), 0);
+    // Largest remainder wins; on a tie (within float noise) the heavier domain wins, so the
+    // result never depends on rounding (e.g. AI Practitioner's 24% vs 14% domains both left 0.4)
+    const rem = raw.map((r, j) => r - counts[j]);
+    const i = rem.reduce((best, v, j) => {
+      const diff = v - rem[best];
+      return diff > 1e-9 || (Math.abs(diff) <= 1e-9 && weights[j] > weights[best]) ? j : best;
+    }, 0);
     counts[i] += 1;
     raw[i] = counts[i]; // don't pick the same domain twice in a row
   }

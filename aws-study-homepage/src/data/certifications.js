@@ -60,7 +60,7 @@ export const certifications = [
     questions: '65 questions',
     passingScore: '720/1000',
     officialUrl: 'https://aws.amazon.com/certification/certified-solutions-architect-associate/',
-    features: ['Flashcards', 'Quiz Game', 'Study Guide']
+    features: ['Quiz Game', 'Flashcards', 'Exam Simulator', 'Study Guide']
   },
   {
     id: 'developer-associate',

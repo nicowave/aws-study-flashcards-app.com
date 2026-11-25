@@ -2,11 +2,13 @@ import { useState } from 'react'
 
 // The sender retries. Your handler either dedupes by event id (conditional write) or it doesn't.
 
+// Sample payloads cycle; every new event still gets its own id (only retries repeat an id).
 const EVENTS = [
-  { id: 'evt_7f3a', type: 'payment.succeeded', amount: '$49.00' },
-  { id: 'evt_9c21', type: 'sensor.reading', amount: '121.3 V' },
-  { id: 'evt_b048', type: 'payment.succeeded', amount: '$120.00' },
+  { type: 'payment.succeeded', amount: '$49.00' },
+  { type: 'sensor.reading', amount: '121.3 V' },
+  { type: 'payment.succeeded', amount: '$120.00' },
 ]
+const eventId = (n) => `evt_${String(n + 1).padStart(4, '0')}`
 
 export default function IdempotencyLab() {
   const [idempotent, setIdempotent] = useState(false)
@@ -36,7 +38,7 @@ export default function IdempotencyLab() {
   }
 
   function sendNew() {
-    const evt = EVENTS[next % EVENTS.length]
+    const evt = { id: eventId(next), ...EVENTS[next % EVENTS.length] }
     setLast(evt); setNext(n => n + 1)
     deliver(evt, false)
   }
