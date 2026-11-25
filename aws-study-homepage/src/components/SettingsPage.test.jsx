@@ -3,10 +3,17 @@ import { render, screen, within, act, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SettingsPage from './SettingsPage';
 import { useAuth } from '../context/AuthContext';
+import { getEntitlements } from '../services/billing';
 import { isAnalyticsOptedOut, setAnalyticsOptOut } from '../services/analytics';
 
-// The hub's settings page has no billing section (plans are managed on the hub's
-// pricing cards), so only auth and analytics are faked here.
+// Auth, analytics and billing are faked here. Plan & Billing shows only once checkout is
+// switched on (BILLING_ENABLED); its own behaviour is in BillingSection.test.jsx.
+const billing = vi.hoisted(() => ({ enabled: false }));
+vi.mock('../services/billing', () => ({
+  get BILLING_ENABLED() { return billing.enabled; },
+  getEntitlements: vi.fn(),
+  openBillingPortal: vi.fn(),
+}));
 vi.mock('../context/AuthContext', () => ({ useAuth: vi.fn() }));
 vi.mock('../services/analytics', () => ({
   isAnalyticsOptedOut: vi.fn(),
@@ -464,5 +471,26 @@ describe('SettingsPage', () => {
       expect(await screen.findByText('Incorrect password')).toBeInTheDocument();
       expect(onBack).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('SettingsPage: Plan & Billing', () => {
+  afterEach(() => { billing.enabled = false; });
+
+  it('is hidden while checkout is switched off', () => {
+    setAuth();
+    render(<SettingsPage onBack={vi.fn()} />);
+    expect(screen.queryByRole('heading', { name: /plan & billing/i })).not.toBeInTheDocument();
+  });
+
+  it('shows once checkout is on, and "See plans" calls onSeePlans', async () => {
+    billing.enabled = true;
+    vi.mocked(getEntitlements).mockResolvedValue({ plan: null, certs: [] });
+    setAuth();
+    const onSeePlans = vi.fn();
+    render(<SettingsPage onBack={vi.fn()} onSeePlans={onSeePlans} />);
+    expect(screen.getByRole('heading', { name: /plan & billing/i })).toBeInTheDocument();
+    await userEvent.click(await screen.findByRole('button', { name: 'See plans' }));
+    expect(onSeePlans).toHaveBeenCalledTimes(1);
   });
 });

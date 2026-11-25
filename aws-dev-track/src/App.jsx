@@ -8,7 +8,9 @@ import { getAllDecks, getAllCards, getExamTrapCards } from './data/devTrackCards
 import StudyGuide from './features/StudyGuide.jsx'
 import QuizGame from './features/QuizGame.jsx'
 import PracticeExam from './features/PracticeExam.jsx'
+import { onThisName } from './config/auth.config.js'
 
+// Written with the old name; onThisName() keeps a visitor on the name they opened (and its sign-in)
 const HUB_URL = 'https://aws-study-flashcards-app.com'
 
 function Flashcards() {
@@ -120,7 +122,7 @@ export default function App() {
     <div className="shell">
       <div className="topbar">
         <div><h1>Dev Track: protocols and backend</h1><p className="lead" style={{ margin: 0 }}>Hands-on labs for the stuff behind every cloud API and IoT fleet.</p></div>
-        <div className="brand"><a href={HUB_URL}>Level Up Study Hub</a></div>
+        <div className="brand"><a href={onThisName(HUB_URL)}>Level Up Study Hub</a></div>
       </div>
       <nav className="tabs" aria-label="Sections">
         {TABS.map(([id, label]) => <button key={id} onClick={() => setTab(id)} aria-current={tab === id ? 'page' : undefined}>{label}</button>)}

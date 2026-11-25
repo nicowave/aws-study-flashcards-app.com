@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, within, act, fireEvent } from '@testing-library/react';
+import { render, screen, within, act, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import { useAuth } from './context/AuthContext';
-import { getPlan, getProTrialStatus, startCheckout, openBillingPortal, PRO_TRIAL_DAYS } from './services/billing';
+import { getPlan, getProTrialStatus, getEntitlements, startCheckout, openBillingPortal, PRO_TRIAL_DAYS } from './services/billing';
 import { certifications, categories } from './data/certifications';
 import { COURSES } from './data/courses';
 import { GIS_PAGE } from './data/gis';
@@ -28,6 +28,7 @@ vi.mock('./services/billing', async (importOriginal) => {
     PRO_TRIAL_DAYS: days,
     getPlan: vi.fn(),
     getProTrialStatus: vi.fn(),
+    getEntitlements: vi.fn(),
     startCheckout: vi.fn(),
     openBillingPortal: vi.fn(),
   };
@@ -120,6 +121,7 @@ beforeEach(() => {
   setAuth();
   vi.mocked(getPlan).mockReset().mockResolvedValue(null);
   vi.mocked(getProTrialStatus).mockReset().mockResolvedValue(true); // a first-time buyer unless a test says otherwise
+  vi.mocked(getEntitlements).mockReset().mockResolvedValue({ plan: null, certs: [] }); // Settings → Plan & Billing
   vi.mocked(startCheckout).mockReset();
   vi.mocked(openBillingPortal).mockReset();
   at(promo.end + MINUTE); // outside any sale unless a test says otherwise
@@ -617,6 +619,17 @@ describe('App', () => {
       // The back button is icon-only, with no accessible name (SettingsPage), so find it by class
       await userEvent.click(container.querySelector('.settings-back-btn'));
       expect(section('AWS Certifications')).toBeInTheDocument();
+    });
+
+    it('Settings → Plan & Billing → "See plans" goes back home, to the plans section', async () => {
+      signIn();
+      const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(() => {});
+      render(<App />);
+      await userEvent.click(within(header()).getByRole('button', { name: 'Settings' }));
+      expect(await screen.findByText(/Your plan:/)).toHaveTextContent('Free');
+      await userEvent.click(screen.getByRole('button', { name: 'See plans' }));
+      expect(screen.queryByRole('heading', { name: 'Account Settings' })).not.toBeInTheDocument();
+      await waitFor(() => expect(scrolled.mock.contexts.some((el) => el.id === 'plans')).toBe(true));
     });
 
     it('goes back to the homepage if the member signs out while on Settings', async () => {

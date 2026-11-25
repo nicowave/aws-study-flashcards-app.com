@@ -30,7 +30,8 @@ const goToVerification = async (user) => {
 const pick = (user, label) => user.selectOptions(screen.getByRole('combobox'), screen.getByRole('option', { name: label }));
 
 describe('TlsLab handshake steps', () => {
-  it('walks Client Hello -> Server Hello + chain -> verification -> key exchange -> encrypted data', async () => {
+  // TLS 1.3, RFC 8446 Figure 1: the key shares come first, the certificate after them (encrypted)
+  it('walks the TLS 1.3 order: key shares, then the certificate, verification, Finished', async () => {
     const user = userEvent.setup();
     render(<TlsLab />);
     const titles = [stepTitle()];
@@ -40,32 +41,46 @@ describe('TlsLab handshake steps', () => {
       titles.push(stepTitle());
     }
     expect(titles.map((t) => t.replace(/\.$/, ''))).toEqual([
-      'Client Hello',
-      'Server Hello + certificate chain',
+      'Client Hello + key share',
+      'Server Hello + key share',
+      'Certificate + CertificateVerify (encrypted)',
       'Chain verification',
-      'Key exchange (ECDHE)',
-      'Encrypted application data',
+      'Finished, then encrypted application data',
     ]);
     expect(stepLabel()).toBe(`step ${titles.length} of ${titles.length}`);
     await user.click(screen.getByRole('button', { name: 'Back' }));
-    expect(stepTitle()).toBe('Key exchange (ECDHE).');
+    expect(stepTitle()).toBe('Chain verification.');
   });
 
-  it('teaches SNI, that the root is not sent, and forward secrecy', async () => {
+  it('teaches SNI, forward secrecy, the encrypted certificate, that the root is not sent, and one round trip', async () => {
     const user = userEvent.setup();
     render(<TlsLab />);
     expect(screen.getByText(/hostname I want \(SNI\)/)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Next step' }));
-    expect(screen.getByText(/does not send the root/)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Next step' }));
-    await user.click(screen.getByRole('button', { name: 'Next step' }));
     expect(screen.getByText(/forward secrecy/)).toBeInTheDocument();
+    expect(screen.getByText(/everything after this message is encrypted/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Next step' }));
+    expect(screen.getByText(/does not send the root/)).toBeInTheDocument();
+    expect(screen.getByText(/signature over the whole handshake with the leaf private key/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Next step' }));
+    await user.click(screen.getByRole('button', { name: 'Next step' }));
+    expect(screen.getByText(/one round trip \(TLS 1\.2 needed two\)/)).toBeInTheDocument();
+  });
+
+  it('with mTLS, the device answers a CertificateRequest with its own cert', async () => {
+    const user = userEvent.setup();
+    render(<TlsLab />);
+    await user.click(screen.getByRole('checkbox'));
+    expect(screen.getByText(/CertificateRequest/)).toBeInTheDocument();
   });
 
   it('gives no verdict until the client has verified the chain', async () => {
     const user = userEvent.setup();
     render(<TlsLab />);
+    // Not even once the certificate has arrived: only the verification step decides
     await user.click(screen.getByRole('button', { name: 'Next step' }));
+    await user.click(screen.getByRole('button', { name: 'Next step' }));
+    expect(stepTitle()).toMatch(/^Certificate/);
     expect(verdict()).toBeNull();
     await goToVerification(user);
     expect(verdict()).not.toBeNull();
@@ -167,7 +182,7 @@ describe('TlsLab chain verification', () => {
     render(<TlsLab />);
     await goToVerification(user);
     await pick(user, 'Expired leaf');
-    expect(stepTitle()).toBe('Client Hello.');
+    expect(stepTitle()).toBe('Client Hello + key share.');
     expect(verdict()).toBeNull();
   });
 });

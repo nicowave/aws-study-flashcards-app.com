@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeftIcon, UserIcon, CameraIcon, PaletteIcon, KeyIcon, BarChartIcon, TrashIcon, ImageIcon, RefreshIcon, CheckIcon } from './Icons';
 import { isAnalyticsOptedOut, setAnalyticsOptOut } from '../services/analytics';
+import { BILLING_ENABLED } from '../services/billing';
+import BillingSection from './BillingSection';
 import './SettingsPage.css';
 
 // Constants
@@ -106,7 +108,7 @@ const resizeImage = (file) => {
   });
 };
 
-const SettingsPage = ({ onBack }) => {
+const SettingsPage = ({ onBack, onSeePlans = onBack }) => {
   const {
     user, userData, isGuest,
     changeUserPassword, changeDisplayName, updateAvatar, deleteUserAccount, refreshUserData
@@ -613,6 +615,9 @@ const SettingsPage = ({ onBack }) => {
           </form>
         </div>
       )}
+
+      {/* Plan & Billing: only once checkout is switched on, and never for guests (no account to bill) */}
+      {BILLING_ENABLED && !isGuest && <BillingSection onSeePlans={onSeePlans} />}
 
       {/* Section 4: Analytics */}
       <div className="settings-section">
