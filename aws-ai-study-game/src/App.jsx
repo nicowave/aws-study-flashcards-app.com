@@ -107,7 +107,7 @@ function GameContent() {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [sessionStats, setSessionStats] = useState({
-    correct: 0, total: 0, streak: 0, xpEarned: 0, startTime: null
+    correct: 0, total: 0, streak: 0, bestStreak: 0, xpEarned: 0, startTime: null
   });
   const [showParticles, setShowParticles] = useState(false);
   const [newAchievement, setNewAchievement] = useState(null);
@@ -181,7 +181,7 @@ function GameContent() {
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setShowExplanation(false);
-    setSessionStats({ correct: 0, total: 0, streak: 0, xpEarned: 0, startTime: Date.now() });
+    setSessionStats({ correct: 0, total: 0, streak: 0, bestStreak: 0, xpEarned: 0, startTime: Date.now() });
     setQuestionStartTime(Date.now());
     setGameState('playing');
   }, []);
@@ -201,7 +201,8 @@ function GameContent() {
       const xpGained = recordCorrectAnswer(responseTime);
       setSessionStats(prev => ({
         ...prev, correct: prev.correct + 1, total: prev.total + 1,
-        streak: prev.streak + 1, xpEarned: prev.xpEarned + (xpGained || 0)
+        streak: prev.streak + 1, bestStreak: Math.max(prev.bestStreak || 0, prev.streak + 1),
+        xpEarned: prev.xpEarned + (xpGained || 0)
       }));
     } else {
       playSound('incorrect');

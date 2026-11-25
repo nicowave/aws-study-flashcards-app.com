@@ -11,7 +11,8 @@ const ResultsScreen = ({
   onSelectDomain,
   onMainMenu
 }) => {
-  const { correct = 0, total = 0, streak = 0, xpEarned = 0 } = sessionStats || {};
+  // bestStreak is the longest run of correct answers this session; streak resets on a miss
+  const { correct = 0, total = 0, streak = 0, bestStreak = streak, xpEarned = 0 } = sessionStats || {};
   const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
   
   // Determine performance level
@@ -90,7 +91,7 @@ const ResultsScreen = ({
         </div>
         <div className="result-stat">
           <FlameIcon size={24} />
-          <span className="stat-value">{streak}</span>
+          <span className="stat-value">{bestStreak}</span>
           <span className="stat-label">Best Streak</span>
         </div>
         <div className="result-stat">
