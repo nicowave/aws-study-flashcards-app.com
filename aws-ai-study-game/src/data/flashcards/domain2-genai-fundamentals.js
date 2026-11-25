@@ -1,6 +1,7 @@
 // Flashcard data organized by module/topic
 // Each card has front (question/term) and back (answer/definition)
 // Cards can include optional hints, tags, and difficulty levels
+// Sources: official AWS documentation, linked on each card
 
 export const domain2 = {
   id: 'domain2',
@@ -9,17 +10,21 @@ export const domain2 = {
   icon: '✨',
   color: '#c084fc',
   gradient: 'linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%)',
-  source: 'AWS Certified AI Practitioner Exam Guide - Domain 2',
+  source: 'Official AWS documentation (linked on each card)',
   examWeight: '24%',
   cards: [
     // Task Statement 2.1: Explain the basic concepts of GenAI
     {
       id: 'd2c1',
       front: 'What are Tokens in the context of large language models?',
-      back: 'Tokens are the basic units of text that LLMs process. A token can be a word, part of a word, or a character.\n\nKey facts:\n• English text averages ~1.3 tokens per word\n• "Tokenization" splits text into these units\n• Models have token limits (context window)\n• Pricing is based on input/output tokens\n\nExample: "unhappiness" might be split into ["un", "happi", "ness"]',
+      back: 'Tokens are the basic units of text that LLMs process. A token can be a word, part of a word, or a character.\n\nKey facts:\n• Token counts depend on each model\'s tokenizer (the Amazon Bedrock CountTokens API returns the exact count)\n• "Tokenization" splits text into these units\n• Models have token limits (context window)\n• Pricing is based on input/output tokens\n\nExample: "unhappiness" might be split into ["un", "happi", "ness"]',
       hint: 'The smallest units a model reads and generates',
       tags: ['tokens', 'tokenization', 'llm-basics'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Key terminology – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/key-definitions.html', checked: '2026-11-25' },
+        { title: 'Monitor your token usage by counting tokens before running inference – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/count-tokens.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
@@ -29,6 +34,9 @@ export const domain2 = {
       hint: 'Splitting large text into smaller pieces',
       tags: ['chunking', 'rag', 'data-processing'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'How content chunking works for knowledge bases – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/kb-chunking.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
@@ -38,15 +46,23 @@ export const domain2 = {
       hint: 'Numbers that capture meaning',
       tags: ['embeddings', 'vectors', 'semantic-search'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What is Embedding? – AWS', url: 'https://aws.amazon.com/what-is/embeddings-in-machine-learning/', checked: '2026-11-25' },
+        { title: 'Key terminology – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/key-definitions.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
       id: 'd2c4',
       front: 'What are Vectors and Vector Databases in generative AI?',
-      back: 'Vectors are ordered lists of numbers representing data in multi-dimensional space. Vector databases store and search these efficiently.\n\nKey concepts:\n• Each embedding is a vector (e.g., [0.2, -0.5, 0.8, ...])\n• Similarity is measured by distance (cosine, Euclidean)\n• Vector databases enable fast nearest-neighbor search\n\nAWS options:\n• Amazon OpenSearch Serverless\n• Amazon Aurora with pgvector\n• Pinecone on AWS Marketplace',
+      back: 'Vectors are ordered lists of numbers representing data in multi-dimensional space. Vector databases store and search these efficiently.\n\nKey concepts:\n• Each embedding is a vector (e.g., [0.2, -0.5, 0.8, ...])\n• Similarity is measured with a distance function such as cosine\n• Vector databases enable fast nearest-neighbor search\n\nAWS options:\n• Amazon OpenSearch Serverless\n• Amazon Aurora PostgreSQL with pgvector\n• Amazon S3 Vectors\n• Third-party stores such as Pinecone (supported by Bedrock Knowledge Bases)',
       hint: 'Lists of numbers stored in specialized databases',
       tags: ['vectors', 'vector-databases', 'embeddings'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What is a Vector Database? – AWS', url: 'https://aws.amazon.com/what-is/vector-databases/', checked: '2026-11-25' },
+        { title: 'Prerequisites for using a vector store you created for a knowledge base – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-setup.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
@@ -56,42 +72,62 @@ export const domain2 = {
       hint: 'Crafting inputs to get better AI outputs',
       tags: ['prompt-engineering', 'techniques', 'best-practices'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' },
+        { title: 'What is Prompt Engineering? – AWS', url: 'https://aws.amazon.com/what-is/prompt-engineering/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
       id: 'd2c6',
       front: 'What is a Transformer-based Large Language Model (LLM)?',
-      back: 'A deep learning model built on the Transformer architecture that processes and generates human-like text.\n\nKey characteristics:\n• Self-attention mechanism to understand context\n• Trained on massive text datasets\n• Billions of parameters\n• Can handle long-range dependencies in text\n\nExamples: GPT, Claude, Llama, Amazon Titan Text\n\nThe Transformer architecture (2017) revolutionized NLP by enabling parallel processing of sequences',
+      back: 'A deep learning model built on the Transformer architecture that processes and generates human-like text.\n\nKey characteristics:\n• Self-attention mechanism to understand context\n• Trained on massive text datasets\n• Billions of parameters\n• Can handle long-range dependencies in text\n\nExamples: GPT, Claude, Llama, Cohere Command\n\nThe Transformer architecture (2017) revolutionized NLP by enabling parallel processing of sequences',
       hint: 'Architecture using self-attention for text generation',
       tags: ['transformer', 'llm', 'architecture'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What are Transformers? – AWS', url: 'https://aws.amazon.com/what-is/transformers-in-artificial-intelligence/', checked: '2026-11-25' },
+        { title: 'What is LLM? – Large Language Models Explained – AWS', url: 'https://aws.amazon.com/what-is/large-language-model/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
       id: 'd2c7',
       front: 'What is a Foundation Model (FM)?',
-      back: 'A large AI model pre-trained on broad, diverse datasets that can be adapted to a wide range of downstream tasks.\n\nCharacteristics:\n• Trained on massive unlabeled data\n• General-purpose capabilities\n• Can be fine-tuned for specific tasks\n• Serves as a starting point (foundation)\n\nExamples on Amazon Bedrock:\n• Anthropic Claude (text)\n• Amazon Titan (text and embeddings)\n• Stability AI (images)\n• Meta Llama (text)',
+      back: 'A large AI model pre-trained on broad, diverse datasets that can be adapted to a wide range of downstream tasks.\n\nCharacteristics:\n• Trained on massive unlabeled data\n• General-purpose capabilities\n• Can be fine-tuned for specific tasks\n• Serves as a starting point (foundation)\n\nExamples on Amazon Bedrock:\n• Anthropic Claude (text)\n• Amazon Nova (text and multimodal) and Amazon Titan (embeddings)\n• Stability AI (images)\n• Meta Llama (text)',
       hint: 'Pre-trained general-purpose model adaptable to many tasks',
       tags: ['foundation-models', 'pre-training', 'bedrock'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'What are Foundation Models? – AWS', url: 'https://aws.amazon.com/what-is/foundation-models/', checked: '2026-11-25' },
+        { title: 'Models at a glance – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
       id: 'd2c8',
       front: 'What are Multimodal Models in generative AI?',
-      back: 'AI models that can process and generate multiple types of data (modalities) such as text, images, audio, and video.\n\nCapabilities:\n• Text + Image understanding (e.g., describe an image)\n• Image generation from text prompts\n• Audio transcription and generation\n• Cross-modal reasoning\n\nExamples:\n• Anthropic Claude (text + image input)\n• Amazon Titan Multimodal Embeddings\n• GPT-4 Vision',
+      back: 'AI models that can process and generate multiple types of data (modalities) such as text, images, audio, and video.\n\nCapabilities:\n• Text + Image understanding (e.g., describe an image)\n• Image generation from text prompts\n• Audio transcription and generation\n• Cross-modal reasoning\n\nExamples:\n• Amazon Nova Lite and Nova Pro (text, image, and video input)\n• Amazon Titan Multimodal Embeddings (text and images in one vector space)',
       hint: 'Models that handle text, images, audio, and more',
       tags: ['multimodal', 'foundation-models', 'capabilities'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'What is Amazon Nova? – Amazon Nova User Guide', url: 'https://docs.aws.amazon.com/nova/latest/userguide/what-is-nova.html', checked: '2026-11-25' },
+        { title: 'Amazon Titan Multimodal Embeddings G1 model – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/titan-multiemb-models.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
       id: 'd2c9',
       front: 'What are Diffusion Models in generative AI?',
-      back: 'A class of generative models that create data (typically images) by learning to reverse a noise-adding process.\n\nHow they work:\n• Forward process: gradually add noise to data until pure noise\n• Reverse process: learn to remove noise step by step\n• Generate new data by starting from random noise\n\nExamples:\n• Stable Diffusion (Stability AI)\n• Amazon Titan Image Generator\n• DALL-E\n\nStrengths: High-quality image generation, controllable outputs',
+      back: 'A class of generative models that create data (typically images) by learning to reverse a noise-adding process.\n\nHow they work:\n• Forward process: gradually add noise to data until pure noise\n• Reverse process: learn to remove noise step by step\n• Generate new data by starting from random noise\n\nExamples:\n• Stable Diffusion (Stability AI), including Stable Diffusion 3.5 Large on Amazon Bedrock\n\nStrengths: High-quality image generation, controllable outputs',
       hint: 'Generate images by learning to remove noise',
       tags: ['diffusion-models', 'image-generation', 'architecture'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What is Stable Diffusion? – AWS', url: 'https://aws.amazon.com/what-is/stable-diffusion/', checked: '2026-11-25' },
+        { title: 'Models at a glance – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
@@ -101,6 +137,10 @@ export const domain2 = {
       hint: 'Creating visual and audio content with AI',
       tags: ['use-cases', 'image-generation', 'audio-generation'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'What is Generative AI? – AWS', url: 'https://aws.amazon.com/what-is/generative-ai/', checked: '2026-11-25' },
+        { title: 'What Is Amazon Polly? – Amazon Polly Developer Guide', url: 'https://docs.aws.amazon.com/polly/latest/dg/what-is.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
@@ -110,33 +150,49 @@ export const domain2 = {
       hint: 'Condensing text and converting between languages',
       tags: ['use-cases', 'summarization', 'translation'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'What is Generative AI? – AWS', url: 'https://aws.amazon.com/what-is/generative-ai/', checked: '2026-11-25' },
+        { title: 'What is LLM? – Large Language Models Explained – AWS', url: 'https://aws.amazon.com/what-is/large-language-model/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
       id: 'd2c12',
       front: 'How is generative AI used for Code Generation and AI Assistants?',
-      back: 'Code generation:\n• Auto-complete code (Amazon Q Developer)\n• Generate code from natural language\n• Code review and bug detection\n• Test case generation\n• Code documentation\n\nAI assistants:\n• Amazon Q Business for enterprise knowledge\n• Conversational chatbots\n• Personal productivity assistants\n• Domain-specific expert systems\n\nBoth reduce manual effort and accelerate workflows',
+      back: 'Code generation:\n• Auto-complete code (Amazon Q Developer)\n• Generate code from natural language\n• Code review and bug detection\n• Test case generation\n• Code documentation\n\nAI assistants:\n• Amazon Q Business for enterprise knowledge (no longer open to new customers; AWS points to Amazon Quick)\n• Conversational chatbots\n• Personal productivity assistants\n• Domain-specific expert systems\n\nBoth reduce manual effort and accelerate workflows',
       hint: 'Writing code and powering intelligent helpers',
       tags: ['use-cases', 'code-generation', 'ai-assistants'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'What is Amazon Q Developer? – Amazon Q Developer User Guide', url: 'https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Q Business? – Amazon Q Business User Guide', url: 'https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/what-is.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
       id: 'd2c13',
       front: 'How is generative AI used for Customer Service Agents and Search?',
-      back: 'Customer service agents:\n• Automated chatbots handling routine inquiries\n• Intelligent ticket routing and response\n• 24/7 availability with natural conversations\n• Sentiment analysis and escalation\n\nSearch and information retrieval:\n• Semantic search (meaning-based, not keyword-based)\n• Enterprise knowledge base search\n• RAG-powered question answering\n• Amazon Kendra for intelligent search\n\nBoth improve user experience and reduce operational costs',
+      back: 'Customer service agents:\n• Automated chatbots handling routine inquiries\n• Intelligent ticket routing and response\n• 24/7 availability with natural conversations\n• Sentiment analysis and escalation\n\nSearch and information retrieval:\n• Semantic search (meaning-based, not keyword-based)\n• Enterprise knowledge base search\n• RAG-powered question answering\n• Amazon Bedrock Knowledge Bases for RAG (Amazon Kendra, the older intelligent search service, is no longer open to new customers)\n\nBoth improve user experience and reduce operational costs',
       hint: 'Automating support and finding information intelligently',
       tags: ['use-cases', 'customer-service', 'search'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Retrieve data and generate AI responses with Amazon Bedrock Knowledge Bases – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Kendra? – Amazon Kendra Developer Guide', url: 'https://docs.aws.amazon.com/kendra/latest/dg/what-is-kendra.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
       id: 'd2c14',
       front: 'How is generative AI used for Recommendation Engines?',
-      back: 'GenAI enhances recommendations by understanding content and user intent at a deeper level.\n\nCapabilities:\n• Personalized product recommendations\n• Content curation (articles, videos, music)\n• Next-best-action suggestions\n• Conversational recommendations via chat\n\nAdvantages over traditional approaches:\n• Understands nuance and context\n• Handles cold-start problem better\n• Can explain why items are recommended\n• Adapts to natural language preferences\n\nAWS service: Amazon Personalize',
+      back: 'GenAI enhances recommendations by understanding content and user intent at a deeper level.\n\nCapabilities:\n• Personalized product recommendations\n• Content curation (articles, videos, music)\n• Next-best-action suggestions\n• Conversational recommendations via chat\n\nAdvantages over traditional approaches:\n• Understands nuance and context\n• Can describe recommendations in words (e.g. themed carousels, short summaries)\n• Can recommend through a chat bot\n• Adapts to natural language preferences\n\nAWS service: Amazon Personalize (its Content Generator uses generative AI to add themes to batch recommendations)',
       hint: 'Suggesting relevant items based on deep understanding',
       tags: ['use-cases', 'recommendation-engines', 'personalization'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Amazon Personalize and generative AI – Amazon Personalize Developer Guide', url: 'https://docs.aws.amazon.com/personalize/latest/dg/personalize-with-gen-ai.html', checked: '2026-11-25' },
+        { title: 'What is Generative AI? – AWS', url: 'https://aws.amazon.com/what-is/generative-ai/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
@@ -146,24 +202,36 @@ export const domain2 = {
       hint: 'Seven stages from data to deployment and back',
       tags: ['fm-lifecycle', 'model-development', 'mlops'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' },
+        { title: 'Generative AI lifecycle – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/generative-ai-lifecycle.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
       id: 'd2c16',
       front: 'What is involved in Data Selection and Pre-training for foundation models?',
-      back: 'Data Selection:\n• Choose diverse, high-quality datasets\n• Remove biased, toxic, or private content\n• Balance representation across domains\n• Consider data licensing and compliance\n\nPre-training:\n• Self-supervised learning on massive data\n• Learns general language/vision patterns\n• Requires enormous compute resources (GPUs/TPUs)\n• Can cost millions of dollars\n• Results in a general-purpose foundation model\n\nMost organizations skip pre-training and use existing FMs',
+      back: 'Data Selection:\n• Choose diverse, high-quality datasets\n• Remove biased, toxic, or private content\n• Balance representation across domains\n• Consider data licensing and compliance\n\nPre-training:\n• Self-supervised learning on massive data\n• Learns general language/vision patterns\n• Requires enormous compute resources (large GPU clusters)\n• Can cost millions of dollars\n• Results in a general-purpose foundation model\n\nMost organizations skip pre-training and use existing FMs',
       hint: 'Curating data and initial large-scale training',
       tags: ['fm-lifecycle', 'pre-training', 'data-selection'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What are Foundation Models? – AWS', url: 'https://aws.amazon.com/what-is/foundation-models/', checked: '2026-11-25' },
+        { title: 'What is LLM? – Large Language Models Explained – AWS', url: 'https://aws.amazon.com/what-is/large-language-model/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
       id: 'd2c17',
       front: 'What is Fine-tuning and how does it differ from Pre-training?',
-      back: 'Fine-tuning adapts a pre-trained foundation model to a specific task or domain using a smaller, labeled dataset.\n\nPre-training vs Fine-tuning:\n• Pre-training: broad data, general knowledge, very expensive\n• Fine-tuning: narrow data, specialized skills, much cheaper\n\nFine-tuning methods:\n• Full fine-tuning - update all model weights\n• Parameter-efficient (PEFT/LoRA) - update small subset\n• Instruction tuning - train on instruction-response pairs\n• RLHF - align with human preferences\n\nAWS: Amazon Bedrock custom model training',
+      back: 'Fine-tuning adapts a pre-trained foundation model to a specific task or domain using a smaller, labeled dataset.\n\nPre-training vs Fine-tuning:\n• Pre-training: broad data, general knowledge, very expensive\n• Fine-tuning: narrow data, specialized skills, much cheaper\n\nFine-tuning methods:\n• Full fine-tuning - update all model weights\n• Parameter-efficient (PEFT/LoRA) - update small subset\n• Instruction tuning - train on instruction-response pairs\n• RLHF - align with human preferences\n\nAWS: Amazon Bedrock model customization (supervised fine-tuning, reinforcement fine-tuning, distillation) and SageMaker JumpStart fine-tuning (including LoRA and instruction tuning)',
       hint: 'Specializing a general model for your specific needs',
       tags: ['fine-tuning', 'fm-lifecycle', 'customization'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Customize your model to improve its performance for your use case – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html', checked: '2026-11-25' },
+        { title: 'Foundation models and hyperparameters for fine-tuning – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/jumpstart-foundation-models-fine-tuning.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     {
@@ -173,6 +241,10 @@ export const domain2 = {
       hint: 'Testing, serving, and continuously improving models',
       tags: ['fm-lifecycle', 'evaluation', 'deployment', 'feedback'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Evaluate the performance of Amazon Bedrock resources – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/evaluation.html', checked: '2026-11-25' },
+        { title: 'Generative AI lifecycle – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/generative-ai-lifecycle.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.1'
     },
     // Task Statement 2.2: Understand generative AI model selection and business value
@@ -183,6 +255,10 @@ export const domain2 = {
       hint: 'Same input, different outputs',
       tags: ['nondeterminism', 'limitations', 'model-behavior'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Influence response generation with inference parameters – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html', checked: '2026-11-25' },
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.2'
     },
     {
@@ -192,15 +268,22 @@ export const domain2 = {
       hint: 'Type, performance, cost, compliance',
       tags: ['model-selection', 'business-decisions'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' },
+        { title: 'Generative AI lifecycle – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/generative-ai-lifecycle.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.2'
     },
     {
       id: 'd2c21',
       front: 'How do you determine business value for generative AI applications?',
-      back: 'Key metrics:\n• Cross-domain Performance - versatility across tasks\n• Efficiency - time/cost savings\n• Conversion Rate - customer actions\n• Average Revenue Per User (ARPU)\n• Accuracy - quality of outputs\n• Customer Lifetime Value (CLV)\n• User engagement and satisfaction\n• Productivity improvements',
+      back: 'Key metrics:\n• Cross-domain Performance - versatility across tasks\n• Return on Investment (ROI)\n• Efficiency - time/cost savings\n• Conversion Rate - customer actions\n• Average Revenue Per User (ARPU)\n• Accuracy - quality of outputs\n• Customer Lifetime Value (CLV)\n• User engagement and satisfaction\n• Productivity improvements',
       hint: 'Measure impact on revenue and efficiency',
       tags: ['business-metrics', 'roi', 'value'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.2'
     },
     {
@@ -210,6 +293,10 @@ export const domain2 = {
       hint: 'Wrong answers presented confidently',
       tags: ['inaccuracy', 'limitations', 'quality'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What is Generative AI? – AWS', url: 'https://aws.amazon.com/what-is/generative-ai/', checked: '2026-11-25' },
+        { title: 'Retrieve data and generate AI responses with Amazon Bedrock Knowledge Bases – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.2'
     },
     {
@@ -219,6 +306,10 @@ export const domain2 = {
       hint: 'One model, many tasks',
       tags: ['adaptability', 'advantages', 'versatility'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' },
+        { title: 'What are Foundation Models? – AWS', url: 'https://aws.amazon.com/what-is/foundation-models/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.2'
     },
     {
@@ -228,15 +319,23 @@ export const domain2 = {
       hint: 'Fast, real-time outputs',
       tags: ['responsiveness', 'advantages', 'performance'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' },
+        { title: 'What is Generative AI? – AWS', url: 'https://aws.amazon.com/what-is/generative-ai/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.2'
     },
     {
       id: 'd2c25',
       front: 'Why is Simplicity an advantage of generative AI?',
-      back: 'GenAI simplifies AI adoption:\n• Natural language interface (no coding needed)\n• Pre-trained models ready to use\n• Lower technical barrier to entry\n• Minimal data requirements to get started\n• User-friendly tools like PartyRock\n• Quick prototyping and experimentation\n\nDemocratizes AI access for non-technical users',
+      back: 'GenAI simplifies AI adoption:\n• Natural language interface (no coding needed)\n• Pre-trained models ready to use\n• Lower technical barrier to entry\n• Minimal data requirements to get started\n• User-friendly tools like PartyRock\n• Quick prototyping and experimentation\n\nDemocratizes AI access for non-technical users\n\nNote: the current exam guide lists adaptability, responsiveness, conversational capabilities and content generation as GenAI advantages; ease of use appears as "accessibility" and "lower barrier to entry" of AWS GenAI services',
       hint: 'Easy to use, low barrier to entry',
       tags: ['simplicity', 'advantages', 'accessibility'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' },
+        { title: 'Announcing PartyRock, an Amazon Bedrock Playground – AWS What\'s New', url: 'https://aws.amazon.com/about-aws/whats-new/2023/11/partyrock-amazon-bedrock-playground/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.2'
     },
     {
@@ -246,6 +345,10 @@ export const domain2 = {
       hint: 'Speed, scale, and reliability needs',
       tags: ['performance', 'model-selection', 'requirements'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' },
+        { title: 'Generative AI lifecycle – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/generative-ai-lifecycle.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.2'
     },
     {
@@ -255,6 +358,10 @@ export const domain2 = {
       hint: 'Regulatory and legal requirements',
       tags: ['compliance', 'governance', 'regulations'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock FAQs – AWS', url: 'https://aws.amazon.com/bedrock/faqs/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.2'
     },
     // Task Statement 2.3: AWS infrastructure and technologies for generative AI
@@ -265,15 +372,23 @@ export const domain2 = {
       hint: 'Managed foundation model service',
       tags: ['aws-services', 'bedrock', 'foundation-models'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Amazon Bedrock FAQs – AWS', url: 'https://aws.amazon.com/bedrock/faqs/', checked: '2026-11-25' },
+        { title: 'Overview – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.3'
     },
     {
       id: 'd2c29',
       front: 'What is Amazon SageMaker JumpStart?',
-      back: 'AWS service providing pre-trained models, algorithms, and solution templates for quick ML/AI deployment.\n\nFeatures:\n• 100+ pre-built models\n• One-click deployment\n• Foundation models access\n• Fine-tuning capabilities\n• Custom training options\n\nReduces time from idea to production',
+      back: 'An Amazon SageMaker AI ML hub providing pre-trained models, algorithms, and solution templates for quick ML/AI deployment.\n\nFeatures:\n• Hundreds of pretrained models and built-in algorithms\n• One-click deployment\n• Foundation models access\n• Fine-tuning capabilities\n• Custom training options\n\nReduces time from idea to production',
       hint: 'Quick-start ML model hub',
       tags: ['aws-services', 'sagemaker', 'jumpstart'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'SageMaker JumpStart pretrained models – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/studio-jumpstart.html', checked: '2026-11-25' },
+        { title: 'Amazon SageMaker JumpStart – AWS', url: 'https://aws.amazon.com/sagemaker/ai/jumpstart/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.3'
     },
     {
@@ -283,15 +398,22 @@ export const domain2 = {
       hint: 'No-code GenAI playground',
       tags: ['aws-services', 'partyrock', 'playground'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Announcing PartyRock, an Amazon Bedrock Playground – AWS What\'s New', url: 'https://aws.amazon.com/about-aws/whats-new/2023/11/partyrock-amazon-bedrock-playground/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.3'
     },
     {
       id: 'd2c31',
       front: 'What is Amazon Q?',
-      back: 'AWS generative AI-powered assistant for business and development tasks.\n\nCapabilities:\n• Code generation and debugging (Q Developer)\n• Business intelligence and analytics (Q Business)\n• AWS expert assistance\n• Natural language queries\n• Integration with enterprise data\n• Secure and compliant\n\nPersonalized for your organization',
+      back: 'AWS generative AI-powered assistant for business and development tasks.\n\nCapabilities:\n• Code generation and debugging (Q Developer)\n• Answers, summaries and tasks over company data (Q Business)\n• AWS expert assistance\n• Natural language queries\n• Integration with enterprise data\n• Secure and compliant\n\nPersonalized for your organization\n\nStatus: Q Business is no longer open to new customers (AWS points to Amazon Quick), and Q Developer IDE plugins reach end of support on April 30, 2027 (AWS points to Kiro). The current exam guide lists Amazon Quick and Kiro',
       hint: 'AWS AI assistant for work',
       tags: ['aws-services', 'amazon-q', 'ai-assistant'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'What is Amazon Q Business? – Amazon Q Business User Guide', url: 'https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/what-is.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Q Developer? – Amazon Q Developer User Guide', url: 'https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.3'
     },
     {
@@ -301,6 +423,10 @@ export const domain2 = {
       hint: 'Easy, fast, cost-effective, scalable',
       tags: ['aws-benefits', 'advantages'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock FAQs – AWS', url: 'https://aws.amazon.com/bedrock/faqs/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.3'
     },
     {
@@ -310,6 +436,10 @@ export const domain2 = {
       hint: 'Built-in security and compliance',
       tags: ['security', 'aws-benefits', 'compliance'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Amazon Bedrock FAQs – AWS', url: 'https://aws.amazon.com/bedrock/faqs/', checked: '2026-11-25' },
+        { title: 'Security, Guardrails, and Observability in Amazon Bedrock – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/security.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.3'
     },
     {
@@ -319,15 +449,23 @@ export const domain2 = {
       hint: 'Speed, scale, and customization drive costs',
       tags: ['cost', 'pricing', 'tradeoffs'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Content Domain 2: Fundamentals of GenAI – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain2.html', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock Pricing – AWS', url: 'https://aws.amazon.com/bedrock/pricing/', checked: '2026-11-25' }
+      ],
       taskStatement: '2.3'
     },
     {
       id: 'd2c35',
       front: 'What is Token-based Pricing in AWS generative AI services?',
-      back: 'Pricing model where you pay based on the number of tokens processed.\n\nComponents:\n• Input tokens (prompt)\n• Output tokens (response)\n• Different rates for different models\n• Volume discounts available\n\nExample: Amazon Bedrock charges per 1,000 input/output tokens\n\nBenefit: Pay only for what you use',
+      back: 'Pricing model where you pay based on the number of tokens processed.\n\nComponents:\n• Input tokens (prompt)\n• Output tokens (response)\n• Different rates for different models\n• Lower rates with batch inference or Provisioned Throughput commitments\n\nExample: Amazon Bedrock lists on-demand prices per 1 million input/output tokens\n\nBenefit: Pay only for what you use',
       hint: 'Pay per token processed',
       tags: ['pricing', 'tokens', 'cost-model'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Amazon Bedrock Pricing – AWS', url: 'https://aws.amazon.com/bedrock/pricing/', checked: '2026-11-25' },
+        { title: 'Monitor your token usage by counting tokens before running inference – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/count-tokens.html', checked: '2026-11-25' }
+      ],
       taskStatement: '2.3'
     }
   ]
