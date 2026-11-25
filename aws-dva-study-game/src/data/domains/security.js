@@ -19,7 +19,11 @@ export const security = {
         'One IAM user per customer, with its access keys kept in the device keychain'
       ],
       correctAnswer: 2,
-      explanation: 'The user pool is the user directory that handles sign-up and sign-in and returns JWTs; the identity pool exchanges those tokens for temporary AWS credentials (through STS) scoped by an IAM role, which the SDK uses to call S3 directly. User pool tokens are not AWS credentials and cannot sign S3 requests. Identity pools do not create IAM users, and per-customer IAM users with stored access keys are the long-term credentials the requirement forbids.'
+      explanation: 'The user pool is the user directory that handles sign-up and sign-in and returns JWTs; the identity pool exchanges those tokens for temporary AWS credentials (through STS) scoped by an IAM role, which the SDK uses to call S3 directly. User pool tokens are not AWS credentials and cannot sign S3 requests. Identity pools do not create IAM users, and per-customer IAM users with stored access keys are the long-term credentials the requirement forbids.',
+      sources: [
+        { title: 'Common Amazon Cognito scenarios – Amazon Cognito Developer Guide', url: 'https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-scenarios.html', checked: '2026-11-25' },
+        { title: 'Amazon Cognito identity pools – Amazon Cognito Developer Guide', url: 'https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec2',
@@ -31,7 +35,11 @@ export const security = {
         'Switch the method to IAM authorization so the ID token is checked as a SigV4 signature'
       ],
       correctAnswer: 0,
-      explanation: 'When a method has OAuth scopes configured, the Cognito authorizer expects an access token and validates its scope claim; without scopes it accepts the ID token. Refresh tokens are only used to obtain new ID and access tokens and are never sent to the API. A pre sign-up trigger runs before registration and cannot add scopes, and IAM authorization requires SigV4-signed requests made with AWS credentials, not JWTs.'
+      explanation: 'When a method has OAuth scopes configured, the Cognito authorizer expects an access token and validates its scope claim; without scopes it accepts the ID token. Refresh tokens are only used to obtain new ID and access tokens and are never sent to the API. A pre sign-up trigger runs before registration and cannot add scopes, and IAM authorization requires SigV4-signed requests made with AWS credentials, not JWTs.',
+      sources: [
+        { title: 'Integrate a REST API with an Amazon Cognito user pool – Amazon API Gateway Developer Guide', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-enable-cognito-user-pool.html', checked: '2026-11-25' },
+        { title: 'Understanding user pool JSON web tokens (JWTs) – Amazon Cognito Developer Guide', url: 'https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-with-identity-providers.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec3',
@@ -43,7 +51,11 @@ export const security = {
         'A REQUEST authorizer that receives headers, query strings and context'
       ],
       correctAnswer: 3,
-      explanation: 'A REQUEST Lambda authorizer receives the full request identity, including headers, query string parameters, stage variables and the request context such as the source IP, so it can combine all three inputs. A TOKEN authorizer receives only a single token from one header, and a validation regular expression only pre-checks that token format. A Cognito authorizer validates user pool tokens and cannot run custom logic over headers and query strings.'
+      explanation: 'A REQUEST Lambda authorizer receives the full request identity, including headers, query string parameters, stage variables and the request context such as the source IP, so it can combine all three inputs. A TOKEN authorizer receives only a single token from one header, and a validation regular expression only pre-checks that token format. A Cognito authorizer validates user pool tokens and cannot run custom logic over headers and query strings.',
+      sources: [
+        { title: 'Use API Gateway Lambda authorizers – Amazon API Gateway Developer Guide', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html', checked: '2026-11-25' },
+        { title: 'Input to an API Gateway Lambda authorizer – Amazon API Gateway Developer Guide', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-lambda-authorizer-input.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec4',
@@ -55,7 +67,11 @@ export const security = {
         'A Lambda TOKEN authorizer that checks the account ID claimed by the caller'
       ],
       correctAnswer: 1,
-      explanation: 'With IAM (AWS_IAM) authorization the caller signs each request with SigV4 using its role credentials, and for cross-account access the API resource policy must allow account B in addition to the caller having execute-api:Invoke. The client credentials grant still issues tokens that must be managed. API keys identify clients for usage plans and throttling but are not an authorization mechanism, and an account ID sent by the caller can be forged.'
+      explanation: 'With IAM (AWS_IAM) authorization the caller signs each request with SigV4 using its role credentials, and for cross-account access the API resource policy must allow account B in addition to the caller having execute-api:Invoke. The client credentials grant still issues tokens that must be managed. API keys identify clients for usage plans and throttling but are not an authorization mechanism, and an account ID sent by the caller can be forged.',
+      sources: [
+        { title: 'How API Gateway resource policies affect authorization workflow – Amazon API Gateway Developer Guide', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-authorization-flow.html', checked: '2026-11-25' },
+        { title: 'Usage plans and API keys for REST APIs in API Gateway – Amazon API Gateway Developer Guide', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec5',
@@ -67,7 +83,10 @@ export const security = {
         'Encrypt the configuration file with a KMS key and decrypt it at startup'
       ],
       correctAnswer: 1,
-      explanation: 'An instance profile delivers temporary, automatically rotated role credentials through the instance metadata service, and the SDK default credential provider chain picks them up with no code changes. Storing the keys in Secrets Manager, environment variables or an encrypted file still relies on long-term IAM user keys that must be rotated manually, and each adds code or bootstrapping work.'
+      explanation: 'An instance profile delivers temporary, automatically rotated role credentials through the instance metadata service, and the SDK default credential provider chain picks them up with no code changes. Storing the keys in Secrets Manager, environment variables or an encrypted file still relies on long-term IAM user keys that must be rotated manually, and each adds code or bootstrapping work.',
+      sources: [
+        { title: 'Use an IAM role to grant permissions to applications running on Amazon EC2 instances – AWS Identity and Access Management User Guide', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec6',
@@ -79,7 +98,11 @@ export const security = {
         'Grant the DynamoDB permissions to the task role used by the application code'
       ],
       correctAnswer: 3,
-      explanation: 'The task role supplies the credentials that application code inside the container uses for AWS API calls, so DynamoDB permissions belong there. The task execution role is used by the ECS agent for actions such as pulling images, writing logs and fetching referenced secrets. Fargate has no container instance role, the service-linked role is for ECS itself, and copying credentials into environment variables defeats the purpose of roles.'
+      explanation: 'The task role supplies the credentials that application code inside the container uses for AWS API calls, so DynamoDB permissions belong there. The task execution role is used by the ECS agent for actions such as pulling images, writing logs and fetching referenced secrets. Fargate has no container instance role, the service-linked role is for ECS itself, and copying credentials into environment variables defeats the purpose of roles.',
+      sources: [
+        { title: 'Amazon ECS task IAM role – Amazon Elastic Container Service Developer Guide', url: 'https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html', checked: '2026-11-25' },
+        { title: 'Amazon ECS task execution IAM role – Amazon Elastic Container Service Developer Guide', url: 'https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec7',
@@ -91,7 +114,11 @@ export const security = {
         'Peer the VPCs of both accounts so the function can reach the table over private addresses'
       ],
       correctAnswer: 0,
-      explanation: 'A role in account B whose trust policy allows the function role to assume it, with a permissions policy limited to the table, gives temporary credentials and keeps control in account B. An IAM user with stored keys is a long-term credential. An identity policy in account A alone cannot grant access to a resource in account B without a grant on the account B side, and network connectivity does not provide IAM authorization.'
+      explanation: 'A role in account B whose trust policy allows the function role to assume it, with a permissions policy limited to the table, gives temporary credentials and keeps control in account B. An IAM user with stored keys is a long-term credential. An identity policy in account A alone cannot grant access to a resource in account B without a grant on the account B side, and network connectivity does not provide IAM authorization.',
+      sources: [
+        { title: 'IAM tutorial: Delegate access across AWS accounts using IAM roles – AWS Identity and Access Management User Guide', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html', checked: '2026-11-25' },
+        { title: 'Cross-account policy evaluation logic – AWS Identity and Access Management User Guide', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic-cross-account.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec8',
@@ -103,7 +130,10 @@ export const security = {
         'An inline policy that denies every action outside CloudWatch'
       ],
       correctAnswer: 2,
-      explanation: 'Requiring a unique external ID in the trust policy means the vendor must pass the value agreed with this customer when calling AssumeRole, so a request made on behalf of a different customer fails. A permissions boundary in the vendor account limits the vendor, not who can assume the role. aws:SecureTransport only enforces TLS, and limiting the role to CloudWatch reduces impact but does not stop the wrong party from assuming it.'
+      explanation: 'Requiring a unique external ID in the trust policy means the vendor must pass the value agreed with this customer when calling AssumeRole, so a request made on behalf of a different customer fails. A permissions boundary in the vendor account limits the vendor, not who can assume the role. aws:SecureTransport only enforces TLS, and limiting the role to CloudWatch reduces impact but does not stop the wrong party from assuming it.',
+      sources: [
+        { title: 'The confused deputy problem – AWS Identity and Access Management User Guide', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec9',
@@ -115,7 +145,11 @@ export const security = {
         'Copy temporary IAM Identity Center credentials into the workflow secrets'
       ],
       correctAnswer: 0,
-      explanation: 'With GitHub registered as an OIDC provider, each workflow run presents a short-lived OIDC token and calls AssumeRoleWithWebIdentity, receiving temporary credentials; the role trust policy can restrict the repository and branch. Rotating or relocating an IAM user key still leaves a long-lived credential, and fetching it from Secrets Manager would itself need credentials. Identity Center session credentials expire and are tied to a person, so copying them into secrets is neither automated nor appropriate.'
+      explanation: 'With GitHub registered as an OIDC provider, each workflow run presents a short-lived OIDC token and calls AssumeRoleWithWebIdentity, receiving temporary credentials; the role trust policy can restrict the repository and branch. Rotating or relocating an IAM user key still leaves a long-lived credential, and fetching it from Secrets Manager would itself need credentials. Identity Center session credentials expire and are tied to a person, so copying them into secrets is neither automated nor appropriate.',
+      sources: [
+        { title: 'Create a role for OpenID Connect federation (console) – AWS Identity and Access Management User Guide', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html', checked: '2026-11-25' },
+        { title: 'OIDC federation – AWS Identity and Access Management User Guide', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_oidc.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec10',
@@ -127,7 +161,10 @@ export const security = {
         'The request is denied, because an explicit deny overrides any allow'
       ],
       correctAnswer: 3,
-      explanation: 'In IAM policy evaluation an explicit Deny that matches the request always wins over any Allow, regardless of where each statement lives or how specific it is. Attachment order and specificity play no role. Within the same account, an identity policy allow is enough for S3 access without a bucket policy, so the denial comes from the matching Deny, not a missing bucket policy.'
+      explanation: 'In IAM policy evaluation an explicit Deny that matches the request always wins over any Allow, regardless of where each statement lives or how specific it is. Attachment order and specificity play no role. Within the same account, an identity policy allow is enough for S3 access without a bucket policy, so the denial comes from the matching Deny, not a missing bucket policy.',
+      sources: [
+        { title: 'Policy evaluation logic – AWS Identity and Access Management User Guide', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec11',
@@ -139,7 +176,11 @@ export const security = {
         'An IAM role for S3 whose trust policy names lambda.amazonaws.com'
       ],
       correctAnswer: 2,
-      explanation: 'Services that push events to Lambda, such as S3 and SNS, are authorized by the function resource-based policy (lambda add-permission) with the service principal and a source ARN or account condition. The execution role controls what the function can do, not who can invoke it. A bucket policy governs access to the bucket, and S3 event notifications do not assume a role to invoke Lambda.'
+      explanation: 'Services that push events to Lambda, such as S3 and SNS, are authorized by the function resource-based policy (lambda add-permission) with the service principal and a source ARN or account condition. The execution role controls what the function can do, not who can invoke it. A bucket policy governs access to the bucket, and S3 event notifications do not assume a role to invoke Lambda.',
+      sources: [
+        { title: 'Granting Event Function access to AWS services – AWS Lambda Developer Guide', url: 'https://docs.aws.amazon.com/lambda/latest/dg/permissions-function-services.html', checked: '2026-11-25' },
+        { title: 'Granting permissions to publish event notification messages to a destination – Amazon S3 User Guide', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/grant-destinations-permissions-to-s3.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec12',
@@ -151,7 +192,11 @@ export const security = {
         'A DynamoDB stream that deletes items written by other users'
       ],
       correctAnswer: 1,
-      explanation: 'A fine-grained access control condition on dynamodb:LeadingKeys using the ${cognito-identity.amazonaws.com:sub} policy variable restricts every request to items whose partition key matches the caller identity ID, enforced by IAM. A table per user does not scale and multiplies operational work. Client-side filtering is not a security control because the credentials still allow access to everything, and a stream reacts after the unauthorized write has already happened.'
+      explanation: 'A fine-grained access control condition on dynamodb:LeadingKeys using the ${cognito-identity.amazonaws.com:sub} policy variable restricts every request to items whose partition key matches the caller identity ID, enforced by IAM. A table per user does not scale and multiplies operational work. Client-side filtering is not a security control because the credentials still allow access to everything, and a stream reacts after the unauthorized write has already happened.',
+      sources: [
+        { title: 'IAM roles – Amazon Cognito Developer Guide', url: 'https://docs.aws.amazon.com/cognito/latest/developerguide/iam-roles.html', checked: '2026-11-25' },
+        { title: 'Using IAM policy conditions for fine-grained access control – Amazon DynamoDB Developer Guide', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec13',
@@ -163,7 +208,11 @@ export const security = {
         'Environment variable credentials come earlier in the chain than the instance role'
       ],
       correctAnswer: 3,
-      explanation: 'The default provider chain checks sources in order and stops at the first one it finds, and environment variables are checked before the EC2 instance metadata role, so the old IAM user keys are used. The SDK never merges credentials from several sources, and the instance profile is checked late in the chain, not first. The IMDSv2 hop limit affects containers on the instance, not a process on the host, and the trail shows a user, not a failed role lookup.'
+      explanation: 'The default provider chain checks sources in order and stops at the first one it finds, and environment variables are checked before the EC2 instance metadata role, so the old IAM user keys are used. The SDK never merges credentials from several sources, and the instance profile is checked late in the chain, not first. The IMDSv2 hop limit affects containers on the instance, not a process on the host, and the trail shows a user, not a failed role lookup.',
+      sources: [
+        { title: 'AWS SDKs and Tools standardized credential providers – AWS SDKs and Tools Reference Guide', url: 'https://docs.aws.amazon.com/sdkref/latest/guide/standardized-credentials.html', checked: '2026-11-25' },
+        { title: 'Default credentials provider chain in the AWS SDK for Java 2.x – AWS SDK for Java 2.x Developer Guide', url: 'https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials-chain.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec14',
@@ -175,7 +224,10 @@ export const security = {
         'Attach S3 permission policies directly to each user pool group in the Cognito console'
       ],
       correctAnswer: 0,
-      explanation: 'User pool groups can carry an IAM role ARN and a precedence; the token then includes the role claims, and the identity pool setting to choose the role from the token issues credentials for that role. Separate user pools add operational overhead for a simple role split. The unauthenticated role is for guests who have not signed in, and user pool groups reference IAM roles rather than holding permission policies themselves.'
+      explanation: 'User pool groups can carry an IAM role ARN and a precedence; the token then includes the role claims, and the identity pool setting to choose the role from the token issues credentials for that role. Separate user pools add operational overhead for a simple role split. The unauthenticated role is for guests who have not signed in, and user pool groups reference IAM roles rather than holding permission policies themselves.',
+      sources: [
+        { title: 'Using role-based access control – Amazon Cognito Developer Guide', url: 'https://docs.aws.amazon.com/cognito/latest/developerguide/role-based-access-control.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec15',
@@ -187,7 +239,11 @@ export const security = {
         'Change the KMS key to an asymmetric RSA key spec that accepts larger input'
       ],
       correctAnswer: 2,
-      explanation: 'Encrypt accepts at most 4 KB of plaintext, so larger data uses envelope encryption: GenerateDataKey returns a plaintext data key to encrypt the file locally and an encrypted copy of that key to store next to the ciphertext. The 4 KB limit is fixed, not an adjustable quota. Chunking multiplies KMS requests and cost, and asymmetric keys accept even less plaintext than symmetric keys.'
+      explanation: 'Encrypt accepts at most 4 KB of plaintext, so larger data uses envelope encryption: GenerateDataKey returns a plaintext data key to encrypt the file locally and an encrypted copy of that key to store next to the ciphertext. The 4 KB limit is fixed, not an adjustable quota. Chunking multiplies KMS requests and cost, and asymmetric keys accept even less plaintext than symmetric keys.',
+      sources: [
+        { title: 'Encrypt – AWS Key Management Service API Reference', url: 'https://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html', checked: '2026-11-25' },
+        { title: 'Generate data keys – AWS Key Management Service Developer Guide', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/data-keys.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec16',
@@ -199,7 +255,11 @@ export const security = {
         'Call the Encrypt API directly for each message instead of GenerateDataKey'
       ],
       correctAnswer: 1,
-      explanation: 'Data key caching in the AWS Encryption SDK reuses a data key for a bounded number of messages, bytes or time, cutting GenerateDataKey calls sharply. KMS request quotas apply per account and Region across keys, so more keys or an AWS managed key do not raise the limit. Calling Encrypt for every message still sends one request per message, so throttling continues.'
+      explanation: 'Data key caching in the AWS Encryption SDK reuses a data key for a bounded number of messages, bytes or time, cutting GenerateDataKey calls sharply. KMS request quotas apply per account and Region across keys, so more keys or an AWS managed key do not raise the limit. Calling Encrypt for every message still sends one request per message, so throttling continues.',
+      sources: [
+        { title: 'Data key caching – AWS Encryption SDK Developer Guide', url: 'https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/data-key-caching.html', checked: '2026-11-25' },
+        { title: 'Request quotas – AWS Key Management Service Developer Guide', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/requests-per-second.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec17',
@@ -211,11 +271,14 @@ export const security = {
         'Replace the key with a multi-Region KMS key in the same Region'
       ],
       correctAnswer: 0,
-      explanation: 'An S3 Bucket Key is a short-lived bucket-level key derived from the KMS key, so S3 no longer calls KMS for every object and KMS request volume and cost drop sharply. SSE-C would force every client to send the key with each request, which is a large code change. Key rotation changes key material, not request volume, and a multi-Region key has the same per-request behavior.'
+      explanation: 'An S3 Bucket Key is a short-lived bucket-level key derived from the KMS key, so S3 no longer calls KMS for every object and KMS request volume and cost drop sharply. SSE-C would force every client to send the key with each request, which is a large code change. Key rotation changes key material, not request volume, and a multi-Region key has the same per-request behavior.',
+      sources: [
+        { title: 'Reducing the cost of SSE-KMS with Amazon S3 Bucket Keys – Amazon S3 User Guide', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec18',
-      question: 'A compliance standard requires that objects in Amazon S3 be protected by two independent layers of encryption applied on the server side, using keys managed in AWS KMS. Which option meets this requirement with the least effort?',
+      question: 'A compliance standard requires that objects in Amazon S3 be protected by two independent layers of encryption applied on the server side, using AWS KMS. Which option meets this requirement with the least effort?',
       options: [
         'SSE-S3 default encryption with S3 Bucket Keys enabled',
         'SSE-KMS with a customer managed key and automatic rotation',
@@ -223,7 +286,10 @@ export const security = {
         'DSSE-KMS, dual-layer server-side encryption with KMS keys'
       ],
       correctAnswer: 3,
-      explanation: 'DSSE-KMS applies two layers of encryption to each object on the server side using AWS KMS keys, which is designed for standards that require multilayer encryption. SSE-S3, SSE-KMS and SSE-C each apply a single layer, and Bucket Keys or rotation do not add a second layer. Building two layers yourself with client-side encryption would work but adds far more effort.'
+      explanation: 'DSSE-KMS applies two independent layers of AES-256 encryption to each object on the server side, the first with a data key generated by AWS KMS and the second with a separate key managed by S3, which is designed for standards that require multilayer encryption. SSE-S3, SSE-KMS and SSE-C each apply a single layer, and Bucket Keys or rotation do not add a second layer. Building two layers yourself with client-side encryption would work but adds far more effort.',
+      sources: [
+        { title: 'Using dual-layer server-side encryption with AWS KMS keys (DSSE-KMS) – Amazon S3 User Guide', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingDSSEncryption.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec19',
@@ -235,7 +301,11 @@ export const security = {
         'DSSE-KMS with a customer managed key in a CloudHSM key store'
       ],
       correctAnswer: 1,
-      explanation: 'With SSE-C the client sends its own key in each PUT and GET request, S3 uses it to encrypt or decrypt and then discards it, storing only a salted HMAC of the key to validate later requests; HTTPS is required. Imported key material and a CloudHSM key store keep the key inside AWS KMS or AWS CloudHSM, which the policy forbids. SSE-S3 uses keys that S3 manages.'
+      explanation: 'With SSE-C the client sends its own key in each PUT and GET request, S3 uses it to encrypt or decrypt and then discards it, storing only a salted HMAC of the key to validate later requests; HTTPS is required. Since April 2026 new buckets block SSE-C by default, so the developer must first allow it in the bucket default encryption settings. Imported key material and a CloudHSM key store keep the key inside AWS KMS or AWS CloudHSM, which the policy forbids. SSE-S3 uses keys that S3 manages.',
+      sources: [
+        { title: 'Using server-side encryption with customer-provided keys (SSE-C) – Amazon S3 User Guide', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerSideEncryptionCustomerKeys.html', checked: '2026-11-25' },
+        { title: 'Specifying server-side encryption with customer-provided keys (SSE-C) – Amazon S3 User Guide', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/specifying-s3-c-encryption.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec20',
@@ -247,7 +317,10 @@ export const security = {
         'Store each tenant ciphertext under a separate S3 prefix with its own policy'
       ],
       correctAnswer: 2,
-      explanation: 'Encryption context is non-secret key-value data bound to the ciphertext as additional authenticated data: Decrypt fails unless the exact same context is supplied, and the context is recorded in CloudTrail. Grants control who may use the key, not which ciphertext belongs to which tenant. Rotation changes key material for everyone on a schedule, and S3 prefixes do not bind ciphertext to a tenant at the cryptographic level.'
+      explanation: 'Encryption context is non-secret key-value data bound to the ciphertext as additional authenticated data: Decrypt fails unless the exact same context is supplied, and the context is recorded in CloudTrail. Grants control who may use the key, not which ciphertext belongs to which tenant. Rotation changes key material for everyone on a schedule, and S3 prefixes do not bind ciphertext to a tenant at the cryptographic level.',
+      sources: [
+        { title: 'Encryption context – AWS Key Management Service Developer Guide', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/encrypt_context.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec21',
@@ -259,7 +332,10 @@ export const security = {
         'Enable automatic key rotation on the existing customer managed key'
       ],
       correctAnswer: 3,
-      explanation: 'Automatic rotation adds new key material on a schedule while keeping the same key ID and ARN and retaining older material, so existing ciphertext still decrypts and no code changes are needed. Creating new keys and re-encrypting data is manual work that changes the key ID. Scheduling deletion destroys the key and makes data unrecoverable, and AWS owned keys give the team no visibility or audit evidence of rotation.'
+      explanation: 'Automatic rotation adds new key material on a schedule while keeping the same key ID and ARN and retaining older material, so existing ciphertext still decrypts and no code changes are needed. Creating new keys and re-encrypting data is manual work that changes the key ID. Scheduling deletion destroys the key and makes data unrecoverable, and AWS owned keys give the team no visibility or audit evidence of rotation.',
+      sources: [
+        { title: 'Rotate AWS KMS keys – AWS Key Management Service Developer Guide', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec22',
@@ -271,7 +347,10 @@ export const security = {
         'Copy the key material into a new key for each job and delete it afterward'
       ],
       correctAnswer: 0,
-      explanation: 'KMS grants delegate specific operations on one key to a principal programmatically and can be retired or revoked when no longer needed, without touching the key policy. Editing the key policy per job is exactly what is not allowed and risks breaking the policy. A kms:* policy on every key violates least privilege, and KMS key material cannot be exported or copied into another key.'
+      explanation: 'KMS grants delegate specific operations on one key to a principal programmatically and can be retired or revoked when no longer needed, without touching the key policy. Editing the key policy per job is exactly what is not allowed and risks breaking the policy. A kms:* policy on every key violates least privilege, and KMS key material cannot be exported or copied into another key.',
+      sources: [
+        { title: 'Grants in AWS KMS – AWS Key Management Service Developer Guide', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/grants.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec23',
@@ -283,7 +362,11 @@ export const security = {
         'A switch to the aws/s3 AWS managed key so that it can be shared'
       ],
       correctAnswer: 1,
-      explanation: 'Cross-account use of a KMS key needs both sides: the key policy in account A must allow account B (or the role), and an IAM policy in account B must grant kms:Decrypt on the key ARN. An IAM policy alone cannot reach a key in another account. ReplicateKey creates multi-Region replicas within the same account, and AWS managed keys cannot be used cross-account because their key policies cannot be edited.'
+      explanation: 'Cross-account use of a KMS key needs both sides: the key policy in account A must allow account B (or the role), and an IAM policy in account B must grant kms:Decrypt on the key ARN. An IAM policy alone cannot reach a key in another account. ReplicateKey creates multi-Region replicas within the same account, and AWS managed keys cannot be used cross-account because their key policies cannot be edited.',
+      sources: [
+        { title: 'Allowing users in other accounts to use a KMS key – AWS Key Management Service Developer Guide', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-modifying-external-accounts.html', checked: '2026-11-25' },
+        { title: 'AWS KMS keys – AWS Key Management Service Developer Guide', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec24',
@@ -295,7 +378,11 @@ export const security = {
         'Request a private certificate from AWS Private CA in eu-west-1'
       ],
       correctAnswer: 2,
-      explanation: 'CloudFront, and API Gateway edge-optimized endpoints, can only use ACM certificates from us-east-1 (N. Virginia), whereas Regional API Gateway endpoints and load balancers use certificates in their own Region. ACM certificates are Regional resources with no cross-Region sharing setting. Validation status is not tied to edge locations, and a private CA certificate would not be trusted by public browsers.'
+      explanation: 'CloudFront, and API Gateway edge-optimized endpoints, can only use ACM certificates from us-east-1 (N. Virginia), whereas Regional API Gateway endpoints and load balancers use certificates in their own Region. ACM certificates are Regional resources with no cross-Region sharing setting. Validation status is not tied to edge locations, and a private CA certificate would not be trusted by public browsers.',
+      sources: [
+        { title: 'Requirements for using SSL/TLS certificates with CloudFront – Amazon CloudFront Developer Guide', url: 'https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cnames-and-https-requirements.html', checked: '2026-11-25' },
+        { title: 'What is AWS Certificate Manager? – AWS Certificate Manager User Guide', url: 'https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec25',
@@ -307,7 +394,11 @@ export const security = {
         'The AWS managed key aws/dynamodb with an edited key policy for the team'
       ],
       correctAnswer: 0,
-      explanation: 'A customer managed key gives full control of the key policy, lets the team disable or schedule deletion of the key, and logs its use in CloudTrail. The AWS owned key is the default and is invisible in the account. DynamoDB always encrypts data at rest and it cannot be turned off, and AWS managed keys are visible in CloudTrail but their key policies cannot be edited.'
+      explanation: 'A customer managed key gives full control of the key policy, lets the team disable or schedule deletion of the key, and logs its use in CloudTrail. The AWS owned key is the default and is invisible in the account. DynamoDB always encrypts data at rest and it cannot be turned off, and AWS managed keys are visible in CloudTrail but their key policies cannot be edited.',
+      sources: [
+        { title: 'DynamoDB encryption at rest – Amazon DynamoDB Developer Guide', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/EncryptionAtRest.html', checked: '2026-11-25' },
+        { title: 'AWS KMS keys – AWS Key Management Service Developer Guide', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec26',
@@ -319,7 +410,10 @@ export const security = {
         'Encrypt on the client with the Amazon S3 Encryption Client and a KMS key'
       ],
       correctAnswer: 3,
-      explanation: 'Client-side encryption encrypts the data in the application before upload, using a data key protected by KMS, so S3 stores only ciphertext. SSE-KMS and DSSE-KMS are server-side: S3 receives the plaintext over TLS and encrypts it at rest. Requiring aws:SecureTransport protects data in transit but S3 still receives the plaintext.'
+      explanation: 'Client-side encryption encrypts the data in the application before upload, using a data key protected by KMS, so S3 stores only ciphertext. SSE-KMS and DSSE-KMS are server-side: S3 receives the plaintext over TLS and encrypts it at rest. Requiring aws:SecureTransport protects data in transit but S3 still receives the plaintext.',
+      sources: [
+        { title: 'Protecting data by using client-side encryption – Amazon S3 User Guide', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingClientSideEncryption.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec27',
@@ -331,7 +425,10 @@ export const security = {
         'A customer managed KMS key with automatic rotation protecting the password'
       ],
       correctAnswer: 2,
-      explanation: 'Secrets Manager rotates the secret on a schedule using a rotation Lambda function (or managed rotation for supported databases) that updates both the database and the secret, and the function always reads the current value. Parameter Store has no built-in rotation; an expiration policy only notifies. Environment variables need a configuration update to change, and KMS key rotation changes the encryption key, not the database password.'
+      explanation: 'Secrets Manager rotates the secret on a schedule using a rotation Lambda function (or managed rotation for supported databases) that updates both the database and the secret, and the function always reads the current value. Parameter Store has no built-in rotation; an expiration policy only notifies. Environment variables need a configuration update to change, and KMS key rotation changes the encryption key, not the database password.',
+      sources: [
+        { title: 'Rotate AWS Secrets Manager secrets – AWS Secrets Manager User Guide', url: 'https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec28',
@@ -343,7 +440,11 @@ export const security = {
         'A DynamoDB table encrypted at rest with a customer managed key'
       ],
       correctAnswer: 1,
-      explanation: 'Standard Parameter Store parameters have no storage charge, and SecureString encrypts values with a KMS key, which fits values that do not need rotation. Secrets Manager charges for each secret per month and its main advantage, built-in rotation, is not required. AppConfig is meant for non-secret application configuration and feature flags, and a DynamoDB table means writing custom access code and paying for the table.'
+      explanation: 'Standard Parameter Store parameters have no storage charge, and SecureString encrypts values with a KMS key, which fits values that do not need rotation. Secrets Manager charges for each secret per month and its main advantage, built-in rotation, is not required. AppConfig is meant for non-secret application configuration and feature flags, and a DynamoDB table means writing custom access code and paying for the table.',
+      sources: [
+        { title: 'Choosing parameter tiers in Parameter Store – AWS Systems Manager User Guide', url: 'https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-advanced-parameters.html', checked: '2026-11-25' },
+        { title: 'Pricing | AWS Secrets Manager', url: 'https://aws.amazon.com/secrets-manager/pricing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec29',
@@ -355,7 +456,10 @@ export const security = {
         'Increase the function memory so that each GetSecretValue call completes faster'
       ],
       correctAnswer: 0,
-      explanation: 'The AWS Parameters and Secrets Lambda Extension runs a local cache in the execution environment, so the function retrieves secrets over a localhost endpoint and Secrets Manager is called only when the cache expires; caching client libraries work similarly. A plaintext environment variable exposes the secret and stops reflecting rotation. Provisioned concurrency does not change code that fetches the secret on every invocation, and more memory does not remove the network call.'
+      explanation: 'The AWS Parameters and Secrets Lambda Extension runs a local cache in the execution environment, so the function retrieves secrets over a localhost endpoint and Secrets Manager is called only when the cache expires; caching client libraries work similarly. A plaintext environment variable exposes the secret and stops reflecting rotation. Provisioned concurrency does not change code that fetches the secret on every invocation, and more memory does not remove the network call.',
+      sources: [
+        { title: 'Use AWS Secrets Manager secrets in AWS Lambda functions – AWS Secrets Manager User Guide', url: 'https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets_lambda.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec30',
@@ -367,7 +471,10 @@ export const security = {
         'Set a customer managed KMS key in the function encryption configuration'
       ],
       correctAnswer: 3,
-      explanation: 'Lambda always encrypts environment variables at rest; specifying a customer managed KMS key gives the team control of the key policy, CloudTrail visibility and the ability to disable the key. The default AWS managed key cannot have its policy edited or be disabled. A String parameter is not encrypted, and code signing verifies deployment packages rather than protecting configuration values.'
+      explanation: 'Lambda always encrypts environment variables at rest; specifying a customer managed KMS key gives the team control of the key policy, CloudTrail visibility and the ability to disable the key. The default AWS managed key cannot have its policy edited or be disabled. A String parameter is not encrypted, and code signing verifies deployment packages rather than protecting configuration values.',
+      sources: [
+        { title: 'Securing Lambda environment variables – AWS Lambda Developer Guide', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars-encryption.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec31',
@@ -379,7 +486,10 @@ export const security = {
         'Reduce the log group retention period to the shortest available value'
       ],
       correctAnswer: 1,
-      explanation: 'A CloudWatch Logs data protection policy detects sensitive data types such as card numbers and email addresses and masks them for readers without the logs:Unmask permission. Encrypting the log group with KMS protects data at rest but readers still see plaintext. Macie discovers sensitive data in S3, not in log groups, and shorter retention still leaves the data visible until it expires. The lasting fix is to stop logging the sensitive fields.'
+      explanation: 'A CloudWatch Logs data protection policy detects sensitive data types such as card numbers and email addresses and masks them for readers without the logs:Unmask permission. Encrypting the log group with KMS protects data at rest but readers still see plaintext. Macie discovers sensitive data in S3, not in log groups, and shorter retention still leaves the data visible until it expires. The lasting fix is to stop logging the sensitive fields.',
+      sources: [
+        { title: 'Help protect sensitive log data with masking – Amazon CloudWatch Logs User Guide', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/mask-sensitive-log-data.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec32',
@@ -391,7 +501,11 @@ export const security = {
         'SSM Parameter Store advanced parameters with parameter policies'
       ],
       correctAnswer: 2,
-      explanation: 'AWS AppConfig deploys configuration and feature flags with JSON Schema or Lambda validators, gradual deployment strategies and automatic rollback on CloudWatch alarms. Secrets Manager is for secrets and has no staged rollout of configuration. Updating environment variables applies the change to all new invocations at once with no validation, and Parameter Store policies handle expiration and notifications, not gradual deployment.'
+      explanation: 'AWS AppConfig deploys configuration and feature flags with JSON Schema or Lambda validators, gradual deployment strategies and automatic rollback on CloudWatch alarms. Secrets Manager is for secrets and has no staged rollout of configuration. Updating environment variables applies the change to all new invocations at once with no validation, and Parameter Store policies handle expiration and notifications, not gradual deployment.',
+      sources: [
+        { title: 'Working with deployment strategies – AWS AppConfig User Guide', url: 'https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-creating-deployment-strategy.html', checked: '2026-11-25' },
+        { title: 'Understanding validators – AWS AppConfig User Guide', url: 'https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-creating-configuration-and-profile-validators.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec33',
@@ -403,7 +517,10 @@ export const security = {
         'Edit the aws/secretsmanager key policy in account A so that account B can call kms:Decrypt'
       ],
       correctAnswer: 0,
-      explanation: 'Cross-account access to a secret needs a resource policy on the secret, an IAM policy in account B, and a customer managed KMS key whose key policy allows account B to decrypt. The AWS managed aws/secretsmanager key cannot be used across accounts and its key policy cannot be edited, so a resource policy alone still fails. Replication copies secrets to other Regions in the same account, not to other accounts.'
+      explanation: 'Cross-account access to a secret needs a resource policy on the secret, an IAM policy in account B, and a customer managed KMS key whose key policy allows account B to decrypt. The AWS managed aws/secretsmanager key cannot be used across accounts and its key policy cannot be edited, so a resource policy alone still fails. Replication copies secrets to other Regions in the same account, not to other accounts.',
+      sources: [
+        { title: 'Access AWS Secrets Manager secrets from a different account – AWS Secrets Manager User Guide', url: 'https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_examples_cross.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'sec34',
@@ -415,7 +532,11 @@ export const security = {
         'Set WithDecryption to true and give the role kms:Decrypt on the key'
       ],
       correctAnswer: 3,
-      explanation: 'GetParameter returns SecureString values encrypted unless WithDecryption is true, and the caller also needs kms:Decrypt on the KMS key that protects the parameter. Changing the type to String removes encryption, and both standard and advanced tiers support SecureString. Calling Encrypt would encrypt the value again rather than decrypting it.'
+      explanation: 'GetParameter returns SecureString values encrypted unless WithDecryption is true, and the caller also needs kms:Decrypt on the KMS key that protects the parameter. Changing the type to String removes encryption, and both standard and advanced tiers support SecureString. Calling Encrypt would encrypt the value again rather than decrypting it.',
+      sources: [
+        { title: 'GetParameter – AWS Systems Manager API Reference', url: 'https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_GetParameter.html', checked: '2026-11-25' },
+        { title: 'AWS KMS encryption for AWS Systems Manager Parameter Store SecureString parameters – AWS Systems Manager User Guide', url: 'https://docs.aws.amazon.com/systems-manager/latest/userguide/secure-string-parameter-kms-encryption.html', checked: '2026-11-25' }
+      ]
     }
   ]
 };
