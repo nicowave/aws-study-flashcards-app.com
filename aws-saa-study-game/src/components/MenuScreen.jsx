@@ -1,5 +1,6 @@
 import React from 'react';
 import NewsletterSignup from './NewsletterSignup';
+import { XP_PER_LEVEL, currentLevelProgress } from '../data/constants';
 import { TrophyIcon, TargetIcon, FlameIcon, VolumeIcon, VolumeOffIcon, BookOpenIcon, ChartIcon } from './Icons';
 
 const MenuScreen = ({
@@ -14,8 +15,9 @@ const MenuScreen = ({
 }) => {
   const { level = 1, xp = 0, totalAnswered = 0, totalCorrect = 0, maxStreak = 0 } = globalStats || {};
   const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
-  const xpForNextLevel = level * 100;
-  const xpProgress = (xp % 100) / 100 * 100;
+  // Every level takes the same XP_PER_LEVEL, so progress is the XP earned inside the current level
+  const levelXp = currentLevelProgress(xp);
+  const xpProgress = (levelXp / XP_PER_LEVEL) * 100;
 
   return (
     <div className="menu-screen">
@@ -35,7 +37,7 @@ const MenuScreen = ({
           <div className="xp-bar">
             <div className="xp-fill" style={{ width: `${xpProgress}%` }}></div>
           </div>
-          <span className="xp-text">{xp % 100} / {xpForNextLevel} XP</span>
+          <span className="xp-text">{levelXp} / {XP_PER_LEVEL} XP</span>
         </div>
 
         <div className="quick-stats">

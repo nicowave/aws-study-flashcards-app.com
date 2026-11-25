@@ -57,9 +57,9 @@ describe('StatsScreen', () => {
     expect(screen.getByRole('heading', { name: 'Achievements (2)' })).toBeInTheDocument();
   });
 
-  // Bug: useGameStats stores unlocked achievements as ids ('first_blood'), and the screen
-  // prints `achievement.name || achievement`, so learners see the raw id, not the name.
-  it.fails('shows unlocked achievements by name, as stored by useGameStats (ids)', () => {
+  // Regression: useGameStats stores unlocked achievements as ids ('first_blood'); the screen
+  // once printed the raw id instead of the name.
+  it('shows unlocked achievements by name, as stored by useGameStats (ids)', () => {
     const first = achievements[0];
     render(<StatsScreen globalStats={{ ...stats, unlockedAchievements: [first.id] }} onBack={() => {}} onReset={() => {}} />);
     expect(screen.getByText(first.name)).toBeInTheDocument();
@@ -93,8 +93,8 @@ describe('StatsScreen', () => {
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 
-  // Bug: same as the menu; each level is 100 XP, but progress is shown out of level * 100.
-  it.fails('shows XP progress toward the next level out of 100 XP', () => {
+  // Regression: same as the menu; each level is 100 XP, but progress was once shown out of level * 100.
+  it('shows XP progress toward the next level out of 100 XP', () => {
     render(<StatsScreen globalStats={{ ...stats, level: 3, xp: 250 }} onBack={() => {}} onReset={() => {}} />);
     expect(screen.getByText(/to next level/)).toHaveTextContent('50 / 100 XP to next level');
   });

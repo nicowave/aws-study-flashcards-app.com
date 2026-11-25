@@ -72,9 +72,9 @@ describe('MenuScreen', () => {
     expect(screen.getByRole('button', { name: /Sound Off/ })).toBeInTheDocument();
   });
 
-  // Bug: levels are 100 XP apart (XP_PER_LEVEL), but the text divides by level * 100,
-  // so a level-3 learner halfway to level 4 reads "50 / 300 XP" instead of "50 / 100 XP".
-  it.fails('shows XP progress toward the next level out of the 100 XP each level needs', () => {
+  // Regression: levels are 100 XP apart (XP_PER_LEVEL); the text once divided by level * 100,
+  // so a level-3 learner halfway to level 4 read "50 / 300 XP" instead of "50 / 100 XP".
+  it('shows XP progress toward the next level out of the 100 XP each level needs', () => {
     render(<MenuScreen {...props({ globalStats: { level: 3, xp: 250 } })} />);
     expect(screen.getByText(/XP$/, { selector: '.xp-text' })).toHaveTextContent('50 / 100 XP');
   });

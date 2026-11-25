@@ -18,6 +18,12 @@ const props = (over = {}) => ({
 const statValue = (label) => screen.getByText(label, { selector: '.stat-label' }).previousElementSibling;
 
 describe('ResultsScreen', () => {
+  // Regression: "Best Streak" once showed the current streak, which a final wrong answer resets to 0
+  it('shows the best streak of the session, not the streak left after a miss', () => {
+    render(<ResultsScreen {...props({ sessionStats: { correct: 3, total: 4, streak: 0, bestStreak: 3, xpEarned: 30 } })} />);
+    expect(statValue('Best Streak')).toHaveTextContent('3');
+  });
+
   it('shows the score, accuracy, streak and XP from the session', () => {
     render(<ResultsScreen {...props()} />);
     expect(screen.getByRole('heading', { name: /Quiz Complete/ })).toBeInTheDocument();

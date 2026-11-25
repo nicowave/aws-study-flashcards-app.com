@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { domains } from '../data';
+import { achievements } from '../data/achievements';
+import { XP_PER_LEVEL, currentLevelProgress } from '../data/constants';
 import { 
   ArrowLeftIcon, 
   TrophyIcon, 
@@ -25,8 +27,9 @@ const StatsScreen = ({ globalStats, onBack, onReset }) => {
   } = globalStats || {};
 
   const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
-  const xpForNextLevel = level * 100;
-  const xpProgress = (xp % 100);
+  // Every level takes the same XP_PER_LEVEL, so progress is the XP earned inside the current level
+  const xpForNextLevel = XP_PER_LEVEL;
+  const xpProgress = currentLevelProgress(xp);
 
   const handleResetClick = () => {
     setShowResetConfirm(true);
@@ -135,7 +138,8 @@ const StatsScreen = ({ globalStats, onBack, onReset }) => {
             {unlockedAchievements.map((achievement, index) => (
               <div key={index} className="achievement-card">
                 <span className="achievement-icon">🏆</span>
-                <span className="achievement-name">{achievement.name || achievement}</span>
+                {/* useGameStats stores ids ('first_blood'); show the achievement's name */}
+                <span className="achievement-name">{achievement.name || achievements.find((a) => a.id === achievement)?.name || achievement}</span>
               </div>
             ))}
           </div>
