@@ -20,7 +20,11 @@ export const resilientArchitectures = {
         'Move the processing fleet to a larger instance type and enable detailed CloudWatch monitoring'
       ],
       correctAnswer: 2,
-      explanation: 'An SQS queue durably buffers orders so the web tier is decoupled from the processing tier, and scaling the consumers on backlog per instance matches capacity to demand. A load balancer still delivers requests synchronously, so an overwhelmed fleet still drops work. SNS push delivery to HTTP endpoints is not a durable work buffer for busy consumers, and a larger instance only raises the ceiling without decoupling the tiers.'
+      explanation: 'An SQS queue durably buffers orders so the web tier is decoupled from the processing tier, and scaling the consumers on backlog per instance matches capacity to demand. A load balancer still delivers requests synchronously, so an overwhelmed fleet still drops work. SNS push delivery to HTTP endpoints is not a durable work buffer for busy consumers, and a larger instance only raises the ceiling without decoupling the tiers.',
+      sources: [
+        { title: 'What is Amazon Simple Queue Service? – Amazon Simple Queue Service', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html', checked: '2026-11-25' },
+        { title: 'Scaling policy based on Amazon SQS – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-using-sqs-queue.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res2',
@@ -32,7 +36,11 @@ export const resilientArchitectures = {
         'An Amazon SNS standard topic with an Amazon SQS standard queue subscribed to it'
       ],
       correctAnswer: 0,
-      explanation: 'SQS FIFO queues preserve order and deduplicate within a message group, and using the account ID as the group ID keeps each account ordered while different groups are consumed in parallel. A single fixed group ID would serialize every message and destroy parallelism. Standard queues and standard SNS topics offer best-effort ordering and at-least-once delivery, so client-side sorting cannot guarantee order or exactly-once processing.'
+      explanation: 'SQS FIFO queues preserve order and deduplicate within a message group, and using the account ID as the group ID keeps each account ordered while different groups are consumed in parallel. A single fixed group ID would serialize every message and destroy parallelism. Standard queues and standard SNS topics offer best-effort ordering and at-least-once delivery, so client-side sorting cannot guarantee order or exactly-once processing.',
+      sources: [
+        { title: 'Using the message group ID with Amazon SQS FIFO Queues – Amazon Simple Queue Service', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/using-messagegroupid-property.html', checked: '2026-11-25' },
+        { title: 'FIFO queue delivery logic in Amazon SQS – Amazon Simple Queue Service', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-understanding-logic.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res3',
@@ -44,7 +52,10 @@ export const resilientArchitectures = {
         'Raise the visibility timeout above the longest expected processing time'
       ],
       correctAnswer: 3,
-      explanation: 'The default visibility timeout is 30 seconds, so a message still being processed becomes visible again and another worker receives it; setting the timeout above the maximum processing time prevents this. Long polling only reduces empty receives, and retention controls how long unprocessed messages are kept, not redelivery. A DLQ with a receive count of 1 would move healthy, slow messages aside instead of fixing the cause.'
+      explanation: 'The default visibility timeout is 30 seconds, so a message still being processed becomes visible again and another worker receives it; setting the timeout above the maximum processing time prevents this. Long polling only reduces empty receives, and retention controls how long unprocessed messages are kept, not redelivery. A DLQ with a receive count of 1 would move healthy, slow messages aside instead of fixing the cause.',
+      sources: [
+        { title: 'Amazon SQS visibility timeout – Amazon Simple Queue Service', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res4',
@@ -56,7 +67,11 @@ export const resilientArchitectures = {
         'Switch consumers to short polling so they receive the failing messages less often'
       ],
       correctAnswer: 1,
-      explanation: 'A redrive policy moves a message to the dead-letter queue once its receive count exceeds the configured maximum, isolating poison messages for analysis, and a DLQ redrive can return them to the source queue after a fix. Longer retention keeps the failing messages cycling for longer. Encryption does not validate payloads, and short polling changes how receives are sampled, not how failures are handled.'
+      explanation: 'A redrive policy moves a message to the dead-letter queue once its receive count exceeds the configured maximum, isolating poison messages for analysis, and a DLQ redrive can return them to the source queue after a fix. Longer retention keeps the failing messages cycling for longer. Encryption does not validate payloads, and short polling changes how receives are sampled, not how failures are handled.',
+      sources: [
+        { title: 'Using dead-letter queues in Amazon SQS – Amazon Simple Queue Service', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html', checked: '2026-11-25' },
+        { title: 'Learn how to configure a dead-letter queue redrive in Amazon SQS – Amazon Simple Queue Service', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-dead-letter-queue-redrive.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res5',
@@ -68,7 +83,10 @@ export const resilientArchitectures = {
         'Set a delivery delay on the queue so that messages arrive in larger groups'
       ],
       correctAnswer: 1,
-      explanation: 'Long polling makes ReceiveMessage wait (up to 20 seconds) until a message arrives, which sharply cuts empty responses and request charges, and it is a queue or request setting rather than a code redesign. Queue type does not change empty-receive behavior. Visibility timeout governs redelivery of in-flight messages, and delivery delay postpones messages without reducing empty polls.'
+      explanation: 'Long polling makes ReceiveMessage wait (up to 20 seconds) until a message arrives, which sharply cuts empty responses and request charges, and it is a queue or request setting rather than a code redesign. Queue type does not change empty-receive behavior. Visibility timeout governs redelivery of in-flight messages, and delivery delay postpones messages without reducing empty polls.',
+      sources: [
+        { title: 'Amazon SQS short and long polling – Amazon Simple Queue Service', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res6',
@@ -80,7 +98,11 @@ export const resilientArchitectures = {
         'An Amazon SNS topic with a separate Amazon SQS queue subscribed per service'
       ],
       correctAnswer: 3,
-      explanation: 'The SNS-to-SQS fan-out pattern delivers a copy of every event to each queue, and each queue durably buffers events so a service that is down can catch up later. With one shared queue, each message is consumed by only one service. HTTPS subscriptions are retried for a limited time but do not buffer for long outages, and each Kinesis shard holds different records, so a service reading one shard would see only a subset.'
+      explanation: 'The SNS-to-SQS fan-out pattern delivers a copy of every event to each queue, and each queue durably buffers events so a service that is down can catch up later. With one shared queue, each message is consumed by only one service. HTTPS subscriptions are retried for a limited time but do not buffer for long outages, and each Kinesis shard holds different records, so a service reading one shard would see only a subset.',
+      sources: [
+        { title: 'Fanout Amazon SNS notifications to Amazon SQS queues for asynchronous processing – Amazon Simple Notification Service', url: 'https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html', checked: '2026-11-25' },
+        { title: 'Amazon SNS message delivery retries – Amazon Simple Notification Service', url: 'https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res7',
@@ -92,7 +114,11 @@ export const resilientArchitectures = {
         'Amazon Kinesis Data Streams with an enhanced fan-out consumer per target'
       ],
       correctAnswer: 0,
-      explanation: 'EventBridge natively receives SaaS partner events on a partner event bus and uses rules with event patterns to match on any field in the event body and route to many targets. SNS filtering depends on the publisher setting attributes and has no native SaaS integration. The SQS and Kinesis options both require custom routing code to inspect events and invoke each target.'
+      explanation: 'EventBridge natively receives SaaS partner events through a partner event source associated with an event bus, and uses rules with event patterns to match on any field in the event body and route to many targets. SNS filter policies can match message attributes or the message body, but SNS has no native SaaS partner event sources. The SQS and Kinesis options both require custom routing code to inspect events and invoke each target.',
+      sources: [
+        { title: 'Receiving events from a SaaS partner with Amazon EventBridge – Amazon EventBridge', url: 'https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas.html', checked: '2026-11-25' },
+        { title: 'Amazon EventBridge event patterns – Amazon EventBridge', url: 'https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res8',
@@ -104,7 +130,11 @@ export const resilientArchitectures = {
         'An Amazon SNS topic subscribed to the table stream with a filter policy per target'
       ],
       correctAnswer: 2,
-      explanation: 'EventBridge Pipes connect a source such as a DynamoDB stream to a target such as Step Functions, with built-in filtering and an optional enrichment step, so no glue code is needed. A rule on the default bus sees AWS API calls via CloudTrail, not item-level stream records. A Lambda function would work but is exactly the glue code the team wants to avoid, and SNS cannot subscribe to a DynamoDB stream.'
+      explanation: 'EventBridge Pipes connect a source such as a DynamoDB stream to a target such as Step Functions, with built-in filtering and an optional enrichment step, so no glue code is needed. A rule on the default bus sees AWS API calls via CloudTrail, not item-level stream records. A Lambda function would work but is exactly the glue code the team wants to avoid, and SNS cannot subscribe to a DynamoDB stream.',
+      sources: [
+        { title: 'Amazon EventBridge Pipes – Amazon EventBridge', url: 'https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html', checked: '2026-11-25' },
+        { title: 'Event enrichment in Amazon EventBridge Pipes – Amazon EventBridge', url: 'https://docs.aws.amazon.com/eventbridge/latest/userguide/pipes-enrichment.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res9',
@@ -116,7 +146,11 @@ export const resilientArchitectures = {
         'Amazon EventBridge Scheduler with a one-time schedule for each reminder'
       ],
       correctAnswer: 3,
-      explanation: 'EventBridge Scheduler is serverless, supports one-time and recurring schedules with time zones, and is built to hold very large numbers of schedules that invoke targets directly. Scheduled rules are limited by per-bus rule quotas and suit a small set of recurring patterns. An Auto Scaling group of one still leaves cron management on a server, and SQS delivery delays are capped at 15 minutes.'
+      explanation: 'EventBridge Scheduler is serverless, supports one-time and recurring schedules with time zones, and is built to hold very large numbers of schedules that invoke targets directly. Scheduled rules are limited by per-bus rule quotas and suit a small set of recurring patterns. An Auto Scaling group of one still leaves cron management on a server, and SQS delivery delays are capped at 15 minutes.',
+      sources: [
+        { title: 'What is Amazon EventBridge Scheduler? – EventBridge Scheduler', url: 'https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html', checked: '2026-11-25' },
+        { title: 'Amazon SQS delay queues – Amazon Simple Queue Service', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-delay-queues.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res10',
@@ -128,7 +162,11 @@ export const resilientArchitectures = {
         'AWS Step Functions Express Workflows started synchronously'
       ],
       correctAnswer: 0,
-      explanation: 'Standard Workflows can run for up to one year, provide exactly-once workflow execution, keep a full execution history, and can pause on a callback task token until a human approves. Express Workflows are limited to five minutes and offer at-least-once (asynchronous) or at-most-once (synchronous) execution, so neither fits a multi-day process. Chained Lambda functions are capped at 15 minutes each and give no built-in state tracking or audit history.'
+      explanation: 'Standard Workflows can run for up to one year, provide exactly-once workflow execution, keep a full execution history, and can pause on a callback task token until a human approves. Express Workflows are limited to five minutes and offer at-least-once (asynchronous) or at-most-once (synchronous) execution, so neither fits a multi-day process. Chained Lambda functions are capped at 30 minutes each (raised from 15 minutes; older material may still say 15) and give no built-in state tracking or audit history.',
+      sources: [
+        { title: 'Choosing workflow type in Step Functions – AWS Step Functions', url: 'https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html', checked: '2026-11-25' },
+        { title: 'Lambda quotas – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res11',
@@ -140,7 +178,11 @@ export const resilientArchitectures = {
         'An Application Load Balancer with AWS Lambda functions registered as targets'
       ],
       correctAnswer: 2,
-      explanation: 'REST APIs support stage-level response caching, usage plans tied to API keys for per-client quotas and throttling, and request validation. HTTP APIs are cheaper and faster but do not offer API caching or usage plans with API keys. WebSocket APIs are for persistent two-way connections, and an ALB has none of these API management features.'
+      explanation: 'REST APIs support stage-level response caching, usage plans tied to API keys for per-client quotas and throttling, and request validation. HTTP APIs are cheaper and faster but do not offer API caching or usage plans with API keys. WebSocket APIs are for persistent two-way connections, and an ALB has none of these API management features.',
+      sources: [
+        { title: 'Choose between REST APIs and HTTP APIs – Amazon API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html', checked: '2026-11-25' },
+        { title: 'Usage plans and API keys for REST APIs in API Gateway – Amazon API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res12',
@@ -152,7 +194,11 @@ export const resilientArchitectures = {
         'An Amazon SQS queue that each browser client reads with long polling'
       ],
       correctAnswer: 1,
-      explanation: 'WebSocket APIs keep a persistent, bidirectional connection open, so the backend can push messages to clients through the connection management API. REST and HTTP APIs are request-response, so they require polling, which is exactly what the requirement rules out. Having browsers poll SQS directly is still polling, exposes the queue to clients, and gives each message to only one consumer.'
+      explanation: 'WebSocket APIs keep a persistent, bidirectional connection open, so the backend can push messages to clients through the connection management API. REST and HTTP APIs are request-response, so they require polling, which is exactly what the requirement rules out. Having browsers poll SQS directly is still polling, exposes the queue to clients, and gives each message to only one consumer.',
+      sources: [
+        { title: 'API Gateway WebSocket APIs – Amazon API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html', checked: '2026-11-25' },
+        { title: 'Use @connections commands in your backend service – Amazon API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-how-to-call-websocket-api-connections.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res13',
@@ -164,7 +210,11 @@ export const resilientArchitectures = {
         'Enable Lambda SnapStart on the function'
       ],
       correctAnswer: 0,
-      explanation: 'Reserved concurrency sets aside that amount of concurrency for the function and also acts as its maximum, protecting both the database and the other functions in the account. Provisioned concurrency keeps execution environments pre-initialized to reduce cold starts but is not by itself a cap. More memory makes each invocation faster, and SnapStart reduces initialization latency; neither limits concurrency.'
+      explanation: 'Reserved concurrency sets aside that amount of concurrency for the function and also acts as its maximum, protecting both the database and the other functions in the account. Provisioned concurrency keeps execution environments pre-initialized to reduce cold starts but is not by itself a cap. More memory makes each invocation faster, and SnapStart reduces initialization latency; neither limits concurrency.',
+      sources: [
+        { title: 'Configuring reserved concurrency for an Event Function – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html', checked: '2026-11-25' },
+        { title: 'Configuring provisioned concurrency for an Event Function – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res14',
@@ -176,7 +226,11 @@ export const resilientArchitectures = {
         'Configure an on-failure destination that sends failed events to an SQS queue'
       ],
       correctAnswer: 3,
-      explanation: 'For asynchronous invocations, Lambda retries failed events (twice by default) and can then send the event plus invocation details to an on-failure destination such as an SQS queue, ready for reprocessing with no extra code. A longer timeout helps only if failures are timeouts. Logging errors keeps no replayable event, and S3 event notifications always invoke Lambda asynchronously, so the invocation type cannot simply be changed.'
+      explanation: 'For asynchronous invocations, Lambda retries failed events (twice by default) and can then send the event plus invocation details to an on-failure destination such as an SQS queue, ready for reprocessing with no extra code. A longer timeout helps only if failures are timeouts. Logging errors keeps no replayable event, and S3 event notifications always invoke Lambda asynchronously, so the invocation type cannot simply be changed.',
+      sources: [
+        { title: 'Capturing records of Lambda asynchronous invocations – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-retain-records.html', checked: '2026-11-25' },
+        { title: 'How Lambda handles errors and retries with asynchronous invocation – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-error-handling.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res15',
@@ -188,7 +242,10 @@ export const resilientArchitectures = {
         'Recreate the queue as FIFO so failures are retried last'
       ],
       correctAnswer: 1,
-      explanation: 'With ReportBatchItemFailures enabled, the function returns only the IDs of failed messages, so Lambda deletes the successful ones and only the failures become visible again. A batch size of 1 also avoids reprocessing but greatly reduces throughput and increases invocations. A longer visibility timeout only delays the retry of the whole batch, and FIFO queues retry failed groups in order rather than last.'
+      explanation: 'With ReportBatchItemFailures enabled, the function returns only the IDs of failed messages, so Lambda deletes the successful ones and only the failures become visible again. A batch size of 1 also avoids reprocessing but greatly reduces throughput and increases invocations. A longer visibility timeout only delays the retry of the whole batch, and FIFO queues retry failed groups in order rather than last.',
+      sources: [
+        { title: 'Handling errors for an SQS event source in Lambda – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res16',
@@ -200,7 +257,11 @@ export const resilientArchitectures = {
         'Docker installed on Amazon EC2 instances behind a load balancer'
       ],
       correctAnswer: 2,
-      explanation: 'ECS is AWS\'s native container orchestrator, and Fargate runs tasks without any instances to patch, scale, or manage. EKS adds Kubernetes complexity the team does not want, and self-managed nodes require server maintenance. The ECS EC2 launch type and plain Docker on EC2 both leave the team responsible for the underlying instances.'
+      explanation: 'ECS is AWS\'s native container orchestrator, and Fargate runs tasks without any instances to patch, scale, or manage. EKS adds Kubernetes complexity the team does not want, and self-managed nodes require server maintenance. The ECS EC2 launch type and plain Docker on EC2 both leave the team responsible for the underlying instances.',
+      sources: [
+        { title: 'Architect for AWS Fargate for Amazon ECS – Amazon Elastic Container Service', url: 'https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Elastic Container Service? – Amazon Elastic Container Service', url: 'https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res17',
@@ -212,7 +273,11 @@ export const resilientArchitectures = {
         'Suspend the scale-in process on the Auto Scaling group during peak hours'
       ],
       correctAnswer: 2,
-      explanation: 'Moving session state to an external in-memory store such as ElastiCache makes the instances stateless, so any instance can serve any user and instances can be terminated safely. Sticky sessions keep sessions on one instance, so they are still lost when that instance is terminated. Per-instance EBS volumes have the same problem, and suspending scale-in sacrifices elasticity instead of fixing the design.'
+      explanation: 'Moving session state to an external in-memory store such as ElastiCache makes the instances stateless, so any instance can serve any user and instances can be terminated safely. Sticky sessions keep sessions on one instance, so they are still lost when that instance is terminated. Per-instance EBS volumes have the same problem, and suspending scale-in sacrifices elasticity instead of fixing the design.',
+      sources: [
+        { title: 'REL05-BP06 Make systems stateless where possible – Reliability Pillar', url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_mitigate_interaction_failure_stateless.html', checked: '2026-11-25' },
+        { title: 'Edit target group attributes for your Application Load Balancer – Elastic Load Balancing', url: 'https://docs.aws.amazon.com/elasticloadbalancing/latest/application/edit-target-group-attributes.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res18',
@@ -224,7 +289,11 @@ export const resilientArchitectures = {
         'Restore the latest snapshot each night and run reports against the copy'
       ],
       correctAnswer: 0,
-      explanation: 'A read replica receives changes asynchronously from the primary and serves read-only queries on its own endpoint, taking reporting load off the writer with near-current data. The standby in a Multi-AZ DB instance deployment cannot serve reads. More IOPS does not separate the workloads, and a nightly restore gives data that is up to a day old.'
+      explanation: 'A read replica receives changes asynchronously from the primary and serves read-only queries on its own endpoint, taking reporting load off the writer with near-current data. The standby in a Multi-AZ DB instance deployment cannot serve reads. More IOPS does not separate the workloads, and a nightly restore gives data that is up to a day old.',
+      sources: [
+        { title: 'Working with DB instance read replicas – Amazon Relational Database Service', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html', checked: '2026-11-25' },
+        { title: 'Multi-AZ DB instance deployments for Amazon RDS – Amazon Relational Database Service', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZSingleStandby.html', checked: '2026-11-25' }
+      ]
     },
 
     // ---------- Task 2.2: Highly available and fault-tolerant architectures ----------
@@ -238,7 +307,11 @@ export const resilientArchitectures = {
         'Run the instances in an Auto Scaling group across multiple AZs behind an ALB'
       ],
       correctAnswer: 3,
-      explanation: 'Spreading an Auto Scaling group across several Availability Zones behind an Application Load Balancer survives the loss of a zone, which is exactly the stated requirement. A second Region adds cost and complexity for a Regional failure the business does not need to survive. Auto recovery and cluster placement groups both keep everything in one zone, so a zone outage still takes the application down.'
+      explanation: 'Spreading an Auto Scaling group across several Availability Zones behind an Application Load Balancer survives the loss of a zone, which is exactly the stated requirement. A second Region adds cost and complexity for a Regional failure the business does not need to survive. Auto recovery and cluster placement groups both keep everything in one zone, so a zone outage still takes the application down.',
+      sources: [
+        { title: 'Availability Zones – AWS Fault Isolation Boundaries', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-fault-isolation-boundaries/availability-zones.html', checked: '2026-11-25' },
+        { title: 'Placement strategies for your placement groups – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-strategies.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res20',
@@ -250,7 +323,11 @@ export const resilientArchitectures = {
         'A Classic Load Balancer with cross-zone load balancing on'
       ],
       correctAnswer: 1,
-      explanation: 'A Network Load Balancer operates at layer 4, handles very high request rates with low latency, and provides one static IP per Availability Zone that can be an Elastic IP, which partners can allowlist. ALB IP addresses change over time and the ALB is a layer 7 HTTP/HTTPS balancer. GWLB is for inline virtual appliances, and the Classic Load Balancer is a previous-generation option without static IPs.'
+      explanation: 'A Network Load Balancer operates at layer 4, handles very high request rates with low latency, and provides one static IP per Availability Zone that can be an Elastic IP, which partners can allowlist. The ALB is a layer 7 HTTP/HTTPS balancer, and by default its IP addresses change as it scales. GWLB is for inline virtual appliances, and the Classic Load Balancer is a previous-generation option without static IPs.',
+      sources: [
+        { title: 'What is a Network Load Balancer? – Elastic Load Balancing', url: 'https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html', checked: '2026-11-25' },
+        { title: 'How Elastic Load Balancing works – Elastic Load Balancing', url: 'https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res21',
@@ -262,7 +339,10 @@ export const resilientArchitectures = {
         'AWS Network Firewall replacing the third-party appliances entirely'
       ],
       correctAnswer: 0,
-      explanation: 'Gateway Load Balancer is designed to deploy, scale, and health-check fleets of third-party virtual appliances, using GENEVE to pass traffic through them transparently via Gateway Load Balancer endpoints. An NLB balances traffic addressed to the load balancer itself and is not built for transparent bump-in-the-wire inspection. AWS WAF protects HTTP applications only, and Network Firewall would replace the appliances the team must keep.'
+      explanation: 'Gateway Load Balancer is designed to deploy, scale, and health-check fleets of third-party virtual appliances, using GENEVE to pass traffic through them transparently via Gateway Load Balancer endpoints. An NLB balances traffic addressed to the load balancer itself and is not built for transparent bump-in-the-wire inspection. AWS WAF protects HTTP applications only, and Network Firewall would replace the appliances the team must keep.',
+      sources: [
+        { title: 'What is a Gateway Load Balancer? – Elastic Load Balancing', url: 'https://docs.aws.amazon.com/elasticloadbalancing/latest/gateway/introduction.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res22',
@@ -274,7 +354,11 @@ export const resilientArchitectures = {
         'Increase the health check grace period of the group to fifteen minutes'
       ],
       correctAnswer: 2,
-      explanation: 'By default an Auto Scaling group uses only EC2 status checks; adding Elastic Load Balancing health checks lets the group mark instances that fail the target group health check as unhealthy and replace them. Detailed monitoring only increases metric frequency. Scaling out on errors adds instances but leaves the broken one running, and a longer grace period delays health checks rather than enabling them.'
+      explanation: 'By default an Auto Scaling group uses only EC2 status checks; adding Elastic Load Balancing health checks lets the group mark instances that fail the target group health check as unhealthy and replace them. Detailed monitoring only increases metric frequency. Scaling out on errors adds instances but leaves the broken one running, and a longer grace period delays health checks rather than enabling them.',
+      sources: [
+        { title: 'Attach an Elastic Load Balancing load balancer to your Auto Scaling group – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/attach-load-balancer-asg.html', checked: '2026-11-25' },
+        { title: 'Health checks for instances in an Auto Scaling group – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-health-checks.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res23',
@@ -286,7 +370,10 @@ export const resilientArchitectures = {
         'Add a warm pool of pre-initialized instances kept in the Stopped state'
       ],
       correctAnswer: 3,
-      explanation: 'A warm pool keeps instances that have already completed initialization in a Stopped (or Hibernated) state, so they can enter service quickly, and stopped instances incur storage cost but no instance-hour charges. A higher minimum capacity works but pays for idle running instances all day. Changing the policy type or warmup value does not make a 10-minute initialization any shorter.'
+      explanation: 'A warm pool keeps instances that have already completed initialization in a Stopped (or Hibernated) state, so they can enter service quickly, and stopped instances incur storage cost but no instance-hour charges. A higher minimum capacity works but pays for idle running instances all day. Changing the policy type or warmup value does not make a 10-minute initialization any shorter.',
+      sources: [
+        { title: 'Decrease latency for applications with long boot times using warm pools – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-warm-pools.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res24',
@@ -298,7 +385,10 @@ export const resilientArchitectures = {
         'Multivalue answer routing that returns both endpoints in each response'
       ],
       correctAnswer: 1,
-      explanation: 'Failover routing returns the primary record while its health check passes and automatically switches to the secondary record when it fails, then switches back on recovery: classic active-passive. A geolocation default record only serves users whose location matches no other record. Latency routing would send some users to the maintenance page even when the site is healthy, and multivalue answers return both endpoints to clients, not a clean failover.'
+      explanation: 'Failover routing returns the primary record while its health check passes and automatically switches to the secondary record when it fails, then switches back on recovery: classic active-passive. A geolocation default record only serves users whose location matches no other record. Latency routing would send some users to the maintenance page even when the site is healthy, and multivalue answers return both endpoints to clients, not a clean failover.',
+      sources: [
+        { title: 'Failover routing – Amazon Route 53', url: 'https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-failover.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res25',
@@ -310,19 +400,27 @@ export const resilientArchitectures = {
         'Multivalue answer routing with health checks on both Regions'
       ],
       correctAnswer: 1,
-      explanation: 'Geolocation routing answers based on where the user is located, which enforces location-based rules such as licensing, and a default record catches users outside the defined locations. Latency routing explicitly optimizes for latency, which the requirement says must not decide the answer. Weighted and multivalue routing distribute traffic without regard to user location.'
+      explanation: 'Geolocation routing answers based on where the user is located, which enforces location-based rules such as licensing, and a default record catches users outside the defined locations. Latency routing explicitly optimizes for latency, which the requirement says must not decide the answer. Weighted and multivalue routing distribute traffic without regard to user location.',
+      sources: [
+        { title: 'Geolocation routing – Amazon Route 53', url: 'https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-geo.html', checked: '2026-11-25' },
+        { title: 'Latency-based routing – Amazon Route 53', url: 'https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-latency.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res26',
-      question: 'A company uses Route 53 failover records in a private hosted zone for an internal service that listens only on private IP addresses inside a VPC. Route 53 health checkers cannot reach those private endpoints. How can the company make failover respond to the health of the service?',
+      question: 'A company uses Route 53 failover records in a private hosted zone for an internal service that listens only on private IP addresses inside a VPC. Route 53\'s standard health checkers run on the internet and cannot reach those private endpoints. How can the company make failover respond to the health of the service?',
       options: [
-        'Create an HTTP health check that targets the private IP address directly',
+        'Create a standard HTTP health check that targets the private IP address',
         'Create a calculated health check that combines two HTTP health checks',
         'Use a simple routing record with Evaluate Target Health set to Yes',
         'Create a health check that monitors the state of a CloudWatch alarm'
       ],
       correctAnswer: 3,
-      explanation: 'Route 53 health checkers run outside the VPC, so for private resources you publish a CloudWatch metric and alarm (for example from the service or its load balancer) and create a health check based on that alarm\'s state. An HTTP check against a private IP cannot reach it, and a calculated check whose child checks cannot reach it does not help. Simple routing does not support failover or health checks.'
+      explanation: 'Standard Route 53 health checkers run outside the VPC, so one option for private resources is to publish a CloudWatch metric and alarm (for example from the service or its load balancer) and create a health check based on that alarm\'s state. Route 53 now also offers private endpoint health checks that run from a health check source inside the VPC. A standard check against a private IP cannot reach it, and a calculated check whose child checks cannot reach it does not help. Simple routing does not support failover or health checks.',
+      sources: [
+        { title: 'Configuring failover in a private hosted zone – Amazon Route 53', url: 'https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-failover-private-hosted-zones.html', checked: '2026-11-25' },
+        { title: 'Private endpoint health checks – Amazon Route 53', url: 'https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/health-checks-private-endpoints.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res27',
@@ -334,7 +432,11 @@ export const resilientArchitectures = {
         'A single-AZ instance with automated backups and point-in-time restore'
       ],
       correctAnswer: 0,
-      explanation: 'A Multi-AZ DB instance deployment synchronously replicates to one standby in another zone and fails over automatically, which meets the requirement at the lowest cost. A Multi-AZ DB cluster adds a second standby and readable instances the company does not need. A read replica is asynchronous and must be promoted manually, and a point-in-time restore is neither automatic nor fast.'
+      explanation: 'A Multi-AZ DB instance deployment synchronously replicates to one standby in another zone and fails over automatically, which meets the requirement at the lowest cost. A Multi-AZ DB cluster adds a second standby and readable instances the company does not need. A read replica is asynchronous and must be promoted manually, and a point-in-time restore is neither automatic nor fast.',
+      sources: [
+        { title: 'Multi-AZ DB instance deployments for Amazon RDS – Amazon Relational Database Service', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZSingleStandby.html', checked: '2026-11-25' },
+        { title: 'Working with DB instance read replicas – Amazon Relational Database Service', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res28',
@@ -346,7 +448,11 @@ export const resilientArchitectures = {
         'An Amazon RDS Proxy in front of a single-AZ instance to pool connections'
       ],
       correctAnswer: 2,
-      explanation: 'A Multi-AZ DB cluster places a writer and two readable standbys in three Availability Zones, typically fails over faster than a Multi-AZ DB instance deployment, and serves reads through its reader endpoint. A Multi-AZ instance standby cannot serve reads. Scripted replica promotion is manual-style failover with possible data loss, and RDS Proxy improves connection handling but adds no standby.'
+      explanation: 'A Multi-AZ DB cluster places a writer and two readable standbys in three Availability Zones, typically fails over faster than a Multi-AZ DB instance deployment, and serves reads through its reader endpoint. A Multi-AZ instance standby cannot serve reads. Scripted replica promotion is manual-style failover with possible data loss, and RDS Proxy improves connection handling but adds no standby.',
+      sources: [
+        { title: 'Multi-AZ DB cluster deployments for Amazon RDS – Amazon Relational Database Service', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/multi-az-db-clusters-concepts.html', checked: '2026-11-25' },
+        { title: 'Amazon RDS Multi AZ Deployments | Cloud Relational Database | Amazon Web Services', url: 'https://aws.amazon.com/rds/features/multi-az/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res29',
@@ -358,7 +464,11 @@ export const resilientArchitectures = {
         'A custom binlog replication process managed with a scheduled script'
       ],
       correctAnswer: 0,
-      explanation: 'Aurora Global Database replicates at the storage layer to secondary Regions with typical lag under a second, serves local reads there, and supports managed failover to promote the secondary quickly. Aurora Replicas in the same Region do not protect against a Regional outage. Hourly snapshot copies give an RPO of up to an hour and a long restore, and custom binlog replication adds operational effort and lag.'
+      explanation: 'Aurora Global Database replicates at the storage layer to secondary Regions with typical lag under a second, serves local reads there, and supports managed failover to promote the secondary quickly. Aurora Replicas in the same Region do not protect against a Regional outage. Hourly snapshot copies give an RPO of up to an hour and a long restore, and custom binlog replication adds operational effort and lag.',
+      sources: [
+        { title: 'Using Amazon Aurora Global Database – Amazon Aurora', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-global-database.html', checked: '2026-11-25' },
+        { title: 'MySQL PostgreSQL Relational Database – Amazon Aurora Global Database – AWS', url: 'https://aws.amazon.com/rds/aurora/global-database/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res30',
@@ -370,7 +480,11 @@ export const resilientArchitectures = {
         'DynamoDB global tables with a replica table in each of the three Regions'
       ],
       correctAnswer: 3,
-      explanation: 'DynamoDB global tables are multi-Region and multi-active, so each Region accepts local reads and writes and AWS manages replication between replicas, which also keeps the game running if a Region fails. DAX caches reads for a table in one Region and does not replicate writes across Regions. CloudFront does not cache database writes, and a custom Streams-and-Lambda copier is what global tables already provide as a managed feature.'
+      explanation: 'DynamoDB global tables are multi-Region and multi-active, so each Region accepts local reads and writes and AWS manages replication between replicas, which also keeps the game running if a Region fails. DAX caches reads for a table in one Region and does not replicate writes across Regions. CloudFront does not cache database writes, and a custom Streams-and-Lambda copier is what global tables already provide as a managed feature.',
+      sources: [
+        { title: 'Global tables - multi-active, multi-Region replication – Amazon DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html', checked: '2026-11-25' },
+        { title: 'In-memory acceleration with DynamoDB Accelerator (DAX) – Amazon DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res31',
@@ -382,7 +496,11 @@ export const resilientArchitectures = {
         'Suspend and then re-enable versioning on the destination bucket'
       ],
       correctAnswer: 2,
-      explanation: 'Replication rules apply only to objects written after the rule is enabled; S3 Batch Replication is the feature for replicating existing objects (and retrying failed ones). Replication Time Control adds a 15-minute replication SLA for new objects but does not backfill. Transfer Acceleration speeds up client uploads over long distances, and toggling versioning does not trigger replication.'
+      explanation: 'Replication rules apply only to objects written after the rule is enabled; S3 Batch Replication is the feature for replicating existing objects (and retrying failed ones). Replication Time Control adds a 15-minute replication SLA for new objects but does not backfill. Transfer Acceleration speeds up client uploads over long distances, and toggling versioning does not trigger replication.',
+      sources: [
+        { title: 'Replicating existing objects with Batch Replication – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-batch-replication-batch.html', checked: '2026-11-25' },
+        { title: 'Meeting compliance requirements with S3 Replication Time Control – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication-time-control.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res32',
@@ -394,7 +512,11 @@ export const resilientArchitectures = {
         'Multi-site active/active'
       ],
       correctAnswer: 1,
-      explanation: 'Pilot light keeps core data continuously replicated and running in the DR Region while application servers stay off until needed, giving an RPO of minutes and an RTO in the tens of minutes at low cost. Backup and restore is cheaper but typically has an RPO and RTO of hours. Warm standby and multi-site active/active recover faster but cost more than the requirements justify.'
+      explanation: 'Pilot light keeps core data continuously replicated and running in the DR Region while application servers stay off until needed, giving an RPO of minutes and an RTO in the tens of minutes at low cost. Backup and restore is cheaper but typically has an RPO and RTO of hours. Warm standby and multi-site active/active recover faster but cost more than the requirements justify.',
+      sources: [
+        { title: 'REL13-BP02 Use defined recovery strategies to meet the recovery objectives – Reliability Pillar', url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_planning_for_recovery_disaster_recovery.html', checked: '2026-11-25' },
+        { title: 'Disaster recovery options in the cloud – Disaster Recovery of Workloads on AWS: Recovery in the Cloud', url: 'https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res33',
@@ -406,7 +528,11 @@ export const resilientArchitectures = {
         'Warm standby with a scaled-down but fully functional copy of the stack'
       ],
       correctAnswer: 3,
-      explanation: 'Warm standby runs a smaller, fully working copy of the whole stack that can serve traffic immediately and scale up, giving an RTO of minutes without paying for full capacity twice. Backup and restore and pilot light must first launch or deploy application resources, so recovery takes longer. Active/active requires multi-Region writes, which the application cannot support, and costs the most.'
+      explanation: 'Warm standby runs a smaller, fully working copy of the whole stack that can serve traffic immediately and scale up, giving an RTO of minutes without paying for full capacity twice. Backup and restore and pilot light must first launch or deploy application resources, so recovery takes longer. The active/active option accepts writes in both Regions, which the application cannot support, and running full capacity in every Region costs the most.',
+      sources: [
+        { title: 'REL13-BP02 Use defined recovery strategies to meet the recovery objectives – Reliability Pillar', url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_planning_for_recovery_disaster_recovery.html', checked: '2026-11-25' },
+        { title: 'Disaster recovery options in the cloud – Disaster Recovery of Workloads on AWS: Recovery in the Cloud', url: 'https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res34',
@@ -414,11 +540,15 @@ export const resilientArchitectures = {
       options: [
         'AWS Elastic Disaster Recovery with continuous block-level replication',
         'AWS Backup with daily backups of the virtual machines kept in AWS',
-        'AWS Application Migration Service with a single planned cutover',
+        'AWS Transform MGN (formerly Application Migration Service) for a planned cutover',
         'AWS DataSync tasks that copy the server file systems every hour'
       ],
       correctAnswer: 0,
-      explanation: 'AWS Elastic Disaster Recovery continuously replicates source servers at the block level into a low-cost staging area and launches full recovery instances only during a drill or failover, delivering an RPO of seconds and an RTO of minutes. Daily backups give an RPO of up to a day. Application Migration Service is for one-time migrations rather than ongoing DR, and DataSync copies files, not bootable servers.'
+      explanation: 'AWS Elastic Disaster Recovery continuously replicates source servers at the block level into a low-cost staging area and launches full recovery instances only during a drill or failover, delivering an RPO of seconds and an RTO of minutes. Daily backups give an RPO of up to a day. AWS Transform MGN (formerly AWS Application Migration Service) is for migrations rather than ongoing DR, and DataSync copies files, not bootable servers.',
+      sources: [
+        { title: 'What is Elastic Disaster Recovery? – AWS Elastic Disaster Recovery', url: 'https://docs.aws.amazon.com/drs/latest/userguide/what-is-drs.html', checked: '2026-11-25' },
+        { title: 'What Is AWS Transform MGN? – AWS Transform MGN', url: 'https://docs.aws.amazon.com/mgn/latest/ug/what-is-mgn.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res35',
@@ -430,7 +560,11 @@ export const resilientArchitectures = {
         'S3 Cross-Region Replication of exported snapshots with versioning enabled'
       ],
       correctAnswer: 2,
-      explanation: 'AWS Backup centrally manages backup plans across many services and accounts through Organizations backup policies, copies recovery points to other Regions, and AWS Backup Vault Lock in compliance mode makes backups immutable until retention ends. Data Lifecycle Manager covers only EBS snapshots and AMIs and is configured per account. Custom Lambda scripts and exported snapshots add operational effort and give no deletion protection guarantee.'
+      explanation: 'AWS Backup centrally manages backup plans across many services and accounts through Organizations backup policies, copies recovery points to other Regions, and AWS Backup Vault Lock in compliance mode makes backups immutable until retention ends. Data Lifecycle Manager covers only EBS snapshots and AMIs and is configured per account. Custom Lambda scripts and exported snapshots add operational effort and give no deletion protection guarantee.',
+      sources: [
+        { title: 'AWS Backup Vault Lock – AWS Backup', url: 'https://docs.aws.amazon.com/aws-backup/latest/devguide/vault-lock.html', checked: '2026-11-25' },
+        { title: 'Backup policies – AWS Organizations', url: 'https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_backup.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'res36',
@@ -442,7 +576,11 @@ export const resilientArchitectures = {
         'Take EBS snapshots before each manual patch so instances can be restored'
       ],
       correctAnswer: 1,
-      explanation: 'Immutable infrastructure replaces instances instead of changing them: build a new versioned AMI (for example with EC2 Image Builder) and roll it out with an instance refresh, and roll back by redeploying the previous AMI. Run Command automates in-place patching but still mutates running servers. Termination protection blocks the replacement that immutability relies on, and per-instance snapshots make rollback slow and manual.'
+      explanation: 'Immutable infrastructure replaces instances instead of changing them: build a new versioned AMI (for example with EC2 Image Builder) and roll it out with an instance refresh, and roll back by redeploying the previous AMI. Run Command automates in-place patching but still mutates running servers. Termination protection only guards against accidental API terminations (it does not stop Auto Scaling from replacing instances) and does nothing about drift, and per-instance snapshots make rollback slow and manual.',
+      sources: [
+        { title: 'REL08-BP04 Deploy using immutable infrastructure – Reliability Pillar', url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_tracking_change_management_immutable_infrastructure.html', checked: '2026-11-25' },
+        { title: 'Change instance termination protection – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_ChangingDisableAPITermination.html', checked: '2026-11-25' }
+      ]
     }
   ]
 };

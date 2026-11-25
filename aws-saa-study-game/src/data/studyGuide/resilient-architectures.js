@@ -10,6 +10,11 @@ export const resilientArchitecturesGuide = {
     {
       id: 'ress1',
       title: 'Decoupling with Queues, Topics, and Events',
+      sources: [
+        { title: 'Amazon SQS queue types – Amazon Simple Queue Service', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-queue-types.html', checked: '2026-11-25' },
+        { title: 'Fanout Amazon SNS notifications to Amazon SQS queues for asynchronous processing – Amazon Simple Notification Service', url: 'https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html', checked: '2026-11-25' },
+        { title: 'Amazon EventBridge Pipes – Amazon EventBridge', url: 'https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Loose coupling means components talk through an intermediary instead of calling each other directly, so a slow or failed component does not take the others down and each side can scale on its own. On the exam, any scenario with lost requests during spikes, tightly chained tiers, or one producer feeding several consumers is pointing you at SQS, SNS, or EventBridge.' },
         { type: 'comparison', title: 'SQS vs SNS vs EventBridge', items: [
@@ -37,6 +42,11 @@ export const resilientArchitecturesGuide = {
     {
       id: 'ress2',
       title: 'Serverless Orchestration, APIs, and Containers',
+      sources: [
+        { title: 'Choosing workflow type in Step Functions – AWS Step Functions', url: 'https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html', checked: '2026-11-25' },
+        { title: 'Choose between REST APIs and HTTP APIs – Amazon API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html', checked: '2026-11-25' },
+        { title: 'Choosing an AWS container service – AWS Decision Guides', url: 'https://docs.aws.amazon.com/decision-guides/latest/decision-guides/choosing-aws-container-service.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Serverless and container services let you build scalable components without managing servers. The exam tests which flavor of each service fits a constraint such as run duration, cost per request, push vs pull, or how much infrastructure the team is willing to operate.' },
         { type: 'comparison', title: 'Step Functions: Standard vs Express Workflows', items: [
@@ -60,7 +70,7 @@ export const resilientArchitecturesGuide = {
         { type: 'comparison', title: 'Container platforms', items: [
           { label: 'Amazon ECS', description: 'AWS-native orchestrator with a simple task and service model and deep integration with ALB, IAM roles for tasks, and CloudWatch. Lowest learning curve.' },
           { label: 'Amazon EKS', description: 'Managed Kubernetes control plane. Choose it when the team already uses Kubernetes tooling or needs portability across environments.' },
-          { label: 'AWS Fargate', description: 'Serverless compute for ECS and EKS: no instances to patch, scale, or right-size. Choose it whenever the requirement says no server management. Use the EC2 launch type instead for GPUs, special instance types, or maximum cost control at scale.' }
+          { label: 'AWS Fargate', description: 'Serverless compute for ECS and EKS: no instances to patch, scale, or right-size. Choose it whenever the requirement says no server management. Use the EC2 launch type, or Amazon ECS Managed Instances (AWS provisions, patches, and scales the EC2 instances), for GPUs, special instance types, or maximum cost control at scale.' }
         ]},
         { type: 'examTip', text: 'Duration and history decide Step Functions: more than five minutes, human approval, or audit trail = Standard; huge volume of short executions = Express. For API Gateway, caching or per-client API keys = REST API, cheapest simple proxy = HTTP API, server push = WebSocket API. "No servers to manage" with containers = Fargate.' }
       ]
@@ -68,6 +78,11 @@ export const resilientArchitecturesGuide = {
     {
       id: 'ress3',
       title: 'Scaling Stateless Tiers: Caching, Replicas, and Session State',
+      sources: [
+        { title: 'REL05-BP06 Make systems stateless where possible – Reliability Pillar', url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_mitigate_interaction_failure_stateless.html', checked: '2026-11-25' },
+        { title: 'In-memory acceleration with DynamoDB Accelerator (DAX) – Amazon DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html', checked: '2026-11-25' },
+        { title: 'Edit target group attributes for your Application Load Balancer – Elastic Load Balancing', url: 'https://docs.aws.amazon.com/elasticloadbalancing/latest/application/edit-target-group-attributes.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Horizontal scaling only works when any instance can serve any request. That means keeping state out of the compute tier, taking repeated reads off the database with caches and replicas, and splitting components so each can scale and fail on its own.' },
         { type: 'keyTerm', term: 'Stateless design', definition: 'Instances or containers hold no user-specific data between requests. Sessions go to ElastiCache or DynamoDB, files to S3 or EFS, and configuration to AMIs, Parameter Store, or Secrets Manager. Stateless instances can be added, removed, or replaced at any time.' },
@@ -93,6 +108,11 @@ export const resilientArchitecturesGuide = {
     {
       id: 'ress4',
       title: 'Multi-AZ Compute: Load Balancing and Auto Scaling',
+      sources: [
+        { title: 'How Elastic Load Balancing works – Elastic Load Balancing', url: 'https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html', checked: '2026-11-25' },
+        { title: 'Attach an Elastic Load Balancing load balancer to your Auto Scaling group – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/attach-load-balancer-asg.html', checked: '2026-11-25' },
+        { title: 'Decrease latency for applications with long boot times using warm pools – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-warm-pools.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'An Availability Zone is one or more data centers with independent power and networking. The default resilient pattern for compute is an Auto Scaling group spread across at least two (ideally three) zones behind an Elastic Load Balancer. Multi-AZ protects against zone failure inside a Region; only multi-Region designs protect against a Regional outage, at much higher cost and complexity.' },
         { type: 'table', headers: ['Load balancer', 'Layer and protocols', 'Choose it for'], rows: [
@@ -106,8 +126,8 @@ export const resilientArchitecturesGuide = {
           { label: 'Target tracking', description: 'Keeps a metric near a target value, such as 50% CPU, ALB requests per target, or SQS backlog per instance. The usual first choice.' },
           { label: 'Step scaling', description: 'Applies different adjustments depending on how far a CloudWatch alarm is breached, for fine-grained control.' },
           { label: 'Scheduled scaling', description: 'Changes capacity at specific times for known events, such as business hours or a launch date.' },
-          { label: 'Predictive scaling', description: 'Uses machine learning on historical load to forecast recurring daily or weekly patterns and launches capacity before the demand arrives. Pair it with target tracking for unexpected spikes.' },
-          { label: 'Warm pools', description: 'Keep pre-initialized instances in a Stopped, Hibernated, or Running state so applications with long initialization can scale out quickly; stopped instances pay only for storage.' }
+          { label: 'Predictive scaling', description: 'Analyzes historical load to forecast recurring daily or weekly patterns and launches capacity before the demand arrives. Pair it with target tracking for unexpected spikes.' },
+          { label: 'Warm pools', description: 'Keep pre-initialized instances in a Stopped, Hibernated, or Running state so applications with long initialization can scale out quickly; stopped instances pay only for their EBS volumes and attached Elastic IP addresses.' }
         ]},
         { type: 'keyTerm', term: 'Immutable infrastructure', definition: 'Never change running servers. Build a new versioned image (EC2 Image Builder or a pipeline), roll it out with an Auto Scaling instance refresh or a blue/green deployment, and roll back by redeploying the previous version. This removes configuration drift and makes changes repeatable.' },
         { type: 'examTip', text: 'Static IPs for allowlisting, TCP/UDP, or millions of requests per second = NLB; URL-based routing = ALB; third-party appliances = GWLB. Instances returning errors but never replaced = enable ELB health checks on the Auto Scaling group. "Survive an AZ failure, most cost-effective" means Multi-AZ, not a second Region.' }
@@ -116,6 +136,11 @@ export const resilientArchitecturesGuide = {
     {
       id: 'ress5',
       title: 'Highly Available Data: RDS, Aurora, DynamoDB, and S3',
+      sources: [
+        { title: 'Configuring and managing a Multi-AZ deployment for Amazon RDS – Amazon Relational Database Service', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html', checked: '2026-11-25' },
+        { title: 'High availability for Amazon Aurora – Amazon Aurora', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.AuroraHighAvailability.html', checked: '2026-11-25' },
+        { title: 'Meeting compliance requirements with S3 Replication Time Control – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication-time-control.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Compute is easy to replace; data is not. The exam expects you to tell apart features that provide high availability (automatic failover), read scaling, and cross-Region disaster recovery, because each database option provides a different mix.' },
         { type: 'table', headers: ['Option', 'Replication', 'Readable?', 'Failover', 'Main purpose'], rows: [
@@ -126,11 +151,11 @@ export const resilientArchitecturesGuide = {
           ['Aurora Global Database', 'Storage-level to secondary Regions, typically under 1 second', 'Yes, in each secondary Region', 'Managed switchover or failover', 'Cross-Region DR and local reads']
         ]},
         { type: 'awsService', name: 'Amazon DynamoDB global tables', description: 'Multi-Region, multi-active replicas of a table: every replica Region accepts reads and writes and AWS manages replication. Default replication is asynchronous with last-writer-wins conflict resolution; a multi-Region strong consistency mode is also available for workloads that cannot tolerate stale reads. Use for globally distributed apps that must keep working if a Region fails. Point-in-time recovery protects against accidental writes and deletes.' },
-        { type: 'awsService', name: 'Amazon S3 replication', description: 'Cross-Region Replication (CRR) and Same-Region Replication (SRR) copy objects asynchronously between buckets, which both need versioning. Only new objects replicate after a rule is enabled; use S3 Batch Replication for existing objects. S3 Replication Time Control adds an SLA of 99.99% of objects replicated within 15 minutes, with replication metrics.' },
+        { type: 'awsService', name: 'Amazon S3 replication', description: 'Cross-Region Replication (CRR) and Same-Region Replication (SRR) copy objects asynchronously between buckets, which both need versioning. Only new objects replicate after a rule is enabled; use S3 Batch Replication for existing objects. S3 Replication Time Control replicates most new objects in seconds and adds an SLA-backed 15-minute replication time, with replication metrics.' },
         { type: 'bulletList', title: 'Replication facts that decide answers:', items: [
           'A Multi-AZ DB instance standby cannot serve reads; any answer that reads from it is wrong.',
           'Read replicas are asynchronous, so promoting one can lose the most recent writes.',
-          'Aurora with no replicas recovers by creating a new instance, which is slower; add at least one Aurora Replica in another AZ for fast failover.',
+          'Aurora with no replicas must recover the primary host (typically under 10 minutes), which is much slower than promoting a replica; add at least one Aurora Replica in another AZ for fast failover.',
           'S3 is already designed for very high durability within a Region; replication is for Regional DR, compliance copies, or lower-latency access elsewhere.'
         ]},
         { type: 'examTip', text: 'HA only = RDS Multi-AZ; HA plus readable standbys on RDS = Multi-AZ DB cluster; offload reads = read replicas; relational cross-Region DR with an RPO of seconds = Aurora Global Database; multi-Region writes for key-value data = DynamoDB global tables. "Old objects missing after enabling CRR" = S3 Batch Replication.' }
@@ -139,6 +164,11 @@ export const resilientArchitecturesGuide = {
     {
       id: 'ress6',
       title: 'Multi-Region Failover and Disaster Recovery',
+      sources: [
+        { title: 'REL13-BP02 Use defined recovery strategies to meet the recovery objectives – Reliability Pillar', url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_planning_for_recovery_disaster_recovery.html', checked: '2026-11-25' },
+        { title: 'Choosing a routing policy – Amazon Route 53', url: 'https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html', checked: '2026-11-25' },
+        { title: 'Types of Amazon Route 53 health checks – Amazon Route 53', url: 'https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/health-checks-types.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Disaster recovery questions give you a Recovery Point Objective (how much data loss is acceptable) and a Recovery Time Objective (how long the service may be down), plus a budget. Pick the cheapest strategy that still meets both numbers, then pick the services that implement it.' },
         { type: 'keyTerm', term: 'RPO and RTO', definition: 'RPO is the maximum acceptable age of the data you recover, driven by backup frequency or replication lag. RTO is the maximum acceptable time from disruption to restored service, driven by how much infrastructure is already running.' },
@@ -157,7 +187,7 @@ export const resilientArchitecturesGuide = {
           ['Multivalue answer', 'Return up to eight healthy records for simple client-side spreading (not a load balancer)'],
           ['IP-based', 'Route by the client IP range, for example a known ISP or corporate network']
         ]},
-        { type: 'keyTerm', term: 'Route 53 health checks', definition: 'Endpoint checks probe a public IP or domain over HTTP, HTTPS, or TCP; calculated checks combine other checks; CloudWatch alarm checks follow an alarm state. Health checkers run outside your VPC, so for private resources use a CloudWatch alarm-based health check.' },
+        { type: 'keyTerm', term: 'Route 53 health checks', definition: 'Endpoint checks probe a public IP or domain over HTTP, HTTPS, or TCP; calculated checks combine other checks; CloudWatch alarm checks follow an alarm state. Standard health checkers run on the internet, outside your VPC, so for private resources use a private endpoint health check (runs from a health check source in your VPC) or a CloudWatch alarm-based health check.' },
         { type: 'awsService', name: 'AWS Elastic Disaster Recovery', description: 'Continuously replicates on-premises, other-cloud, or EC2 servers at the block level into a low-cost staging area in AWS, and launches full-size recovery instances only for drills or real failovers. Delivers an RPO of seconds and an RTO of minutes without paying for idle production compute.' },
         { type: 'awsService', name: 'AWS Backup', description: 'Centralized, policy-based backups for EC2, EBS, RDS, Aurora, DynamoDB, EFS, FSx, S3, and more, across accounts through AWS Organizations backup policies. Copies recovery points across Regions and accounts, and AWS Backup Vault Lock (compliance mode) makes backups immutable so no one can delete them before retention ends, which protects against ransomware.' },
         { type: 'numberedList', title: 'Choosing a DR design:', items: [
