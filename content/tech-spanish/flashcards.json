@@ -1,0 +1,4638 @@
+{
+  "deck": {
+    "id": "tech-spanish",
+    "name": "Tech Spanish ↔ Tech English",
+    "description": "Vocabulario técnico de desarrollo, DevOps y AWS en los dos idiomas.",
+    "source": "content/tech-spanish/glossary.source.mjs"
+  },
+  "cards": [
+    {
+      "id": "ts-deploy-en-es",
+      "front": "deploy / deployment",
+      "back": "desplegar, despliegue; implementar, implementación. En el equipo: \"deployar\", \"hacer el deploy\", \"subirlo\". Ej.: \"Desplegamos la API en us-east-1 después de cada merge.\"",
+      "hint": "We deploy the API to us-east-1 after every merge.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-deploy-es-en",
+      "front": "desplegar, despliegue",
+      "back": "deploy / deployment. E.g. \"We deploy the API to us-east-1 after every merge.\"",
+      "hint": "Desplegamos la API en us-east-1 después de cada merge.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-build-en-es",
+      "front": "build (noun and verb)",
+      "back": "compilación, compilar; construir. En el equipo: \"la build\", \"buildear\", \"compilar\". Ej.: \"La compilación falló porque se rompió una prueba.\"",
+      "hint": "The build failed because a test broke.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-build-es-en",
+      "front": "compilación, compilar",
+      "back": "build (noun and verb). E.g. \"The build failed because a test broke.\"",
+      "hint": "La compilación falló porque se rompió una prueba.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-commit-en-es",
+      "front": "commit",
+      "back": "confirmación (de cambios), confirmar. En el equipo: \"hacer commit\", \"commitear\" — la traducción de Git al español deja \"commit\" en inglés. Ej.: \"Haz commit del cambio con un mensaje claro.\"",
+      "hint": "Commit the change with a clear message.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-commit-es-en",
+      "front": "confirmación (de cambios), confirmar",
+      "back": "commit. E.g. \"Commit the change with a clear message.\"",
+      "hint": "Haz commit del cambio con un mensaje claro.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-branch-en-es",
+      "front": "branch",
+      "back": "rama. En el equipo: \"rama\" es lo normal; \"branch\" también se oye. Ej.: \"Crea una rama para la nueva Lambda.\"",
+      "hint": "Create a branch for the new Lambda.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-branch-es-en",
+      "front": "rama",
+      "back": "branch. E.g. \"Create a branch for the new Lambda.\"",
+      "hint": "Crea una rama para la nueva Lambda.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-merge-en-es",
+      "front": "merge",
+      "back": "fusionar (GitHub); combinar (VS Code); fusión. En el equipo: \"mergear\", \"hacer el merge\". Ej.: \"Fusiona la rama cuando CI esté en verde.\"",
+      "hint": "Merge the branch once CI is green.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-merge-es-en",
+      "front": "fusionar (GitHub)",
+      "back": "merge. E.g. \"Merge the branch once CI is green.\"",
+      "hint": "Fusiona la rama cuando CI esté en verde.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-pull-request-en-es",
+      "front": "pull request (PR)",
+      "back": "solicitud de cambios; solicitud de extracción. En el equipo: \"abrir una PR\" (el género varía: \"la PR\" por \"la solicitud\", \"el PR\" por \"el pull request\"). Ej.: \"Abre una PR y pide una revisión.\"",
+      "hint": "Open a pull request and ask for a review.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-pull-request-es-en",
+      "front": "solicitud de cambios",
+      "back": "pull request (PR). E.g. \"Open a pull request and ask for a review.\"",
+      "hint": "Abre una PR y pide una revisión.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-push-en-es",
+      "front": "push",
+      "back": "subir (cambios); insertar (VS Code). En el equipo: \"pushear\", \"subir los cambios\". Ej.: \"Sube tu rama antes de irte.\"",
+      "hint": "Push your branch before you leave.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-push-es-en",
+      "front": "subir (cambios)",
+      "back": "push. E.g. \"Push your branch before you leave.\"",
+      "hint": "Sube tu rama antes de irte.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-pull-en-es",
+      "front": "pull",
+      "back": "extraer; incorporar cambios (VS Code). En el equipo: \"hacer pull\", \"bajarse los cambios\". Ej.: \"Haz pull de main antes de empezar.\" ⚠ No confundir \"pull\" con \"pull request\": la PR no trae nada, pide que se incorporen tus cambios.",
+      "hint": "Pull main before you start.",
+      "tags": [
+        "dev",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-pull-es-en",
+      "front": "extraer",
+      "back": "pull. E.g. \"Pull main before you start.\"",
+      "hint": "Haz pull de main antes de empezar.",
+      "tags": [
+        "dev",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-clone-en-es",
+      "front": "clone",
+      "back": "clonar. En el equipo: \"clonar el repo\". Ej.: \"Clona el repo y ejecuta npm install.\"",
+      "hint": "Clone the repo and run npm install.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-clone-es-en",
+      "front": "clonar",
+      "back": "clone. E.g. \"Clone the repo and run npm install.\"",
+      "hint": "Clona el repo y ejecuta npm install.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-fork-en-es",
+      "front": "fork",
+      "back": "bifurcación, bifurcar. En el equipo: \"hacer un fork\", \"forkear\". Ej.: \"Haz un fork del proyecto para proponer un arreglo.\"",
+      "hint": "Fork the project to propose a fix.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-fork-es-en",
+      "front": "bifurcación, bifurcar",
+      "back": "fork. E.g. \"Fork the project to propose a fix.\"",
+      "hint": "Haz un fork del proyecto para proponer un arreglo.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-repository-en-es",
+      "front": "repository (repo)",
+      "back": "repositorio. En el equipo: \"el repo\". Ej.: \"La infraestructura vive en su propio repo.\"",
+      "hint": "The infrastructure lives in its own repo.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-repository-es-en",
+      "front": "repositorio",
+      "back": "repository (repo). E.g. \"The infrastructure lives in its own repo.\"",
+      "hint": "La infraestructura vive en su propio repo.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-bug-en-es",
+      "front": "bug",
+      "back": "error, fallo. En el equipo: \"un bug\" — se dice muchísimo así. Ej.: \"Hay un error en el flujo de inicio de sesión.\"",
+      "hint": "There is a bug in the sign-in flow.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-bug-es-en",
+      "front": "error, fallo",
+      "back": "bug. E.g. \"There is a bug in the sign-in flow.\"",
+      "hint": "Hay un error en el flujo de inicio de sesión.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-debug-en-es",
+      "front": "debug / debugging",
+      "back": "depurar, depuración. En el equipo: \"debuggear\" (también \"debuguear\"). Ej.: \"Pasé la mañana depurando el timeout de la Lambda.\"",
+      "hint": "I spent the morning debugging the Lambda timeout.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-debug-es-en",
+      "front": "depurar, depuración",
+      "back": "debug / debugging. E.g. \"I spent the morning debugging the Lambda timeout.\"",
+      "hint": "Pasé la mañana depurando el timeout de la Lambda.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-fix-en-es",
+      "front": "fix / hotfix",
+      "back": "corrección, arreglo; corrección urgente. En el equipo: \"meter un fix\", \"un hotfix\". Ej.: \"Sacamos una corrección urgente para la página de pago.\"",
+      "hint": "We shipped a hotfix for the checkout page.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-fix-es-en",
+      "front": "corrección, arreglo",
+      "back": "fix / hotfix. E.g. \"We shipped a hotfix for the checkout page.\"",
+      "hint": "Sacamos una corrección urgente para la página de pago.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-patch-en-es",
+      "front": "patch",
+      "back": "parche, revisión. En el equipo: \"parche\", \"parchear\". Ej.: \"Aplica el parche de seguridad a todas las instancias.\"",
+      "hint": "Apply the security patch to every instance.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-patch-es-en",
+      "front": "parche, revisión",
+      "back": "patch. E.g. \"Apply the security patch to every instance.\"",
+      "hint": "Aplica el parche de seguridad a todas las instancias.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-refactor-en-es",
+      "front": "refactor",
+      "back": "refactorizar, refactorización. En el equipo: \"refactorizar\", \"hacer un refactor\". Ej.: \"Refactoriza el handler antes de añadir rutas nuevas.\"",
+      "hint": "Refactor the handler before adding new routes.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-refactor-es-en",
+      "front": "refactorizar, refactorización",
+      "back": "refactor. E.g. \"Refactor the handler before adding new routes.\"",
+      "hint": "Refactoriza el handler antes de añadir rutas nuevas.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-release-en-es",
+      "front": "release",
+      "back": "versión, lanzamiento; publicar. En el equipo: \"la release\", \"sacar la release\". Ej.: \"La próxima versión sale el martes.\" ⚠ \"Release\" no es \"relevar\" ni \"liberar\" en un documento formal; \"liberar una versión\" se oye, pero \"publicar\" es más claro.",
+      "hint": "The next release ships on Tuesday.",
+      "tags": [
+        "dev",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-release-es-en",
+      "front": "versión, lanzamiento",
+      "back": "release. E.g. \"The next release ships on Tuesday.\"",
+      "hint": "La próxima versión sale el martes.",
+      "tags": [
+        "dev",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-rollback-en-es",
+      "front": "rollback / roll back",
+      "back": "reversión, revertir; volver a la versión anterior. En el equipo: \"hacer rollback\". Ej.: \"Si suben los errores, haz rollback del despliegue.\"",
+      "hint": "Roll back the deploy if errors go up.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-rollback-es-en",
+      "front": "reversión, revertir",
+      "back": "rollback / roll back. E.g. \"Roll back the deploy if errors go up.\"",
+      "hint": "Si suben los errores, haz rollback del despliegue.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-revert-en-es",
+      "front": "revert",
+      "back": "revertir, deshacer. En el equipo: \"revertir el commit\". Ej.: \"Revierte el commit que rompió la compilación.\"",
+      "hint": "Revert the commit that broke the build.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-revert-es-en",
+      "front": "revertir, deshacer",
+      "back": "revert. E.g. \"Revert the commit that broke the build.\"",
+      "hint": "Revierte el commit que rompió la compilación.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-backlog-en-es",
+      "front": "backlog",
+      "back": "lista de pendientes, trabajo pendiente. En el equipo: \"el backlog\" — casi nadie lo traduce en el día a día. Ej.: \"Añádelo al backlog para el próximo sprint.\"",
+      "hint": "Add it to the backlog for next sprint.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-backlog-es-en",
+      "front": "lista de pendientes, trabajo pendiente",
+      "back": "backlog. E.g. \"Add it to the backlog for next sprint.\"",
+      "hint": "Añádelo al backlog para el próximo sprint.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-sprint-en-es",
+      "front": "sprint",
+      "back": "sprint, iteración. En el equipo: \"el sprint\". Ej.: \"En este sprint nos centramos en la facturación.\"",
+      "hint": "This sprint we focus on billing.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-sprint-es-en",
+      "front": "sprint, iteración",
+      "back": "sprint. E.g. \"This sprint we focus on billing.\"",
+      "hint": "En este sprint nos centramos en la facturación.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-feature-en-es",
+      "front": "feature",
+      "back": "funcionalidad, característica, función. En el equipo: \"la feature\", \"una feature nueva\". Ej.: \"La nueva funcionalidad permite exportar tarjetas.\"",
+      "hint": "The new feature lets users export cards.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-feature-es-en",
+      "front": "funcionalidad, característica, función",
+      "back": "feature. E.g. \"The new feature lets users export cards.\"",
+      "hint": "La nueva funcionalidad permite exportar tarjetas.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-requirement-en-es",
+      "front": "requirement",
+      "back": "requisito. En el equipo: \"requisito\" (no \"requerimiento\" en España; en Latinoamérica \"requerimiento\" es muy común). Ej.: \"Una latencia menor de 100 ms es un requisito obligatorio.\"",
+      "hint": "Latency under 100 ms is a hard requirement.",
+      "tags": [
+        "dev",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-requirement-es-en",
+      "front": "requisito",
+      "back": "requirement. E.g. \"Latency under 100 ms is a hard requirement.\"",
+      "hint": "Una latencia menor de 100 ms es un requisito obligatorio.",
+      "tags": [
+        "dev",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-issue-en-es",
+      "front": "issue / ticket",
+      "back": "incidencia, tique, problema. En el equipo: \"abrir un ticket\", \"un issue\". Ej.: \"Abre una incidencia con los pasos para reproducirlo.\"",
+      "hint": "Open an issue with the steps to reproduce.",
+      "tags": [
+        "dev",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-issue-es-en",
+      "front": "incidencia, tique, problema",
+      "back": "issue / ticket. E.g. \"Open an issue with the steps to reproduce.\"",
+      "hint": "Abre una incidencia con los pasos para reproducirlo.",
+      "tags": [
+        "dev",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-roadmap-en-es",
+      "front": "roadmap",
+      "back": "hoja de ruta. En el equipo: \"el roadmap\". Ej.: \"El soporte multirregión está en la hoja de ruta.\"",
+      "hint": "Multi-region support is on the roadmap.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-roadmap-es-en",
+      "front": "hoja de ruta",
+      "back": "roadmap. E.g. \"Multi-region support is on the roadmap.\"",
+      "hint": "El soporte multirregión está en la hoja de ruta.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-mvp-en-es",
+      "front": "MVP (minimum viable product)",
+      "back": "producto mínimo viable (PMV). En el equipo: \"el MVP\" (se pronuncia en español: \"eme-uve-pe\"). Ej.: \"Nuestro MVP corre en una sola Lambda.\"",
+      "hint": "Our MVP runs on a single Lambda.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-mvp-es-en",
+      "front": "producto mínimo viable (PMV)",
+      "back": "MVP (minimum viable product). E.g. \"Our MVP runs on a single Lambda.\"",
+      "hint": "Nuestro MVP corre en una sola Lambda.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-prototype-en-es",
+      "front": "prototype / proof of concept (PoC)",
+      "back": "prototipo; prueba de concepto. En el equipo: \"una PoC\". Ej.: \"Primero haz una prueba de concepto con Bedrock.\"",
+      "hint": "Build a proof of concept with Bedrock first.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-prototype-es-en",
+      "front": "prototipo",
+      "back": "prototype / proof of concept (PoC). E.g. \"Build a proof of concept with Bedrock first.\"",
+      "hint": "Primero haz una prueba de concepto con Bedrock.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-legacy-en-es",
+      "front": "legacy code / legacy system",
+      "back": "código heredado, sistema heredado. En el equipo: \"el legacy\", \"código legacy\". Ej.: \"El sistema heredado todavía corre en EC2.\"",
+      "hint": "The legacy system still runs on EC2.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-legacy-es-en",
+      "front": "código heredado, sistema heredado",
+      "back": "legacy code / legacy system. E.g. \"The legacy system still runs on EC2.\"",
+      "hint": "El sistema heredado todavía corre en EC2.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-tech-debt-en-es",
+      "front": "technical debt (tech debt)",
+      "back": "deuda técnica. En el equipo: \"deuda técnica\" — sí se traduce. Ej.: \"Saltarse las pruebas ahora suma deuda técnica.\"",
+      "hint": "Skipping tests now adds tech debt.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-tech-debt-es-en",
+      "front": "deuda técnica",
+      "back": "technical debt (tech debt). E.g. \"Skipping tests now adds tech debt.\"",
+      "hint": "Saltarse las pruebas ahora suma deuda técnica.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-workaround-en-es",
+      "front": "workaround",
+      "back": "solución alternativa, solución provisional. En el equipo: \"un workaround\". Ej.: \"Usa una solución provisional hasta que AWS cambie el límite.\"",
+      "hint": "Use a workaround until AWS fixes the limit.",
+      "tags": [
+        "dev",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-workaround-es-en",
+      "front": "solución alternativa, solución provisional",
+      "back": "workaround. E.g. \"Use a workaround until AWS fixes the limit.\"",
+      "hint": "Usa una solución provisional hasta que AWS cambie el límite.",
+      "tags": [
+        "dev",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-edge-case-en-es",
+      "front": "edge case / corner case",
+      "back": "caso límite, caso extremo. En el equipo: \"un edge case\", \"caso borde\" (calco, muy usado en Latinoamérica). Ej.: \"Un bucket vacío es un caso límite.\"",
+      "hint": "An empty bucket is an edge case.",
+      "tags": [
+        "dev",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-edge-case-es-en",
+      "front": "caso límite, caso extremo",
+      "back": "edge case / corner case. E.g. \"An empty bucket is an edge case.\"",
+      "hint": "Un bucket vacío es un caso límite.",
+      "tags": [
+        "dev",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-function-en-es",
+      "front": "function",
+      "back": "función. En el equipo: \"función\". Ej.: \"La función devuelve el ítem de DynamoDB.\"",
+      "hint": "The function returns the item from DynamoDB.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-function-es-en",
+      "front": "función",
+      "back": "function. E.g. \"The function returns the item from DynamoDB.\"",
+      "hint": "La función devuelve el ítem de DynamoDB.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-method-en-es",
+      "front": "method",
+      "back": "método. En el equipo: \"método\". Ej.: \"Llama al método send del cliente.\"",
+      "hint": "Call the send method on the client.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-method-es-en",
+      "front": "método",
+      "back": "method. E.g. \"Call the send method on the client.\"",
+      "hint": "Llama al método send del cliente.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-variable-en-es",
+      "front": "variable",
+      "back": "variable. En el equipo: \"variable\" (en femenino: \"la variable\"). Ej.: \"Lee el nombre de la tabla de una variable de entorno.\"",
+      "hint": "Read the table name from an environment variable.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-variable-es-en",
+      "front": "variable",
+      "back": "variable. E.g. \"Read the table name from an environment variable.\"",
+      "hint": "Lee el nombre de la tabla de una variable de entorno.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-constant-en-es",
+      "front": "constant",
+      "back": "constante. En el equipo: \"constante\". Ej.: \"Guarda la región en una constante.\"",
+      "hint": "Keep the region in a constant.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-constant-es-en",
+      "front": "constante",
+      "back": "constant. E.g. \"Keep the region in a constant.\"",
+      "hint": "Guarda la región en una constante.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-loop-en-es",
+      "front": "loop",
+      "back": "bucle; ciclo. En el equipo: \"un bucle\" (España), \"un ciclo\" (muy usado en México y otros países). Ej.: \"El bucle sube cada archivo a S3.\"",
+      "hint": "The loop uploads each file to S3.",
+      "tags": [
+        "code",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-loop-es-en",
+      "front": "bucle",
+      "back": "loop. E.g. \"The loop uploads each file to S3.\"",
+      "hint": "El bucle sube cada archivo a S3.",
+      "tags": [
+        "code",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-array-en-es",
+      "front": "array",
+      "back": "arreglo, matriz, vector; array. En el equipo: \"array\" — casi siempre en inglés. Ej.: \"Recorre con map el array de IDs de instancias.\" ⚠ \"Matriz\" en documentación traducida suele ser un array de cualquier dimensión, no solo una tabla 2D.",
+      "hint": "Map over the array of instance IDs.",
+      "tags": [
+        "code",
+        "en-es",
+        "false-friend",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-array-es-en",
+      "front": "arreglo, matriz, vector",
+      "back": "array. E.g. \"Map over the array of instance IDs.\"",
+      "hint": "Recorre con map el array de IDs de instancias.",
+      "tags": [
+        "code",
+        "es-en",
+        "false-friend",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-list-en-es",
+      "front": "list",
+      "back": "lista. En el equipo: \"lista\". Ej.: \"Python devuelve una lista de nombres de buckets.\"",
+      "hint": "Python returns a list of bucket names.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-list-es-en",
+      "front": "lista",
+      "back": "list. E.g. \"Python returns a list of bucket names.\"",
+      "hint": "Python devuelve una lista de nombres de buckets.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-string-en-es",
+      "front": "string",
+      "back": "cadena (de texto/caracteres). En el equipo: \"un string\" (masculino) o \"una cadena\". Ej.: \"El ARN es solo una cadena de texto.\"",
+      "hint": "The ARN is just a string.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-string-es-en",
+      "front": "cadena (de texto/caracteres)",
+      "back": "string. E.g. \"The ARN is just a string.\"",
+      "hint": "El ARN es solo una cadena de texto.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-integer-en-es",
+      "front": "integer",
+      "back": "entero, número entero. En el equipo: \"un entero\", \"un int\". Ej.: \"El puerto tiene que ser un entero.\"",
+      "hint": "The port must be an integer.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-integer-es-en",
+      "front": "entero, número entero",
+      "back": "integer. E.g. \"The port must be an integer.\"",
+      "hint": "El puerto tiene que ser un entero.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-boolean-en-es",
+      "front": "boolean",
+      "back": "booleano. En el equipo: \"un booleano\". Ej.: \"Activa el control de versiones con un booleano.\"",
+      "hint": "Set versioning with a boolean flag.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-boolean-es-en",
+      "front": "booleano",
+      "back": "boolean. E.g. \"Set versioning with a boolean flag.\"",
+      "hint": "Activa el control de versiones con un booleano.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-object-en-es",
+      "front": "object",
+      "back": "objeto. En el equipo: \"objeto\". Ej.: \"El evento es un objeto JSON.\"",
+      "hint": "The event is a JSON object.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-object-es-en",
+      "front": "objeto",
+      "back": "object. E.g. \"The event is a JSON object.\"",
+      "hint": "El evento es un objeto JSON.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-class-en-es",
+      "front": "class",
+      "back": "clase. En el equipo: \"clase\". Ej.: \"Una pila de CDK es una clase.\"",
+      "hint": "A CDK stack is a class.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-class-es-en",
+      "front": "clase",
+      "back": "class. E.g. \"A CDK stack is a class.\"",
+      "hint": "Una pila de CDK es una clase.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-parameter-en-es",
+      "front": "parameter / argument",
+      "back": "parámetro / argumento. En el equipo: \"parámetro\", \"argumento\". Ej.: \"Pasa el nombre del bucket como argumento.\" ⚠ \"Argumento\" en código no es una discusión: es el valor que pasas a una función.",
+      "hint": "Pass the bucket name as an argument.",
+      "tags": [
+        "code",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-parameter-es-en",
+      "front": "parámetro / argumento",
+      "back": "parameter / argument. E.g. \"Pass the bucket name as an argument.\"",
+      "hint": "Pasa el nombre del bucket como argumento.",
+      "tags": [
+        "code",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-return-en-es",
+      "front": "return (value)",
+      "back": "devolver, retornar; valor de retorno. En el equipo: \"devuelve\" (España), \"retorna\" (muy común en Latinoamérica). Ej.: \"El handler devuelve una respuesta 200.\"",
+      "hint": "The handler returns a 200 response.",
+      "tags": [
+        "code",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-return-es-en",
+      "front": "devolver, retornar",
+      "back": "return (value). E.g. \"The handler returns a 200 response.\"",
+      "hint": "El handler devuelve una respuesta 200.",
+      "tags": [
+        "code",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-callback-en-es",
+      "front": "callback",
+      "back": "función de devolución de llamada; callback. En el equipo: \"un callback\" — la traducción larga casi no se usa al hablar. Ej.: \"Antes el SDK recibía un callback.\"",
+      "hint": "The SDK used to take a callback.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-callback-es-en",
+      "front": "función de devolución de llamada",
+      "back": "callback. E.g. \"The SDK used to take a callback.\"",
+      "hint": "Antes el SDK recibía un callback.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-promise-en-es",
+      "front": "promise",
+      "back": "promesa. En el equipo: \"promesa\" o \"promise\". Ej.: \"client.send devuelve una promesa.\"",
+      "hint": "client.send returns a promise.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-promise-es-en",
+      "front": "promesa",
+      "back": "promise. E.g. \"client.send returns a promise.\"",
+      "hint": "client.send devuelve una promesa.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-async-en-es",
+      "front": "async / asynchronous",
+      "back": "asíncrono, asincrónico. En el equipo: \"async\", \"asíncrono\". Ej.: \"Haz el handler async y usa await en la llamada.\"",
+      "hint": "Make the handler async and await the call.",
+      "tags": [
+        "code",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-async-es-en",
+      "front": "asíncrono, asincrónico",
+      "back": "async / asynchronous. E.g. \"Make the handler async and await the call.\"",
+      "hint": "Haz el handler async y usa await en la llamada.",
+      "tags": [
+        "code",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-framework-en-es",
+      "front": "framework",
+      "back": "marco de trabajo; framework. En el equipo: \"framework\" — se dice siempre en inglés. Ej.: \"React es una biblioteca, no un framework completo.\"",
+      "hint": "React is a library, not a full framework.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-framework-es-en",
+      "front": "marco de trabajo",
+      "back": "framework. E.g. \"React is a library, not a full framework.\"",
+      "hint": "React es una biblioteca, no un framework completo.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-library-en-es",
+      "front": "library",
+      "back": "biblioteca. En el equipo: \"librería\" — muy oído, aunque sea un falso amigo. Ej.: \"boto3 es la biblioteca de AWS para Python.\" ⚠ \"Library\" = biblioteca. \"Librería\" es una tienda de libros (bookstore). En la oficina vas a oír \"librería\" todo el tiempo; en un documento, escribe \"biblioteca\".",
+      "hint": "boto3 is the AWS library for Python.",
+      "tags": [
+        "code",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-library-es-en",
+      "front": "biblioteca",
+      "back": "library. E.g. \"boto3 is the AWS library for Python.\"",
+      "hint": "boto3 es la biblioteca de AWS para Python.",
+      "tags": [
+        "code",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-dependency-en-es",
+      "front": "dependency",
+      "back": "dependencia. En el equipo: \"las dependencias\", \"las deps\". Ej.: \"Actualiza las dependencias antes de la versión.\"",
+      "hint": "Update the dependencies before the release.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-dependency-es-en",
+      "front": "dependencia",
+      "back": "dependency. E.g. \"Update the dependencies before the release.\"",
+      "hint": "Actualiza las dependencias antes de la versión.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-package-en-es",
+      "front": "package",
+      "back": "paquete. En el equipo: \"paquete\" (de npm, de pip). Ej.: \"Instala el paquete con npm.\"",
+      "hint": "Install the package with npm.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-package-es-en",
+      "front": "paquete",
+      "back": "package. E.g. \"Install the package with npm.\"",
+      "hint": "Instala el paquete con npm.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-module-en-es",
+      "front": "module",
+      "back": "módulo. En el equipo: \"módulo\". Ej.: \"Exporta el handler desde el módulo.\"",
+      "hint": "Export the handler from the module.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-module-es-en",
+      "front": "módulo",
+      "back": "module. E.g. \"Export the handler from the module.\"",
+      "hint": "Exporta el handler desde el módulo.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-import-en-es",
+      "front": "import",
+      "back": "importar. En el equipo: \"importar\". Ej.: \"Importa DynamoDBClient desde el SDK.\"",
+      "hint": "Import DynamoDBClient from the SDK.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-import-es-en",
+      "front": "importar",
+      "back": "import. E.g. \"Import DynamoDBClient from the SDK.\"",
+      "hint": "Importa DynamoDBClient desde el SDK.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-sdk-en-es",
+      "front": "SDK (software development kit)",
+      "back": "SDK, kit de desarrollo de software. En el equipo: \"el SDK\" (masculino). Ej.: \"Usa el AWS SDK para JavaScript v3.\"",
+      "hint": "Use the AWS SDK for JavaScript v3.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-sdk-es-en",
+      "front": "SDK, kit de desarrollo de software",
+      "back": "SDK (software development kit). E.g. \"Use the AWS SDK for JavaScript v3.\"",
+      "hint": "Usa el AWS SDK para JavaScript v3.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-api-en-es",
+      "front": "API",
+      "back": "API (interfaz de programación de aplicaciones). En el equipo: \"la API\" (femenino, por \"interfaz\"). Ej.: \"La API devuelve JSON.\"",
+      "hint": "The API returns JSON.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-api-es-en",
+      "front": "API (interfaz de programación de aplicaciones)",
+      "back": "API. E.g. \"The API returns JSON.\"",
+      "hint": "La API devuelve JSON.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-endpoint-en-es",
+      "front": "endpoint",
+      "back": "punto de conexión; endpoint. En el equipo: \"el endpoint\". Ej.: \"Llama al endpoint /progress.\"",
+      "hint": "Call the /progress endpoint.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-endpoint-es-en",
+      "front": "punto de conexión",
+      "back": "endpoint. E.g. \"Call the /progress endpoint.\"",
+      "hint": "Llama al endpoint /progress.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-request-response-en-es",
+      "front": "request / response",
+      "back": "solicitud, petición / respuesta. En el equipo: \"la request\", \"la petición\". Ej.: \"La petición agotó el tiempo de espera a los 30 segundos.\"",
+      "hint": "The request timed out after 30 seconds.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-request-response-es-en",
+      "front": "solicitud, petición / respuesta",
+      "back": "request / response. E.g. \"The request timed out after 30 seconds.\"",
+      "hint": "La petición agotó el tiempo de espera a los 30 segundos.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-runtime-en-es",
+      "front": "runtime",
+      "back": "tiempo de ejecución; entorno de ejecución. En el equipo: \"el runtime\" (de Lambda: Node.js 22, Python 3.13). Ej.: \"Elige el runtime de Python 3.13.\" ⚠ \"Tiempo de ejecución\" también es \"runtime\" en el sentido de \"mientras corre\" (\"error en tiempo de ejecución\").",
+      "hint": "Pick the Python 3.13 runtime.",
+      "tags": [
+        "code",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-runtime-es-en",
+      "front": "tiempo de ejecución",
+      "back": "runtime. E.g. \"Pick the Python 3.13 runtime.\"",
+      "hint": "Elige el runtime de Python 3.13.",
+      "tags": [
+        "code",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-compile-en-es",
+      "front": "compile / compiler",
+      "back": "compilar / compilador. En el equipo: \"compilar\". Ej.: \"TypeScript se compila a JavaScript.\"",
+      "hint": "TypeScript compiles to JavaScript.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-compile-es-en",
+      "front": "compilar / compilador",
+      "back": "compile / compiler. E.g. \"TypeScript compiles to JavaScript.\"",
+      "hint": "TypeScript se compila a JavaScript.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-syntax-en-es",
+      "front": "syntax error",
+      "back": "error de sintaxis. En el equipo: \"error de sintaxis\". Ej.: \"Un corchete que falta provoca un error de sintaxis.\"",
+      "hint": "A missing bracket causes a syntax error.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-syntax-es-en",
+      "front": "error de sintaxis",
+      "back": "syntax error. E.g. \"A missing bracket causes a syntax error.\"",
+      "hint": "Un corchete que falta provoca un error de sintaxis.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-exception-en-es",
+      "front": "exception / throw / catch",
+      "back": "excepción / lanzar / capturar. En el equipo: \"tirar una excepción\", \"cachearla\" (Latinoamérica). Ej.: \"Captura ConditionalCheckFailedException y reintenta.\" ⚠ \"Cachear\" puede ser \"catch\" (capturar) o \"cache\" (almacenar en caché). Por escrito, usa \"capturar\".",
+      "hint": "Catch ConditionalCheckFailedException and retry.",
+      "tags": [
+        "code",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-exception-es-en",
+      "front": "excepción / lanzar / capturar",
+      "back": "exception / throw / catch. E.g. \"Catch ConditionalCheckFailedException and retry.\"",
+      "hint": "Captura ConditionalCheckFailedException y reintenta.",
+      "tags": [
+        "code",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-comment-en-es",
+      "front": "comment (in code)",
+      "back": "comentario. En el equipo: \"comentario\", \"comentar el código\". Ej.: \"Añade un comentario que explique el reintento.\"",
+      "hint": "Add a comment explaining the retry.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-comment-es-en",
+      "front": "comentario",
+      "back": "comment (in code). E.g. \"Add a comment explaining the retry.\"",
+      "hint": "Añade un comentario que explique el reintento.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-linter-en-es",
+      "front": "linter / lint",
+      "back": "analizador de código; linter. En el equipo: \"pasar el linter\". Ej.: \"El linter marca las importaciones sin usar.\"",
+      "hint": "The linter flags unused imports.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-linter-es-en",
+      "front": "analizador de código",
+      "back": "linter / lint. E.g. \"The linter flags unused imports.\"",
+      "hint": "El linter marca las importaciones sin usar.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-type-en-es",
+      "front": "type / typed",
+      "back": "tipo / tipado. En el equipo: \"tipado fuerte\", \"tipar\". Ej.: \"TypeScript añade tipos a JavaScript.\"",
+      "hint": "TypeScript adds types to JavaScript.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-type-es-en",
+      "front": "tipo / tipado",
+      "back": "type / typed. E.g. \"TypeScript adds types to JavaScript.\"",
+      "hint": "TypeScript añade tipos a JavaScript.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-script-en-es",
+      "front": "script",
+      "back": "script; guion. En el equipo: \"script\" — nadie dice \"guion\" para código. Ej.: \"Ejecuta el script de despliegue desde la raíz del repo.\"",
+      "hint": "Run the deploy script from the repo root.",
+      "tags": [
+        "code",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-script-es-en",
+      "front": "script",
+      "back": "script. E.g. \"Run the deploy script from the repo root.\"",
+      "hint": "Ejecuta el script de despliegue desde la raíz del repo.",
+      "tags": [
+        "code",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-run-execute-en-es",
+      "front": "run / execute",
+      "back": "ejecutar. En el equipo: \"correr\" (calco de \"run\", muy común en Latinoamérica), \"ejecutar\". Ej.: \"Ejecuta las pruebas antes de hacer push.\"",
+      "hint": "Run the tests before you push.",
+      "tags": [
+        "code",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-run-execute-es-en",
+      "front": "ejecutar",
+      "back": "run / execute. E.g. \"Run the tests before you push.\"",
+      "hint": "Ejecuta las pruebas antes de hacer push.",
+      "tags": [
+        "code",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-pipeline-en-es",
+      "front": "pipeline",
+      "back": "canalización; pipeline. En el equipo: \"el pipeline\" (o \"la pipeline\"). Ej.: \"El pipeline ejecuta las pruebas y luego despliega.\"",
+      "hint": "The pipeline runs tests, then deploys.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-pipeline-es-en",
+      "front": "canalización",
+      "back": "pipeline. E.g. \"The pipeline runs tests, then deploys.\"",
+      "hint": "El pipeline ejecuta las pruebas y luego despliega.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-ci-en-es",
+      "front": "continuous integration (CI)",
+      "back": "integración continua (IC). En el equipo: \"el CI\", \"pasar el CI\" — la sigla en inglés. Ej.: \"La integración continua corre en cada PR.\"",
+      "hint": "CI runs on every pull request.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-ci-es-en",
+      "front": "integración continua (IC)",
+      "back": "continuous integration (CI). E.g. \"CI runs on every pull request.\"",
+      "hint": "La integración continua corre en cada PR.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-cd-en-es",
+      "front": "continuous delivery / deployment (CD)",
+      "back": "entrega continua / implementación continua. En el equipo: \"CI/CD\" (se dice \"ci-di\" o \"ce-i-ce-de\"). Ej.: \"Con entrega continua, main siempre se puede desplegar.\"",
+      "hint": "With CD, main is always deployable.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-cd-es-en",
+      "front": "entrega continua / implementación continua",
+      "back": "continuous delivery / deployment (CD). E.g. \"With CD, main is always deployable.\"",
+      "hint": "Con entrega continua, main siempre se puede desplegar.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-environment-en-es",
+      "front": "environment",
+      "back": "entorno; ambiente. En el equipo: \"el entorno de staging\", \"el env\". Ej.: \"Pruébalo primero en el entorno de staging.\"",
+      "hint": "Test it in the staging environment first.",
+      "tags": [
+        "devops",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-environment-es-en",
+      "front": "entorno",
+      "back": "environment. E.g. \"Test it in the staging environment first.\"",
+      "hint": "Pruébalo primero en el entorno de staging.",
+      "tags": [
+        "devops",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-production-en-es",
+      "front": "production (prod)",
+      "back": "producción. En el equipo: \"prod\", \"en producción\". Ej.: \"Nunca pruebes en producción.\"",
+      "hint": "Never test in production.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-production-es-en",
+      "front": "producción",
+      "back": "production (prod). E.g. \"Never test in production.\"",
+      "hint": "Nunca pruebes en producción.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-staging-en-es",
+      "front": "staging",
+      "back": "preproducción; entorno de pruebas. En el equipo: \"staging\", \"pre\" (España: \"pre\", \"preprod\"). Ej.: \"Preproducción es una copia de producción.\"",
+      "hint": "Staging mirrors production.",
+      "tags": [
+        "devops",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-staging-es-en",
+      "front": "preproducción",
+      "back": "staging. E.g. \"Staging mirrors production.\"",
+      "hint": "Preproducción es una copia de producción.",
+      "tags": [
+        "devops",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-dev-env-en-es",
+      "front": "development environment (dev)",
+      "back": "entorno de desarrollo. En el equipo: \"en dev\", \"en local\". Ej.: \"Funciona en desarrollo pero no en producción.\"",
+      "hint": "It works in dev but not in prod.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-dev-env-es-en",
+      "front": "entorno de desarrollo",
+      "back": "development environment (dev). E.g. \"It works in dev but not in prod.\"",
+      "hint": "Funciona en desarrollo pero no en producción.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-container-en-es",
+      "front": "container",
+      "back": "contenedor. En el equipo: \"contenedor\" — sí se traduce. Ej.: \"La aplicación corre en un contenedor en ECS.\"",
+      "hint": "The app runs in a container on ECS.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-container-es-en",
+      "front": "contenedor",
+      "back": "container. E.g. \"The app runs in a container on ECS.\"",
+      "hint": "La aplicación corre en un contenedor en ECS.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-image-en-es",
+      "front": "image (container image)",
+      "back": "imagen (de contenedor). En el equipo: \"la imagen de Docker\". Ej.: \"Sube la imagen a Amazon ECR.\"",
+      "hint": "Push the image to Amazon ECR.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-image-es-en",
+      "front": "imagen (de contenedor)",
+      "back": "image (container image). E.g. \"Push the image to Amazon ECR.\"",
+      "hint": "Sube la imagen a Amazon ECR.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-orchestration-en-es",
+      "front": "orchestration",
+      "back": "orquestación. En el equipo: \"orquestación\", \"orquestador\". Ej.: \"Kubernetes se encarga de la orquestación de contenedores.\"",
+      "hint": "Kubernetes handles container orchestration.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-orchestration-es-en",
+      "front": "orquestación",
+      "back": "orchestration. E.g. \"Kubernetes handles container orchestration.\"",
+      "hint": "Kubernetes se encarga de la orquestación de contenedores.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-cluster-en-es",
+      "front": "cluster",
+      "back": "clúster. En el equipo: \"el clúster\" (con tilde en español). Ej.: \"El clúster de EKS tiene tres nodos.\"",
+      "hint": "The EKS cluster has three nodes.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-cluster-es-en",
+      "front": "clúster",
+      "back": "cluster. E.g. \"The EKS cluster has three nodes.\"",
+      "hint": "El clúster de EKS tiene tres nodos.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-rollout-en-es",
+      "front": "rollout / gradual rollout",
+      "back": "implantación, lanzamiento gradual. En el equipo: \"el rollout\". Ej.: \"Primero lo lanzamos al 10% de los usuarios.\"",
+      "hint": "We roll out to 10% of users first.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-rollout-es-en",
+      "front": "implantación, lanzamiento gradual",
+      "back": "rollout / gradual rollout. E.g. \"We roll out to 10% of users first.\"",
+      "hint": "Primero lo lanzamos al 10% de los usuarios.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-blue-green-en-es",
+      "front": "blue/green deployment",
+      "back": "implementación azul/verde. En el equipo: \"blue/green\" — casi siempre en inglés. Ej.: \"CodeDeploy admite implementaciones azul/verde.\"",
+      "hint": "CodeDeploy supports blue/green deployments.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ts-blue-green-es-en",
+      "front": "implementación azul/verde",
+      "back": "blue/green deployment. E.g. \"CodeDeploy supports blue/green deployments.\"",
+      "hint": "CodeDeploy admite implementaciones azul/verde.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ts-canary-en-es",
+      "front": "canary release",
+      "back": "versión canario; despliegue canario. En el equipo: \"un canary\". Ej.: \"Envía el 5% del tráfico al canario.\"",
+      "hint": "Send 5% of traffic to the canary.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ts-canary-es-en",
+      "front": "versión canario",
+      "back": "canary release. E.g. \"Send 5% of traffic to the canary.\"",
+      "hint": "Envía el 5% del tráfico al canario.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ts-feature-flag-en-es",
+      "front": "feature flag / toggle",
+      "back": "marca de funcionalidad; feature flag. En el equipo: \"meterlo detrás de un flag\". Ej.: \"Oculta la página nueva detrás de un feature flag.\"",
+      "hint": "Hide the new page behind a feature flag.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-feature-flag-es-en",
+      "front": "marca de funcionalidad",
+      "back": "feature flag / toggle. E.g. \"Hide the new page behind a feature flag.\"",
+      "hint": "Oculta la página nueva detrás de un feature flag.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-iac-en-es",
+      "front": "infrastructure as code (IaC)",
+      "back": "infraestructura como código (IaC). En el equipo: \"infra como código\". Ej.: \"Definimos todo con infraestructura como código en CDK.\"",
+      "hint": "We define everything with IaC in CDK.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-iac-es-en",
+      "front": "infraestructura como código (IaC)",
+      "back": "infrastructure as code (IaC). E.g. \"We define everything with IaC in CDK.\"",
+      "hint": "Definimos todo con infraestructura como código en CDK.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-provision-en-es",
+      "front": "provision",
+      "back": "aprovisionar. En el equipo: \"levantar\" recursos, \"provisionar\" (calco frecuente). Ej.: \"Terraform aprovisiona la VPC.\" ⚠ \"Provisionar\" se oye mucho, en un documento formal, \"aprovisionar\" es la forma más asentada.",
+      "hint": "Terraform provisions the VPC.",
+      "tags": [
+        "devops",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-provision-es-en",
+      "front": "aprovisionar",
+      "back": "provision. E.g. \"Terraform provisions the VPC.\"",
+      "hint": "Terraform aprovisiona la VPC.",
+      "tags": [
+        "devops",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-monitoring-en-es",
+      "front": "monitoring",
+      "back": "supervisión; monitorización (Esp.); monitoreo (Lat.). En el equipo: \"monitorear\" (Latinoamérica), \"monitorizar\" (España). Ej.: \"CloudWatch se encarga del monitoreo y las alarmas.\"",
+      "hint": "CloudWatch handles monitoring and alarms.",
+      "tags": [
+        "devops",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-monitoring-es-en",
+      "front": "supervisión",
+      "back": "monitoring. E.g. \"CloudWatch handles monitoring and alarms.\"",
+      "hint": "CloudWatch se encarga del monitoreo y las alarmas.",
+      "tags": [
+        "devops",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-log-en-es",
+      "front": "log / logging",
+      "back": "registro; registros. En el equipo: \"los logs\", \"mirar los logs\", \"loguear\". Ej.: \"Revisa los registros en CloudWatch.\" ⚠ \"Loguear\" = escribir en el log. No confundir con \"loguearse\" = iniciar sesión.",
+      "hint": "Check the logs in CloudWatch.",
+      "tags": [
+        "devops",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-log-es-en",
+      "front": "registro",
+      "back": "log / logging. E.g. \"Check the logs in CloudWatch.\"",
+      "hint": "Revisa los registros en CloudWatch.",
+      "tags": [
+        "devops",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-alert-en-es",
+      "front": "alert / alarm",
+      "back": "alerta / alarma. En el equipo: \"saltó la alarma\". Ej.: \"La alarma salta cuando los errores superan el 5%.\"",
+      "hint": "The alarm fires when errors pass 5%.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-alert-es-en",
+      "front": "alerta / alarma",
+      "back": "alert / alarm. E.g. \"The alarm fires when errors pass 5%.\"",
+      "hint": "La alarma salta cuando los errores superan el 5%.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-on-call-en-es",
+      "front": "on-call",
+      "back": "de guardia; guardia. En el equipo: \"estar de guardia\" — sí se traduce. Ej.: \"Este fin de semana estoy de guardia.\"",
+      "hint": "I am on call this weekend.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-on-call-es-en",
+      "front": "de guardia",
+      "back": "on-call. E.g. \"I am on call this weekend.\"",
+      "hint": "Este fin de semana estoy de guardia.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-incident-en-es",
+      "front": "incident",
+      "back": "incidente. En el equipo: \"un incidente\". Ej.: \"Abrimos un incidente por la caída.\" ⚠ \"Incidencia\" (España) suele ser un ticket o problema menor; \"incidente\" es algo serio en producción.",
+      "hint": "We opened an incident for the outage.",
+      "tags": [
+        "devops",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-incident-es-en",
+      "front": "incidente",
+      "back": "incident. E.g. \"We opened an incident for the outage.\"",
+      "hint": "Abrimos un incidente por la caída.",
+      "tags": [
+        "devops",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-outage-en-es",
+      "front": "outage / downtime",
+      "back": "caída, interrupción del servicio; tiempo de inactividad. En el equipo: \"se cayó\", \"una caída\". Ej.: \"La caída duró 12 minutos.\"",
+      "hint": "The outage lasted 12 minutes.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-outage-es-en",
+      "front": "caída, interrupción del servicio",
+      "back": "outage / downtime. E.g. \"The outage lasted 12 minutes.\"",
+      "hint": "La caída duró 12 minutos.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-postmortem-en-es",
+      "front": "postmortem",
+      "back": "análisis posterior al incidente; postmortem. En el equipo: \"el postmortem\" (sin culpables: \"blameless\"). Ej.: \"Escribe el análisis del incidente antes del viernes.\"",
+      "hint": "Write the postmortem by Friday.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-postmortem-es-en",
+      "front": "análisis posterior al incidente",
+      "back": "postmortem. E.g. \"Write the postmortem by Friday.\"",
+      "hint": "Escribe el análisis del incidente antes del viernes.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-uptime-en-es",
+      "front": "uptime / availability",
+      "back": "tiempo de actividad; disponibilidad. En el equipo: \"uptime\", \"disponibilidad\". Ej.: \"Garantizamos una disponibilidad del 99,9%.\" ⚠ Decimales: España usa coma (99,9%); México y Centroamérica, punto (99.9%).",
+      "hint": "We promise 99.9% uptime.",
+      "tags": [
+        "devops",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-uptime-es-en",
+      "front": "tiempo de actividad",
+      "back": "uptime / availability. E.g. \"We promise 99.9% uptime.\"",
+      "hint": "Garantizamos una disponibilidad del 99,9%.",
+      "tags": [
+        "devops",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-sla-en-es",
+      "front": "SLA (service level agreement)",
+      "back": "acuerdo de nivel de servicio (ANS). En el equipo: \"el SLA\" (en inglés). Ej.: \"El SLA cubre un 99,99% de disponibilidad.\"",
+      "hint": "The SLA covers 99.99% availability.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-sla-es-en",
+      "front": "acuerdo de nivel de servicio (ANS)",
+      "back": "SLA (service level agreement). E.g. \"The SLA covers 99.99% availability.\"",
+      "hint": "El SLA cubre un 99,99% de disponibilidad.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-hotfix-prod-en-es",
+      "front": "it's on fire / firefighting",
+      "back": "apagar incendios. En el equipo: \"apagar incendios\" — la metáfora es igual en los dos idiomas. Ej.: \"Pasamos la semana apagando incendios.\"",
+      "hint": "We spent the week firefighting.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-hotfix-prod-es-en",
+      "front": "apagar incendios",
+      "back": "it's on fire / firefighting. E.g. \"We spent the week firefighting.\"",
+      "hint": "Pasamos la semana apagando incendios.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-artifact-en-es",
+      "front": "artifact (build artifact)",
+      "back": "artefacto. En el equipo: \"el artefacto\". Ej.: \"El pipeline guarda el artefacto de la compilación en S3.\"",
+      "hint": "The pipeline stores the build artifact in S3.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-artifact-es-en",
+      "front": "artefacto",
+      "back": "artifact (build artifact). E.g. \"The pipeline stores the build artifact in S3.\"",
+      "hint": "El pipeline guarda el artefacto de la compilación en S3.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-cache-en-es",
+      "front": "cache / invalidate",
+      "back": "caché / invalidar. En el equipo: \"cachear\", \"limpiar la caché\". Ej.: \"Invalida la caché de CloudFront después del despliegue.\"",
+      "hint": "Invalidate the CloudFront cache after the deploy.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-cache-es-en",
+      "front": "caché / invalidar",
+      "back": "cache / invalidate. E.g. \"Invalidate the CloudFront cache after the deploy.\"",
+      "hint": "Invalida la caché de CloudFront después del despliegue.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-config-en-es",
+      "front": "configuration / settings",
+      "back": "configuración. En el equipo: \"la config\". Ej.: \"Mantén la configuración fuera del código.\"",
+      "hint": "Keep the config out of the code.",
+      "tags": [
+        "devops",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-config-es-en",
+      "front": "configuración",
+      "back": "configuration / settings. E.g. \"Keep the config out of the code.\"",
+      "hint": "Mantén la configuración fuera del código.",
+      "tags": [
+        "devops",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-cloud-en-es",
+      "front": "the cloud / cloud computing",
+      "back": "la nube; computación en la nube. En el equipo: \"en la nube\", \"en cloud\". Ej.: \"Movimos toda la aplicación a la nube.\"",
+      "hint": "We moved the whole app to the cloud.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-cloud-es-en",
+      "front": "la nube",
+      "back": "the cloud / cloud computing. E.g. \"We moved the whole app to the cloud.\"",
+      "hint": "Movimos toda la aplicación a la nube.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-region-en-es",
+      "front": "Region",
+      "back": "región. En el equipo: \"la región\", \"us-east-1\" (\"North Virginia\"). Ej.: \"Despliega en dos regiones para la recuperación ante desastres.\"",
+      "hint": "Deploy in two Regions for disaster recovery.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-region-es-en",
+      "front": "región",
+      "back": "Region. E.g. \"Deploy in two Regions for disaster recovery.\"",
+      "hint": "Despliega en dos regiones para la recuperación ante desastres.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-az-en-es",
+      "front": "Availability Zone (AZ)",
+      "back": "zona de disponibilidad (AZ). En el equipo: \"la AZ\" (se dice \"a-zeta\" o \"ei-zi\"). Ej.: \"Reparte las instancias entre tres zonas de disponibilidad.\"",
+      "hint": "Spread instances across three AZs.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-az-es-en",
+      "front": "zona de disponibilidad (AZ)",
+      "back": "Availability Zone (AZ). E.g. \"Spread instances across three AZs.\"",
+      "hint": "Reparte las instancias entre tres zonas de disponibilidad.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-edge-location-en-es",
+      "front": "edge location",
+      "back": "ubicación de borde. En el equipo: \"edge location\", \"el edge\". Ej.: \"CloudFront almacena archivos en caché en las ubicaciones de borde.\"",
+      "hint": "CloudFront caches files at edge locations.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-edge-location-es-en",
+      "front": "ubicación de borde",
+      "back": "edge location. E.g. \"CloudFront caches files at edge locations.\"",
+      "hint": "CloudFront almacena archivos en caché en las ubicaciones de borde.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-bucket-en-es",
+      "front": "bucket (S3)",
+      "back": "bucket. En el equipo: \"el bucket\" — nadie dice \"cubo\". Ej.: \"Sube el sitio a un bucket de S3.\" ⚠ No traduzcas \"bucket\" como \"cubo\": AWS en español deja \"bucket\".",
+      "hint": "Upload the site to an S3 bucket.",
+      "tags": [
+        "cloud",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-bucket-es-en",
+      "front": "bucket",
+      "back": "bucket (S3). E.g. \"Upload the site to an S3 bucket.\"",
+      "hint": "Sube el sitio a un bucket de S3.",
+      "tags": [
+        "cloud",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-object-s3-en-es",
+      "front": "object (S3) / key",
+      "back": "objeto / clave. En el equipo: \"el objeto\", \"la key\". Ej.: \"Cada objeto tiene una clave, como la ruta de un archivo.\"",
+      "hint": "Each object has a key, like a file path.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-object-s3-es-en",
+      "front": "objeto / clave",
+      "back": "object (S3) / key. E.g. \"Each object has a key, like a file path.\"",
+      "hint": "Cada objeto tiene una clave, como la ruta de un archivo.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-instance-en-es",
+      "front": "instance (EC2)",
+      "back": "instancia. En el equipo: \"la instancia\", \"levantar una instancia\". Ej.: \"Detén la instancia por la noche para ahorrar.\" ⚠ \"Instancia\" en español común significa \"solicitud formal\" (a instancias de). En la nube es una máquina virtual.",
+      "hint": "Stop the instance at night to save money.",
+      "tags": [
+        "cloud",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-instance-es-en",
+      "front": "instancia",
+      "back": "instance (EC2). E.g. \"Stop the instance at night to save money.\"",
+      "hint": "Detén la instancia por la noche para ahorrar.",
+      "tags": [
+        "cloud",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-vm-en-es",
+      "front": "virtual machine (VM)",
+      "back": "máquina virtual (MV). En el equipo: \"una VM\", \"una máquina\". Ej.: \"Una instancia EC2 es una máquina virtual.\"",
+      "hint": "An EC2 instance is a virtual machine.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-vm-es-en",
+      "front": "máquina virtual (MV)",
+      "back": "virtual machine (VM). E.g. \"An EC2 instance is a virtual machine.\"",
+      "hint": "Una instancia EC2 es una máquina virtual.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-server-en-es",
+      "front": "server",
+      "back": "servidor. En el equipo: \"el servidor\", \"el server\". Ej.: \"El servidor corre Amazon Linux.\"",
+      "hint": "The server runs Amazon Linux.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-server-es-en",
+      "front": "servidor",
+      "back": "server. E.g. \"The server runs Amazon Linux.\"",
+      "hint": "El servidor corre Amazon Linux.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-serverless-en-es",
+      "front": "serverless",
+      "back": "sin servidor. En el equipo: \"serverless\" — casi siempre en inglés. Ej.: \"Lambda es sin servidor: nunca administras servidores.\"",
+      "hint": "Lambda is serverless: you never manage servers.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-serverless-es-en",
+      "front": "sin servidor",
+      "back": "serverless. E.g. \"Lambda is serverless: you never manage servers.\"",
+      "hint": "Lambda es sin servidor: nunca administras servidores.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-lambda-function-en-es",
+      "front": "Lambda function",
+      "back": "función de Lambda. En el equipo: \"la Lambda\" (femenino, por \"función\"). Ej.: \"La función de Lambda escribe en DynamoDB.\"",
+      "hint": "The Lambda function writes to DynamoDB.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-lambda-function-es-en",
+      "front": "función de Lambda",
+      "back": "Lambda function. E.g. \"The Lambda function writes to DynamoDB.\"",
+      "hint": "La función de Lambda escribe en DynamoDB.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-load-balancer-en-es",
+      "front": "load balancer",
+      "back": "balanceador de carga. En el equipo: \"el balanceador\", \"el ALB\". Ej.: \"El balanceador de carga reparte el tráfico entre instancias.\"",
+      "hint": "The load balancer spreads traffic across instances.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-load-balancer-es-en",
+      "front": "balanceador de carga",
+      "back": "load balancer. E.g. \"The load balancer spreads traffic across instances.\"",
+      "hint": "El balanceador de carga reparte el tráfico entre instancias.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-scaling-en-es",
+      "front": "scaling / scale out / scale up",
+      "back": "escalado; escalar horizontalmente / verticalmente. En el equipo: \"escalar\", \"que escale\". Ej.: \"Auto Scaling añade instancias cuando sube la CPU.\" ⚠ \"Escalar\" un problema también es \"escalarlo\" a un superior (escalate). El contexto lo aclara.",
+      "hint": "Auto Scaling adds instances when CPU goes up.",
+      "tags": [
+        "cloud",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-scaling-es-en",
+      "front": "escalado",
+      "back": "scaling / scale out / scale up. E.g. \"Auto Scaling adds instances when CPU goes up.\"",
+      "hint": "Auto Scaling añade instancias cuando sube la CPU.",
+      "tags": [
+        "cloud",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-high-availability-en-es",
+      "front": "high availability (HA)",
+      "back": "alta disponibilidad. En el equipo: \"alta disponibilidad\". Ej.: \"Multi-AZ da alta disponibilidad a la base de datos.\"",
+      "hint": "Multi-AZ gives the database high availability.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-high-availability-es-en",
+      "front": "alta disponibilidad",
+      "back": "high availability (HA). E.g. \"Multi-AZ gives the database high availability.\"",
+      "hint": "Multi-AZ da alta disponibilidad a la base de datos.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-fault-tolerance-en-es",
+      "front": "fault tolerance",
+      "back": "tolerancia a errores; tolerancia a fallos. En el equipo: \"tolerancia a fallos\". Ej.: \"La tolerancia a fallos significa cero caídas si falla una AZ.\"",
+      "hint": "Fault tolerance means no downtime when an AZ fails.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-fault-tolerance-es-en",
+      "front": "tolerancia a errores",
+      "back": "fault tolerance. E.g. \"Fault tolerance means no downtime when an AZ fails.\"",
+      "hint": "La tolerancia a fallos significa cero caídas si falla una AZ.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-disaster-recovery-en-es",
+      "front": "disaster recovery (DR)",
+      "back": "recuperación ante desastres. En el equipo: \"el plan de DR\". Ej.: \"Nuestro plan de recuperación ante desastres restaura desde otra región.\"",
+      "hint": "Our DR plan restores from another Region.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-disaster-recovery-es-en",
+      "front": "recuperación ante desastres",
+      "back": "disaster recovery (DR). E.g. \"Our DR plan restores from another Region.\"",
+      "hint": "Nuestro plan de recuperación ante desastres restaura desde otra región.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-iam-role-en-es",
+      "front": "IAM role",
+      "back": "rol de IAM. En el equipo: \"el rol\". Ej.: \"Dale a la Lambda un rol de IAM con permiso de lectura.\" ⚠ \"Rol\" con una sola \"l\"; \"role\" en español no existe. \"Rollo\" es otra cosa.",
+      "hint": "Give the Lambda an IAM role with read access.",
+      "tags": [
+        "cloud",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-iam-role-es-en",
+      "front": "rol de IAM",
+      "back": "IAM role. E.g. \"Give the Lambda an IAM role with read access.\"",
+      "hint": "Dale a la Lambda un rol de IAM con permiso de lectura.",
+      "tags": [
+        "cloud",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-policy-en-es",
+      "front": "policy (IAM)",
+      "back": "política. En el equipo: \"la política\", \"la policy\". Ej.: \"Asocia una política que permita s3:GetObject.\" ⚠ \"Política\" aquí no es \"politics\": es un documento de reglas (policy).",
+      "hint": "Attach a policy that allows s3:GetObject.",
+      "tags": [
+        "cloud",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-policy-es-en",
+      "front": "política",
+      "back": "policy (IAM). E.g. \"Attach a policy that allows s3:GetObject.\"",
+      "hint": "Asocia una política que permita s3:GetObject.",
+      "tags": [
+        "cloud",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-vpc-en-es",
+      "front": "VPC (virtual private cloud)",
+      "back": "VPC, nube privada virtual. En el equipo: \"la VPC\" (femenino, por \"nube\"). Ej.: \"La base de datos vive en una subred privada de la VPC.\"",
+      "hint": "The database lives in a private subnet of the VPC.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-vpc-es-en",
+      "front": "VPC, nube privada virtual",
+      "back": "VPC (virtual private cloud). E.g. \"The database lives in a private subnet of the VPC.\"",
+      "hint": "La base de datos vive en una subred privada de la VPC.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-subnet-en-es",
+      "front": "subnet",
+      "back": "subred. En el equipo: \"subred pública / privada\". Ej.: \"Pon el balanceador en las subredes públicas.\"",
+      "hint": "Put the load balancer in the public subnets.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-subnet-es-en",
+      "front": "subred",
+      "back": "subnet. E.g. \"Put the load balancer in the public subnets.\"",
+      "hint": "Pon el balanceador en las subredes públicas.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-security-group-en-es",
+      "front": "security group",
+      "back": "grupo de seguridad. En el equipo: \"el security group\", \"el SG\". Ej.: \"Abre el puerto 443 en el grupo de seguridad.\"",
+      "hint": "Open port 443 in the security group.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-security-group-es-en",
+      "front": "grupo de seguridad",
+      "back": "security group. E.g. \"Open port 443 in the security group.\"",
+      "hint": "Abre el puerto 443 en el grupo de seguridad.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-gateway-en-es",
+      "front": "gateway (internet / NAT / API)",
+      "back": "puerta de enlace. En el equipo: \"el gateway\", \"el NAT\". Ej.: \"Las instancias privadas salen a internet por una puerta de enlace NAT.\"",
+      "hint": "Private instances reach the internet through a NAT gateway.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-gateway-es-en",
+      "front": "puerta de enlace",
+      "back": "gateway (internet / NAT / API). E.g. \"Private instances reach the internet through a NAT gateway.\"",
+      "hint": "Las instancias privadas salen a internet por una puerta de enlace NAT.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-cdn-en-es",
+      "front": "CDN (content delivery network)",
+      "back": "red de entrega de contenido (CDN). En el equipo: \"la CDN\". Ej.: \"CloudFront es la CDN de AWS.\"",
+      "hint": "CloudFront is AWS's CDN.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-cdn-es-en",
+      "front": "red de entrega de contenido (CDN)",
+      "back": "CDN (content delivery network). E.g. \"CloudFront is AWS's CDN.\"",
+      "hint": "CloudFront es la CDN de AWS.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-dns-en-es",
+      "front": "DNS / domain / record",
+      "back": "DNS / dominio / registro. En el equipo: \"el DNS\", \"apuntar el dominio\". Ej.: \"Apunta el dominio a CloudFront con un registro de alias.\"",
+      "hint": "Point the domain at CloudFront with an alias record.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-dns-es-en",
+      "front": "DNS / dominio / registro",
+      "back": "DNS / domain / record. E.g. \"Point the domain at CloudFront with an alias record.\"",
+      "hint": "Apunta el dominio a CloudFront con un registro de alias.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-storage-en-es",
+      "front": "storage",
+      "back": "almacenamiento. En el equipo: \"almacenamiento\". Ej.: \"S3 es almacenamiento de objetos.\"",
+      "hint": "S3 is object storage.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-storage-es-en",
+      "front": "almacenamiento",
+      "back": "storage. E.g. \"S3 is object storage.\"",
+      "hint": "S3 es almacenamiento de objetos.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-compute-en-es",
+      "front": "compute",
+      "back": "cómputo; procesamiento. En el equipo: \"cómputo\" (Latinoamérica), \"computación\" o \"procesamiento\" (España). Ej.: \"Lambda cobra el cómputo por milisegundo.\"",
+      "hint": "Lambda bills compute by the millisecond.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-compute-es-en",
+      "front": "cómputo",
+      "back": "compute. E.g. \"Lambda bills compute by the millisecond.\"",
+      "hint": "Lambda cobra el cómputo por milisegundo.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-managed-service-en-es",
+      "front": "managed service",
+      "back": "servicio administrado; servicio gestionado. En el equipo: \"servicio gestionado\" (España), \"administrado\" (Latinoamérica). Ej.: \"RDS es un servicio de base de datos administrado.\"",
+      "hint": "RDS is a managed database service.",
+      "tags": [
+        "cloud",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-managed-service-es-en",
+      "front": "servicio administrado",
+      "back": "managed service. E.g. \"RDS is a managed database service.\"",
+      "hint": "RDS es un servicio de base de datos administrado.",
+      "tags": [
+        "cloud",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-shared-responsibility-en-es",
+      "front": "shared responsibility model",
+      "back": "modelo de responsabilidad compartida. En el equipo: \"responsabilidad compartida\". Ej.: \"Según el modelo de responsabilidad compartida, tú parcheas el sistema operativo en EC2.\"",
+      "hint": "Under the shared responsibility model, you patch the OS on EC2.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-shared-responsibility-es-en",
+      "front": "modelo de responsabilidad compartida",
+      "back": "shared responsibility model. E.g. \"Under the shared responsibility model, you patch the OS on EC2.\"",
+      "hint": "Según el modelo de responsabilidad compartida, tú parcheas el sistema operativo en EC2.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-pay-as-you-go-en-es",
+      "front": "pay-as-you-go / on-demand",
+      "back": "pago por uso / bajo demanda. En el equipo: \"on-demand\", \"pagas por lo que usas\". Ej.: \"Las instancias bajo demanda no tienen costo inicial.\"",
+      "hint": "On-Demand instances have no upfront cost.",
+      "tags": [
+        "cloud",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-pay-as-you-go-es-en",
+      "front": "pago por uso / bajo demanda",
+      "back": "pay-as-you-go / on-demand. E.g. \"On-Demand instances have no upfront cost.\"",
+      "hint": "Las instancias bajo demanda no tienen costo inicial.",
+      "tags": [
+        "cloud",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-reserved-spot-en-es",
+      "front": "Reserved Instances / Spot Instances",
+      "back": "instancias reservadas / instancias de spot. En el equipo: \"las spot\". Ej.: \"Las instancias de spot pueden interrumpirse con dos minutos de aviso.\"",
+      "hint": "Spot Instances can be interrupted with two minutes of notice.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-reserved-spot-es-en",
+      "front": "instancias reservadas / instancias de spot",
+      "back": "Reserved Instances / Spot Instances. E.g. \"Spot Instances can be interrupted with two minutes of notice.\"",
+      "hint": "Las instancias de spot pueden interrumpirse con dos minutos de aviso.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-console-en-es",
+      "front": "console (AWS Management Console)",
+      "back": "consola. En el equipo: \"entrar a la consola\". Ej.: \"Puedes hacerlo en la consola o con la CLI.\"",
+      "hint": "You can do it in the console or with the CLI.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-console-es-en",
+      "front": "consola",
+      "back": "console (AWS Management Console). E.g. \"You can do it in the console or with the CLI.\"",
+      "hint": "Puedes hacerlo en la consola o con la CLI.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-cli-en-es",
+      "front": "CLI (command line interface)",
+      "back": "CLI, interfaz de línea de comandos. En el equipo: \"la CLI\" (femenino, por \"interfaz\"), \"la terminal\" / \"el terminal\" (España). Ej.: \"Lista tus buckets con la CLI.\"",
+      "hint": "List your buckets with the CLI.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-cli-es-en",
+      "front": "CLI, interfaz de línea de comandos",
+      "back": "CLI (command line interface). E.g. \"List your buckets with the CLI.\"",
+      "hint": "Lista tus buckets con la CLI.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-account-en-es",
+      "front": "account (AWS account)",
+      "back": "cuenta. En el equipo: \"la cuenta de prod\", \"la cuenta de dev\". Ej.: \"Usa una cuenta separada para producción.\"",
+      "hint": "Use a separate account for production.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-account-es-en",
+      "front": "cuenta",
+      "back": "account (AWS account). E.g. \"Use a separate account for production.\"",
+      "hint": "Usa una cuenta separada para producción.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-stack-en-es",
+      "front": "stack (CloudFormation / CDK)",
+      "back": "pila. En el equipo: \"el stack\" — \"pila\" casi solo por escrito. Ej.: \"cdk deploy actualiza la pila.\" ⚠ \"Stack\" también es \"pila tecnológica\" (tech stack): \"¿qué stack usan?\".",
+      "hint": "cdk deploy updates the stack.",
+      "tags": [
+        "cloud",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-stack-es-en",
+      "front": "pila",
+      "back": "stack (CloudFormation / CDK). E.g. \"cdk deploy updates the stack.\"",
+      "hint": "cdk deploy actualiza la pila.",
+      "tags": [
+        "cloud",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-resource-en-es",
+      "front": "resource",
+      "back": "recurso. En el equipo: \"recurso\". Ej.: \"Etiqueta cada recurso con su responsable.\"",
+      "hint": "Tag every resource with its owner.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-resource-es-en",
+      "front": "recurso",
+      "back": "resource. E.g. \"Tag every resource with its owner.\"",
+      "hint": "Etiqueta cada recurso con su responsable.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-tag-en-es",
+      "front": "tag",
+      "back": "etiqueta. En el equipo: \"etiquetar\", \"taguear\". Ej.: \"Las etiquetas te ayudan a dividir la factura por equipo.\"",
+      "hint": "Tags help you split the bill by team.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-tag-es-en",
+      "front": "etiqueta",
+      "back": "tag. E.g. \"Tags help you split the bill by team.\"",
+      "hint": "Las etiquetas te ayudan a dividir la factura por equipo.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-quota-en-es",
+      "front": "quota / limit / throttling",
+      "back": "cuota / límite / limitación (controlada). En el equipo: \"throttling\", \"nos limitaron\". Ej.: \"Pide un aumento de cuota para la simultaneidad de Lambda.\"",
+      "hint": "Request a quota increase for Lambda concurrency.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-quota-es-en",
+      "front": "cuota / límite / limitación (controlada)",
+      "back": "quota / limit / throttling. E.g. \"Request a quota increase for Lambda concurrency.\"",
+      "hint": "Pide un aumento de cuota para la simultaneidad de Lambda.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-latency-en-es",
+      "front": "latency / throughput",
+      "back": "latencia / rendimiento. En el equipo: \"latencia\", \"throughput\". Ej.: \"La caché redujo la latencia a la mitad.\" ⚠ \"Rendimiento\" puede ser \"performance\" o \"throughput\": aclara cuál si importa.",
+      "hint": "Caching cut latency in half.",
+      "tags": [
+        "cloud",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-latency-es-en",
+      "front": "latencia / rendimiento",
+      "back": "latency / throughput. E.g. \"Caching cut latency in half.\"",
+      "hint": "La caché redujo la latencia a la mitad.",
+      "tags": [
+        "cloud",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-migration-cloud-en-es",
+      "front": "lift and shift / migration",
+      "back": "migración tal cual; rehospedaje. En el equipo: \"lift and shift\". Ej.: \"Un lift and shift mueve la máquina sin cambios.\"",
+      "hint": "A lift and shift moves the VM without changes.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ts-migration-cloud-es-en",
+      "front": "migración tal cual",
+      "back": "lift and shift / migration. E.g. \"A lift and shift moves the VM without changes.\"",
+      "hint": "Un lift and shift mueve la máquina sin cambios.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ts-billing-en-es",
+      "front": "billing / bill / cost",
+      "back": "facturación / factura / costo (Lat.), coste (Esp.). En el equipo: \"la factura de AWS\". Ej.: \"Configura una alerta de presupuesto antes de que la factura te sorprenda.\"",
+      "hint": "Set a budget alert before the bill surprises you.",
+      "tags": [
+        "cloud",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-billing-es-en",
+      "front": "facturación / factura / costo (Lat.), coste (Esp.)",
+      "back": "billing / bill / cost. E.g. \"Set a budget alert before the bill surprises you.\"",
+      "hint": "Configura una alerta de presupuesto antes de que la factura te sorprenda.",
+      "tags": [
+        "cloud",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-database-en-es",
+      "front": "database",
+      "back": "base de datos. En el equipo: \"la base\", \"la DB\". Ej.: \"DynamoDB es una base de datos NoSQL.\"",
+      "hint": "DynamoDB is a NoSQL database.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-database-es-en",
+      "front": "base de datos",
+      "back": "database. E.g. \"DynamoDB is a NoSQL database.\"",
+      "hint": "DynamoDB es una base de datos NoSQL.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-query-en-es",
+      "front": "query",
+      "back": "consulta. En el equipo: \"la query\" (femenino) — muy usado. Ej.: \"Esa consulta recorre toda la tabla.\"",
+      "hint": "That query scans the whole table.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-query-es-en",
+      "front": "consulta",
+      "back": "query. E.g. \"That query scans the whole table.\"",
+      "hint": "Esa consulta recorre toda la tabla.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-table-en-es",
+      "front": "table",
+      "back": "tabla. En el equipo: \"tabla\". Ej.: \"Crea una tabla con una clave de partición.\"",
+      "hint": "Create a table with a partition key.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-table-es-en",
+      "front": "tabla",
+      "back": "table. E.g. \"Create a table with a partition key.\"",
+      "hint": "Crea una tabla con una clave de partición.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-row-column-en-es",
+      "front": "row / column",
+      "back": "fila / columna. En el equipo: \"fila\", \"columna\". Ej.: \"Cada fila es un usuario.\"",
+      "hint": "Each row is one user.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-row-column-es-en",
+      "front": "fila / columna",
+      "back": "row / column. E.g. \"Each row is one user.\"",
+      "hint": "Cada fila es un usuario.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-item-attribute-en-es",
+      "front": "item / attribute (DynamoDB)",
+      "back": "elemento, ítem / atributo. En el equipo: \"el ítem\". Ej.: \"Cada elemento puede tener atributos distintos.\"",
+      "hint": "Each item can have different attributes.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-item-attribute-es-en",
+      "front": "elemento, ítem / atributo",
+      "back": "item / attribute (DynamoDB). E.g. \"Each item can have different attributes.\"",
+      "hint": "Cada elemento puede tener atributos distintos.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-partition-key-en-es",
+      "front": "partition key",
+      "back": "clave de partición. En el equipo: \"la PK\", \"la partition key\". Ej.: \"La clave de partición decide dónde se guarda el elemento.\"",
+      "hint": "The partition key decides where the item is stored.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-partition-key-es-en",
+      "front": "clave de partición",
+      "back": "partition key. E.g. \"The partition key decides where the item is stored.\"",
+      "hint": "La clave de partición decide dónde se guarda el elemento.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-sort-key-en-es",
+      "front": "sort key",
+      "back": "clave de ordenación; clave de clasificación. En el equipo: \"la sort key\", \"la SK\". Ej.: \"Usa una fecha como clave de ordenación para obtener los elementos en orden.\"",
+      "hint": "Use a date as the sort key to get items in order.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-sort-key-es-en",
+      "front": "clave de ordenación",
+      "back": "sort key. E.g. \"Use a date as the sort key to get items in order.\"",
+      "hint": "Usa una fecha como clave de ordenación para obtener los elementos en orden.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-primary-key-en-es",
+      "front": "primary key",
+      "back": "clave principal; clave primaria. En el equipo: \"clave primaria\" (lo más oído), \"clave principal\" (AWS y Microsoft). Ej.: \"La clave principal tiene que ser única.\"",
+      "hint": "The primary key must be unique.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-primary-key-es-en",
+      "front": "clave principal",
+      "back": "primary key. E.g. \"The primary key must be unique.\"",
+      "hint": "La clave principal tiene que ser única.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-index-en-es",
+      "front": "index / secondary index (GSI, LSI)",
+      "back": "índice / índice secundario global (GSI). En el equipo: \"un GSI\" (se dice la sigla en inglés). Ej.: \"Añade un índice secundario global para consultar por correo.\"",
+      "hint": "Add a GSI to query by email.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-index-es-en",
+      "front": "índice / índice secundario global (GSI)",
+      "back": "index / secondary index (GSI, LSI). E.g. \"Add a GSI to query by email.\"",
+      "hint": "Añade un índice secundario global para consultar por correo.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-schema-en-es",
+      "front": "schema",
+      "back": "esquema. En el equipo: \"el esquema\". Ej.: \"DynamoDB no tiene un esquema fijo.\"",
+      "hint": "DynamoDB has no fixed schema.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-schema-es-en",
+      "front": "esquema",
+      "back": "schema. E.g. \"DynamoDB has no fixed schema.\"",
+      "hint": "DynamoDB no tiene un esquema fijo.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-migration-en-es",
+      "front": "migration (schema / data)",
+      "back": "migración. En el equipo: \"correr la migración\". Ej.: \"Ejecuta la migración antes de desplegar el código nuevo.\"",
+      "hint": "Run the migration before deploying the new code.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-migration-es-en",
+      "front": "migración",
+      "back": "migration (schema / data). E.g. \"Run the migration before deploying the new code.\"",
+      "hint": "Ejecuta la migración antes de desplegar el código nuevo.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-backup-en-es",
+      "front": "backup",
+      "back": "copia de seguridad; copia de respaldo. En el equipo: \"el backup\", \"un respaldo\" (muy común en Latinoamérica). Ej.: \"Activa la recuperación a un momento dado para las copias de seguridad.\"",
+      "hint": "Turn on point-in-time recovery for backups.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-backup-es-en",
+      "front": "copia de seguridad",
+      "back": "backup. E.g. \"Turn on point-in-time recovery for backups.\"",
+      "hint": "Activa la recuperación a un momento dado para las copias de seguridad.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-restore-en-es",
+      "front": "restore",
+      "back": "restaurar. En el equipo: \"restaurar el backup\". Ej.: \"Restaura la tabla a ayer a las 9 a. m.\"",
+      "hint": "Restore the table to yesterday at 9 a.m.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-restore-es-en",
+      "front": "restaurar",
+      "back": "restore. E.g. \"Restore the table to yesterday at 9 a.m.\"",
+      "hint": "Restaura la tabla a ayer a las 9 a. m.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-replica-en-es",
+      "front": "replica / replication",
+      "back": "réplica / replicación. En el equipo: \"la réplica de lectura\". Ej.: \"Las réplicas de lectura le quitan carga a la principal.\"",
+      "hint": "Read replicas take load off the primary.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-replica-es-en",
+      "front": "réplica / replicación",
+      "back": "replica / replication. E.g. \"Read replicas take load off the primary.\"",
+      "hint": "Las réplicas de lectura le quitan carga a la principal.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-transaction-en-es",
+      "front": "transaction",
+      "back": "transacción. En el equipo: \"transacción\". Ej.: \"Escribe los dos elementos en una sola transacción.\"",
+      "hint": "Write both items in one transaction.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-transaction-es-en",
+      "front": "transacción",
+      "back": "transaction. E.g. \"Write both items in one transaction.\"",
+      "hint": "Escribe los dos elementos en una sola transacción.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-record-en-es",
+      "front": "record",
+      "back": "registro. En el equipo: \"registro\". Ej.: \"Inserta un registro por pedido.\" ⚠ \"Registro\" también es log y entrada de DNS: en español una misma palabra cubre tres ideas.",
+      "hint": "Insert one record per order.",
+      "tags": [
+        "data",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-record-es-en",
+      "front": "registro",
+      "back": "record. E.g. \"Insert one record per order.\"",
+      "hint": "Inserta un registro por pedido.",
+      "tags": [
+        "data",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-dataset-en-es",
+      "front": "dataset",
+      "back": "conjunto de datos. En el equipo: \"el dataset\". Ej.: \"Entrena el modelo con un conjunto de datos limpio.\"",
+      "hint": "Train the model on a clean dataset.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-dataset-es-en",
+      "front": "conjunto de datos",
+      "back": "dataset. E.g. \"Train the model on a clean dataset.\"",
+      "hint": "Entrena el modelo con un conjunto de datos limpio.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-big-data-en-es",
+      "front": "big data",
+      "back": "macrodatos; datos masivos. En el equipo: \"big data\" — en la oficina nadie dice \"macrodatos\". Ej.: \"EMR procesa macrodatos con Spark.\"",
+      "hint": "EMR processes big data with Spark.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-big-data-es-en",
+      "front": "macrodatos",
+      "back": "big data. E.g. \"EMR processes big data with Spark.\"",
+      "hint": "EMR procesa macrodatos con Spark.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-data-lake-en-es",
+      "front": "data lake / data warehouse",
+      "back": "lago de datos / almacén de datos. En el equipo: \"el data lake\", \"el warehouse\". Ej.: \"Nuestro lago de datos vive en S3.\"",
+      "hint": "Our data lake lives in S3.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-data-lake-es-en",
+      "front": "lago de datos / almacén de datos",
+      "back": "data lake / data warehouse. E.g. \"Our data lake lives in S3.\"",
+      "hint": "Nuestro lago de datos vive en S3.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-etl-en-es",
+      "front": "ETL / pipeline (data)",
+      "back": "ETL (extraer, transformar, cargar). En el equipo: \"el ETL\". Ej.: \"Glue ejecuta el proceso ETL cada noche.\"",
+      "hint": "Glue runs the nightly ETL job.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-etl-es-en",
+      "front": "ETL (extraer, transformar, cargar)",
+      "back": "ETL / pipeline (data). E.g. \"Glue runs the nightly ETL job.\"",
+      "hint": "Glue ejecuta el proceso ETL cada noche.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-stream-en-es",
+      "front": "stream / streaming",
+      "back": "flujo, secuencia; transmisión. En el equipo: \"el stream\". Ej.: \"DynamoDB Streams activa una Lambda con cada cambio.\"",
+      "hint": "DynamoDB Streams trigger a Lambda on every change.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-stream-es-en",
+      "front": "flujo, secuencia",
+      "back": "stream / streaming. E.g. \"DynamoDB Streams trigger a Lambda on every change.\"",
+      "hint": "DynamoDB Streams activa una Lambda con cada cambio.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-json-en-es",
+      "front": "JSON / field / key-value",
+      "back": "JSON / campo / clave-valor. En el equipo: \"el JSON\", \"el campo\". Ej.: \"Añade un campo email al JSON.\"",
+      "hint": "Add an email field to the JSON.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-json-es-en",
+      "front": "JSON / campo / clave-valor",
+      "back": "JSON / field / key-value. E.g. \"Add an email field to the JSON.\"",
+      "hint": "Añade un campo email al JSON.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-scan-en-es",
+      "front": "scan (vs query)",
+      "back": "examen (Scan) / consulta (Query). En el equipo: \"hacer un scan\" — se deja en inglés. Ej.: \"Un scan lee todos los elementos; una query lee una sola partición.\"",
+      "hint": "A scan reads every item; a query reads one partition.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ts-scan-es-en",
+      "front": "examen (Scan) / consulta (Query)",
+      "back": "scan (vs query). E.g. \"A scan reads every item; a query reads one partition.\"",
+      "hint": "Un scan lee todos los elementos; una query lee una sola partición.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ts-machine-learning-en-es",
+      "front": "machine learning / model / training",
+      "back": "aprendizaje automático / modelo / entrenamiento. En el equipo: \"machine learning\", \"entrenar el modelo\". Ej.: \"SageMaker entrena el modelo.\"",
+      "hint": "SageMaker trains the model.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-machine-learning-es-en",
+      "front": "aprendizaje automático / modelo / entrenamiento",
+      "back": "machine learning / model / training. E.g. \"SageMaker trains the model.\"",
+      "hint": "SageMaker entrena el modelo.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-llm-en-es",
+      "front": "LLM / prompt / inference",
+      "back": "modelo de lenguaje grande / instrucción / inferencia. En el equipo: \"el prompt\", \"un LLM\". Ej.: \"Bedrock ejecuta la inferencia en el modelo que elijas.\"",
+      "hint": "Bedrock runs inference on the model you pick.",
+      "tags": [
+        "data",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-llm-es-en",
+      "front": "modelo de lenguaje grande / instrucción / inferencia",
+      "back": "LLM / prompt / inference. E.g. \"Bedrock runs inference on the model you pick.\"",
+      "hint": "Bedrock ejecuta la inferencia en el modelo que elijas.",
+      "tags": [
+        "data",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-authentication-en-es",
+      "front": "authentication (authn)",
+      "back": "autenticación. En el equipo: \"autenticación\" (\"autentificación\" también se oye). Ej.: \"Cognito se encarga de la autenticación.\"",
+      "hint": "Cognito handles authentication.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-authentication-es-en",
+      "front": "autenticación",
+      "back": "authentication (authn). E.g. \"Cognito handles authentication.\"",
+      "hint": "Cognito se encarga de la autenticación.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-authorization-en-es",
+      "front": "authorization (authz)",
+      "back": "autorización. En el equipo: \"autorización\". Ej.: \"La autenticación es quién eres; la autorización es qué puedes hacer.\"",
+      "hint": "Authentication is who you are; authorization is what you can do.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-authorization-es-en",
+      "front": "autorización",
+      "back": "authorization (authz). E.g. \"Authentication is who you are; authorization is what you can do.\"",
+      "hint": "La autenticación es quién eres; la autorización es qué puedes hacer.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-sign-in-en-es",
+      "front": "sign in / log in / sign up",
+      "back": "iniciar sesión / registrarse. En el equipo: \"loguearse\", \"hacer login\". Ej.: \"Inicia sesión con Google.\"",
+      "hint": "Sign in with Google.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-sign-in-es-en",
+      "front": "iniciar sesión / registrarse",
+      "back": "sign in / log in / sign up. E.g. \"Sign in with Google.\"",
+      "hint": "Inicia sesión con Google.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-credentials-en-es",
+      "front": "credentials",
+      "back": "credenciales. En el equipo: \"las credenciales\". Ej.: \"Nunca subas credenciales a Git.\"",
+      "hint": "Never commit credentials to Git.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-credentials-es-en",
+      "front": "credenciales",
+      "back": "credentials. E.g. \"Never commit credentials to Git.\"",
+      "hint": "Nunca subas credenciales a Git.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-password-en-es",
+      "front": "password",
+      "back": "contraseña. En el equipo: \"la contraseña\", \"la clave\" (Latinoamérica), \"la pass\". Ej.: \"Cambia la contraseña de la base de datos cada 90 días.\"",
+      "hint": "Rotate the database password every 90 days.",
+      "tags": [
+        "security",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-password-es-en",
+      "front": "contraseña",
+      "back": "password. E.g. \"Rotate the database password every 90 days.\"",
+      "hint": "Cambia la contraseña de la base de datos cada 90 días.",
+      "tags": [
+        "security",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-token-en-es",
+      "front": "token",
+      "back": "token. En el equipo: \"el token\". Ej.: \"El token de actualización mantiene tu sesión iniciada.\"",
+      "hint": "The refresh token keeps you signed in.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-token-es-en",
+      "front": "token",
+      "back": "token. E.g. \"The refresh token keeps you signed in.\"",
+      "hint": "El token de actualización mantiene tu sesión iniciada.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-api-key-en-es",
+      "front": "API key / access key",
+      "back": "clave de API / clave de acceso. En el equipo: \"la API key\". Ej.: \"Guarda la clave de API en Secrets Manager.\"",
+      "hint": "Store the API key in Secrets Manager.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-api-key-es-en",
+      "front": "clave de API / clave de acceso",
+      "back": "API key / access key. E.g. \"Store the API key in Secrets Manager.\"",
+      "hint": "Guarda la clave de API en Secrets Manager.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-secret-en-es",
+      "front": "secret",
+      "back": "secreto. En el equipo: \"un secreto\" (en Secrets Manager). Ej.: \"La clave de Stripe es un secreto, no un valor de configuración.\"",
+      "hint": "The Stripe key is a secret, not a config value.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-secret-es-en",
+      "front": "secreto",
+      "back": "secret. E.g. \"The Stripe key is a secret, not a config value.\"",
+      "hint": "La clave de Stripe es un secreto, no un valor de configuración.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-encryption-en-es",
+      "front": "encryption / encrypt / decrypt",
+      "back": "cifrado / cifrar / descifrar. En el equipo: \"encriptar\" (muy oído). Ej.: \"S3 cifra los objetos en reposo de forma predeterminada.\"",
+      "hint": "S3 encrypts objects at rest by default.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-encryption-es-en",
+      "front": "cifrado / cifrar / descifrar",
+      "back": "encryption / encrypt / decrypt. E.g. \"S3 encrypts objects at rest by default.\"",
+      "hint": "S3 cifra los objetos en reposo de forma predeterminada.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-at-rest-transit-en-es",
+      "front": "at rest / in transit",
+      "back": "en reposo / en tránsito. En el equipo: \"cifrado en reposo y en tránsito\". Ej.: \"Cifra los datos en reposo y en tránsito.\"",
+      "hint": "Encrypt data at rest and in transit.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-at-rest-transit-es-en",
+      "front": "en reposo / en tránsito",
+      "back": "at rest / in transit. E.g. \"Encrypt data at rest and in transit.\"",
+      "hint": "Cifra los datos en reposo y en tránsito.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-permissions-en-es",
+      "front": "permissions / access",
+      "back": "permisos / acceso. En el equipo: \"no tengo permisos\". Ej.: \"El error dice que no tienes permisos para s3:PutObject.\"",
+      "hint": "The error says you lack permissions for s3:PutObject.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-permissions-es-en",
+      "front": "permisos / acceso",
+      "back": "permissions / access. E.g. \"The error says you lack permissions for s3:PutObject.\"",
+      "hint": "El error dice que no tienes permisos para s3:PutObject.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-least-privilege-en-es",
+      "front": "least privilege",
+      "back": "privilegio mínimo. En el equipo: \"mínimo privilegio\". Ej.: \"Aplica el privilegio mínimo: concede solo lo necesario.\"",
+      "hint": "Follow least privilege: grant only what is needed.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-least-privilege-es-en",
+      "front": "privilegio mínimo",
+      "back": "least privilege. E.g. \"Follow least privilege: grant only what is needed.\"",
+      "hint": "Aplica el privilegio mínimo: concede solo lo necesario.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-mfa-en-es",
+      "front": "MFA (multi-factor authentication)",
+      "back": "autenticación multifactor (MFA). En el equipo: \"el doble factor\", \"el MFA\". Ej.: \"Activa la MFA para el usuario raíz.\"",
+      "hint": "Turn on MFA for the root user.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-mfa-es-en",
+      "front": "autenticación multifactor (MFA)",
+      "back": "MFA (multi-factor authentication). E.g. \"Turn on MFA for the root user.\"",
+      "hint": "Activa la MFA para el usuario raíz.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-root-user-en-es",
+      "front": "root user",
+      "back": "usuario raíz. En el equipo: \"el root\". Ej.: \"No uses el usuario raíz para el trabajo diario.\"",
+      "hint": "Do not use the root user for daily work.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-root-user-es-en",
+      "front": "usuario raíz",
+      "back": "root user. E.g. \"Do not use the root user for daily work.\"",
+      "hint": "No uses el usuario raíz para el trabajo diario.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-vulnerability-en-es",
+      "front": "vulnerability / exploit",
+      "back": "vulnerabilidad / exploit. En el equipo: \"una vulnerabilidad\", \"un CVE\". Ej.: \"Inspector analiza las instancias en busca de vulnerabilidades.\"",
+      "hint": "Inspector scans instances for vulnerabilities.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-vulnerability-es-en",
+      "front": "vulnerabilidad / exploit",
+      "back": "vulnerability / exploit. E.g. \"Inspector scans instances for vulnerabilities.\"",
+      "hint": "Inspector analiza las instancias en busca de vulnerabilidades.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-firewall-en-es",
+      "front": "firewall / WAF",
+      "back": "cortafuegos; firewall. En el equipo: \"el firewall\" (Latinoamérica), \"el cortafuegos\" (más usado en España). Ej.: \"AWS WAF es un firewall de aplicaciones web.\"",
+      "hint": "AWS WAF is a web application firewall.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-firewall-es-en",
+      "front": "cortafuegos",
+      "back": "firewall / WAF. E.g. \"AWS WAF is a web application firewall.\"",
+      "hint": "AWS WAF es un firewall de aplicaciones web.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-phishing-en-es",
+      "front": "phishing",
+      "back": "suplantación de identidad; phishing. En el equipo: \"phishing\". Ej.: \"El correo era un intento de phishing.\"",
+      "hint": "The email was a phishing attempt.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-phishing-es-en",
+      "front": "suplantación de identidad",
+      "back": "phishing. E.g. \"The email was a phishing attempt.\"",
+      "hint": "El correo era un intento de phishing.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-hacker-en-es",
+      "front": "hacker / to hack / breach",
+      "back": "hacker, pirata informático / hackear / brecha (de seguridad). En el equipo: \"hackear\", \"nos hackearon\". Ej.: \"La brecha no expuso datos de clientes.\" ⚠ \"Hacker\" en inglés técnico también es alguien que programa con ingenio; en español casi siempre suena delictivo.",
+      "hint": "The breach exposed no customer data.",
+      "tags": [
+        "security",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-hacker-es-en",
+      "front": "hacker, pirata informático / hackear / brecha (de seguridad)",
+      "back": "hacker / to hack / breach. E.g. \"The breach exposed no customer data.\"",
+      "hint": "La brecha no expuso datos de clientes.",
+      "tags": [
+        "security",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-audit-en-es",
+      "front": "audit / compliance",
+      "back": "auditoría / cumplimiento (normativo). En el equipo: \"compliance\". Ej.: \"CloudTrail guarda un registro de auditoría de las llamadas a la API.\"",
+      "hint": "CloudTrail keeps an audit log of API calls.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-audit-es-en",
+      "front": "auditoría / cumplimiento (normativo)",
+      "back": "audit / compliance. E.g. \"CloudTrail keeps an audit log of API calls.\"",
+      "hint": "CloudTrail guarda un registro de auditoría de las llamadas a la API.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-certificate-en-es",
+      "front": "certificate (TLS/SSL)",
+      "back": "certificado. En el equipo: \"el certificado\", \"el SSL\". Ej.: \"ACM emite certificados gratuitos para CloudFront.\"",
+      "hint": "ACM issues free certificates for CloudFront.",
+      "tags": [
+        "security",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-certificate-es-en",
+      "front": "certificado",
+      "back": "certificate (TLS/SSL). E.g. \"ACM issues free certificates for CloudFront.\"",
+      "hint": "ACM emite certificados gratuitos para CloudFront.",
+      "tags": [
+        "security",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-stand-up-en-es",
+      "front": "stand-up / daily",
+      "back": "reunión diaria. En el equipo: \"la daily\" (muy usado), \"el stand-up\". Ej.: \"Trae los bloqueos a la daily.\"",
+      "hint": "Bring blockers to the stand-up.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-stand-up-es-en",
+      "front": "reunión diaria",
+      "back": "stand-up / daily. E.g. \"Bring blockers to the stand-up.\"",
+      "hint": "Trae los bloqueos a la daily.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-code-review-en-es",
+      "front": "code review",
+      "back": "revisión de código. En el equipo: \"la review\", \"revisar la PR\". Ej.: \"Se necesitan dos aprobaciones en la revisión de código.\"",
+      "hint": "Two approvals are required in code review.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-code-review-es-en",
+      "front": "revisión de código",
+      "back": "code review. E.g. \"Two approvals are required in code review.\"",
+      "hint": "Se necesitan dos aprobaciones en la revisión de código.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-blocker-en-es",
+      "front": "blocker / blocked",
+      "back": "bloqueo, impedimento / bloqueado. En el equipo: \"estoy bloqueado con…\", \"tengo un blocker\". Ej.: \"Mi bloqueo es el permiso de IAM que falta.\"",
+      "hint": "My blocker is the missing IAM permission.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-blocker-es-en",
+      "front": "bloqueo, impedimento / bloqueado",
+      "back": "blocker / blocked. E.g. \"My blocker is the missing IAM permission.\"",
+      "hint": "Mi bloqueo es el permiso de IAM que falta.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-estimate-en-es",
+      "front": "estimate",
+      "back": "estimación, estimar. En el equipo: \"estimar\", \"¿cuánto le pones?\". Ej.: \"Mi estimación es de tres días.\"",
+      "hint": "My estimate is three days.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-estimate-es-en",
+      "front": "estimación, estimar",
+      "back": "estimate. E.g. \"My estimate is three days.\"",
+      "hint": "Mi estimación es de tres días.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-story-points-en-es",
+      "front": "story points / user story",
+      "back": "puntos de historia / historia de usuario. En el equipo: \"la historia\", \"cuántos puntos\". Ej.: \"Esta historia de usuario vale cinco puntos.\"",
+      "hint": "This user story is five points.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-story-points-es-en",
+      "front": "puntos de historia / historia de usuario",
+      "back": "story points / user story. E.g. \"This user story is five points.\"",
+      "hint": "Esta historia de usuario vale cinco puntos.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-deadline-en-es",
+      "front": "deadline",
+      "back": "fecha límite; plazo. En el equipo: \"el deadline\", \"la fecha de entrega\". Ej.: \"La fecha límite es el viernes al mediodía.\"",
+      "hint": "The deadline is Friday at noon.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-deadline-es-en",
+      "front": "fecha límite",
+      "back": "deadline. E.g. \"The deadline is Friday at noon.\"",
+      "hint": "La fecha límite es el viernes al mediodía.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-ship-it-en-es",
+      "front": "ship it / ship",
+      "back": "publicarlo, sacarlo, lanzarlo. En el equipo: \"¡sácalo!\", \"¡pa' producción!\", \"shipearlo\". Ej.: \"Las pruebas pasan. ¡A producción!\"",
+      "hint": "Tests pass. Ship it!",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-ship-it-es-en",
+      "front": "publicarlo, sacarlo, lanzarlo",
+      "back": "ship it / ship. E.g. \"Tests pass. Ship it!\"",
+      "hint": "Las pruebas pasan. ¡A producción!",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-lgtm-en-es",
+      "front": "LGTM (looks good to me)",
+      "back": "\"me parece bien\", \"todo bien\"; aprobado. En el equipo: \"LGTM\" — se escribe igual en inglés en las PR. Ej.: \"LGTM, lo fusiono ahora.\"",
+      "hint": "LGTM, merging now.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-lgtm-es-en",
+      "front": "\"me parece bien\", \"todo bien\"",
+      "back": "LGTM (looks good to me). E.g. \"LGTM, merging now.\"",
+      "hint": "LGTM, lo fusiono ahora.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-nit-en-es",
+      "front": "nit / nitpick",
+      "back": "detalle menor, minucia. En el equipo: \"nit:\" al principio del comentario. Ej.: \"Nit: cambia el nombre de esta variable.\"",
+      "hint": "Nit: rename this variable.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ts-nit-es-en",
+      "front": "detalle menor, minucia",
+      "back": "nit / nitpick. E.g. \"Nit: rename this variable.\"",
+      "hint": "Nit: cambia el nombre de esta variable.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ts-feedback-en-es",
+      "front": "feedback",
+      "back": "comentarios, opiniones; retroalimentación. En el equipo: \"dar feedback\" — se usa muchísimo. Ej.: \"Gracias por los comentarios sobre el diseño.\"",
+      "hint": "Thanks for the feedback on the design.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-feedback-es-en",
+      "front": "comentarios, opiniones",
+      "back": "feedback. E.g. \"Thanks for the feedback on the design.\"",
+      "hint": "Gracias por los comentarios sobre el diseño.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-meeting-en-es",
+      "front": "meeting / call / sync",
+      "back": "reunión / llamada. En el equipo: \"una call\", \"una reu\", \"un sync\". Ej.: \"Hablamos después de comer.\"",
+      "hint": "Let's sync after lunch.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-meeting-es-en",
+      "front": "reunión / llamada",
+      "back": "meeting / call / sync. E.g. \"Let's sync after lunch.\"",
+      "hint": "Hablamos después de comer.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-retro-en-es",
+      "front": "retrospective (retro)",
+      "back": "retrospectiva. En el equipo: \"la retro\". Ej.: \"Plantéalo en la retro.\"",
+      "hint": "Raise it in the retro.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-retro-es-en",
+      "front": "retrospectiva",
+      "back": "retrospective (retro). E.g. \"Raise it in the retro.\"",
+      "hint": "Plantéalo en la retro.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-planning-en-es",
+      "front": "sprint planning",
+      "back": "planificación del sprint. En el equipo: \"la planning\". Ej.: \"Estimamos los tickets en la planning.\"",
+      "hint": "We size the tickets in planning.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-planning-es-en",
+      "front": "planificación del sprint",
+      "back": "sprint planning. E.g. \"We size the tickets in planning.\"",
+      "hint": "Estimamos los tickets en la planning.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-kickoff-en-es",
+      "front": "kickoff",
+      "back": "reunión de arranque, inicio del proyecto. En el equipo: \"el kickoff\". Ej.: \"La reunión de arranque del proyecto es el lunes.\"",
+      "hint": "The project kickoff is Monday.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-kickoff-es-en",
+      "front": "reunión de arranque, inicio del proyecto",
+      "back": "kickoff. E.g. \"The project kickoff is Monday.\"",
+      "hint": "La reunión de arranque del proyecto es el lunes.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-stakeholder-en-es",
+      "front": "stakeholder",
+      "back": "parte interesada. En el equipo: \"los stakeholders\". Ej.: \"Comparte la demo con las partes interesadas.\"",
+      "hint": "Share the demo with stakeholders.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-stakeholder-es-en",
+      "front": "parte interesada",
+      "back": "stakeholder. E.g. \"Share the demo with stakeholders.\"",
+      "hint": "Comparte la demo con las partes interesadas.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-pm-po-en-es",
+      "front": "product manager / product owner",
+      "back": "gerente de producto / responsable de producto. En el equipo: \"el PM\", \"el PO\" (siglas en inglés). Ej.: \"Pídele al PO que lo priorice.\"",
+      "hint": "Ask the product owner to prioritize it.",
+      "tags": [
+        "team",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-pm-po-es-en",
+      "front": "gerente de producto / responsable de producto",
+      "back": "product manager / product owner. E.g. \"Ask the product owner to prioritize it.\"",
+      "hint": "Pídele al PO que lo priorice.",
+      "tags": [
+        "team",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-priority-en-es",
+      "front": "priority / prioritize",
+      "back": "prioridad / priorizar. En el equipo: \"esto es P0\", \"priorizar\". Ej.: \"Este error es P1.\"",
+      "hint": "This bug is a P1.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-priority-es-en",
+      "front": "prioridad / priorizar",
+      "back": "priority / prioritize. E.g. \"This bug is a P1.\"",
+      "hint": "Este error es P1.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-scope-en-es",
+      "front": "scope / out of scope",
+      "back": "alcance / fuera del alcance. En el equipo: \"queda fuera del scope\". Ej.: \"La versión móvil queda fuera del alcance de la v1.\"",
+      "hint": "Mobile is out of scope for v1.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-scope-es-en",
+      "front": "alcance / fuera del alcance",
+      "back": "scope / out of scope. E.g. \"Mobile is out of scope for v1.\"",
+      "hint": "La versión móvil queda fuera del alcance de la v1.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-follow-up-en-es",
+      "front": "follow up / follow-up",
+      "back": "dar seguimiento; seguimiento. En el equipo: \"te hago follow-up\", \"le doy seguimiento\". Ej.: \"Le doy seguimiento por correo.\"",
+      "hint": "I'll follow up by email.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-follow-up-es-en",
+      "front": "dar seguimiento",
+      "back": "follow up / follow-up. E.g. \"I'll follow up by email.\"",
+      "hint": "Le doy seguimiento por correo.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-heads-up-en-es",
+      "front": "heads-up",
+      "back": "aviso. En el equipo: \"te aviso\", \"un heads-up\". Ej.: \"Aviso: el despliegue es a las 5.\"",
+      "hint": "Heads-up: the deploy is at 5.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-heads-up-es-en",
+      "front": "aviso",
+      "back": "heads-up. E.g. \"Heads-up: the deploy is at 5.\"",
+      "hint": "Aviso: el despliegue es a las 5.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-pair-programming-en-es",
+      "front": "pair programming",
+      "back": "programación en pareja. En el equipo: \"hacer pairing\". Ej.: \"Hagamos pairing con la política de IAM.\"",
+      "hint": "Let's pair on the IAM policy.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-pair-programming-es-en",
+      "front": "programación en pareja",
+      "back": "pair programming. E.g. \"Let's pair on the IAM policy.\"",
+      "hint": "Hagamos pairing con la política de IAM.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-onboarding-en-es",
+      "front": "onboarding",
+      "back": "incorporación. En el equipo: \"el onboarding\". Ej.: \"La incorporación dura dos semanas.\"",
+      "hint": "Onboarding takes two weeks.",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-onboarding-es-en",
+      "front": "incorporación",
+      "back": "onboarding. E.g. \"Onboarding takes two weeks.\"",
+      "hint": "La incorporación dura dos semanas.",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-remote-en-es",
+      "front": "remote work / time zone",
+      "back": "teletrabajo, trabajo remoto / zona horaria. En el equipo: \"trabajo en remoto\" (España), \"trabajo remoto / home office\" (Latinoamérica). Ej.: \"Somos un equipo 100% remoto en tres zonas horarias.\"",
+      "hint": "We are fully remote across three time zones.",
+      "tags": [
+        "team",
+        "en-es",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-remote-es-en",
+      "front": "teletrabajo, trabajo remoto / zona horaria",
+      "back": "remote work / time zone. E.g. \"We are fully remote across three time zones.\"",
+      "hint": "Somos un equipo 100% remoto en tres zonas horarias.",
+      "tags": [
+        "team",
+        "es-en",
+        "region"
+      ],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ts-eta-en-es",
+      "front": "ETA / timeline",
+      "back": "hora estimada / plazos. En el equipo: \"¿cuál es el ETA?\". Ej.: \"¿Para cuándo estaría el arreglo?\"",
+      "hint": "What is the ETA for the fix?",
+      "tags": [
+        "team",
+        "en-es"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-eta-es-en",
+      "front": "hora estimada / plazos",
+      "back": "ETA / timeline. E.g. \"What is the ETA for the fix?\"",
+      "hint": "¿Para cuándo estaría el arreglo?",
+      "tags": [
+        "team",
+        "es-en"
+      ],
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "ts-eventually-ff-en-es",
+      "front": "eventually / actually (false friends)",
+      "back": "finalmente, con el tiempo / en realidad. En el equipo: Traducción correcta: \"eventually\" = \"al final\"; \"actually\" = \"en realidad\". Ej.: \"Las lecturas de DynamoDB son de consistencia eventual de forma predeterminada.\" ⚠ \"Eventualmente\" en español es \"quizás, de forma no segura\"; \"actualmente\" es \"now\". \"Eventual consistency\" se oye como \"consistencia eventual\" (calco muy extendido); \"coherencia final\" es una alternativa más clara.",
+      "hint": "DynamoDB reads are eventually consistent by default.",
+      "tags": [
+        "team",
+        "en-es",
+        "false-friend"
+      ],
+      "difficulty": "advanced"
+    },
+    {
+      "id": "ts-eventually-ff-es-en",
+      "front": "finalmente, con el tiempo / en realidad",
+      "back": "eventually / actually (false friends). E.g. \"DynamoDB reads are eventually consistent by default.\"",
+      "hint": "Las lecturas de DynamoDB son de consistencia eventual de forma predeterminada.",
+      "tags": [
+        "team",
+        "es-en",
+        "false-friend"
+      ],
+      "difficulty": "advanced"
+    }
+  ]
+}

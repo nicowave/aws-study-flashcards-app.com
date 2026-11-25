@@ -1,0 +1,4616 @@
+{
+  "version": 1,
+  "groups": [
+    {
+      "id": "dev",
+      "en": "Development basics",
+      "es": "Lo básico del desarrollo"
+    },
+    {
+      "id": "code",
+      "en": "Code and languages",
+      "es": "Código y lenguajes"
+    },
+    {
+      "id": "devops",
+      "en": "DevOps and CI/CD",
+      "es": "DevOps y CI/CD"
+    },
+    {
+      "id": "cloud",
+      "en": "Cloud and AWS",
+      "es": "Nube y AWS"
+    },
+    {
+      "id": "data",
+      "en": "Data",
+      "es": "Datos"
+    },
+    {
+      "id": "security",
+      "en": "Security",
+      "es": "Seguridad"
+    },
+    {
+      "id": "team",
+      "en": "Teamwork and meetings",
+      "es": "Trabajo en equipo y reuniones"
+    }
+  ],
+  "sources": {
+    "aws-s3": {
+      "title": "Amazon S3 — Guía del usuario (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/AmazonS3/latest/userguide/Welcome.html",
+      "quote": "De forma predeterminada, los buckets y los objetos de S3 son privados",
+      "checked": "2026-11-25"
+    },
+    "aws-az": {
+      "title": "Regiones y zonas de disponibilidad — Amazon EC2 (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/AWSEC2/latest/UserGuide/using-regions-availability-zones.html",
+      "quote": "Regiones de AWS, zonas de disponibilidad, locales AWS Outposts y de Wavelength",
+      "checked": "2026-11-25"
+    },
+    "aws-elb": {
+      "title": "¿Qué es Elastic Load Balancing? (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+      "quote": "Puede configurar su balanceador de carga para enrutar el tráfico",
+      "checked": "2026-11-25"
+    },
+    "aws-lambda": {
+      "title": "¿Qué es AWS Lambda? (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/lambda/latest/dg/welcome.html",
+      "quote": "AWS Lambda es un servicio de computación sin servidor.",
+      "checked": "2026-11-25"
+    },
+    "aws-autoscaling": {
+      "title": "¿Qué es Amazon EC2 Auto Scaling? (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+      "quote": "el número mínimo de instancias en cada grupo de escalado automático",
+      "checked": "2026-11-25"
+    },
+    "aws-iam-roles": {
+      "title": "Roles de IAM (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/IAM/latest/UserGuide/id_roles.html",
+      "quote": "Roles de IAM - AWS Identity and Access Management",
+      "checked": "2026-11-25"
+    },
+    "aws-sg": {
+      "title": "Grupos de seguridad — Amazon VPC (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/vpc/latest/userguide/vpc-security-groups.html",
+      "quote": "Controlar el tráfico hacia los recursos de AWS mediante grupos de seguridad",
+      "checked": "2026-11-25"
+    },
+    "aws-subnets": {
+      "title": "Subredes para la VPC (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/vpc/latest/userguide/configure-subnets.html",
+      "quote": "Subredes para la VPC",
+      "checked": "2026-11-25"
+    },
+    "aws-ddb-core": {
+      "title": "Componentes principales de DynamoDB (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html",
+      "quote": "El primer atributo es la clave de partición y el segundo, la clave de ordenación.",
+      "checked": "2026-11-25"
+    },
+    "aws-ddb-gsi": {
+      "title": "Índices secundarios globales — DynamoDB (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/GSI.html",
+      "quote": "Uso de índices secundarios globales en DynamoDB",
+      "checked": "2026-11-25"
+    },
+    "aws-cfn-stacks": {
+      "title": "Pilas de CloudFormation (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/AWSCloudFormation/latest/UserGuide/stacks.html",
+      "quote": "Administrar los recursos de AWS como una sola unidad con pilas CloudFormation",
+      "checked": "2026-11-25"
+    },
+    "aws-codedeploy": {
+      "title": "¿Qué es CodeDeploy? (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/codedeploy/latest/userguide/welcome.html",
+      "quote": "CodeDeploy es un servicio de implementación que automatiza las implementaciones de aplicaciones",
+      "checked": "2026-11-25"
+    },
+    "aws-codedeploy-deployments": {
+      "title": "Trabajar con despliegues en CodeDeploy (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/codedeploy/latest/userguide/deployments.html",
+      "quote": "Trabajar con despliegues en CodeDeploy",
+      "checked": "2026-11-25"
+    },
+    "github-glossary-2022": {
+      "title": "GitHub Docs — glosario en español (copia de 2022 en el repo github/docs)",
+      "url": "https://raw.githubusercontent.com/github/docs/0b15d0d2368e8fae73c98a7db6699e410c2f32ec/translations/es-ES/data/glossaries/external.yml",
+      "quote": "Subir significa enviar tus cambios confirmados a un repositorio remoto en GitHub.com.",
+      "checked": "2026-11-25"
+    },
+    "vscode-git-es": {
+      "title": "VS Code, paquete de idioma español — comandos de Git",
+      "url": "https://raw.githubusercontent.com/microsoft/vscode-loc/main/i18n/vscode-language-pack-es/translations/extensions/vscode.git.i18n.json",
+      "quote": "push → \"Insertar\"; pull → \"Incorporar cambios (\"pull\")\"; merge → \"Combinar...\"",
+      "checked": "2026-11-25"
+    },
+    "git-es-po": {
+      "title": "Traducción oficial de Git al español (po/es.po)",
+      "url": "https://raw.githubusercontent.com/git/git/master/po/es.po",
+      "quote": "nada para hacer commit, el árbol de trabajo está limpio",
+      "checked": "2026-11-25"
+    }
+  },
+  "terms": [
+    {
+      "id": "deploy",
+      "group": "dev",
+      "en": "deploy / deployment",
+      "es": "desplegar, despliegue; implementar, implementación",
+      "register": {
+        "formal": "desplegar / implementar",
+        "casual": "deployar, hacer el deploy",
+        "slang": "subir a prod"
+      },
+      "atWork": "\"deployar\", \"hacer el deploy\", \"subirlo\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "We deploy the API to us-east-1 after every merge.",
+        "es": "Desplegamos la API en us-east-1 después de cada merge."
+      },
+      "note": {
+        "text": "AWS en español usa sobre todo \"implementación\", pero también \"despliegue\", a veces en la misma página. Las dos son correctas: elige una y sé coherente en todo el documento.",
+        "sources": [
+          "aws-codedeploy",
+          "aws-codedeploy-deployments"
+        ],
+        "pending": "Fundéu: si tiene recomendación sobre \"deploy\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "build",
+      "group": "dev",
+      "en": "build (noun and verb)",
+      "es": "compilación, compilar; construir",
+      "register": {
+        "formal": "compilación / compilar",
+        "casual": "la build, buildear",
+        "slang": "buildear"
+      },
+      "atWork": "\"la build\", \"buildear\", \"compilar\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The build failed because a test broke.",
+        "es": "La compilación falló porque se rompió una prueba."
+      },
+      "note": {
+        "text": "Para un sitio en Vite no hay \"compilación\" en sentido clásico; muchos equipos dicen simplemente \"la build\" (en femenino o masculino, según el equipo).",
+        "sources": [],
+        "pending": null
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "commit",
+      "group": "dev",
+      "en": "commit",
+      "es": "confirmación (de cambios), confirmar",
+      "register": {
+        "formal": "confirmación de cambios",
+        "casual": "commit, commitear",
+        "slang": "commitear"
+      },
+      "atWork": "\"hacer commit\", \"commitear\" — la traducción de Git al español deja \"commit\" en inglés",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Commit the change with a clear message.",
+        "es": "Haz commit del cambio con un mensaje claro."
+      },
+      "note": {
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "sources": [
+          "github-glossary-2022",
+          "vscode-git-es",
+          "git-es-po"
+        ],
+        "pending": "docs.github.com/es actual, que puede usar otra forma para \"pull request\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "branch",
+      "group": "dev",
+      "en": "branch",
+      "es": "rama",
+      "register": {
+        "formal": "rama",
+        "casual": "rama, branch",
+        "slang": "branch"
+      },
+      "atWork": "\"rama\" es lo normal; \"branch\" también se oye",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Create a branch for the new Lambda.",
+        "es": "Crea una rama para la nueva Lambda."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "merge",
+      "group": "dev",
+      "en": "merge",
+      "es": "fusionar (GitHub); combinar (VS Code); fusión",
+      "register": {
+        "formal": "fusionar / combinar",
+        "casual": "mergear, hacer merge",
+        "slang": "mergear"
+      },
+      "atWork": "\"mergear\", \"hacer el merge\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Merge the branch once CI is green.",
+        "es": "Fusiona la rama cuando CI esté en verde."
+      },
+      "note": {
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "sources": [
+          "github-glossary-2022",
+          "vscode-git-es",
+          "git-es-po"
+        ],
+        "pending": "docs.github.com/es actual, que puede usar otra forma para \"pull request\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "pull-request",
+      "group": "dev",
+      "en": "pull request (PR)",
+      "es": "solicitud de cambios; solicitud de extracción",
+      "register": {
+        "formal": "solicitud de cambios (pull request)",
+        "casual": "PR, pull request",
+        "slang": "la PR / el PR"
+      },
+      "atWork": "\"abrir una PR\" (el género varía: \"la PR\" por \"la solicitud\", \"el PR\" por \"el pull request\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Open a pull request and ask for a review.",
+        "es": "Abre una PR y pide una revisión."
+      },
+      "note": {
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "sources": [
+          "github-glossary-2022",
+          "vscode-git-es",
+          "git-es-po"
+        ],
+        "pending": "docs.github.com/es actual, que puede usar otra forma para \"pull request\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "push",
+      "group": "dev",
+      "en": "push",
+      "es": "subir (cambios); insertar (VS Code)",
+      "register": {
+        "formal": "subir los cambios al repositorio remoto",
+        "casual": "pushear, subir",
+        "slang": "pushear"
+      },
+      "atWork": "\"pushear\", \"subir los cambios\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Push your branch before you leave.",
+        "es": "Sube tu rama antes de irte."
+      },
+      "note": {
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "sources": [
+          "github-glossary-2022",
+          "vscode-git-es",
+          "git-es-po"
+        ],
+        "pending": "docs.github.com/es actual, que puede usar otra forma para \"pull request\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "pull",
+      "group": "dev",
+      "en": "pull",
+      "es": "extraer; incorporar cambios (VS Code)",
+      "register": {
+        "formal": "obtener los cambios del remoto",
+        "casual": "hacer pull, bajar los cambios",
+        "slang": "pullear"
+      },
+      "atWork": "\"hacer pull\", \"bajarse los cambios\"",
+      "region": null,
+      "falseFriend": "No confundir \"pull\" con \"pull request\": la PR no trae nada, pide que se incorporen tus cambios.",
+      "example": {
+        "en": "Pull main before you start.",
+        "es": "Haz pull de main antes de empezar."
+      },
+      "note": {
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "sources": [
+          "github-glossary-2022",
+          "vscode-git-es",
+          "git-es-po"
+        ],
+        "pending": "docs.github.com/es actual, que puede usar otra forma para \"pull request\"."
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "clone",
+      "group": "dev",
+      "en": "clone",
+      "es": "clonar",
+      "register": {
+        "formal": "clonar",
+        "casual": "clonar",
+        "slang": null
+      },
+      "atWork": "\"clonar el repo\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Clone the repo and run npm install.",
+        "es": "Clona el repo y ejecuta npm install."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "fork",
+      "group": "dev",
+      "en": "fork",
+      "es": "bifurcación, bifurcar",
+      "register": {
+        "formal": "bifurcación",
+        "casual": "fork, hacer un fork",
+        "slang": "forkear"
+      },
+      "atWork": "\"hacer un fork\", \"forkear\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Fork the project to propose a fix.",
+        "es": "Haz un fork del proyecto para proponer un arreglo."
+      },
+      "note": {
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "sources": [
+          "github-glossary-2022",
+          "vscode-git-es",
+          "git-es-po"
+        ],
+        "pending": "docs.github.com/es actual, que puede usar otra forma para \"pull request\"."
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "repository",
+      "group": "dev",
+      "en": "repository (repo)",
+      "es": "repositorio",
+      "register": {
+        "formal": "repositorio",
+        "casual": "repo",
+        "slang": "repo"
+      },
+      "atWork": "\"el repo\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The infrastructure lives in its own repo.",
+        "es": "La infraestructura vive en su propio repo."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bug",
+      "group": "dev",
+      "en": "bug",
+      "es": "error, fallo",
+      "register": {
+        "formal": "error / fallo",
+        "casual": "bug",
+        "slang": "bicho (en broma)"
+      },
+      "atWork": "\"un bug\" — se dice muchísimo así",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "There is a bug in the sign-in flow.",
+        "es": "Hay un error en el flujo de inicio de sesión."
+      },
+      "note": {
+        "text": "\"Error\" o \"fallo\" en un documento; \"bug\" al hablar.",
+        "sources": [],
+        "pending": "Fundéu sobre \"bug\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "debug",
+      "group": "dev",
+      "en": "debug / debugging",
+      "es": "depurar, depuración",
+      "register": {
+        "formal": "depurar",
+        "casual": "debuggear, depurar",
+        "slang": "debuguear"
+      },
+      "atWork": "\"debuggear\" (también \"debuguear\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "I spent the morning debugging the Lambda timeout.",
+        "es": "Pasé la mañana depurando el timeout de la Lambda."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "fix",
+      "group": "dev",
+      "en": "fix / hotfix",
+      "es": "corrección, arreglo; corrección urgente",
+      "register": {
+        "formal": "corrección",
+        "casual": "fix, arreglo",
+        "slang": "parche"
+      },
+      "atWork": "\"meter un fix\", \"un hotfix\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "We shipped a hotfix for the checkout page.",
+        "es": "Sacamos una corrección urgente para la página de pago."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "patch",
+      "group": "dev",
+      "en": "patch",
+      "es": "parche, revisión",
+      "register": {
+        "formal": "parche / actualización",
+        "casual": "parche",
+        "slang": "parchear"
+      },
+      "atWork": "\"parche\", \"parchear\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Apply the security patch to every instance.",
+        "es": "Aplica el parche de seguridad a todas las instancias."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "refactor",
+      "group": "dev",
+      "en": "refactor",
+      "es": "refactorizar, refactorización",
+      "register": {
+        "formal": "refactorizar",
+        "casual": "refactorizar, refactor",
+        "slang": "refactorear"
+      },
+      "atWork": "\"refactorizar\", \"hacer un refactor\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Refactor the handler before adding new routes.",
+        "es": "Refactoriza el handler antes de añadir rutas nuevas."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "release",
+      "group": "dev",
+      "en": "release",
+      "es": "versión, lanzamiento; publicar",
+      "register": {
+        "formal": "versión / lanzamiento",
+        "casual": "release, sacar una versión",
+        "slang": "releasear"
+      },
+      "atWork": "\"la release\", \"sacar la release\"",
+      "region": null,
+      "falseFriend": "\"Release\" no es \"relevar\" ni \"liberar\" en un documento formal; \"liberar una versión\" se oye, pero \"publicar\" es más claro.",
+      "example": {
+        "en": "The next release ships on Tuesday.",
+        "es": "La próxima versión sale el martes."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "rollback",
+      "group": "dev",
+      "en": "rollback / roll back",
+      "es": "reversión, revertir; volver a la versión anterior",
+      "register": {
+        "formal": "revertir a la versión anterior",
+        "casual": "hacer rollback",
+        "slang": "tirar para atrás"
+      },
+      "atWork": "\"hacer rollback\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Roll back the deploy if errors go up.",
+        "es": "Si suben los errores, haz rollback del despliegue."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "revert",
+      "group": "dev",
+      "en": "revert",
+      "es": "revertir, deshacer",
+      "register": {
+        "formal": "revertir",
+        "casual": "revertir, hacer un revert",
+        "slang": null
+      },
+      "atWork": "\"revertir el commit\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Revert the commit that broke the build.",
+        "es": "Revierte el commit que rompió la compilación."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "backlog",
+      "group": "dev",
+      "en": "backlog",
+      "es": "lista de pendientes, trabajo pendiente",
+      "register": {
+        "formal": "trabajo pendiente",
+        "casual": "backlog",
+        "slang": "backlog"
+      },
+      "atWork": "\"el backlog\" — casi nadie lo traduce en el día a día",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Add it to the backlog for next sprint.",
+        "es": "Añádelo al backlog para el próximo sprint."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "sprint",
+      "group": "dev",
+      "en": "sprint",
+      "es": "sprint, iteración",
+      "register": {
+        "formal": "iteración (sprint)",
+        "casual": "sprint",
+        "slang": "sprint"
+      },
+      "atWork": "\"el sprint\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "This sprint we focus on billing.",
+        "es": "En este sprint nos centramos en la facturación."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "feature",
+      "group": "dev",
+      "en": "feature",
+      "es": "funcionalidad, característica, función",
+      "register": {
+        "formal": "funcionalidad",
+        "casual": "feature",
+        "slang": "feature"
+      },
+      "atWork": "\"la feature\", \"una feature nueva\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The new feature lets users export cards.",
+        "es": "La nueva funcionalidad permite exportar tarjetas."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "requirement",
+      "group": "dev",
+      "en": "requirement",
+      "es": "requisito",
+      "register": {
+        "formal": "requisito",
+        "casual": "requisito",
+        "slang": null
+      },
+      "atWork": "\"requisito\" (no \"requerimiento\" en España; en Latinoamérica \"requerimiento\" es muy común)",
+      "region": "Latinoamérica: \"requerimiento\" es habitual. España: \"requisito\".",
+      "falseFriend": null,
+      "example": {
+        "en": "Latency under 100 ms is a hard requirement.",
+        "es": "Una latencia menor de 100 ms es un requisito obligatorio."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "issue",
+      "group": "dev",
+      "en": "issue / ticket",
+      "es": "incidencia, tique, problema",
+      "register": {
+        "formal": "incidencia",
+        "casual": "ticket, issue",
+        "slang": "tique"
+      },
+      "atWork": "\"abrir un ticket\", \"un issue\"",
+      "region": "España: \"incidencia\" es muy común. Latinoamérica: \"ticket\", \"caso\".",
+      "falseFriend": null,
+      "example": {
+        "en": "Open an issue with the steps to reproduce.",
+        "es": "Abre una incidencia con los pasos para reproducirlo."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "roadmap",
+      "group": "dev",
+      "en": "roadmap",
+      "es": "hoja de ruta",
+      "register": {
+        "formal": "hoja de ruta",
+        "casual": "roadmap",
+        "slang": "roadmap"
+      },
+      "atWork": "\"el roadmap\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Multi-region support is on the roadmap.",
+        "es": "El soporte multirregión está en la hoja de ruta."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "mvp",
+      "group": "dev",
+      "en": "MVP (minimum viable product)",
+      "es": "producto mínimo viable (PMV)",
+      "register": {
+        "formal": "producto mínimo viable",
+        "casual": "MVP",
+        "slang": "MVP"
+      },
+      "atWork": "\"el MVP\" (se pronuncia en español: \"eme-uve-pe\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Our MVP runs on a single Lambda.",
+        "es": "Nuestro MVP corre en una sola Lambda."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "prototype",
+      "group": "dev",
+      "en": "prototype / proof of concept (PoC)",
+      "es": "prototipo; prueba de concepto",
+      "register": {
+        "formal": "prueba de concepto",
+        "casual": "PoC, prototipo",
+        "slang": "una PoC"
+      },
+      "atWork": "\"una PoC\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Build a proof of concept with Bedrock first.",
+        "es": "Primero haz una prueba de concepto con Bedrock."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "legacy",
+      "group": "dev",
+      "en": "legacy code / legacy system",
+      "es": "código heredado, sistema heredado",
+      "register": {
+        "formal": "sistema heredado",
+        "casual": "código legacy",
+        "slang": "legacy"
+      },
+      "atWork": "\"el legacy\", \"código legacy\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The legacy system still runs on EC2.",
+        "es": "El sistema heredado todavía corre en EC2."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "tech-debt",
+      "group": "dev",
+      "en": "technical debt (tech debt)",
+      "es": "deuda técnica",
+      "register": {
+        "formal": "deuda técnica",
+        "casual": "deuda técnica",
+        "slang": null
+      },
+      "atWork": "\"deuda técnica\" — sí se traduce",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Skipping tests now adds tech debt.",
+        "es": "Saltarse las pruebas ahora suma deuda técnica."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "workaround",
+      "group": "dev",
+      "en": "workaround",
+      "es": "solución alternativa, solución provisional",
+      "register": {
+        "formal": "solución provisional",
+        "casual": "workaround, apaño",
+        "slang": "parche, chapuza (Esp.)"
+      },
+      "atWork": "\"un workaround\"",
+      "region": "España: \"apaño\" o \"chapuza\" (despectivo). Río de la Plata: \"un parche\", \"atado con alambre\".",
+      "falseFriend": null,
+      "example": {
+        "en": "Use a workaround until AWS fixes the limit.",
+        "es": "Usa una solución provisional hasta que AWS cambie el límite."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "edge-case",
+      "group": "dev",
+      "en": "edge case / corner case",
+      "es": "caso límite, caso extremo",
+      "register": {
+        "formal": "caso límite",
+        "casual": "edge case, caso borde",
+        "slang": null
+      },
+      "atWork": "\"un edge case\", \"caso borde\" (calco, muy usado en Latinoamérica)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "An empty bucket is an edge case.",
+        "es": "Un bucket vacío es un caso límite."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "function",
+      "group": "code",
+      "en": "function",
+      "es": "función",
+      "register": {
+        "formal": "función",
+        "casual": "función",
+        "slang": null
+      },
+      "atWork": "\"función\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The function returns the item from DynamoDB.",
+        "es": "La función devuelve el ítem de DynamoDB."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "method",
+      "group": "code",
+      "en": "method",
+      "es": "método",
+      "register": {
+        "formal": "método",
+        "casual": "método",
+        "slang": null
+      },
+      "atWork": "\"método\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Call the send method on the client.",
+        "es": "Llama al método send del cliente."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "variable",
+      "group": "code",
+      "en": "variable",
+      "es": "variable",
+      "register": {
+        "formal": "variable",
+        "casual": "variable",
+        "slang": null
+      },
+      "atWork": "\"variable\" (en femenino: \"la variable\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Read the table name from an environment variable.",
+        "es": "Lee el nombre de la tabla de una variable de entorno."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "constant",
+      "group": "code",
+      "en": "constant",
+      "es": "constante",
+      "register": {
+        "formal": "constante",
+        "casual": "constante",
+        "slang": null
+      },
+      "atWork": "\"constante\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Keep the region in a constant.",
+        "es": "Guarda la región en una constante."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "loop",
+      "group": "code",
+      "en": "loop",
+      "es": "bucle; ciclo",
+      "register": {
+        "formal": "bucle",
+        "casual": "bucle / ciclo, loop",
+        "slang": "loop"
+      },
+      "atWork": "\"un bucle\" (España), \"un ciclo\" (muy usado en México y otros países)",
+      "region": "España: \"bucle\". Latinoamérica: \"ciclo\" o \"bucle\"; \"loop\" en todas partes.",
+      "falseFriend": null,
+      "example": {
+        "en": "The loop uploads each file to S3.",
+        "es": "El bucle sube cada archivo a S3."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "array",
+      "group": "code",
+      "en": "array",
+      "es": "arreglo, matriz, vector; array",
+      "register": {
+        "formal": "matriz / arreglo",
+        "casual": "array",
+        "slang": "array"
+      },
+      "atWork": "\"array\" — casi siempre en inglés",
+      "region": "Latinoamérica: \"arreglo\" en clases y libros. España: \"vector\" o \"array\". En documentación traducida también aparece \"matriz\".",
+      "falseFriend": "\"Matriz\" en documentación traducida suele ser un array de cualquier dimensión, no solo una tabla 2D.",
+      "example": {
+        "en": "Map over the array of instance IDs.",
+        "es": "Recorre con map el array de IDs de instancias."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "list",
+      "group": "code",
+      "en": "list",
+      "es": "lista",
+      "register": {
+        "formal": "lista",
+        "casual": "lista",
+        "slang": null
+      },
+      "atWork": "\"lista\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Python returns a list of bucket names.",
+        "es": "Python devuelve una lista de nombres de buckets."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "string",
+      "group": "code",
+      "en": "string",
+      "es": "cadena (de texto/caracteres)",
+      "register": {
+        "formal": "cadena de caracteres",
+        "casual": "string, cadena",
+        "slang": "string"
+      },
+      "atWork": "\"un string\" (masculino) o \"una cadena\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The ARN is just a string.",
+        "es": "El ARN es solo una cadena de texto."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "integer",
+      "group": "code",
+      "en": "integer",
+      "es": "entero, número entero",
+      "register": {
+        "formal": "número entero",
+        "casual": "entero, int",
+        "slang": "int"
+      },
+      "atWork": "\"un entero\", \"un int\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The port must be an integer.",
+        "es": "El puerto tiene que ser un entero."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "boolean",
+      "group": "code",
+      "en": "boolean",
+      "es": "booleano",
+      "register": {
+        "formal": "booleano",
+        "casual": "booleano, bool",
+        "slang": "bool"
+      },
+      "atWork": "\"un booleano\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Set versioning with a boolean flag.",
+        "es": "Activa el control de versiones con un booleano."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "object",
+      "group": "code",
+      "en": "object",
+      "es": "objeto",
+      "register": {
+        "formal": "objeto",
+        "casual": "objeto",
+        "slang": null
+      },
+      "atWork": "\"objeto\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The event is a JSON object.",
+        "es": "El evento es un objeto JSON."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "class",
+      "group": "code",
+      "en": "class",
+      "es": "clase",
+      "register": {
+        "formal": "clase",
+        "casual": "clase",
+        "slang": null
+      },
+      "atWork": "\"clase\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "A CDK stack is a class.",
+        "es": "Una pila de CDK es una clase."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "parameter",
+      "group": "code",
+      "en": "parameter / argument",
+      "es": "parámetro / argumento",
+      "register": {
+        "formal": "parámetro / argumento",
+        "casual": "parámetro, param",
+        "slang": "param"
+      },
+      "atWork": "\"parámetro\", \"argumento\"",
+      "region": null,
+      "falseFriend": "\"Argumento\" en código no es una discusión: es el valor que pasas a una función.",
+      "example": {
+        "en": "Pass the bucket name as an argument.",
+        "es": "Pasa el nombre del bucket como argumento."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "return",
+      "group": "code",
+      "en": "return (value)",
+      "es": "devolver, retornar; valor de retorno",
+      "register": {
+        "formal": "devolver",
+        "casual": "retornar, devolver",
+        "slang": null
+      },
+      "atWork": "\"devuelve\" (España), \"retorna\" (muy común en Latinoamérica)",
+      "region": "\"Retornar\" es más frecuente en Latinoamérica; \"devolver\" en España.",
+      "falseFriend": null,
+      "example": {
+        "en": "The handler returns a 200 response.",
+        "es": "El handler devuelve una respuesta 200."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "callback",
+      "group": "code",
+      "en": "callback",
+      "es": "función de devolución de llamada; callback",
+      "register": {
+        "formal": "función de devolución de llamada",
+        "casual": "callback",
+        "slang": "callback"
+      },
+      "atWork": "\"un callback\" — la traducción larga casi no se usa al hablar",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The SDK used to take a callback.",
+        "es": "Antes el SDK recibía un callback."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "promise",
+      "group": "code",
+      "en": "promise",
+      "es": "promesa",
+      "register": {
+        "formal": "promesa",
+        "casual": "promesa, promise",
+        "slang": null
+      },
+      "atWork": "\"promesa\" o \"promise\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "client.send returns a promise.",
+        "es": "client.send devuelve una promesa."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "async",
+      "group": "code",
+      "en": "async / asynchronous",
+      "es": "asíncrono, asincrónico",
+      "register": {
+        "formal": "asíncrono",
+        "casual": "async",
+        "slang": "async"
+      },
+      "atWork": "\"async\", \"asíncrono\"",
+      "region": "\"Asincrónico\" se oye más en el Río de la Plata y otros países; \"asíncrono\" en España. Ambos son correctos.",
+      "falseFriend": null,
+      "example": {
+        "en": "Make the handler async and await the call.",
+        "es": "Haz el handler async y usa await en la llamada."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "framework",
+      "group": "code",
+      "en": "framework",
+      "es": "marco de trabajo; framework",
+      "register": {
+        "formal": "marco de trabajo (framework)",
+        "casual": "framework",
+        "slang": "framework"
+      },
+      "atWork": "\"framework\" — se dice siempre en inglés",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "React is a library, not a full framework.",
+        "es": "React es una biblioteca, no un framework completo."
+      },
+      "note": {
+        "text": "\"Marco de trabajo\" existe, pero casi nadie lo dice; en un documento, \"framework\" con la traducción al lado la primera vez.",
+        "sources": [],
+        "pending": "Fundéu sobre \"framework\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "library",
+      "group": "code",
+      "en": "library",
+      "es": "biblioteca",
+      "register": {
+        "formal": "biblioteca",
+        "casual": "librería (muy oído), biblioteca",
+        "slang": "lib"
+      },
+      "atWork": "\"librería\" — muy oído, aunque sea un falso amigo",
+      "region": null,
+      "falseFriend": "\"Library\" = biblioteca. \"Librería\" es una tienda de libros (bookstore). En la oficina vas a oír \"librería\" todo el tiempo; en un documento, escribe \"biblioteca\".",
+      "example": {
+        "en": "boto3 is the AWS library for Python.",
+        "es": "boto3 es la biblioteca de AWS para Python."
+      },
+      "note": {
+        "text": "\"Library\" = biblioteca. \"Librería\" es la tienda de libros, pero el calco está muy extendido entre programadores.",
+        "sources": [],
+        "pending": "DLE: acepciones de \"librería\" y \"biblioteca\"."
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "dependency",
+      "group": "code",
+      "en": "dependency",
+      "es": "dependencia",
+      "register": {
+        "formal": "dependencia",
+        "casual": "dependencia, dep",
+        "slang": "deps"
+      },
+      "atWork": "\"las dependencias\", \"las deps\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Update the dependencies before the release.",
+        "es": "Actualiza las dependencias antes de la versión."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "package",
+      "group": "code",
+      "en": "package",
+      "es": "paquete",
+      "register": {
+        "formal": "paquete",
+        "casual": "paquete",
+        "slang": null
+      },
+      "atWork": "\"paquete\" (de npm, de pip)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Install the package with npm.",
+        "es": "Instala el paquete con npm."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "module",
+      "group": "code",
+      "en": "module",
+      "es": "módulo",
+      "register": {
+        "formal": "módulo",
+        "casual": "módulo",
+        "slang": null
+      },
+      "atWork": "\"módulo\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Export the handler from the module.",
+        "es": "Exporta el handler desde el módulo."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "import",
+      "group": "code",
+      "en": "import",
+      "es": "importar",
+      "register": {
+        "formal": "importar",
+        "casual": "importar",
+        "slang": null
+      },
+      "atWork": "\"importar\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Import DynamoDBClient from the SDK.",
+        "es": "Importa DynamoDBClient desde el SDK."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "sdk",
+      "group": "code",
+      "en": "SDK (software development kit)",
+      "es": "SDK, kit de desarrollo de software",
+      "register": {
+        "formal": "kit de desarrollo de software (SDK)",
+        "casual": "el SDK",
+        "slang": null
+      },
+      "atWork": "\"el SDK\" (masculino)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Use the AWS SDK for JavaScript v3.",
+        "es": "Usa el AWS SDK para JavaScript v3."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "api",
+      "group": "code",
+      "en": "API",
+      "es": "API (interfaz de programación de aplicaciones)",
+      "register": {
+        "formal": "API",
+        "casual": "API",
+        "slang": null
+      },
+      "atWork": "\"la API\" (femenino, por \"interfaz\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The API returns JSON.",
+        "es": "La API devuelve JSON."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "endpoint",
+      "group": "code",
+      "en": "endpoint",
+      "es": "punto de conexión; endpoint",
+      "register": {
+        "formal": "punto de conexión",
+        "casual": "endpoint",
+        "slang": "endpoint"
+      },
+      "atWork": "\"el endpoint\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Call the /progress endpoint.",
+        "es": "Llama al endpoint /progress."
+      },
+      "note": {
+        "text": "En documentación traducida aparece \"punto de conexión\"; al hablar, todo el mundo dice \"endpoint\".",
+        "sources": [],
+        "pending": "Confirmar el término en la documentación de AWS y Microsoft en español."
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "request-response",
+      "group": "code",
+      "en": "request / response",
+      "es": "solicitud, petición / respuesta",
+      "register": {
+        "formal": "solicitud / respuesta",
+        "casual": "petición, request / respuesta",
+        "slang": "request"
+      },
+      "atWork": "\"la request\", \"la petición\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The request timed out after 30 seconds.",
+        "es": "La petición agotó el tiempo de espera a los 30 segundos."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "runtime",
+      "group": "code",
+      "en": "runtime",
+      "es": "tiempo de ejecución; entorno de ejecución",
+      "register": {
+        "formal": "entorno de ejecución",
+        "casual": "runtime",
+        "slang": "runtime"
+      },
+      "atWork": "\"el runtime\" (de Lambda: Node.js 22, Python 3.13)",
+      "region": null,
+      "falseFriend": "\"Tiempo de ejecución\" también es \"runtime\" en el sentido de \"mientras corre\" (\"error en tiempo de ejecución\").",
+      "example": {
+        "en": "Pick the Python 3.13 runtime.",
+        "es": "Elige el runtime de Python 3.13."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "compile",
+      "group": "code",
+      "en": "compile / compiler",
+      "es": "compilar / compilador",
+      "register": {
+        "formal": "compilar",
+        "casual": "compilar",
+        "slang": null
+      },
+      "atWork": "\"compilar\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "TypeScript compiles to JavaScript.",
+        "es": "TypeScript se compila a JavaScript."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "syntax",
+      "group": "code",
+      "en": "syntax error",
+      "es": "error de sintaxis",
+      "register": {
+        "formal": "error de sintaxis",
+        "casual": "error de sintaxis",
+        "slang": null
+      },
+      "atWork": "\"error de sintaxis\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "A missing bracket causes a syntax error.",
+        "es": "Un corchete que falta provoca un error de sintaxis."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "exception",
+      "group": "code",
+      "en": "exception / throw / catch",
+      "es": "excepción / lanzar / capturar",
+      "register": {
+        "formal": "lanzar / capturar una excepción",
+        "casual": "tirar / cachear una excepción",
+        "slang": "cachear"
+      },
+      "atWork": "\"tirar una excepción\", \"cachearla\" (Latinoamérica)",
+      "region": null,
+      "falseFriend": "\"Cachear\" puede ser \"catch\" (capturar) o \"cache\" (almacenar en caché). Por escrito, usa \"capturar\".",
+      "example": {
+        "en": "Catch ConditionalCheckFailedException and retry.",
+        "es": "Captura ConditionalCheckFailedException y reintenta."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "comment",
+      "group": "code",
+      "en": "comment (in code)",
+      "es": "comentario",
+      "register": {
+        "formal": "comentario",
+        "casual": "comentario",
+        "slang": null
+      },
+      "atWork": "\"comentario\", \"comentar el código\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Add a comment explaining the retry.",
+        "es": "Añade un comentario que explique el reintento."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "linter",
+      "group": "code",
+      "en": "linter / lint",
+      "es": "analizador de código; linter",
+      "register": {
+        "formal": "analizador de código estático",
+        "casual": "linter",
+        "slang": "pasar el linter"
+      },
+      "atWork": "\"pasar el linter\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The linter flags unused imports.",
+        "es": "El linter marca las importaciones sin usar."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "type",
+      "group": "code",
+      "en": "type / typed",
+      "es": "tipo / tipado",
+      "register": {
+        "formal": "tipo de datos / tipado",
+        "casual": "tipo, tipado",
+        "slang": null
+      },
+      "atWork": "\"tipado fuerte\", \"tipar\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "TypeScript adds types to JavaScript.",
+        "es": "TypeScript añade tipos a JavaScript."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "script",
+      "group": "code",
+      "en": "script",
+      "es": "script; guion",
+      "register": {
+        "formal": "script",
+        "casual": "script",
+        "slang": null
+      },
+      "atWork": "\"script\" — nadie dice \"guion\" para código",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Run the deploy script from the repo root.",
+        "es": "Ejecuta el script de despliegue desde la raíz del repo."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "run-execute",
+      "group": "code",
+      "en": "run / execute",
+      "es": "ejecutar",
+      "register": {
+        "formal": "ejecutar",
+        "casual": "correr, ejecutar",
+        "slang": "correr"
+      },
+      "atWork": "\"correr\" (calco de \"run\", muy común en Latinoamérica), \"ejecutar\"",
+      "region": "\"Correr un script\" es habitual en Latinoamérica; en España se prefiere \"ejecutar\" o \"lanzar\".",
+      "falseFriend": null,
+      "example": {
+        "en": "Run the tests before you push.",
+        "es": "Ejecuta las pruebas antes de hacer push."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "pipeline",
+      "group": "devops",
+      "en": "pipeline",
+      "es": "canalización; pipeline",
+      "register": {
+        "formal": "canalización (pipeline)",
+        "casual": "pipeline",
+        "slang": "el pipe"
+      },
+      "atWork": "\"el pipeline\" (o \"la pipeline\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The pipeline runs tests, then deploys.",
+        "es": "El pipeline ejecuta las pruebas y luego despliega."
+      },
+      "note": {
+        "text": "\"Canalización\" aparece en documentación traducida; al hablar se dice \"pipeline\".",
+        "sources": [],
+        "pending": "Guía de estilo y terminología de Microsoft."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ci",
+      "group": "devops",
+      "en": "continuous integration (CI)",
+      "es": "integración continua (IC)",
+      "register": {
+        "formal": "integración continua",
+        "casual": "CI",
+        "slang": "CI"
+      },
+      "atWork": "\"el CI\", \"pasar el CI\" — la sigla en inglés",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "CI runs on every pull request.",
+        "es": "La integración continua corre en cada PR."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "cd",
+      "group": "devops",
+      "en": "continuous delivery / deployment (CD)",
+      "es": "entrega continua / implementación continua",
+      "register": {
+        "formal": "entrega continua",
+        "casual": "CD",
+        "slang": null
+      },
+      "atWork": "\"CI/CD\" (se dice \"ci-di\" o \"ce-i-ce-de\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "With CD, main is always deployable.",
+        "es": "Con entrega continua, main siempre se puede desplegar."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "environment",
+      "group": "devops",
+      "en": "environment",
+      "es": "entorno; ambiente",
+      "register": {
+        "formal": "entorno",
+        "casual": "entorno / ambiente",
+        "slang": "env"
+      },
+      "atWork": "\"el entorno de staging\", \"el env\"",
+      "region": "España: \"entorno\". Latinoamérica: \"ambiente\" es muy común (\"ambiente de pruebas\").",
+      "falseFriend": null,
+      "example": {
+        "en": "Test it in the staging environment first.",
+        "es": "Pruébalo primero en el entorno de staging."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "production",
+      "group": "devops",
+      "en": "production (prod)",
+      "es": "producción",
+      "register": {
+        "formal": "entorno de producción",
+        "casual": "producción, prod",
+        "slang": "prod"
+      },
+      "atWork": "\"prod\", \"en producción\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Never test in production.",
+        "es": "Nunca pruebes en producción."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "staging",
+      "group": "devops",
+      "en": "staging",
+      "es": "preproducción; entorno de pruebas",
+      "register": {
+        "formal": "entorno de preproducción",
+        "casual": "staging",
+        "slang": "stage"
+      },
+      "atWork": "\"staging\", \"pre\" (España: \"pre\", \"preprod\")",
+      "region": "España: \"pre\" o \"preproducción\". Latinoamérica: \"staging\" o \"QA\".",
+      "falseFriend": null,
+      "example": {
+        "en": "Staging mirrors production.",
+        "es": "Preproducción es una copia de producción."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "dev-env",
+      "group": "devops",
+      "en": "development environment (dev)",
+      "es": "entorno de desarrollo",
+      "register": {
+        "formal": "entorno de desarrollo",
+        "casual": "dev, desarrollo",
+        "slang": "dev"
+      },
+      "atWork": "\"en dev\", \"en local\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "It works in dev but not in prod.",
+        "es": "Funciona en desarrollo pero no en producción."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "container",
+      "group": "devops",
+      "en": "container",
+      "es": "contenedor",
+      "register": {
+        "formal": "contenedor",
+        "casual": "contenedor",
+        "slang": null
+      },
+      "atWork": "\"contenedor\" — sí se traduce",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The app runs in a container on ECS.",
+        "es": "La aplicación corre en un contenedor en ECS."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "image",
+      "group": "devops",
+      "en": "image (container image)",
+      "es": "imagen (de contenedor)",
+      "register": {
+        "formal": "imagen de contenedor",
+        "casual": "imagen",
+        "slang": null
+      },
+      "atWork": "\"la imagen de Docker\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Push the image to Amazon ECR.",
+        "es": "Sube la imagen a Amazon ECR."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "orchestration",
+      "group": "devops",
+      "en": "orchestration",
+      "es": "orquestación",
+      "register": {
+        "formal": "orquestación",
+        "casual": "orquestación",
+        "slang": null
+      },
+      "atWork": "\"orquestación\", \"orquestador\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Kubernetes handles container orchestration.",
+        "es": "Kubernetes se encarga de la orquestación de contenedores."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "cluster",
+      "group": "devops",
+      "en": "cluster",
+      "es": "clúster",
+      "register": {
+        "formal": "clúster",
+        "casual": "clúster",
+        "slang": null
+      },
+      "atWork": "\"el clúster\" (con tilde en español)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The EKS cluster has three nodes.",
+        "es": "El clúster de EKS tiene tres nodos."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "rollout",
+      "group": "devops",
+      "en": "rollout / gradual rollout",
+      "es": "implantación, lanzamiento gradual",
+      "register": {
+        "formal": "implantación gradual",
+        "casual": "rollout",
+        "slang": "rollout"
+      },
+      "atWork": "\"el rollout\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "We roll out to 10% of users first.",
+        "es": "Primero lo lanzamos al 10% de los usuarios."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "blue-green",
+      "group": "devops",
+      "en": "blue/green deployment",
+      "es": "implementación azul/verde",
+      "register": {
+        "formal": "implementación azul/verde",
+        "casual": "blue/green",
+        "slang": null
+      },
+      "atWork": "\"blue/green\" — casi siempre en inglés",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "CodeDeploy supports blue/green deployments.",
+        "es": "CodeDeploy admite implementaciones azul/verde."
+      },
+      "note": null,
+      "difficulty": "advanced"
+    },
+    {
+      "id": "canary",
+      "group": "devops",
+      "en": "canary release",
+      "es": "versión canario; despliegue canario",
+      "register": {
+        "formal": "despliegue canario",
+        "casual": "canary",
+        "slang": null
+      },
+      "atWork": "\"un canary\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Send 5% of traffic to the canary.",
+        "es": "Envía el 5% del tráfico al canario."
+      },
+      "note": null,
+      "difficulty": "advanced"
+    },
+    {
+      "id": "feature-flag",
+      "group": "devops",
+      "en": "feature flag / toggle",
+      "es": "marca de funcionalidad; feature flag",
+      "register": {
+        "formal": "indicador de funcionalidad",
+        "casual": "feature flag",
+        "slang": "flag"
+      },
+      "atWork": "\"meterlo detrás de un flag\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Hide the new page behind a feature flag.",
+        "es": "Oculta la página nueva detrás de un feature flag."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "iac",
+      "group": "devops",
+      "en": "infrastructure as code (IaC)",
+      "es": "infraestructura como código (IaC)",
+      "register": {
+        "formal": "infraestructura como código",
+        "casual": "IaC",
+        "slang": null
+      },
+      "atWork": "\"infra como código\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "We define everything with IaC in CDK.",
+        "es": "Definimos todo con infraestructura como código en CDK."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "provision",
+      "group": "devops",
+      "en": "provision",
+      "es": "aprovisionar",
+      "register": {
+        "formal": "aprovisionar",
+        "casual": "provisionar, levantar",
+        "slang": "levantar"
+      },
+      "atWork": "\"levantar\" recursos, \"provisionar\" (calco frecuente)",
+      "region": null,
+      "falseFriend": "\"Provisionar\" se oye mucho, en un documento formal, \"aprovisionar\" es la forma más asentada.",
+      "example": {
+        "en": "Terraform provisions the VPC.",
+        "es": "Terraform aprovisiona la VPC."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "monitoring",
+      "group": "devops",
+      "en": "monitoring",
+      "es": "supervisión; monitorización (Esp.); monitoreo (Lat.)",
+      "register": {
+        "formal": "supervisión / monitorización",
+        "casual": "monitoreo, monitorear",
+        "slang": null
+      },
+      "atWork": "\"monitorear\" (Latinoamérica), \"monitorizar\" (España)",
+      "region": "España: \"monitorizar, monitorización\". Latinoamérica: \"monitorear, monitoreo\".",
+      "falseFriend": null,
+      "example": {
+        "en": "CloudWatch handles monitoring and alarms.",
+        "es": "CloudWatch se encarga del monitoreo y las alarmas."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "log",
+      "group": "devops",
+      "en": "log / logging",
+      "es": "registro; registros",
+      "register": {
+        "formal": "registro",
+        "casual": "log, los logs",
+        "slang": "loguear"
+      },
+      "atWork": "\"los logs\", \"mirar los logs\", \"loguear\"",
+      "region": null,
+      "falseFriend": "\"Loguear\" = escribir en el log. No confundir con \"loguearse\" = iniciar sesión.",
+      "example": {
+        "en": "Check the logs in CloudWatch.",
+        "es": "Revisa los registros en CloudWatch."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "alert",
+      "group": "devops",
+      "en": "alert / alarm",
+      "es": "alerta / alarma",
+      "register": {
+        "formal": "alerta / alarma",
+        "casual": "alerta",
+        "slang": null
+      },
+      "atWork": "\"saltó la alarma\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The alarm fires when errors pass 5%.",
+        "es": "La alarma salta cuando los errores superan el 5%."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "on-call",
+      "group": "devops",
+      "en": "on-call",
+      "es": "de guardia; guardia",
+      "register": {
+        "formal": "estar de guardia",
+        "casual": "estar de guardia, on-call",
+        "slang": "estar de guardia"
+      },
+      "atWork": "\"estar de guardia\" — sí se traduce",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "I am on call this weekend.",
+        "es": "Este fin de semana estoy de guardia."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "incident",
+      "group": "devops",
+      "en": "incident",
+      "es": "incidente",
+      "register": {
+        "formal": "incidente",
+        "casual": "incidente",
+        "slang": null
+      },
+      "atWork": "\"un incidente\"",
+      "region": null,
+      "falseFriend": "\"Incidencia\" (España) suele ser un ticket o problema menor; \"incidente\" es algo serio en producción.",
+      "example": {
+        "en": "We opened an incident for the outage.",
+        "es": "Abrimos un incidente por la caída."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "outage",
+      "group": "devops",
+      "en": "outage / downtime",
+      "es": "caída, interrupción del servicio; tiempo de inactividad",
+      "register": {
+        "formal": "interrupción del servicio",
+        "casual": "caída",
+        "slang": "se cayó"
+      },
+      "atWork": "\"se cayó\", \"una caída\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The outage lasted 12 minutes.",
+        "es": "La caída duró 12 minutos."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "postmortem",
+      "group": "devops",
+      "en": "postmortem",
+      "es": "análisis posterior al incidente; postmortem",
+      "register": {
+        "formal": "análisis posterior al incidente",
+        "casual": "postmortem",
+        "slang": null
+      },
+      "atWork": "\"el postmortem\" (sin culpables: \"blameless\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Write the postmortem by Friday.",
+        "es": "Escribe el análisis del incidente antes del viernes."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "uptime",
+      "group": "devops",
+      "en": "uptime / availability",
+      "es": "tiempo de actividad; disponibilidad",
+      "register": {
+        "formal": "disponibilidad",
+        "casual": "uptime",
+        "slang": null
+      },
+      "atWork": "\"uptime\", \"disponibilidad\"",
+      "region": null,
+      "falseFriend": "Decimales: España usa coma (99,9%); México y Centroamérica, punto (99.9%).",
+      "example": {
+        "en": "We promise 99.9% uptime.",
+        "es": "Garantizamos una disponibilidad del 99,9%."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "sla",
+      "group": "devops",
+      "en": "SLA (service level agreement)",
+      "es": "acuerdo de nivel de servicio (ANS)",
+      "register": {
+        "formal": "acuerdo de nivel de servicio",
+        "casual": "el SLA",
+        "slang": null
+      },
+      "atWork": "\"el SLA\" (en inglés)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The SLA covers 99.99% availability.",
+        "es": "El SLA cubre un 99,99% de disponibilidad."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "hotfix-prod",
+      "group": "devops",
+      "en": "it's on fire / firefighting",
+      "es": "apagar incendios",
+      "register": {
+        "formal": "resolver problemas urgentes",
+        "casual": "apagar incendios",
+        "slang": "está todo ardiendo"
+      },
+      "atWork": "\"apagar incendios\" — la metáfora es igual en los dos idiomas",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "We spent the week firefighting.",
+        "es": "Pasamos la semana apagando incendios."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "artifact",
+      "group": "devops",
+      "en": "artifact (build artifact)",
+      "es": "artefacto",
+      "register": {
+        "formal": "artefacto",
+        "casual": "artefacto",
+        "slang": null
+      },
+      "atWork": "\"el artefacto\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The pipeline stores the build artifact in S3.",
+        "es": "El pipeline guarda el artefacto de la compilación en S3."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "cache",
+      "group": "devops",
+      "en": "cache / invalidate",
+      "es": "caché / invalidar",
+      "register": {
+        "formal": "memoria caché / invalidar",
+        "casual": "caché, cachear, invalidar",
+        "slang": "cachear"
+      },
+      "atWork": "\"cachear\", \"limpiar la caché\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Invalidate the CloudFront cache after the deploy.",
+        "es": "Invalida la caché de CloudFront después del despliegue."
+      },
+      "note": {
+        "text": "\"La caché\" es lo habitual en España; en Latinoamérica también se oye \"el caché\".",
+        "sources": [],
+        "pending": null
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "config",
+      "group": "devops",
+      "en": "configuration / settings",
+      "es": "configuración",
+      "register": {
+        "formal": "configuración",
+        "casual": "config",
+        "slang": "config"
+      },
+      "atWork": "\"la config\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Keep the config out of the code.",
+        "es": "Mantén la configuración fuera del código."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "cloud",
+      "group": "cloud",
+      "en": "the cloud / cloud computing",
+      "es": "la nube; computación en la nube",
+      "register": {
+        "formal": "computación en la nube",
+        "casual": "la nube, cloud",
+        "slang": "cloud"
+      },
+      "atWork": "\"en la nube\", \"en cloud\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "We moved the whole app to the cloud.",
+        "es": "Movimos toda la aplicación a la nube."
+      },
+      "note": {
+        "text": "\"La nube\" y \"computación en la nube\" son lo normal; AWS en español dice \"servicio de computación\".",
+        "sources": [
+          "aws-lambda"
+        ],
+        "pending": "Fundéu sobre \"nube\" y \"cloud computing\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "region",
+      "group": "cloud",
+      "en": "Region",
+      "es": "región",
+      "register": {
+        "formal": "región",
+        "casual": "región",
+        "slang": null
+      },
+      "atWork": "\"la región\", \"us-east-1\" (\"North Virginia\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Deploy in two Regions for disaster recovery.",
+        "es": "Despliega en dos regiones para la recuperación ante desastres."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "az",
+      "group": "cloud",
+      "en": "Availability Zone (AZ)",
+      "es": "zona de disponibilidad (AZ)",
+      "register": {
+        "formal": "zona de disponibilidad",
+        "casual": "AZ, zona",
+        "slang": "la AZ"
+      },
+      "atWork": "\"la AZ\" (se dice \"a-zeta\" o \"ei-zi\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Spread instances across three AZs.",
+        "es": "Reparte las instancias entre tres zonas de disponibilidad."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "edge-location",
+      "group": "cloud",
+      "en": "edge location",
+      "es": "ubicación de borde",
+      "register": {
+        "formal": "ubicación de borde",
+        "casual": "edge location",
+        "slang": null
+      },
+      "atWork": "\"edge location\", \"el edge\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "CloudFront caches files at edge locations.",
+        "es": "CloudFront almacena archivos en caché en las ubicaciones de borde."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bucket",
+      "group": "cloud",
+      "en": "bucket (S3)",
+      "es": "bucket",
+      "register": {
+        "formal": "bucket de S3",
+        "casual": "bucket",
+        "slang": "el bucket"
+      },
+      "atWork": "\"el bucket\" — nadie dice \"cubo\"",
+      "region": null,
+      "falseFriend": "No traduzcas \"bucket\" como \"cubo\": AWS en español deja \"bucket\".",
+      "example": {
+        "en": "Upload the site to an S3 bucket.",
+        "es": "Sube el sitio a un bucket de S3."
+      },
+      "note": {
+        "text": "La guía de S3 en español dice \"bucket(s) de S3\" y nunca \"depósito\".",
+        "sources": [
+          "aws-s3"
+        ],
+        "pending": null
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "object-s3",
+      "group": "cloud",
+      "en": "object (S3) / key",
+      "es": "objeto / clave",
+      "register": {
+        "formal": "objeto / clave",
+        "casual": "objeto, key",
+        "slang": null
+      },
+      "atWork": "\"el objeto\", \"la key\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Each object has a key, like a file path.",
+        "es": "Cada objeto tiene una clave, como la ruta de un archivo."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "instance",
+      "group": "cloud",
+      "en": "instance (EC2)",
+      "es": "instancia",
+      "register": {
+        "formal": "instancia",
+        "casual": "instancia, la máquina",
+        "slang": "la máquina"
+      },
+      "atWork": "\"la instancia\", \"levantar una instancia\"",
+      "region": null,
+      "falseFriend": "\"Instancia\" en español común significa \"solicitud formal\" (a instancias de). En la nube es una máquina virtual.",
+      "example": {
+        "en": "Stop the instance at night to save money.",
+        "es": "Detén la instancia por la noche para ahorrar."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "vm",
+      "group": "cloud",
+      "en": "virtual machine (VM)",
+      "es": "máquina virtual (MV)",
+      "register": {
+        "formal": "máquina virtual",
+        "casual": "VM, máquina",
+        "slang": null
+      },
+      "atWork": "\"una VM\", \"una máquina\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "An EC2 instance is a virtual machine.",
+        "es": "Una instancia EC2 es una máquina virtual."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "server",
+      "group": "cloud",
+      "en": "server",
+      "es": "servidor",
+      "register": {
+        "formal": "servidor",
+        "casual": "servidor, server",
+        "slang": "server"
+      },
+      "atWork": "\"el servidor\", \"el server\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The server runs Amazon Linux.",
+        "es": "El servidor corre Amazon Linux."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "serverless",
+      "group": "cloud",
+      "en": "serverless",
+      "es": "sin servidor",
+      "register": {
+        "formal": "sin servidor",
+        "casual": "serverless",
+        "slang": "serverless"
+      },
+      "atWork": "\"serverless\" — casi siempre en inglés",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Lambda is serverless: you never manage servers.",
+        "es": "Lambda es sin servidor: nunca administras servidores."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "lambda-function",
+      "group": "cloud",
+      "en": "Lambda function",
+      "es": "función de Lambda",
+      "register": {
+        "formal": "función de Lambda",
+        "casual": "la Lambda",
+        "slang": "la lambda"
+      },
+      "atWork": "\"la Lambda\" (femenino, por \"función\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The Lambda function writes to DynamoDB.",
+        "es": "La función de Lambda escribe en DynamoDB."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "load-balancer",
+      "group": "cloud",
+      "en": "load balancer",
+      "es": "balanceador de carga",
+      "register": {
+        "formal": "balanceador de carga",
+        "casual": "balanceador, el ALB",
+        "slang": "el LB"
+      },
+      "atWork": "\"el balanceador\", \"el ALB\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The load balancer spreads traffic across instances.",
+        "es": "El balanceador de carga reparte el tráfico entre instancias."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "scaling",
+      "group": "cloud",
+      "en": "scaling / scale out / scale up",
+      "es": "escalado; escalar horizontalmente / verticalmente",
+      "register": {
+        "formal": "escalado horizontal / vertical",
+        "casual": "escalar",
+        "slang": "escalar"
+      },
+      "atWork": "\"escalar\", \"que escale\"",
+      "region": null,
+      "falseFriend": "\"Escalar\" un problema también es \"escalarlo\" a un superior (escalate). El contexto lo aclara.",
+      "example": {
+        "en": "Auto Scaling adds instances when CPU goes up.",
+        "es": "Auto Scaling añade instancias cuando sube la CPU."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "high-availability",
+      "group": "cloud",
+      "en": "high availability (HA)",
+      "es": "alta disponibilidad",
+      "register": {
+        "formal": "alta disponibilidad",
+        "casual": "alta disponibilidad, HA",
+        "slang": null
+      },
+      "atWork": "\"alta disponibilidad\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Multi-AZ gives the database high availability.",
+        "es": "Multi-AZ da alta disponibilidad a la base de datos."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "fault-tolerance",
+      "group": "cloud",
+      "en": "fault tolerance",
+      "es": "tolerancia a errores; tolerancia a fallos",
+      "register": {
+        "formal": "tolerancia a fallos",
+        "casual": "tolerancia a fallos",
+        "slang": null
+      },
+      "atWork": "\"tolerancia a fallos\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Fault tolerance means no downtime when an AZ fails.",
+        "es": "La tolerancia a fallos significa cero caídas si falla una AZ."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "disaster-recovery",
+      "group": "cloud",
+      "en": "disaster recovery (DR)",
+      "es": "recuperación ante desastres",
+      "register": {
+        "formal": "recuperación ante desastres",
+        "casual": "DR, recuperación",
+        "slang": null
+      },
+      "atWork": "\"el plan de DR\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Our DR plan restores from another Region.",
+        "es": "Nuestro plan de recuperación ante desastres restaura desde otra región."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "iam-role",
+      "group": "cloud",
+      "en": "IAM role",
+      "es": "rol de IAM",
+      "register": {
+        "formal": "rol de IAM",
+        "casual": "el rol",
+        "slang": null
+      },
+      "atWork": "\"el rol\"",
+      "region": null,
+      "falseFriend": "\"Rol\" con una sola \"l\"; \"role\" en español no existe. \"Rollo\" es otra cosa.",
+      "example": {
+        "en": "Give the Lambda an IAM role with read access.",
+        "es": "Dale a la Lambda un rol de IAM con permiso de lectura."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "policy",
+      "group": "cloud",
+      "en": "policy (IAM)",
+      "es": "política",
+      "register": {
+        "formal": "política",
+        "casual": "política, policy",
+        "slang": "la policy"
+      },
+      "atWork": "\"la política\", \"la policy\"",
+      "region": null,
+      "falseFriend": "\"Política\" aquí no es \"politics\": es un documento de reglas (policy).",
+      "example": {
+        "en": "Attach a policy that allows s3:GetObject.",
+        "es": "Asocia una política que permita s3:GetObject."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "vpc",
+      "group": "cloud",
+      "en": "VPC (virtual private cloud)",
+      "es": "VPC, nube privada virtual",
+      "register": {
+        "formal": "nube privada virtual (VPC)",
+        "casual": "la VPC",
+        "slang": null
+      },
+      "atWork": "\"la VPC\" (femenino, por \"nube\")",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The database lives in a private subnet of the VPC.",
+        "es": "La base de datos vive en una subred privada de la VPC."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "subnet",
+      "group": "cloud",
+      "en": "subnet",
+      "es": "subred",
+      "register": {
+        "formal": "subred",
+        "casual": "subred, subnet",
+        "slang": null
+      },
+      "atWork": "\"subred pública / privada\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Put the load balancer in the public subnets.",
+        "es": "Pon el balanceador en las subredes públicas."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "security-group",
+      "group": "cloud",
+      "en": "security group",
+      "es": "grupo de seguridad",
+      "register": {
+        "formal": "grupo de seguridad",
+        "casual": "security group, el SG",
+        "slang": "el SG"
+      },
+      "atWork": "\"el security group\", \"el SG\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Open port 443 in the security group.",
+        "es": "Abre el puerto 443 en el grupo de seguridad."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "gateway",
+      "group": "cloud",
+      "en": "gateway (internet / NAT / API)",
+      "es": "puerta de enlace",
+      "register": {
+        "formal": "puerta de enlace",
+        "casual": "gateway",
+        "slang": null
+      },
+      "atWork": "\"el gateway\", \"el NAT\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Private instances reach the internet through a NAT gateway.",
+        "es": "Las instancias privadas salen a internet por una puerta de enlace NAT."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "cdn",
+      "group": "cloud",
+      "en": "CDN (content delivery network)",
+      "es": "red de entrega de contenido (CDN)",
+      "register": {
+        "formal": "red de entrega de contenido",
+        "casual": "CDN",
+        "slang": null
+      },
+      "atWork": "\"la CDN\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "CloudFront is AWS's CDN.",
+        "es": "CloudFront es la CDN de AWS."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "dns",
+      "group": "cloud",
+      "en": "DNS / domain / record",
+      "es": "DNS / dominio / registro",
+      "register": {
+        "formal": "sistema de nombres de dominio / registro",
+        "casual": "DNS, dominio, registro",
+        "slang": null
+      },
+      "atWork": "\"el DNS\", \"apuntar el dominio\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Point the domain at CloudFront with an alias record.",
+        "es": "Apunta el dominio a CloudFront con un registro de alias."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "storage",
+      "group": "cloud",
+      "en": "storage",
+      "es": "almacenamiento",
+      "register": {
+        "formal": "almacenamiento",
+        "casual": "storage, almacenamiento",
+        "slang": null
+      },
+      "atWork": "\"almacenamiento\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "S3 is object storage.",
+        "es": "S3 es almacenamiento de objetos."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "compute",
+      "group": "cloud",
+      "en": "compute",
+      "es": "cómputo; procesamiento",
+      "register": {
+        "formal": "capacidad de cómputo",
+        "casual": "cómputo",
+        "slang": null
+      },
+      "atWork": "\"cómputo\" (Latinoamérica), \"computación\" o \"procesamiento\" (España)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Lambda bills compute by the millisecond.",
+        "es": "Lambda cobra el cómputo por milisegundo."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "managed-service",
+      "group": "cloud",
+      "en": "managed service",
+      "es": "servicio administrado; servicio gestionado",
+      "register": {
+        "formal": "servicio administrado",
+        "casual": "servicio gestionado / administrado",
+        "slang": null
+      },
+      "atWork": "\"servicio gestionado\" (España), \"administrado\" (Latinoamérica)",
+      "region": "España: \"gestionado\". Latinoamérica: \"administrado\". AWS en español usa sobre todo \"administrado\".",
+      "falseFriend": null,
+      "example": {
+        "en": "RDS is a managed database service.",
+        "es": "RDS es un servicio de base de datos administrado."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "shared-responsibility",
+      "group": "cloud",
+      "en": "shared responsibility model",
+      "es": "modelo de responsabilidad compartida",
+      "register": {
+        "formal": "modelo de responsabilidad compartida",
+        "casual": "responsabilidad compartida",
+        "slang": null
+      },
+      "atWork": "\"responsabilidad compartida\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Under the shared responsibility model, you patch the OS on EC2.",
+        "es": "Según el modelo de responsabilidad compartida, tú parcheas el sistema operativo en EC2."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "pay-as-you-go",
+      "group": "cloud",
+      "en": "pay-as-you-go / on-demand",
+      "es": "pago por uso / bajo demanda",
+      "register": {
+        "formal": "pago por uso",
+        "casual": "pago por uso, on-demand",
+        "slang": null
+      },
+      "atWork": "\"on-demand\", \"pagas por lo que usas\"",
+      "region": "\"Costo\" (Latinoamérica) vs \"coste\" (España); ambos son correctos.",
+      "falseFriend": null,
+      "example": {
+        "en": "On-Demand instances have no upfront cost.",
+        "es": "Las instancias bajo demanda no tienen costo inicial."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "reserved-spot",
+      "group": "cloud",
+      "en": "Reserved Instances / Spot Instances",
+      "es": "instancias reservadas / instancias de spot",
+      "register": {
+        "formal": "instancias reservadas / de spot",
+        "casual": "reservadas, spot",
+        "slang": null
+      },
+      "atWork": "\"las spot\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Spot Instances can be interrupted with two minutes of notice.",
+        "es": "Las instancias de spot pueden interrumpirse con dos minutos de aviso."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "console",
+      "group": "cloud",
+      "en": "console (AWS Management Console)",
+      "es": "consola",
+      "register": {
+        "formal": "consola de administración",
+        "casual": "la consola",
+        "slang": null
+      },
+      "atWork": "\"entrar a la consola\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "You can do it in the console or with the CLI.",
+        "es": "Puedes hacerlo en la consola o con la CLI."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "cli",
+      "group": "cloud",
+      "en": "CLI (command line interface)",
+      "es": "CLI, interfaz de línea de comandos",
+      "register": {
+        "formal": "interfaz de línea de comandos",
+        "casual": "la CLI, la terminal",
+        "slang": null
+      },
+      "atWork": "\"la CLI\" (femenino, por \"interfaz\"), \"la terminal\" / \"el terminal\" (España)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "List your buckets with the CLI.",
+        "es": "Lista tus buckets con la CLI."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "account",
+      "group": "cloud",
+      "en": "account (AWS account)",
+      "es": "cuenta",
+      "register": {
+        "formal": "cuenta de AWS",
+        "casual": "cuenta",
+        "slang": null
+      },
+      "atWork": "\"la cuenta de prod\", \"la cuenta de dev\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Use a separate account for production.",
+        "es": "Usa una cuenta separada para producción."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "stack",
+      "group": "cloud",
+      "en": "stack (CloudFormation / CDK)",
+      "es": "pila",
+      "register": {
+        "formal": "pila",
+        "casual": "stack",
+        "slang": "stack"
+      },
+      "atWork": "\"el stack\" — \"pila\" casi solo por escrito",
+      "region": null,
+      "falseFriend": "\"Stack\" también es \"pila tecnológica\" (tech stack): \"¿qué stack usan?\".",
+      "example": {
+        "en": "cdk deploy updates the stack.",
+        "es": "cdk deploy actualiza la pila."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "resource",
+      "group": "cloud",
+      "en": "resource",
+      "es": "recurso",
+      "register": {
+        "formal": "recurso",
+        "casual": "recurso",
+        "slang": null
+      },
+      "atWork": "\"recurso\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Tag every resource with its owner.",
+        "es": "Etiqueta cada recurso con su responsable."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "tag",
+      "group": "cloud",
+      "en": "tag",
+      "es": "etiqueta",
+      "register": {
+        "formal": "etiqueta",
+        "casual": "etiqueta, tag",
+        "slang": "taguear"
+      },
+      "atWork": "\"etiquetar\", \"taguear\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Tags help you split the bill by team.",
+        "es": "Las etiquetas te ayudan a dividir la factura por equipo."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "quota",
+      "group": "cloud",
+      "en": "quota / limit / throttling",
+      "es": "cuota / límite / limitación (controlada)",
+      "register": {
+        "formal": "cuota / limitación",
+        "casual": "límite, throttling",
+        "slang": "nos están throttleando"
+      },
+      "atWork": "\"throttling\", \"nos limitaron\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Request a quota increase for Lambda concurrency.",
+        "es": "Pide un aumento de cuota para la simultaneidad de Lambda."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "latency",
+      "group": "cloud",
+      "en": "latency / throughput",
+      "es": "latencia / rendimiento",
+      "register": {
+        "formal": "latencia / rendimiento",
+        "casual": "latencia, throughput",
+        "slang": null
+      },
+      "atWork": "\"latencia\", \"throughput\"",
+      "region": null,
+      "falseFriend": "\"Rendimiento\" puede ser \"performance\" o \"throughput\": aclara cuál si importa.",
+      "example": {
+        "en": "Caching cut latency in half.",
+        "es": "La caché redujo la latencia a la mitad."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "migration-cloud",
+      "group": "cloud",
+      "en": "lift and shift / migration",
+      "es": "migración tal cual; rehospedaje",
+      "register": {
+        "formal": "rehospedaje (lift and shift)",
+        "casual": "lift and shift",
+        "slang": null
+      },
+      "atWork": "\"lift and shift\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "A lift and shift moves the VM without changes.",
+        "es": "Un lift and shift mueve la máquina sin cambios."
+      },
+      "note": null,
+      "difficulty": "advanced"
+    },
+    {
+      "id": "billing",
+      "group": "cloud",
+      "en": "billing / bill / cost",
+      "es": "facturación / factura / costo (Lat.), coste (Esp.)",
+      "register": {
+        "formal": "facturación",
+        "casual": "la factura",
+        "slang": null
+      },
+      "atWork": "\"la factura de AWS\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Set a budget alert before the bill surprises you.",
+        "es": "Configura una alerta de presupuesto antes de que la factura te sorprenda."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "database",
+      "group": "data",
+      "en": "database",
+      "es": "base de datos",
+      "register": {
+        "formal": "base de datos",
+        "casual": "la base, la BD",
+        "slang": "la DB"
+      },
+      "atWork": "\"la base\", \"la DB\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "DynamoDB is a NoSQL database.",
+        "es": "DynamoDB es una base de datos NoSQL."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "query",
+      "group": "data",
+      "en": "query",
+      "es": "consulta",
+      "register": {
+        "formal": "consulta",
+        "casual": "query, consulta",
+        "slang": "la query"
+      },
+      "atWork": "\"la query\" (femenino) — muy usado",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "That query scans the whole table.",
+        "es": "Esa consulta recorre toda la tabla."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "table",
+      "group": "data",
+      "en": "table",
+      "es": "tabla",
+      "register": {
+        "formal": "tabla",
+        "casual": "tabla",
+        "slang": null
+      },
+      "atWork": "\"tabla\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Create a table with a partition key.",
+        "es": "Crea una tabla con una clave de partición."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "row-column",
+      "group": "data",
+      "en": "row / column",
+      "es": "fila / columna",
+      "register": {
+        "formal": "fila / columna",
+        "casual": "fila / columna",
+        "slang": null
+      },
+      "atWork": "\"fila\", \"columna\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Each row is one user.",
+        "es": "Cada fila es un usuario."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "item-attribute",
+      "group": "data",
+      "en": "item / attribute (DynamoDB)",
+      "es": "elemento, ítem / atributo",
+      "register": {
+        "formal": "elemento / atributo",
+        "casual": "ítem / atributo",
+        "slang": null
+      },
+      "atWork": "\"el ítem\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Each item can have different attributes.",
+        "es": "Cada elemento puede tener atributos distintos."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "partition-key",
+      "group": "data",
+      "en": "partition key",
+      "es": "clave de partición",
+      "register": {
+        "formal": "clave de partición",
+        "casual": "partition key, PK",
+        "slang": "la PK"
+      },
+      "atWork": "\"la PK\", \"la partition key\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The partition key decides where the item is stored.",
+        "es": "La clave de partición decide dónde se guarda el elemento."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "sort-key",
+      "group": "data",
+      "en": "sort key",
+      "es": "clave de ordenación; clave de clasificación",
+      "register": {
+        "formal": "clave de ordenación",
+        "casual": "sort key, SK",
+        "slang": "la SK"
+      },
+      "atWork": "\"la sort key\", \"la SK\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Use a date as the sort key to get items in order.",
+        "es": "Usa una fecha como clave de ordenación para obtener los elementos en orden."
+      },
+      "note": {
+        "text": "AWS no es coherente: la misma página dice \"clave de ordenación\" y \"clave de clasificación\".",
+        "sources": [
+          "aws-ddb-core"
+        ],
+        "pending": null
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "primary-key",
+      "group": "data",
+      "en": "primary key",
+      "es": "clave principal; clave primaria",
+      "register": {
+        "formal": "clave principal",
+        "casual": "clave primaria, PK",
+        "slang": null
+      },
+      "atWork": "\"clave primaria\" (lo más oído), \"clave principal\" (AWS y Microsoft)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The primary key must be unique.",
+        "es": "La clave principal tiene que ser única."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "index",
+      "group": "data",
+      "en": "index / secondary index (GSI, LSI)",
+      "es": "índice / índice secundario global (GSI)",
+      "register": {
+        "formal": "índice secundario global",
+        "casual": "índice, GSI",
+        "slang": "el GSI"
+      },
+      "atWork": "\"un GSI\" (se dice la sigla en inglés)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Add a GSI to query by email.",
+        "es": "Añade un índice secundario global para consultar por correo."
+      },
+      "note": {
+        "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
+        "sources": [
+          "aws-az",
+          "aws-elb",
+          "aws-lambda",
+          "aws-autoscaling",
+          "aws-iam-roles",
+          "aws-sg",
+          "aws-subnets",
+          "aws-ddb-core",
+          "aws-ddb-gsi",
+          "aws-cfn-stacks"
+        ],
+        "pending": null
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "schema",
+      "group": "data",
+      "en": "schema",
+      "es": "esquema",
+      "register": {
+        "formal": "esquema",
+        "casual": "esquema, schema",
+        "slang": null
+      },
+      "atWork": "\"el esquema\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "DynamoDB has no fixed schema.",
+        "es": "DynamoDB no tiene un esquema fijo."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "migration",
+      "group": "data",
+      "en": "migration (schema / data)",
+      "es": "migración",
+      "register": {
+        "formal": "migración",
+        "casual": "migración",
+        "slang": null
+      },
+      "atWork": "\"correr la migración\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Run the migration before deploying the new code.",
+        "es": "Ejecuta la migración antes de desplegar el código nuevo."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "backup",
+      "group": "data",
+      "en": "backup",
+      "es": "copia de seguridad; copia de respaldo",
+      "register": {
+        "formal": "copia de seguridad",
+        "casual": "backup, respaldo",
+        "slang": "backup"
+      },
+      "atWork": "\"el backup\", \"un respaldo\" (muy común en Latinoamérica)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Turn on point-in-time recovery for backups.",
+        "es": "Activa la recuperación a un momento dado para las copias de seguridad."
+      },
+      "note": {
+        "text": "\"Copia de seguridad\" en un documento; \"backup\" o \"respaldo\" al hablar.",
+        "sources": [],
+        "pending": "Fundéu sobre \"backup\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "restore",
+      "group": "data",
+      "en": "restore",
+      "es": "restaurar",
+      "register": {
+        "formal": "restaurar",
+        "casual": "restaurar, levantar el backup",
+        "slang": null
+      },
+      "atWork": "\"restaurar el backup\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Restore the table to yesterday at 9 a.m.",
+        "es": "Restaura la tabla a ayer a las 9 a. m."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "replica",
+      "group": "data",
+      "en": "replica / replication",
+      "es": "réplica / replicación",
+      "register": {
+        "formal": "réplica / replicación",
+        "casual": "réplica",
+        "slang": null
+      },
+      "atWork": "\"la réplica de lectura\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Read replicas take load off the primary.",
+        "es": "Las réplicas de lectura le quitan carga a la principal."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "transaction",
+      "group": "data",
+      "en": "transaction",
+      "es": "transacción",
+      "register": {
+        "formal": "transacción",
+        "casual": "transacción",
+        "slang": null
+      },
+      "atWork": "\"transacción\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Write both items in one transaction.",
+        "es": "Escribe los dos elementos en una sola transacción."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "record",
+      "group": "data",
+      "en": "record",
+      "es": "registro",
+      "register": {
+        "formal": "registro",
+        "casual": "registro",
+        "slang": null
+      },
+      "atWork": "\"registro\"",
+      "region": null,
+      "falseFriend": "\"Registro\" también es log y entrada de DNS: en español una misma palabra cubre tres ideas.",
+      "example": {
+        "en": "Insert one record per order.",
+        "es": "Inserta un registro por pedido."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "dataset",
+      "group": "data",
+      "en": "dataset",
+      "es": "conjunto de datos",
+      "register": {
+        "formal": "conjunto de datos",
+        "casual": "dataset",
+        "slang": "dataset"
+      },
+      "atWork": "\"el dataset\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Train the model on a clean dataset.",
+        "es": "Entrena el modelo con un conjunto de datos limpio."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "big-data",
+      "group": "data",
+      "en": "big data",
+      "es": "macrodatos; datos masivos",
+      "register": {
+        "formal": "macrodatos",
+        "casual": "big data",
+        "slang": null
+      },
+      "atWork": "\"big data\" — en la oficina nadie dice \"macrodatos\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "EMR processes big data with Spark.",
+        "es": "EMR procesa macrodatos con Spark."
+      },
+      "note": {
+        "text": "\"Macrodatos\" es la alternativa en español; en la oficina se dice \"big data\".",
+        "sources": [],
+        "pending": "Fundéu sobre \"big data\"."
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "data-lake",
+      "group": "data",
+      "en": "data lake / data warehouse",
+      "es": "lago de datos / almacén de datos",
+      "register": {
+        "formal": "lago de datos / almacén de datos",
+        "casual": "data lake, data warehouse",
+        "slang": null
+      },
+      "atWork": "\"el data lake\", \"el warehouse\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Our data lake lives in S3.",
+        "es": "Nuestro lago de datos vive en S3."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "etl",
+      "group": "data",
+      "en": "ETL / pipeline (data)",
+      "es": "ETL (extraer, transformar, cargar)",
+      "register": {
+        "formal": "proceso ETL",
+        "casual": "el ETL",
+        "slang": null
+      },
+      "atWork": "\"el ETL\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Glue runs the nightly ETL job.",
+        "es": "Glue ejecuta el proceso ETL cada noche."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "stream",
+      "group": "data",
+      "en": "stream / streaming",
+      "es": "flujo, secuencia; transmisión",
+      "register": {
+        "formal": "flujo de datos / transmisión",
+        "casual": "stream, streaming",
+        "slang": null
+      },
+      "atWork": "\"el stream\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "DynamoDB Streams trigger a Lambda on every change.",
+        "es": "DynamoDB Streams activa una Lambda con cada cambio."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "json",
+      "group": "data",
+      "en": "JSON / field / key-value",
+      "es": "JSON / campo / clave-valor",
+      "register": {
+        "formal": "campo / par clave-valor",
+        "casual": "campo, key",
+        "slang": null
+      },
+      "atWork": "\"el JSON\", \"el campo\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Add an email field to the JSON.",
+        "es": "Añade un campo email al JSON."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "scan",
+      "group": "data",
+      "en": "scan (vs query)",
+      "es": "examen (Scan) / consulta (Query)",
+      "register": {
+        "formal": "operación Scan",
+        "casual": "hacer un scan",
+        "slang": null
+      },
+      "atWork": "\"hacer un scan\" — se deja en inglés",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "A scan reads every item; a query reads one partition.",
+        "es": "Un scan lee todos los elementos; una query lee una sola partición."
+      },
+      "note": null,
+      "difficulty": "advanced"
+    },
+    {
+      "id": "machine-learning",
+      "group": "data",
+      "en": "machine learning / model / training",
+      "es": "aprendizaje automático / modelo / entrenamiento",
+      "register": {
+        "formal": "aprendizaje automático",
+        "casual": "machine learning, ML",
+        "slang": null
+      },
+      "atWork": "\"machine learning\", \"entrenar el modelo\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "SageMaker trains the model.",
+        "es": "SageMaker entrena el modelo."
+      },
+      "note": {
+        "text": "\"Aprendizaje automático\" es la forma habitual por escrito.",
+        "sources": [],
+        "pending": "Fundéu sobre \"machine learning\"."
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "llm",
+      "group": "data",
+      "en": "LLM / prompt / inference",
+      "es": "modelo de lenguaje grande / instrucción / inferencia",
+      "register": {
+        "formal": "modelo de lenguaje grande (LLM)",
+        "casual": "LLM, prompt",
+        "slang": "el prompt"
+      },
+      "atWork": "\"el prompt\", \"un LLM\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Bedrock runs inference on the model you pick.",
+        "es": "Bedrock ejecuta la inferencia en el modelo que elijas."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "authentication",
+      "group": "security",
+      "en": "authentication (authn)",
+      "es": "autenticación",
+      "register": {
+        "formal": "autenticación",
+        "casual": "autenticación, auth",
+        "slang": "auth"
+      },
+      "atWork": "\"autenticación\" (\"autentificación\" también se oye)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Cognito handles authentication.",
+        "es": "Cognito se encarga de la autenticación."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "authorization",
+      "group": "security",
+      "en": "authorization (authz)",
+      "es": "autorización",
+      "register": {
+        "formal": "autorización",
+        "casual": "autorización, permisos",
+        "slang": null
+      },
+      "atWork": "\"autorización\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Authentication is who you are; authorization is what you can do.",
+        "es": "La autenticación es quién eres; la autorización es qué puedes hacer."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "sign-in",
+      "group": "security",
+      "en": "sign in / log in / sign up",
+      "es": "iniciar sesión / registrarse",
+      "register": {
+        "formal": "iniciar sesión / registrarse",
+        "casual": "loguearse, entrar",
+        "slang": "loguearse"
+      },
+      "atWork": "\"loguearse\", \"hacer login\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Sign in with Google.",
+        "es": "Inicia sesión con Google."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "credentials",
+      "group": "security",
+      "en": "credentials",
+      "es": "credenciales",
+      "register": {
+        "formal": "credenciales",
+        "casual": "credenciales",
+        "slang": "las creds"
+      },
+      "atWork": "\"las credenciales\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Never commit credentials to Git.",
+        "es": "Nunca subas credenciales a Git."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "password",
+      "group": "security",
+      "en": "password",
+      "es": "contraseña",
+      "register": {
+        "formal": "contraseña",
+        "casual": "contraseña, clave",
+        "slang": "la pass"
+      },
+      "atWork": "\"la contraseña\", \"la clave\" (Latinoamérica), \"la pass\"",
+      "region": "Latinoamérica: \"clave\" es muy común para \"password\".",
+      "falseFriend": null,
+      "example": {
+        "en": "Rotate the database password every 90 days.",
+        "es": "Cambia la contraseña de la base de datos cada 90 días."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "token",
+      "group": "security",
+      "en": "token",
+      "es": "token",
+      "register": {
+        "formal": "token",
+        "casual": "token",
+        "slang": null
+      },
+      "atWork": "\"el token\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The refresh token keeps you signed in.",
+        "es": "El token de actualización mantiene tu sesión iniciada."
+      },
+      "note": {
+        "text": "\"Token\" se deja en inglés en la práctica.",
+        "sources": [],
+        "pending": "Fundéu y Microsoft sobre \"token\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "api-key",
+      "group": "security",
+      "en": "API key / access key",
+      "es": "clave de API / clave de acceso",
+      "register": {
+        "formal": "clave de API",
+        "casual": "API key",
+        "slang": "la key"
+      },
+      "atWork": "\"la API key\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Store the API key in Secrets Manager.",
+        "es": "Guarda la clave de API en Secrets Manager."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "secret",
+      "group": "security",
+      "en": "secret",
+      "es": "secreto",
+      "register": {
+        "formal": "secreto",
+        "casual": "secreto",
+        "slang": null
+      },
+      "atWork": "\"un secreto\" (en Secrets Manager)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The Stripe key is a secret, not a config value.",
+        "es": "La clave de Stripe es un secreto, no un valor de configuración."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "encryption",
+      "group": "security",
+      "en": "encryption / encrypt / decrypt",
+      "es": "cifrado / cifrar / descifrar",
+      "register": {
+        "formal": "cifrado / cifrar",
+        "casual": "encriptar, cifrar",
+        "slang": "encriptar"
+      },
+      "atWork": "\"encriptar\" (muy oído)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "S3 encrypts objects at rest by default.",
+        "es": "S3 cifra los objetos en reposo de forma predeterminada."
+      },
+      "note": {
+        "text": "\"Cifrar\" es la forma más cuidada por escrito; \"encriptar\" está muy extendido al hablar.",
+        "sources": [],
+        "pending": "Fundéu y DLE sobre \"encriptar\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "at-rest-transit",
+      "group": "security",
+      "en": "at rest / in transit",
+      "es": "en reposo / en tránsito",
+      "register": {
+        "formal": "en reposo / en tránsito",
+        "casual": "en reposo / en tránsito",
+        "slang": null
+      },
+      "atWork": "\"cifrado en reposo y en tránsito\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Encrypt data at rest and in transit.",
+        "es": "Cifra los datos en reposo y en tránsito."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "permissions",
+      "group": "security",
+      "en": "permissions / access",
+      "es": "permisos / acceso",
+      "register": {
+        "formal": "permisos",
+        "casual": "permisos",
+        "slang": null
+      },
+      "atWork": "\"no tengo permisos\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The error says you lack permissions for s3:PutObject.",
+        "es": "El error dice que no tienes permisos para s3:PutObject."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "least-privilege",
+      "group": "security",
+      "en": "least privilege",
+      "es": "privilegio mínimo",
+      "register": {
+        "formal": "principio de privilegio mínimo",
+        "casual": "mínimo privilegio",
+        "slang": null
+      },
+      "atWork": "\"mínimo privilegio\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Follow least privilege: grant only what is needed.",
+        "es": "Aplica el privilegio mínimo: concede solo lo necesario."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "mfa",
+      "group": "security",
+      "en": "MFA (multi-factor authentication)",
+      "es": "autenticación multifactor (MFA)",
+      "register": {
+        "formal": "autenticación multifactor",
+        "casual": "MFA, doble factor",
+        "slang": "2FA"
+      },
+      "atWork": "\"el doble factor\", \"el MFA\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Turn on MFA for the root user.",
+        "es": "Activa la MFA para el usuario raíz."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "root-user",
+      "group": "security",
+      "en": "root user",
+      "es": "usuario raíz",
+      "register": {
+        "formal": "usuario raíz",
+        "casual": "root",
+        "slang": "root"
+      },
+      "atWork": "\"el root\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Do not use the root user for daily work.",
+        "es": "No uses el usuario raíz para el trabajo diario."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "vulnerability",
+      "group": "security",
+      "en": "vulnerability / exploit",
+      "es": "vulnerabilidad / exploit",
+      "register": {
+        "formal": "vulnerabilidad",
+        "casual": "vulnerabilidad, exploit",
+        "slang": null
+      },
+      "atWork": "\"una vulnerabilidad\", \"un CVE\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Inspector scans instances for vulnerabilities.",
+        "es": "Inspector analiza las instancias en busca de vulnerabilidades."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "firewall",
+      "group": "security",
+      "en": "firewall / WAF",
+      "es": "cortafuegos; firewall",
+      "register": {
+        "formal": "cortafuegos",
+        "casual": "firewall",
+        "slang": null
+      },
+      "atWork": "\"el firewall\" (Latinoamérica), \"el cortafuegos\" (más usado en España)",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "AWS WAF is a web application firewall.",
+        "es": "AWS WAF es un firewall de aplicaciones web."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "phishing",
+      "group": "security",
+      "en": "phishing",
+      "es": "suplantación de identidad; phishing",
+      "register": {
+        "formal": "suplantación de identidad (phishing)",
+        "casual": "phishing",
+        "slang": null
+      },
+      "atWork": "\"phishing\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The email was a phishing attempt.",
+        "es": "El correo era un intento de phishing."
+      },
+      "note": {
+        "text": "Se usa \"phishing\", con una explicación al lado la primera vez.",
+        "sources": [],
+        "pending": "Fundéu sobre \"phishing\"."
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "hacker",
+      "group": "security",
+      "en": "hacker / to hack / breach",
+      "es": "hacker, pirata informático / hackear / brecha (de seguridad)",
+      "register": {
+        "formal": "pirata informático / brecha de seguridad",
+        "casual": "hacker, hackear",
+        "slang": "jaquear"
+      },
+      "atWork": "\"hackear\", \"nos hackearon\"",
+      "region": null,
+      "falseFriend": "\"Hacker\" en inglés técnico también es alguien que programa con ingenio; en español casi siempre suena delictivo.",
+      "example": {
+        "en": "The breach exposed no customer data.",
+        "es": "La brecha no expuso datos de clientes."
+      },
+      "note": {
+        "text": "\"Hackear\" y \"hacker\" están muy extendidos.",
+        "sources": [],
+        "pending": "DLE y Fundéu sobre \"hacker\", \"hackear\" y \"jaquear\"."
+      },
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "audit",
+      "group": "security",
+      "en": "audit / compliance",
+      "es": "auditoría / cumplimiento (normativo)",
+      "register": {
+        "formal": "cumplimiento normativo",
+        "casual": "compliance",
+        "slang": "compliance"
+      },
+      "atWork": "\"compliance\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "CloudTrail keeps an audit log of API calls.",
+        "es": "CloudTrail guarda un registro de auditoría de las llamadas a la API."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "certificate",
+      "group": "security",
+      "en": "certificate (TLS/SSL)",
+      "es": "certificado",
+      "register": {
+        "formal": "certificado TLS",
+        "casual": "certificado, el SSL",
+        "slang": null
+      },
+      "atWork": "\"el certificado\", \"el SSL\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "ACM issues free certificates for CloudFront.",
+        "es": "ACM emite certificados gratuitos para CloudFront."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "stand-up",
+      "group": "team",
+      "en": "stand-up / daily",
+      "es": "reunión diaria",
+      "register": {
+        "formal": "reunión diaria",
+        "casual": "la daily, el stand-up",
+        "slang": "la daily"
+      },
+      "atWork": "\"la daily\" (muy usado), \"el stand-up\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Bring blockers to the stand-up.",
+        "es": "Trae los bloqueos a la daily."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "code-review",
+      "group": "team",
+      "en": "code review",
+      "es": "revisión de código",
+      "register": {
+        "formal": "revisión de código",
+        "casual": "code review, review",
+        "slang": "la review"
+      },
+      "atWork": "\"la review\", \"revisar la PR\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Two approvals are required in code review.",
+        "es": "Se necesitan dos aprobaciones en la revisión de código."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "blocker",
+      "group": "team",
+      "en": "blocker / blocked",
+      "es": "bloqueo, impedimento / bloqueado",
+      "register": {
+        "formal": "impedimento",
+        "casual": "bloqueo, blocker",
+        "slang": "estoy bloqueado"
+      },
+      "atWork": "\"estoy bloqueado con…\", \"tengo un blocker\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "My blocker is the missing IAM permission.",
+        "es": "Mi bloqueo es el permiso de IAM que falta."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "estimate",
+      "group": "team",
+      "en": "estimate",
+      "es": "estimación, estimar",
+      "register": {
+        "formal": "estimación",
+        "casual": "estimar, estimación",
+        "slang": null
+      },
+      "atWork": "\"estimar\", \"¿cuánto le pones?\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "My estimate is three days.",
+        "es": "Mi estimación es de tres días."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "story-points",
+      "group": "team",
+      "en": "story points / user story",
+      "es": "puntos de historia / historia de usuario",
+      "register": {
+        "formal": "historia de usuario",
+        "casual": "story points, puntos",
+        "slang": null
+      },
+      "atWork": "\"la historia\", \"cuántos puntos\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "This user story is five points.",
+        "es": "Esta historia de usuario vale cinco puntos."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "deadline",
+      "group": "team",
+      "en": "deadline",
+      "es": "fecha límite; plazo",
+      "register": {
+        "formal": "fecha límite / plazo",
+        "casual": "deadline, la fecha",
+        "slang": "deadline"
+      },
+      "atWork": "\"el deadline\", \"la fecha de entrega\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The deadline is Friday at noon.",
+        "es": "La fecha límite es el viernes al mediodía."
+      },
+      "note": {
+        "text": "\"Fecha límite\" o \"plazo\" en un documento.",
+        "sources": [],
+        "pending": "Fundéu sobre \"deadline\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "ship-it",
+      "group": "team",
+      "en": "ship it / ship",
+      "es": "publicarlo, sacarlo, lanzarlo",
+      "register": {
+        "formal": "publicar / lanzar",
+        "casual": "sacarlo, subirlo",
+        "slang": "¡a producción!"
+      },
+      "atWork": "\"¡sácalo!\", \"¡pa' producción!\", \"shipearlo\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Tests pass. Ship it!",
+        "es": "Las pruebas pasan. ¡A producción!"
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "lgtm",
+      "group": "team",
+      "en": "LGTM (looks good to me)",
+      "es": "\"me parece bien\", \"todo bien\"; aprobado",
+      "register": {
+        "formal": "aprobado",
+        "casual": "LGTM, todo bien",
+        "slang": "LGTM"
+      },
+      "atWork": "\"LGTM\" — se escribe igual en inglés en las PR",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "LGTM, merging now.",
+        "es": "LGTM, lo fusiono ahora."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "nit",
+      "group": "team",
+      "en": "nit / nitpick",
+      "es": "detalle menor, minucia",
+      "register": {
+        "formal": "comentario menor",
+        "casual": "nit, detallito",
+        "slang": "nit"
+      },
+      "atWork": "\"nit:\" al principio del comentario",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Nit: rename this variable.",
+        "es": "Nit: cambia el nombre de esta variable."
+      },
+      "note": null,
+      "difficulty": "advanced"
+    },
+    {
+      "id": "feedback",
+      "group": "team",
+      "en": "feedback",
+      "es": "comentarios, opiniones; retroalimentación",
+      "register": {
+        "formal": "comentarios / retroalimentación",
+        "casual": "feedback",
+        "slang": "feedback"
+      },
+      "atWork": "\"dar feedback\" — se usa muchísimo",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Thanks for the feedback on the design.",
+        "es": "Gracias por los comentarios sobre el diseño."
+      },
+      "note": {
+        "text": "\"Comentarios\", \"opiniones\" o \"retroalimentación\" por escrito; \"feedback\" al hablar.",
+        "sources": [],
+        "pending": "Fundéu sobre \"feedback\"."
+      },
+      "difficulty": "beginner"
+    },
+    {
+      "id": "meeting",
+      "group": "team",
+      "en": "meeting / call / sync",
+      "es": "reunión / llamada",
+      "register": {
+        "formal": "reunión",
+        "casual": "reu, llamada, sync",
+        "slang": "una call, una meet"
+      },
+      "atWork": "\"una call\", \"una reu\", \"un sync\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Let's sync after lunch.",
+        "es": "Hablamos después de comer."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "retro",
+      "group": "team",
+      "en": "retrospective (retro)",
+      "es": "retrospectiva",
+      "register": {
+        "formal": "retrospectiva",
+        "casual": "la retro",
+        "slang": "la retro"
+      },
+      "atWork": "\"la retro\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Raise it in the retro.",
+        "es": "Plantéalo en la retro."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "planning",
+      "group": "team",
+      "en": "sprint planning",
+      "es": "planificación del sprint",
+      "register": {
+        "formal": "planificación del sprint",
+        "casual": "la planning",
+        "slang": "la planning"
+      },
+      "atWork": "\"la planning\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "We size the tickets in planning.",
+        "es": "Estimamos los tickets en la planning."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "kickoff",
+      "group": "team",
+      "en": "kickoff",
+      "es": "reunión de arranque, inicio del proyecto",
+      "register": {
+        "formal": "reunión de inicio",
+        "casual": "kickoff",
+        "slang": "kickoff"
+      },
+      "atWork": "\"el kickoff\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "The project kickoff is Monday.",
+        "es": "La reunión de arranque del proyecto es el lunes."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "stakeholder",
+      "group": "team",
+      "en": "stakeholder",
+      "es": "parte interesada",
+      "register": {
+        "formal": "parte interesada",
+        "casual": "stakeholder",
+        "slang": "stakeholder"
+      },
+      "atWork": "\"los stakeholders\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Share the demo with stakeholders.",
+        "es": "Comparte la demo con las partes interesadas."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "pm-po",
+      "group": "team",
+      "en": "product manager / product owner",
+      "es": "gerente de producto / responsable de producto",
+      "register": {
+        "formal": "responsable de producto",
+        "casual": "el PM, el PO",
+        "slang": "el PO"
+      },
+      "atWork": "\"el PM\", \"el PO\" (siglas en inglés)",
+      "region": "\"Gerente\" es más latinoamericano; en España se usa \"responsable\" o \"jefe de producto\".",
+      "falseFriend": null,
+      "example": {
+        "en": "Ask the product owner to prioritize it.",
+        "es": "Pídele al PO que lo priorice."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "priority",
+      "group": "team",
+      "en": "priority / prioritize",
+      "es": "prioridad / priorizar",
+      "register": {
+        "formal": "priorizar",
+        "casual": "priorizar, P0/P1",
+        "slang": "es P0"
+      },
+      "atWork": "\"esto es P0\", \"priorizar\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "This bug is a P1.",
+        "es": "Este error es P1."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "scope",
+      "group": "team",
+      "en": "scope / out of scope",
+      "es": "alcance / fuera del alcance",
+      "register": {
+        "formal": "alcance",
+        "casual": "alcance, scope",
+        "slang": "scope"
+      },
+      "atWork": "\"queda fuera del scope\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Mobile is out of scope for v1.",
+        "es": "La versión móvil queda fuera del alcance de la v1."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "follow-up",
+      "group": "team",
+      "en": "follow up / follow-up",
+      "es": "dar seguimiento; seguimiento",
+      "register": {
+        "formal": "hacer seguimiento",
+        "casual": "darle seguimiento, follow-up",
+        "slang": "hacer follow-up"
+      },
+      "atWork": "\"te hago follow-up\", \"le doy seguimiento\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "I'll follow up by email.",
+        "es": "Le doy seguimiento por correo."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "heads-up",
+      "group": "team",
+      "en": "heads-up",
+      "es": "aviso",
+      "register": {
+        "formal": "aviso",
+        "casual": "aviso, un heads-up",
+        "slang": null
+      },
+      "atWork": "\"te aviso\", \"un heads-up\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Heads-up: the deploy is at 5.",
+        "es": "Aviso: el despliegue es a las 5."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "pair-programming",
+      "group": "team",
+      "en": "pair programming",
+      "es": "programación en pareja",
+      "register": {
+        "formal": "programación en pareja",
+        "casual": "pair programming, pairing",
+        "slang": "parear"
+      },
+      "atWork": "\"hacer pairing\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Let's pair on the IAM policy.",
+        "es": "Hagamos pairing con la política de IAM."
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "onboarding",
+      "group": "team",
+      "en": "onboarding",
+      "es": "incorporación",
+      "register": {
+        "formal": "incorporación",
+        "casual": "onboarding",
+        "slang": "onboarding"
+      },
+      "atWork": "\"el onboarding\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "Onboarding takes two weeks.",
+        "es": "La incorporación dura dos semanas."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "remote",
+      "group": "team",
+      "en": "remote work / time zone",
+      "es": "teletrabajo, trabajo remoto / zona horaria",
+      "register": {
+        "formal": "teletrabajo",
+        "casual": "remoto, en remoto",
+        "slang": "full remote"
+      },
+      "atWork": "\"trabajo en remoto\" (España), \"trabajo remoto / home office\" (Latinoamérica)",
+      "region": "España: \"teletrabajo\", \"en remoto\". Latinoamérica: \"trabajo remoto\", \"home office\".",
+      "falseFriend": null,
+      "example": {
+        "en": "We are fully remote across three time zones.",
+        "es": "Somos un equipo 100% remoto en tres zonas horarias."
+      },
+      "note": null,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "eta",
+      "group": "team",
+      "en": "ETA / timeline",
+      "es": "hora estimada / plazos",
+      "register": {
+        "formal": "plazo estimado",
+        "casual": "ETA",
+        "slang": "ETA"
+      },
+      "atWork": "\"¿cuál es el ETA?\"",
+      "region": null,
+      "falseFriend": null,
+      "example": {
+        "en": "What is the ETA for the fix?",
+        "es": "¿Para cuándo estaría el arreglo?"
+      },
+      "note": null,
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "eventually-ff",
+      "group": "team",
+      "en": "eventually / actually (false friends)",
+      "es": "finalmente, con el tiempo / en realidad",
+      "register": {
+        "formal": "finalmente / en realidad",
+        "casual": "al final / en realidad",
+        "slang": null
+      },
+      "atWork": "Traducción correcta: \"eventually\" = \"al final\"; \"actually\" = \"en realidad\"",
+      "region": null,
+      "falseFriend": "\"Eventualmente\" en español es \"quizás, de forma no segura\"; \"actualmente\" es \"now\". \"Eventual consistency\" se oye como \"consistencia eventual\" (calco muy extendido); \"coherencia final\" es una alternativa más clara.",
+      "example": {
+        "en": "DynamoDB reads are eventually consistent by default.",
+        "es": "Las lecturas de DynamoDB son de consistencia eventual de forma predeterminada."
+      },
+      "note": {
+        "text": "\"Eventualmente\" no significa \"al final\"; \"actualmente\" significa \"ahora\".",
+        "sources": [],
+        "pending": "RAE, Diccionario panhispánico de dudas: entrada \"eventual\"."
+      },
+      "difficulty": "advanced"
+    }
+  ]
+}
