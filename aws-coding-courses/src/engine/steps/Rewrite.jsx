@@ -1,6 +1,6 @@
 // A writing task: rewrite a message in the other language or another register.
 // The draft is kept in this browser; "Check my text" looks for the key terms.
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Markdown from '../Markdown';
 import { useT } from '../i18n';
 import { checkRewrite } from './rewrite';
@@ -13,13 +13,15 @@ const Rewrite = ({ step, storageId, done, onDone }) => {
   const key = `awsCourse_rewrite_${storageId}`;
   const inputId = `rewrite-${storageId}`;
   const [text, setText] = useState(() => read(key));
-  const [result, setResult] = useState(null);
+  // The text that was checked; the result is worked out on each render so its
+  // explanations follow the interface language if the learner switches it
+  const [checked, setChecked] = useState(null);
+  const result = useMemo(() => (checked === null ? null : checkRewrite(checked, step)), [checked, step]);
   const [showModel, setShowModel] = useState(false);
 
   const check = () => {
-    const r = checkRewrite(text, step);
-    setResult(r);
-    if (r.ok && !done) onDone();
+    setChecked(text);
+    if (checkRewrite(text, step).ok && !done) onDone();
   };
 
   return (
@@ -38,7 +40,7 @@ const Rewrite = ({ step, storageId, done, onDone }) => {
         rows={6}
         value={text}
         placeholder={t('rewrite.placeholder')}
-        onChange={(e) => { setText(e.target.value); write(key, e.target.value); setResult(null); }}
+        onChange={(e) => { setText(e.target.value); write(key, e.target.value); setChecked(null); }}
       />
       <div className="rewrite-actions">
         <button type="button" className="btn" onClick={check} disabled={!text.trim()}>{t('rewrite.check')}</button>

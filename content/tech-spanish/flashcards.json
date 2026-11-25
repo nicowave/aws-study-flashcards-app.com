@@ -1535,7 +1535,7 @@
     {
       "id": "ts-ci-en-es",
       "front": "continuous integration (CI)",
-      "back": "integración continua (IC). En el equipo: \"el CI\", \"pasar el CI\" — la sigla en inglés. Ej.: \"La integración continua corre en cada PR.\"",
+      "back": "integración continua (IC). En el equipo: \"la CI\" o \"el CI\" (el género varía según el equipo), \"pasar la CI\" — la sigla en inglés. Ej.: \"La integración continua corre en cada PR.\"",
       "hint": "CI runs on every pull request.",
       "tags": [
         "devops",
@@ -3571,7 +3571,7 @@
     {
       "id": "ts-scan-en-es",
       "front": "scan (vs query)",
-      "back": "examen (Scan) / consulta (Query). En el equipo: \"hacer un scan\" — se deja en inglés. Ej.: \"Un scan lee todos los elementos; una query lee una sola partición.\"",
+      "back": "análisis (Scan) / consulta (Query). En el equipo: \"hacer un scan\" — se deja en inglés. Ej.: \"Un scan lee todos los elementos; una query lee una sola partición.\"",
       "hint": "A scan reads every item; a query reads one partition.",
       "tags": [
         "data",
@@ -3581,7 +3581,7 @@
     },
     {
       "id": "ts-scan-es-en",
-      "front": "examen (Scan) / consulta (Query)",
+      "front": "análisis (Scan) / consulta (Query)",
       "back": "scan (vs query). E.g. \"A scan reads every item; a query reads one partition.\"",
       "hint": "Un scan lee todos los elementos; una query lee una sola partición.",
       "tags": [

@@ -117,13 +117,13 @@ export default {
         both(
           `**Why first.** Our login is slow because of how it reads the table. To explain the fix, in either language, you need the names of the two ways to read and of the indexes.
 
-- A **Query** reads the items that share one partition key value; you can add a condition on the sort key. A **Scan** reads every item in the table and filters afterwards, so on a big table it's slow and expensive. Scan and Query are API names, so with the team they stay in English: *hacer un scan*, *hacer una query*. A formal document can say *la operación Scan*. Translated documentation may call a Scan an *examen* and a Query a *consulta*.
+- A **Query** reads the items that share one partition key value; you can add a condition on the sort key. A **Scan** reads every item in the table and filters afterwards, so on a big table it's slow and expensive. Scan and Query are API names, so with the team they stay in English: *hacer un scan*, *hacer una query*. A formal document can say *la operación Scan*. AWS's Spanish documentation (machine-translated) mostly calls a Scan an *análisis* (sometimes *examen*) and a Query a *consulta*.
 - An **index** (*índice*) is a second copy of some attributes, organized for a different lookup.
 - A **global secondary index** (*índice secundario global*, the form in AWS's Spanish docs, or just *un GSI*) uses a different partition key, so you can query by email instead of by user ID. You can add one to an existing table. GSI reads are **eventually consistent**: the index can lag the table for a moment. In Spanish you'll see *consistencia eventual*, but don't write *eventualmente consistente*; say *el índice se actualiza con un pequeño retraso*.
 - A **local secondary index** (*índice secundario local*, *un LSI*) keeps the same partition key with a different sort key, and unlike a GSI it can only be created together with the table.`,
           `**Primero, el porqué.** Nuestro login es lento por cómo lee la tabla. Para explicar la solución, en cualquiera de los dos idiomas, necesitas los nombres de las dos formas de leer y de los índices.
 
-- Una **Query** lee los elementos que comparten un mismo valor de clave de partición; puedes añadir una condición sobre la clave de ordenación. Un **Scan** lee todos los elementos de la tabla y filtra después, así que en una tabla grande es lento y caro. Scan y Query son nombres de la API, así que con el equipo se quedan en inglés: *hacer un scan*, *hacer una query*. En un documento formal, *la operación Scan*. La documentación traducida puede llamar *examen* a un Scan y *consulta* a una Query.
+- Una **Query** lee los elementos que comparten un mismo valor de clave de partición; puedes añadir una condición sobre la clave de ordenación. Un **Scan** lee todos los elementos de la tabla y filtra después, así que en una tabla grande es lento y caro. Scan y Query son nombres de la API, así que con el equipo se quedan en inglés: *hacer un scan*, *hacer una query*. En un documento formal, *la operación Scan*. La documentación de AWS en español (traducida automáticamente) llama casi siempre *análisis* a un Scan (a veces *examen*) y *consulta* a una Query.
 - Un **índice** (*index*) es una segunda copia de algunos atributos, organizada para otra búsqueda.
 - Un **índice secundario global** (así lo llama la documentación de AWS en español; con el equipo, *un GSI*) usa otra clave de partición, para que puedas consultar por email en vez de por ID de usuario. Se puede añadir a una tabla que ya existe. Las lecturas de un GSI tienen **consistencia eventual**: el índice puede ir un momento por detrás de la tabla. No escribas *eventualmente consistente*; di *el índice se actualiza con un pequeño retraso*.
 - Un **índice secundario local** (*local secondary index*, *un LSI*) mantiene la misma clave de partición con otra clave de ordenación y, a diferencia de un GSI, solo se puede crear junto con la tabla.`,
@@ -173,7 +173,7 @@ export default {
       mustUse: [
         { any: ['tabla*'], label: 'tabla' },
         { any: ['clave de particion', 'claves de particion', 'llave de particion', 'llaves de particion', 'partition key', 'PK'], label: 'clave de partición' },
-        { any: ['scan*', 'escane*', 'examen', 'recorr*', 'lee toda', 'leer toda', 'lee todos', 'leer todos', 'leemos toda', 'leemos todos'], label: 'scan' },
+        { any: ['scan*', 'escane*', 'examen', 'analisis', 'recorr*', 'lee toda', 'leer toda', 'lee todos', 'leer todos', 'leemos toda', 'leemos todos'], label: 'scan' },
         { any: ['GSI', 'indice*'], label: 'GSI / índice secundario global' },
         { any: ['atributo*', 'campo*', 'email', 'correo'], label: 'el atributo email' },
         { any: ['consult*', 'query', 'querys', 'queries'], label: 'consulta / query' },

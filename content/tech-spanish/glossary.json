@@ -128,6 +128,12 @@
       "quote": "push → \"Insertar\"; pull → \"Incorporar cambios (\"pull\")\"; merge → \"Combinar...\"",
       "checked": "2026-11-25"
     },
+    "aws-ddb-scan": {
+      "title": "Análisis de tablas en DynamoDB (es_es)",
+      "url": "https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/Scan.html",
+      "quote": "Análisis de tablas en DynamoDB",
+      "checked": "2026-11-25"
+    },
     "git-es-po": {
       "title": "Traducción oficial de Git al español (po/es.po)",
       "url": "https://raw.githubusercontent.com/git/git/master/po/es.po",
@@ -667,7 +673,7 @@
       "register": {
         "formal": "incidencia",
         "casual": "ticket, issue",
-        "slang": "tique"
+        "slang": null
       },
       "atWork": "\"abrir un ticket\", \"un issue\"",
       "region": "España: \"incidencia\" es muy común. Latinoamérica: \"ticket\", \"caso\".",
@@ -1585,7 +1591,7 @@
         "casual": "CI",
         "slang": "CI"
       },
-      "atWork": "\"el CI\", \"pasar el CI\" — la sigla en inglés",
+      "atWork": "\"la CI\" o \"el CI\" (el género varía según el equipo), \"pasar la CI\" — la sigla en inglés",
       "region": null,
       "falseFriend": null,
       "example": {
@@ -3624,7 +3630,7 @@
       "id": "scan",
       "group": "data",
       "en": "scan (vs query)",
-      "es": "examen (Scan) / consulta (Query)",
+      "es": "análisis (Scan) / consulta (Query)",
       "register": {
         "formal": "operación Scan",
         "casual": "hacer un scan",
@@ -3637,7 +3643,13 @@
         "en": "A scan reads every item; a query reads one partition.",
         "es": "Un scan lee todos los elementos; una query lee una sola partición."
       },
-      "note": null,
+      "note": {
+        "text": "La página de Scan de DynamoDB en español usa sobre todo \"análisis\" (y alguna vez \"examen\"). En el equipo se dice \"scan\".",
+        "sources": [
+          "aws-ddb-scan"
+        ],
+        "pending": null
+      },
       "difficulty": "advanced"
     },
     {

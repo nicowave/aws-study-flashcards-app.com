@@ -158,17 +158,10 @@ Once it's approved, I'll merge it into main. It ships in Thursday's release.`,
       ],
       avoid: [
         {
-          any: ['the', 'this', 'and', 'with', 'once', 'we'],
+          any: ['the', 'this', 'and', 'with', 'we'],
           why: both(
             'Write it in Spanish: the Madrid team reviews in Spanish.',
             'Escríbela en español: el equipo de Madrid revisa en español.',
-          ),
-        },
-        {
-          any: ['empuj*'],
-          why: both(
-            '"Empujar" is a literal translation of "push" that sounds odd in Git writing. Write "subir" (GitHub\'s 2022 glossary), or "hacer push" / "pushear" with the team.',
-            '"Empujar" es una traducción literal de "push" que suena rara al escribir sobre Git. Escribe "subir" (glosario de GitHub de 2022), o "hacer push" / "pushear" con el equipo.',
           ),
         },
         {
