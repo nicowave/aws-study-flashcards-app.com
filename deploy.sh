@@ -64,6 +64,17 @@ upload_crawler_files() {
     done
 }
 
+# Install when node_modules is missing or older than package.json. Why: a git pull can add a
+# dependency (e.g. the test libraries); checking only that node_modules exists would skip it,
+# and vitest then stops to ask about the missing package mid-deploy.
+# npm rewrites node_modules/.package-lock.json on every install, so it marks the last install.
+ensure_deps() {
+    if [ ! -d node_modules ] || [ package.json -nt node_modules/.package-lock.json ]; then
+        print_step "Installing dependencies (package.json changed since the last install)..."
+        npm install
+    fi
+}
+
 deploy_hub() {
     local site_name="Study Hub Homepage"
     local folder="aws-study-homepage"
@@ -176,8 +187,7 @@ deploy_cloud() {
     print_success "Dependencies ready"
 
     # Every question and flashcard must cite an official AWS page checked within a year.
-    # (An older node_modules may predate vitest, so install it if it's missing.)
-    [ -x node_modules/.bin/vitest ] || npm install
+    ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question and card cites an official AWS source..."
     npm test
     print_success "Sources check passed"
@@ -246,8 +256,7 @@ deploy_ai() {
     print_success "Dependencies ready"
 
     # Every question, card and guide section must cite an official AWS page checked within a year.
-    # (An older node_modules may predate vitest, so install it if it's missing.)
-    [ -x node_modules/.bin/vitest ] || npm install
+    ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question, card and guide section cites an official AWS source..."
     npm test
     print_success "Sources check passed"
@@ -316,8 +325,7 @@ deploy_saa() {
     print_success "Dependencies ready"
 
     # Every question, card and study guide section must cite an official AWS page checked within a year.
-    # (An older node_modules may predate vitest, so install it if it's missing.)
-    [ -x node_modules/.bin/vitest ] || npm install
+    ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question, card and guide section cites an official AWS source..."
     npm test
     print_success "Sources check passed"
@@ -386,8 +394,7 @@ deploy_dva() {
     print_success "Dependencies ready"
 
     # Every question, card and study guide section must cite an official AWS page checked within a year.
-    # (An older node_modules may predate vitest, so install it if it's missing.)
-    [ -x node_modules/.bin/vitest ] || npm install
+    ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question, card and guide section cites an official AWS source..."
     npm test
     print_success "Sources check passed"
