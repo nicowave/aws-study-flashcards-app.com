@@ -141,7 +141,7 @@
     {
       "id": "ts-push-en-es",
       "front": "push",
-      "back": "subir (cambios); insertar (VS Code). En el equipo: \"pushear\", \"subir los cambios\". Ej.: \"Sube tu rama antes de irte.\"",
+      "back": "subir (cambios); insertar (VS Code); empujar (Git). En el equipo: \"pushear\", \"subir los cambios\". Ej.: \"Sube tu rama antes de irte.\"",
       "hint": "Push your branch before you leave.",
       "tags": [
         "dev",
@@ -971,7 +971,7 @@
     {
       "id": "ts-parameter-en-es",
       "front": "parameter / argument",
-      "back": "parámetro / argumento. En el equipo: \"parámetro\", \"argumento\". Ej.: \"Pasa el nombre del bucket como argumento.\" ⚠ \"Argumento\" en código no es una discusión: es el valor que pasas a una función.",
+      "back": "parámetro / argumento. En el equipo: \"parámetro\", \"argumento\". Ej.: \"Pasa el nombre del bucket como argumento.\" ⚠ En inglés, *argument* también es una discusión o pelea; en español, *argumento* es un razonamiento o la trama de una historia. En código, en los dos idiomas, es el valor que pasas a una función.",
       "hint": "Pass the bucket name as an argument.",
       "tags": [
         "code",
@@ -1309,7 +1309,7 @@
     {
       "id": "ts-runtime-en-es",
       "front": "runtime",
-      "back": "tiempo de ejecución; entorno de ejecución. En el equipo: \"el runtime\" (de Lambda: Node.js 22, Python 3.13). Ej.: \"Elige el runtime de Python 3.13.\" ⚠ \"Tiempo de ejecución\" también es \"runtime\" en el sentido de \"mientras corre\" (\"error en tiempo de ejecución\").",
+      "back": "tiempo de ejecución; entorno de ejecución. En el equipo: \"el runtime\" (el de Lambda: Node.js, Python, Java…). Ej.: \"Elige el runtime de Python 3.13.\" ⚠ \"Tiempo de ejecución\" también es \"runtime\" en el sentido de \"mientras corre\" (\"error en tiempo de ejecución\").",
       "hint": "Pick the Python 3.13 runtime.",
       "tags": [
         "code",
@@ -1803,7 +1803,7 @@
     {
       "id": "ts-canary-en-es",
       "front": "canary release",
-      "back": "versión canario; despliegue canario. En el equipo: \"un canary\". Ej.: \"Envía el 5% del tráfico al canario.\"",
+      "back": "despliegue canario; versión canario. En el equipo: \"un canary\". Ej.: \"Envía el 5% del tráfico al canario.\"",
       "hint": "Send 5% of traffic to the canary.",
       "tags": [
         "devops",
@@ -1813,7 +1813,7 @@
     },
     {
       "id": "ts-canary-es-en",
-      "front": "versión canario",
+      "front": "despliegue canario",
       "back": "canary release. E.g. \"Send 5% of traffic to the canary.\"",
       "hint": "Envía el 5% del tráfico al canario.",
       "tags": [
@@ -1825,7 +1825,7 @@
     {
       "id": "ts-feature-flag-en-es",
       "front": "feature flag / toggle",
-      "back": "marca de funcionalidad; feature flag. En el equipo: \"meterlo detrás de un flag\". Ej.: \"Oculta la página nueva detrás de un feature flag.\"",
+      "back": "indicador de funcionalidad; feature flag. En el equipo: \"meterlo detrás de un flag\". Ej.: \"Oculta la página nueva detrás de un feature flag.\"",
       "hint": "Hide the new page behind a feature flag.",
       "tags": [
         "devops",
@@ -1835,7 +1835,7 @@
     },
     {
       "id": "ts-feature-flag-es-en",
-      "front": "marca de funcionalidad",
+      "front": "indicador de funcionalidad",
       "back": "feature flag / toggle. E.g. \"Hide the new page behind a feature flag.\"",
       "hint": "Oculta la página nueva detrás de un feature flag.",
       "tags": [
@@ -1869,7 +1869,7 @@
     {
       "id": "ts-provision-en-es",
       "front": "provision",
-      "back": "aprovisionar. En el equipo: \"levantar\" recursos, \"provisionar\" (calco frecuente). Ej.: \"Terraform aprovisiona la VPC.\" ⚠ \"Provisionar\" se oye mucho, en un documento formal, \"aprovisionar\" es la forma más asentada.",
+      "back": "aprovisionar. En el equipo: \"levantar\" recursos, \"provisionar\" (calco frecuente). Ej.: \"Terraform aprovisiona la VPC.\" ⚠ \"Provisionar\" se oye mucho. En un documento formal, \"aprovisionar\" es la forma más asentada.",
       "hint": "Terraform provisions the VPC.",
       "tags": [
         "devops",
@@ -1985,7 +1985,7 @@
     {
       "id": "ts-incident-en-es",
       "front": "incident",
-      "back": "incidente. En el equipo: \"un incidente\". Ej.: \"Abrimos un incidente por la caída.\" ⚠ \"Incidencia\" (España) suele ser un ticket o problema menor; \"incidente\" es algo serio en producción.",
+      "back": "incidente. En el equipo: \"un incidente\". Ej.: \"Abrimos un incidente por la caída.\" ⚠ En muchos equipos, sobre todo en España, \"incidencia\" se usa para un ticket o un problema menor, e \"incidente\" para algo serio en producción. No es una regla fija: algunas empresas llaman \"incidencia\" a todo.",
       "hint": "We opened an incident for the outage.",
       "tags": [
         "devops",
@@ -2053,7 +2053,7 @@
     {
       "id": "ts-uptime-en-es",
       "front": "uptime / availability",
-      "back": "tiempo de actividad; disponibilidad. En el equipo: \"uptime\", \"disponibilidad\". Ej.: \"Garantizamos una disponibilidad del 99,9%.\" ⚠ Decimales: España usa coma (99,9%); México y Centroamérica, punto (99.9%).",
+      "back": "tiempo de actividad; disponibilidad. En el equipo: \"uptime\", \"disponibilidad\". Ej.: \"Garantizamos una disponibilidad del 99,9%.\" ⚠ Decimales: España y gran parte de Sudamérica usan coma (99,9%); México y parte de Centroamérica y el Caribe, punto (99.9%).",
       "hint": "We promise 99.9% uptime.",
       "tags": [
         "devops",
@@ -2209,7 +2209,7 @@
     {
       "id": "ts-region-en-es",
       "front": "Region",
-      "back": "región. En el equipo: \"la región\", \"us-east-1\" (\"North Virginia\"). Ej.: \"Despliega en dos regiones para la recuperación ante desastres.\"",
+      "back": "región. En el equipo: \"la región\", \"us-east-1\" (en la consola: US East (N. Virginia)). Ej.: \"Despliega en dos regiones para la recuperación ante desastres.\"",
       "hint": "Deploy in two Regions for disaster recovery.",
       "tags": [
         "cloud",
@@ -4013,7 +4013,7 @@
     {
       "id": "ts-hacker-en-es",
       "front": "hacker / to hack / breach",
-      "back": "hacker, pirata informático / hackear / brecha (de seguridad). En el equipo: \"hackear\", \"nos hackearon\". Ej.: \"La brecha no expuso datos de clientes.\" ⚠ \"Hacker\" en inglés técnico también es alguien que programa con ingenio; en español casi siempre suena delictivo.",
+      "back": "atacante, hacker; pirata informático (en la prensa) / hackear / brecha de seguridad. En el equipo: \"hackear\", \"nos hackearon\". Ej.: \"La brecha no expuso datos de clientes.\" ⚠ \"Hacker\" en inglés técnico también es alguien que programa con ingenio; en español casi siempre suena delictivo.",
       "hint": "The breach exposed no customer data.",
       "tags": [
         "security",
@@ -4024,7 +4024,7 @@
     },
     {
       "id": "ts-hacker-es-en",
-      "front": "hacker, pirata informático / hackear / brecha (de seguridad)",
+      "front": "atacante, hacker",
       "back": "hacker / to hack / breach. E.g. \"The breach exposed no customer data.\"",
       "hint": "La brecha no expuso datos de clientes.",
       "tags": [
@@ -4037,7 +4037,7 @@
     {
       "id": "ts-audit-en-es",
       "front": "audit / compliance",
-      "back": "auditoría / cumplimiento (normativo). En el equipo: \"compliance\". Ej.: \"CloudTrail guarda un registro de auditoría de las llamadas a la API.\"",
+      "back": "auditoría / cumplimiento (normativo). En el equipo: \"compliance\", \"la auditoría\". Ej.: \"CloudTrail guarda un registro de auditoría de las llamadas a la API.\"",
       "hint": "CloudTrail keeps an audit log of API calls.",
       "tags": [
         "security",

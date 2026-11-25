@@ -353,3 +353,13 @@ section h2 { font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.01em; }
 .rewrite-feedback.wrong { border-color: var(--danger); }
 .rewrite-feedback.wrong strong { color: var(--danger); }
 .rewrite-model { border: 1px dashed var(--line); border-radius: var(--radius); padding: 12px 16px; }
+
+/* Narrow screens: keep the language switch and sign-in button whole; the brand wraps instead */
+.site-header nav > * { flex: none; }
+.site-header nav .btn { white-space: nowrap; }
+.brand { min-width: 0; }
+@media (max-width: 600px) {
+  .site-header { padding: 10px 14px; gap: 10px; }
+  .site-header nav { gap: 10px; }
+  .brand-mark + .brand-text { font-size: 0.9rem; }
+}

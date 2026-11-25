@@ -131,7 +131,7 @@
     "git-es-po": {
       "title": "Traducción oficial de Git al español (po/es.po)",
       "url": "https://raw.githubusercontent.com/git/git/master/po/es.po",
-      "quote": "nada para hacer commit, el árbol de trabajo está limpio",
+      "quote": "nada para hacer commit, el árbol de trabajo está limpio · Pushing to %s → Empujando a %s",
       "checked": "2026-11-25"
     }
   },
@@ -205,7 +205,7 @@
         "es": "Haz commit del cambio con un mensaje claro."
       },
       "note": {
-        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git mezcla: dice \"empujar\" (push) y a menudo \"fusionar\" (merge), pero deja \"commit\" y \"pull\" en frases como \"hacer commit\" y \"hacer pull\".",
         "sources": [
           "github-glossary-2022",
           "vscode-git-es",
@@ -253,7 +253,7 @@
         "es": "Fusiona la rama cuando CI esté en verde."
       },
       "note": {
-        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git mezcla: dice \"empujar\" (push) y a menudo \"fusionar\" (merge), pero deja \"commit\" y \"pull\" en frases como \"hacer commit\" y \"hacer pull\".",
         "sources": [
           "github-glossary-2022",
           "vscode-git-es",
@@ -281,7 +281,7 @@
         "es": "Abre una PR y pide una revisión."
       },
       "note": {
-        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git mezcla: dice \"empujar\" (push) y a menudo \"fusionar\" (merge), pero deja \"commit\" y \"pull\" en frases como \"hacer commit\" y \"hacer pull\".",
         "sources": [
           "github-glossary-2022",
           "vscode-git-es",
@@ -295,7 +295,7 @@
       "id": "push",
       "group": "dev",
       "en": "push",
-      "es": "subir (cambios); insertar (VS Code)",
+      "es": "subir (cambios); insertar (VS Code); empujar (Git)",
       "register": {
         "formal": "subir los cambios al repositorio remoto",
         "casual": "pushear, subir",
@@ -309,7 +309,7 @@
         "es": "Sube tu rama antes de irte."
       },
       "note": {
-        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git mezcla: dice \"empujar\" (push) y a menudo \"fusionar\" (merge), pero deja \"commit\" y \"pull\" en frases como \"hacer commit\" y \"hacer pull\".",
         "sources": [
           "github-glossary-2022",
           "vscode-git-es",
@@ -337,7 +337,7 @@
         "es": "Haz pull de main antes de empezar."
       },
       "note": {
-        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git mezcla: dice \"empujar\" (push) y a menudo \"fusionar\" (merge), pero deja \"commit\" y \"pull\" en frases como \"hacer commit\" y \"hacer pull\".",
         "sources": [
           "github-glossary-2022",
           "vscode-git-es",
@@ -385,7 +385,7 @@
         "es": "Haz un fork del proyecto para proponer un arreglo."
       },
       "note": {
-        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git deja \"commit\", \"pull\" y \"merge\" en inglés (\"hacer commit\", \"hacer pull\").",
+        "text": "No hay una traducción única. GitHub (glosario de 2022): \"subir\", \"fusionar\", \"confirmación\", \"solicitud de cambios\", \"bifurcación\". VS Code: \"Insertar\", \"Combinar\", \"Incorporar cambios\" y deja \"Commit\". La traducción de Git mezcla: dice \"empujar\" (push) y a menudo \"fusionar\" (merge), pero deja \"commit\" y \"pull\" en frases como \"hacer commit\" y \"hacer pull\".",
         "sources": [
           "github-glossary-2022",
           "vscode-git-es",
@@ -1071,7 +1071,7 @@
       },
       "atWork": "\"parámetro\", \"argumento\"",
       "region": null,
-      "falseFriend": "\"Argumento\" en código no es una discusión: es el valor que pasas a una función.",
+      "falseFriend": "En inglés, *argument* también es una discusión o pelea; en español, *argumento* es un razonamiento o la trama de una historia. En código, en los dos idiomas, es el valor que pasas a una función.",
       "example": {
         "en": "Pass the bucket name as an argument.",
         "es": "Pasa el nombre del bucket como argumento."
@@ -1381,7 +1381,7 @@
         "casual": "runtime",
         "slang": "runtime"
       },
-      "atWork": "\"el runtime\" (de Lambda: Node.js 22, Python 3.13)",
+      "atWork": "\"el runtime\" (el de Lambda: Node.js, Python, Java…)",
       "region": null,
       "falseFriend": "\"Tiempo de ejecución\" también es \"runtime\" en el sentido de \"mientras corre\" (\"error en tiempo de ejecución\").",
       "example": {
@@ -1819,7 +1819,7 @@
       "id": "canary",
       "group": "devops",
       "en": "canary release",
-      "es": "versión canario; despliegue canario",
+      "es": "despliegue canario; versión canario",
       "register": {
         "formal": "despliegue canario",
         "casual": "canary",
@@ -1839,7 +1839,7 @@
       "id": "feature-flag",
       "group": "devops",
       "en": "feature flag / toggle",
-      "es": "marca de funcionalidad; feature flag",
+      "es": "indicador de funcionalidad; feature flag",
       "register": {
         "formal": "indicador de funcionalidad",
         "casual": "feature flag",
@@ -1887,7 +1887,7 @@
       },
       "atWork": "\"levantar\" recursos, \"provisionar\" (calco frecuente)",
       "region": null,
-      "falseFriend": "\"Provisionar\" se oye mucho, en un documento formal, \"aprovisionar\" es la forma más asentada.",
+      "falseFriend": "\"Provisionar\" se oye mucho. En un documento formal, \"aprovisionar\" es la forma más asentada.",
       "example": {
         "en": "Terraform provisions the VPC.",
         "es": "Terraform aprovisiona la VPC."
@@ -1987,7 +1987,7 @@
       },
       "atWork": "\"un incidente\"",
       "region": null,
-      "falseFriend": "\"Incidencia\" (España) suele ser un ticket o problema menor; \"incidente\" es algo serio en producción.",
+      "falseFriend": "En muchos equipos, sobre todo en España, \"incidencia\" se usa para un ticket o un problema menor, e \"incidente\" para algo serio en producción. No es una regla fija: algunas empresas llaman \"incidencia\" a todo.",
       "example": {
         "en": "We opened an incident for the outage.",
         "es": "Abrimos un incidente por la caída."
@@ -2047,7 +2047,7 @@
       },
       "atWork": "\"uptime\", \"disponibilidad\"",
       "region": null,
-      "falseFriend": "Decimales: España usa coma (99,9%); México y Centroamérica, punto (99.9%).",
+      "falseFriend": "Decimales: España y gran parte de Sudamérica usan coma (99,9%); México y parte de Centroamérica y el Caribe, punto (99.9%).",
       "example": {
         "en": "We promise 99.9% uptime.",
         "es": "Garantizamos una disponibilidad del 99,9%."
@@ -2195,7 +2195,7 @@
         "casual": "región",
         "slang": null
       },
-      "atWork": "\"la región\", \"us-east-1\" (\"North Virginia\")",
+      "atWork": "\"la región\", \"us-east-1\" (en la consola: US East (N. Virginia))",
       "region": null,
       "falseFriend": null,
       "example": {
@@ -3148,8 +3148,8 @@
       "es": "consulta",
       "register": {
         "formal": "consulta",
-        "casual": "query, consulta",
-        "slang": "la query"
+        "casual": "la query, consulta",
+        "slang": null
       },
       "atWork": "\"la query\" (femenino) — muy usado",
       "region": null,
@@ -3919,7 +3919,7 @@
       "es": "privilegio mínimo",
       "register": {
         "formal": "principio de privilegio mínimo",
-        "casual": "mínimo privilegio",
+        "casual": "mínimo privilegio, least privilege",
         "slang": null
       },
       "atWork": "\"mínimo privilegio\"",
@@ -4040,11 +4040,11 @@
       "id": "hacker",
       "group": "security",
       "en": "hacker / to hack / breach",
-      "es": "hacker, pirata informático / hackear / brecha (de seguridad)",
+      "es": "atacante, hacker; pirata informático (en la prensa) / hackear / brecha de seguridad",
       "register": {
-        "formal": "pirata informático / brecha de seguridad",
+        "formal": "atacante / brecha de seguridad",
         "casual": "hacker, hackear",
-        "slang": "jaquear"
+        "slang": "nos hackearon"
       },
       "atWork": "\"hackear\", \"nos hackearon\"",
       "region": null,
@@ -4066,11 +4066,11 @@
       "en": "audit / compliance",
       "es": "auditoría / cumplimiento (normativo)",
       "register": {
-        "formal": "cumplimiento normativo",
-        "casual": "compliance",
+        "formal": "auditoría / cumplimiento normativo",
+        "casual": "auditoría, compliance",
         "slang": "compliance"
       },
-      "atWork": "\"compliance\"",
+      "atWork": "\"compliance\", \"la auditoría\"",
       "region": null,
       "falseFriend": null,
       "example": {
@@ -4559,7 +4559,7 @@
         "slang": "full remote"
       },
       "atWork": "\"trabajo en remoto\" (España), \"trabajo remoto / home office\" (Latinoamérica)",
-      "region": "España: \"teletrabajo\", \"en remoto\". Latinoamérica: \"trabajo remoto\", \"home office\".",
+      "region": "España: \"teletrabajo\", \"en remoto\". Latinoamérica: \"trabajo remoto\", \"home office\" y también \"teletrabajo\". Varía por país y empresa.",
       "falseFriend": null,
       "example": {
         "en": "We are fully remote across three time zones.",
