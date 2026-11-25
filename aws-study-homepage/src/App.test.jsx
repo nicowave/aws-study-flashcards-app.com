@@ -585,6 +585,22 @@ describe('App', () => {
       expect(cloud).toHaveAttribute('href', onNewName(certifications.find((c) => c.id === 'cloud-practitioner').url));
     });
 
+    // Regression: the panel once had cards for AI and Cloud Practitioner only, so Solutions
+    // Architect and Developer progress counted toward the totals but never got a card
+    it('gives every live cert the learner has played its own progress card', () => {
+      const live = certifications.filter((c) => c.status === 'available');
+      const progress = Object.fromEntries(live.map((c) => [c.id, { xp: 150, totalAnswered: 4, totalCorrect: 3 }]));
+      signIn({ userData: { isGuest: false, progress } });
+      render(<App />);
+      const welcome = screen.getByText(/welcome back,/i);
+      for (const c of live) {
+        const short = c.name.replace(/^AWS Certified /, '');
+        const card = within(welcome).getByRole('link', { name: new RegExp(short.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) });
+        expect(card).toHaveTextContent('Lvl 2 · 75%');
+        expect(card).toHaveAttribute('href', onNewName(c.url));
+      }
+    });
+
     it('shows no stats panel for a member who has not played yet', () => {
       signIn({ userData: { isGuest: false, progress: {} } });
       render(<App />);

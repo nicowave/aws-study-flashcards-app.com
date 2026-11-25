@@ -15,7 +15,9 @@ const NewsletterSignup = () => {
   const [done, setDone] = useState(() => {
     try { return localStorage.getItem(DONE_KEY) === '1'; } catch { return false; }
   });
-  const [already, setAlready] = useState(false);
+  // On a later visit the welcome email is old news (or never came, for someone already on the
+  // list), so a remembered sign-up gets the "already on the list" wording
+  const [already, setAlready] = useState(done);
 
   const submit = async (e) => {
     e.preventDefault();

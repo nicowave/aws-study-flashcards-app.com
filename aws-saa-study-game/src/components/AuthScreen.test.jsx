@@ -55,23 +55,26 @@ describe('AuthScreen', () => {
       expect(screen.getByRole('button', { name: 'Sign In' })).toHaveAttribute('type', 'submit');
       expect(screen.queryByLabelText('Confirm Password')).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Forgot password?' })).toBeInTheDocument();
+      // Sign-in uses only email and password, so it never asks for a username
+      expect(screen.queryByLabelText('Username')).not.toBeInTheDocument();
     });
 
     it('switches to sign-up and back, keeping the email but clearing passwords', async () => {
       const user = userEvent.setup();
       render(<AuthScreen />);
-      await fill(user, { username: 'learner', email: 'me@example.com', password: 'secret123' });
+      await fill(user, { email: 'me@example.com', password: 'secret123' });
 
       await goToSignUp(user);
       expect(screen.getByRole('heading', { name: 'Create Account' })).toBeInTheDocument();
       expect(field.confirm()).toBeInTheDocument();
+      expect(field.username()).toHaveValue('');
       expect(screen.queryByRole('button', { name: 'Forgot password?' })).not.toBeInTheDocument();
-      expect(field.username()).toHaveValue('learner');
       expect(field.email()).toHaveValue('me@example.com');
       expect(field.password()).toHaveValue('');
 
       await user.click(screen.getByRole('button', { name: 'Sign In' }));
       expect(screen.getByRole('heading', { name: 'Welcome Back' })).toBeInTheDocument();
+      expect(screen.queryByLabelText('Username')).not.toBeInTheDocument();
     });
 
     it('shows and hides the password', async () => {
@@ -90,10 +93,9 @@ describe('AuthScreen', () => {
     const submit = (user) => user.click(screen.getAllByRole('button').find((b) => b.type === 'submit'));
 
     it.each([
-      ['a short username', { username: 'ab', email: 'me@example.com', password: 'secret123' }, 'Username must be at least 3 characters'],
-      ['an email without a domain dot', { username: 'learner', email: 'me@example', password: 'secret123' }, 'Please enter a valid email address'],
-      ['a short password', { username: 'learner', email: 'me@example.com', password: '12345' }, 'Password must be at least 6 characters'],
-    ])('rejects %s without calling auth', async (_, values, message) => {
+      ['an email without a domain dot', { email: 'me@example', password: 'secret123' }, 'Please enter a valid email address'],
+      ['a short password', { email: 'me@example.com', password: '12345' }, 'Password must be at least 6 characters'],
+    ])('on sign-in, rejects %s without calling auth', async (_, values, message) => {
       const user = userEvent.setup();
       render(<AuthScreen />);
       await fill(user, values);
@@ -117,6 +119,16 @@ describe('AuthScreen', () => {
       expect(auth.register).not.toHaveBeenCalled();
     });
 
+    it('on sign-up, rejects a short username without calling auth', async () => {
+      const user = userEvent.setup();
+      render(<AuthScreen />);
+      await goToSignUp(user);
+      await fill(user, { username: 'ab', email: 'me@example.com', password: 'secret123', confirm: 'secret123' });
+      await submit(user);
+      expect(screen.getByText('Username must be at least 3 characters')).toBeInTheDocument();
+      expect(auth.register).not.toHaveBeenCalled();
+    });
+
     it('on sign-up, requires the two passwords to match', async () => {
       const user = userEvent.setup();
       render(<AuthScreen />);
@@ -130,7 +142,8 @@ describe('AuthScreen', () => {
     it('clears the message as soon as the learner types again', async () => {
       const user = userEvent.setup();
       render(<AuthScreen />);
-      await fill(user, { username: 'ab', email: 'me@example.com', password: 'secret123' });
+      await goToSignUp(user);
+      await fill(user, { username: 'ab', email: 'me@example.com', password: 'secret123', confirm: 'secret123' });
       await submit(user);
       expect(screen.getByText(/at least 3 characters/)).toBeInTheDocument();
       await user.type(field.username(), 'c');
@@ -139,10 +152,11 @@ describe('AuthScreen', () => {
   });
 
   describe('submitting', () => {
-    it('signs in with the typed email and password', async () => {
+    // Regression: sign-in once demanded a 3+ character username that login() never used
+    it('signs in with just the email and password', async () => {
       const user = userEvent.setup();
       render(<AuthScreen />);
-      await fill(user, { username: 'learner', email: 'me@example.com', password: 'secret123' });
+      await fill(user, { email: 'me@example.com', password: 'secret123' });
       await user.click(screen.getByRole('button', { name: 'Sign In' }));
       expect(auth.login).toHaveBeenCalledWith('me@example.com', 'secret123');
       expect(auth.register).not.toHaveBeenCalled();
@@ -162,7 +176,7 @@ describe('AuthScreen', () => {
       setAuth({ login: vi.fn().mockRejectedValue(new Error('Network down, try again')) });
       const user = userEvent.setup();
       render(<AuthScreen />);
-      await fill(user, { username: 'learner', email: 'me@example.com', password: 'secret123' });
+      await fill(user, { email: 'me@example.com', password: 'secret123' });
       await user.click(screen.getByRole('button', { name: 'Sign In' }));
       expect(await screen.findByText('Network down, try again')).toBeInTheDocument();
     });
@@ -180,7 +194,6 @@ describe('AuthScreen', () => {
     it('disables everything while auth is busy', () => {
       setAuth({ loading: true });
       render(<AuthScreen onGuestContinue={vi.fn()} />);
-      expect(field.username()).toBeDisabled();
       expect(field.email()).toBeDisabled();
       expect(field.password()).toBeDisabled();
       expect(screen.getByRole('button', { name: /with Google/ })).toBeDisabled();

@@ -5,7 +5,7 @@ import { KeyIcon } from './Icons';
 
 // Two steps inside the hub's sign-in modal: email -> code from the email +
 // new password. Signs the user in when the new password is saved.
-// (The course apps have their own copy styled for AuthScreen.)
+// (The study games and courses have their own copy, styled for their AuthScreen.)
 const ForgotPassword = ({ initialEmail = '', onBack, onSignedIn }) => {
   const { login } = useAuth();
   const [step, setStep] = useState('request');

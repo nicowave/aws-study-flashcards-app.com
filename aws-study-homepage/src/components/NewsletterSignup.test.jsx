@@ -142,6 +142,20 @@ describe('NewsletterSignup (hub)', () => {
       expect(screen.queryByLabelText(/^email$/i)).not.toBeInTheDocument();
     });
 
+    // Regression: a returning subscriber (or one who was already on the list) was told to
+    // "check your inbox for a welcome email" on every later visit
+    it('on a later visit, says "already on the list" and no longer promises a welcome email', async () => {
+      const user = userEvent.setup();
+      const { unmount } = render(<NewsletterSignup />);
+      await signUp(user);
+      await onTheList();
+      unmount();
+
+      render(<NewsletterSignup />);
+      expect(screen.getByRole('heading', { name: /already on the list/i })).toBeInTheDocument();
+      expect(screen.queryByText(/welcome email/i)).not.toBeInTheDocument();
+    });
+
     it('still works when storage is blocked (the form shows; the sign-up is just not remembered)', async () => {
       vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked'); });
       vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });

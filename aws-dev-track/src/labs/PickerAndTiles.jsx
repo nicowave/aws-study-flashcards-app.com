@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { withShuffledOptions } from '../features/store'
 
 const SCENARIOS = [
   { q: 'A sensor sends a 1-second "I am alive" heartbeat. Missing one is fine; the next arrives in a second.', options: ['TCP', 'UDP', 'HTTPS POST', 'MQTT QoS 2'], a: 1, why: 'Freshness beats completeness and you do not want a handshake per beat or connection state for 300k devices. UDP.' },
@@ -11,11 +12,26 @@ const SCENARIOS = [
   { q: 'The dashboard map needs sensor locations at any zoom level for a million users.', options: ['GET /sensors returning all 300k as GeoJSON', 'WMTS tiles /z/x/y.png behind CloudFront', 'WebSocket pushing every sensor', 'Render on the client from a CSV'], a: 1, why: 'Tiles are static assets: cacheable at the edge, tiny per request, and the client only asks for what is on screen.' },
 ]
 
+// Options are written with the right one second (a: 1); shuffle them so the position is never a
+// tell and learners pick the protocol, not "always B"
+const shuffledScenario = (sc) => {
+  const q = withShuffledOptions({ ...sc, correctAnswer: sc.a })
+  return { ...sc, options: q.options, a: q.correctAnswer }
+}
+const shuffledDeck = () => SCENARIOS.map(shuffledScenario)
+
 export function ProtocolPickerLab() {
   const [i, setI] = useState(0)
+  const [deck, setDeck] = useState(shuffledDeck)
   const [picked, setPicked] = useState(null)
   const [score, setScore] = useState({ right: 0, total: 0 })
-  const s = SCENARIOS[i]
+  const s = deck[i]
+  const next = () => {
+    const n = (i + 1) % SCENARIOS.length
+    if (n === 0) setDeck(shuffledDeck()) // a new order of options on every pass
+    setI(n)
+    setPicked(null)
+  }
   const choose = k => { if (picked !== null) return; setPicked(k); setScore(sc => ({ right: sc.right + (k === s.a ? 1 : 0), total: sc.total + 1 })) }
   return (
     <section className="lab">
@@ -31,7 +47,7 @@ export function ProtocolPickerLab() {
       </div>
       {picked !== null && <div className="explain"><strong>{picked === s.a ? 'Right.' : 'Not that one.'}</strong> {s.why}</div>}
       <div className="row">
-        <button className="btn" onClick={() => { setI((i + 1) % SCENARIOS.length); setPicked(null) }} disabled={picked === null}>Next scenario</button>
+        <button className="btn" onClick={next} disabled={picked === null}>Next scenario</button>
         <span className="mono" style={{ fontSize: 13, color: 'var(--ink-soft)' }}>score {score.right}/{score.total}</span>
       </div>
     </section>

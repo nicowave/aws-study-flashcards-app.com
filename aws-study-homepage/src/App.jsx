@@ -232,11 +232,11 @@ const UserStatsPanel = ({ userData }) => {
     ? Math.round((totalCorrect / totalAnswered) * 100)
     : 0;
 
-  // Cert-specific cards
-  const certMeta = [
-    { id: 'ai-practitioner', name: 'AI Practitioner', icon: '\u{1F916}', color: '#a78bfa', url: onThisName('https://ai.aws-study-flashcards-app.com') },
-    { id: 'cloud-practitioner', name: 'Cloud Practitioner', icon: '\u2601\uFE0F', color: '#3fb950', url: onThisName('https://cloud.aws-study-flashcards-app.com') },
-  ];
+  // One card per live cert the learner has progress in. Built from the cert data (each game saves
+  // progress under its cert id), so a new cert gets its card without touching this list.
+  const certMeta = certifications
+    .filter((c) => c.status === 'available')
+    .map((c) => ({ id: c.id, name: c.name.replace(/^AWS Certified /, ''), icon: c.icon, color: c.color, url: onThisName(c.url) }));
   const activeCerts = certMeta.filter(cert => progress[cert.id]);
 
   return (
