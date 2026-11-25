@@ -90,12 +90,9 @@ describe('readiness questions', () => {
       }
     });
 
-    // BUG (stale data): the games' questions were re-checked against current AWS docs after
-    // readiness.js was generated, and readiness.js was not rebuilt. Today Cloud Practitioner ct32
-    // still says "Amazon ElastiCache (Redis or Memcached)" (the game now lists Valkey) and Developer
-    // sec18 has older question wording. Fix: `node scripts/build-readiness.mjs`, then turn this
-    // back into a plain `it`.
-    it.fails('use the wording the games have today (question, options and explanation)', () => {
+    // Regression: readiness.js once fell behind the games' wording. If this fails after
+    // editing a game's questions, rerun `node scripts/build-readiness.mjs`.
+    it('use the wording the games have today (question, options and explanation)', () => {
       const stale = [];
       for (const certId of CERT_IDS) {
         for (const q of READINESS_QUESTIONS[certId]) {

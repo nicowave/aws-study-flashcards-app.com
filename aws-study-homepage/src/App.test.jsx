@@ -169,11 +169,9 @@ describe('App', () => {
       expect(screen.getByText('Certifications Live').previousSibling).toHaveTextContent(String(live.length));
     });
 
-    // BUG (data): the Solutions Architect game ships the timed exam simulator (ExamMode in
-    // aws-saa-study-game), and the hero says "4 Timed Exam Simulators" and the FAQ says every
-    // certification has one, but certifications.js leaves 'Exam Simulator' out of SAA's features,
-    // so its card is the only live card without the tag.
-    it.fails('lists the Exam Simulator on every live cert card, matching the hero count', () => {
+    // Regression: the Solutions Architect card once left out 'Exam Simulator', although the game
+    // ships it and the hero and FAQ say every certification has one.
+    it('lists the Exam Simulator on every live cert card, matching the hero count', () => {
       render(<App />);
       const simulators = screen.getByText('Timed Exam Simulators').previousSibling.textContent;
       for (const cert of live) expect(within(certCard(cert.name)).getByText('Exam Simulator')).toBeInTheDocument();

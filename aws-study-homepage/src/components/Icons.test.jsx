@@ -38,10 +38,9 @@ describe('Icons', () => {
     expect(svg).toHaveAttribute('data-testid', 'icon');
   });
 
-  // BUG: KeyIcon ignores every prop but size and className. App.jsx renders
-  // <KeyIcon size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} /> in the
-  // sign-in modal, so that spacing never applies (and aria-* props would be lost too).
-  it.fails('KeyIcon passes style and other props through', () => {
+  // Regression: KeyIcon once ignored every prop but size and className, so App.jsx's
+  // <KeyIcon style={{ marginRight: 6 }} /> in the sign-in modal lost its spacing.
+  it('KeyIcon passes style and other props through', () => {
     const { container } = render(<Icons.KeyIcon style={{ marginRight: 6 }} aria-label="label" />);
     const svg = container.firstChild;
     expect(svg).toHaveStyle({ marginRight: '6px' });

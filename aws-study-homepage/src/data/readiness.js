@@ -77,7 +77,7 @@ export const READINESS_QUESTIONS = {
         "Amazon CloudFront"
       ],
       "answer": 3,
-      "explanation": "CloudFront is a content delivery network that caches content at edge locations worldwide, so each viewer is served from a nearby point of presence. Global Accelerator routes traffic onto the AWS backbone but does not cache content, S3 Transfer Acceleration speeds uploads into S3 rather than deliveries to viewers, and Route 53 resolves DNS names without caching content."
+      "explanation": "CloudFront is a content delivery network that caches content at edge locations worldwide, so each viewer is served from a nearby point of presence. Global Accelerator routes traffic onto the AWS backbone but does not cache content, S3 Transfer Acceleration speeds long-distance transfers between clients and an S3 bucket but does not cache copies near viewers, and Route 53 resolves DNS names without caching content."
     },
     {
       "id": "ct19",
@@ -97,7 +97,7 @@ export const READINESS_QUESTIONS = {
       "domain": "Cloud Technology & Services",
       "question": "A read-heavy application repeatedly queries the same product data, overloading its database. Which service adds a microsecond-latency in-memory layer to absorb these reads?",
       "options": [
-        "Amazon ElastiCache (Redis or Memcached)",
+        "Amazon ElastiCache (Valkey, Memcached, or Redis OSS)",
         "Amazon Redshift",
         "AWS Storage Gateway",
         "Amazon SNS"
@@ -116,7 +116,7 @@ export const READINESS_QUESTIONS = {
         "Multi-AZ is for MySQL only; Read Replicas are for PostgreSQL only"
       ],
       "answer": 0,
-      "explanation": "Multi-AZ maintains a synchronous standby in another AZ that takes over automatically on failure — availability, not extra read capacity. Read Replicas serve read queries to offload the primary — scaling, not automatic failover. The reversed version is a common exam trap, and both features span multiple engines."
+      "explanation": "A Multi-AZ DB instance deployment maintains a synchronous standby in another AZ that takes over automatically on failure and does not serve reads — availability, not extra read capacity (Multi-AZ DB clusters add readable standbys, but their job is still failover). Read Replicas serve read queries to offload the primary — scaling, not automatic failover. The reversed version is a common exam trap, and both features span multiple engines."
     },
     {
       "id": "bs11",
@@ -129,7 +129,7 @@ export const READINESS_QUESTIONS = {
         "Dedicated Hosts"
       ],
       "answer": 1,
-      "explanation": "Spot Instances offer the largest discount of any EC2 purchasing option — up to 90% off On-Demand — because they use spare capacity that AWS can reclaim with a two-minute warning. Savings Plans and Reserved Instances top out around 72% and require a 1- or 3-year commitment, and Dedicated Hosts carry a premium rather than a discount."
+      "explanation": "Spot Instances offer the largest discount of any EC2 purchasing option — up to 90% off On-Demand — because they use spare capacity that AWS can reclaim with a two-minute warning. Savings Plans and Reserved Instances top out around 72% and require a 1- or 3-year commitment, and Dedicated Hosts pay for a whole physical server for licensing or compliance needs rather than offering a deep discount."
     }
   ],
   "ai-practitioner": [
@@ -157,33 +157,46 @@ export const READINESS_QUESTIONS = {
         "SageMaker Model Monitor"
       ],
       "answer": 1,
-      "explanation": "SageMaker Ground Truth manages data-labeling jobs with human workforces (Mechanical Turk, vendors, or your own team) and can auto-label a portion of data to cut costs. Rekognition analyzes images with pre-trained models but doesn't create training labels, Textract extracts document text, and Model Monitor watches production models."
+      "explanation": "SageMaker Ground Truth manages data-labeling jobs with human workforces (a vendor workforce from AWS Marketplace or your own private team) and its automated data labeling can label part of the data to cut cost and time. Rekognition analyzes images with pre-trained models but doesn't create training labels, Textract extracts document text, and Model Monitor watches production models. Note: Ground Truth is no longer open to new customers; existing customers can keep using it, and exam questions may still name it."
     },
     {
-      "id": "d2q10",
+      "id": "d2q7",
       "domain": "Fundamentals of Generative AI",
-      "question": "A retail app represents every product description as a list of numbers so that items with similar meaning end up numerically close together, even when they share no keywords. What are these numerical representations called?",
+      "question": "A developer reads that a model supports a 200,000-token input limit and is billed per 1,000 tokens. What does a \"token\" represent here?",
       "options": [
-        "Tokens",
-        "Hyperparameters",
-        "Embeddings",
-        "Checkpoints"
+        "A temporary security credential attached to each API request",
+        "A unit of text, such as a word or piece of a word, that the model processes",
+        "One second of accelerated compute time consumed by the invocation",
+        "A checkpoint of the model's weights saved during the training run"
       ],
-      "answer": 2,
-      "explanation": "Embeddings are vector representations of data that capture semantic meaning, so similar concepts land close together in vector space — the basis for semantic search and recommendations. Tokens are the text units a model processes, hyperparameters are training configuration settings, and checkpoints are saved model states."
+      "answer": 1,
+      "explanation": "LLMs split text into tokens — words, subwords, or characters — and both context limits and usage-based pricing are measured in these units. Tokens are unrelated to authentication credentials, compute-time billing, or training checkpoints."
     },
     {
-      "id": "d2q28",
+      "id": "d2q19",
       "domain": "Fundamentals of Generative AI",
-      "question": "A team runs simple sentiment classification through the largest available foundation model and finds costs high and latency slow. What should they consider?",
+      "question": "A compliance team requires that the same prompt always produces nearly identical wording in generated policy summaries. Which inference setting achieves this?",
       "options": [
-        "Using a smaller, cheaper model that meets the accuracy bar for this simple task",
-        "Raising temperature to speed up token selection",
-        "Duplicating the endpoint in a second region",
-        "Adding chain-of-thought prompting to every request"
+        "Increase top-p to 1.0",
+        "Set temperature at or near 0 to make output selection nearly deterministic",
+        "Raise the maximum token limit",
+        "Enable response streaming"
+      ],
+      "answer": 1,
+      "explanation": "Temperature near 0 makes the model almost always pick the highest-probability token, minimizing run-to-run variation. High top-p widens the sampling pool (more variety), max tokens only caps length, and streaming changes delivery, not content."
+    },
+    {
+      "id": "d2q31",
+      "domain": "Fundamentals of Generative AI",
+      "question": "Which describes how a generative adversarial network (GAN) is trained?",
+      "options": [
+        "A generator creates samples while a discriminator tries to distinguish them from real data, and both improve through competition",
+        "A model learns to reverse a gradual noise-adding process",
+        "An agent maximizes cumulative reward through trial and error",
+        "Two identical models vote on which output is more accurate"
       ],
       "answer": 0,
-      "explanation": "Model choice should match task complexity — for simple classification, a smaller model is faster and dramatically cheaper while meeting accuracy needs. Temperature doesn't change speed, a second region doubles cost, and chain-of-thought increases token usage."
+      "explanation": "GANs pit a generator against a discriminator in an adversarial game — the generator improves by trying to fool the discriminator. Reversing added noise describes diffusion models, and reward maximization describes reinforcement learning."
     },
     {
       "id": "d3q8",
@@ -209,7 +222,7 @@ export const READINESS_QUESTIONS = {
         "Bedrock Model Cards"
       ],
       "answer": 0,
-      "explanation": "Bedrock Knowledge Bases manages the entire RAG pipeline — ingesting documents from sources like S3, chunking, generating embeddings, storing them in a vector store, and serving retrieval at query time. Guardrails filter content, and Provisioned Throughput is a capacity option, not a RAG service."
+      "explanation": "Bedrock Knowledge Bases manages the entire RAG pipeline — ingesting documents from sources like S3, chunking, generating embeddings, storing them in a vector store, and serving retrieval at query time. Guardrails filter content, Provisioned Throughput is a capacity option, and model cards are documentation; none of them is a RAG service."
     },
     {
       "id": "d3q36",
@@ -225,30 +238,17 @@ export const READINESS_QUESTIONS = {
       "explanation": "Falling training loss with rising validation loss is the classic overfitting signal — early stopping or fewer epochs preserves generalization. Training longer worsens it, removing validation just blinds you, and doubling the learning rate destabilizes training rather than fixing overfitting."
     },
     {
-      "id": "d4q6",
+      "id": "d4q11",
       "domain": "Guidelines for Responsible AI",
-      "question": "During an audit, an ML team must show where its training data originated and every transformation the data went through before reaching the feature store. What practice provides this record?",
+      "question": "Two models meet a team's accuracy requirement; one is a fraction of the other's size. How does choosing the smaller model support sustainability goals?",
       "options": [
-        "Data lineage — tracking the origin, movement, and transformation of data",
-        "Data residency — controlling the geographic location where data is stored",
-        "Data augmentation — generating additional samples to expand a dataset",
-        "Data masking — obscuring sensitive values within a dataset"
+        "Smaller models qualify for renewable-energy-only AWS Regions",
+        "It consumes less energy for training and inference, cutting the workload's carbon footprint",
+        "It removes the need for any monitoring infrastructure",
+        "Storage savings are the primary environmental factor"
       ],
-      "answer": 0,
-      "explanation": "Data lineage records where data came from, how it was transformed, and where it flowed — exactly the trail an auditor needs to trust a training dataset. Residency concerns geographic location, augmentation expands datasets, and masking hides sensitive values; none of these documents the data's journey through the pipeline."
-    },
-    {
-      "id": "d4q16",
-      "domain": "Guidelines for Responsible AI",
-      "question": "A model shows 94% overall accuracy, but a review reveals only 71% accuracy for one user subgroup. What responsible AI practice does this highlight?",
-      "options": [
-        "Evaluating performance per subgroup, not just in aggregate, before deployment",
-        "Reporting only the overall accuracy to avoid confusion",
-        "Increasing overall accuracy until subgroup accuracy no longer matters",
-        "Retraining with a higher learning rate"
-      ],
-      "answer": 0,
-      "explanation": "Aggregate metrics hide disparate performance across subgroups — fairness assessment requires disaggregated evaluation and closing the gaps found. Hiding the breakdown or chasing overall accuracy leaves the affected group underserved, and learning rate is unrelated."
+      "answer": 1,
+      "explanation": "A smaller model needs less compute at both training and inference time, which lowers energy use and the workload's carbon footprint — distillation, quantization, and pruning serve the same goal. No Region restricts workloads by model size, monitoring is still required, and storage savings are minor next to the compute saved."
     },
     {
       "id": "d5q13",
@@ -261,7 +261,7 @@ export const READINESS_QUESTIONS = {
         "SageMaker Model Monitor"
       ],
       "answer": 1,
-      "explanation": "SageMaker Model Cards capture exactly this governance documentation — purpose, training data, metrics, risk ratings, and limitations — exportable as PDF or JSON for audits. The Model Registry versions model artifacts, Feature Store manages ML features, and Model Monitor watches production quality; none produce standardized model documentation."
+      "explanation": "SageMaker Model Cards capture exactly this governance documentation — purpose, training data, metrics, risk ratings, and limitations — exportable (for example, as a PDF) for audits. The Model Registry versions model artifacts, Feature Store manages ML features, and Model Monitor watches production quality; none produce standardized model documentation."
     }
   ],
   "solutions-architect-associate": [
@@ -315,7 +315,7 @@ export const READINESS_QUESTIONS = {
         "Amazon Kinesis Data Streams with an enhanced fan-out consumer per target"
       ],
       "answer": 0,
-      "explanation": "EventBridge natively receives SaaS partner events on a partner event bus and uses rules with event patterns to match on any field in the event body and route to many targets. SNS filtering depends on the publisher setting attributes and has no native SaaS integration. The SQS and Kinesis options both require custom routing code to inspect events and invoke each target."
+      "explanation": "EventBridge natively receives SaaS partner events through a partner event source associated with an event bus, and uses rules with event patterns to match on any field in the event body and route to many targets. SNS filter policies can match message attributes or the message body, but SNS has no native SaaS partner event sources. The SQS and Kinesis options both require custom routing code to inspect events and invoke each target."
     },
     {
       "id": "res19",
@@ -354,7 +354,7 @@ export const READINESS_QUESTIONS = {
         "Amazon FSx for NetApp ONTAP"
       ],
       "answer": 3,
-      "explanation": "FSx for NetApp ONTAP runs the ONTAP file system, supports multiprotocol NFS, SMB, and iSCSI access, and keeps NetApp features such as SnapMirror, FlexClone, and deduplication. FSx for Windows File Server is SMB-focused, EFS supports only NFS for Linux clients, and FSx for OpenZFS is NFS-based and suited to ZFS migrations rather than NetApp tooling."
+      "explanation": "FSx for NetApp ONTAP runs the ONTAP file system, supports multiprotocol NFS, SMB, and iSCSI access, and keeps NetApp features such as SnapMirror replication, cloning, and deduplication. FSx for Windows File Server is SMB-focused, EFS supports only NFS for Linux clients, and FSx for OpenZFS is NFS-based and suited to ZFS migrations rather than NetApp tooling."
     },
     {
       "id": "perf26",
@@ -452,7 +452,7 @@ export const READINESS_QUESTIONS = {
     {
       "id": "sec18",
       "domain": "Security",
-      "question": "A compliance standard requires that objects in Amazon S3 be protected by two independent layers of encryption applied on the server side, using keys managed in AWS KMS. Which option meets this requirement with the least effort?",
+      "question": "A compliance standard requires that objects in Amazon S3 be protected by two independent layers of encryption applied on the server side, using AWS KMS. Which option meets this requirement with the least effort?",
       "options": [
         "SSE-S3 default encryption with S3 Bucket Keys enabled",
         "SSE-KMS with a customer managed key and automatic rotation",
@@ -460,7 +460,7 @@ export const READINESS_QUESTIONS = {
         "DSSE-KMS, dual-layer server-side encryption with KMS keys"
       ],
       "answer": 3,
-      "explanation": "DSSE-KMS applies two layers of encryption to each object on the server side using AWS KMS keys, which is designed for standards that require multilayer encryption. SSE-S3, SSE-KMS and SSE-C each apply a single layer, and Bucket Keys or rotation do not add a second layer. Building two layers yourself with client-side encryption would work but adds far more effort."
+      "explanation": "DSSE-KMS applies two independent layers of AES-256 encryption to each object on the server side, the first with a data key generated by AWS KMS and the second with a separate key managed by S3, which is designed for standards that require multilayer encryption. SSE-S3, SSE-KMS and SSE-C each apply a single layer, and Bucket Keys or rotation do not add a second layer. Building two layers yourself with client-side encryption would work but adds far more effort."
     },
     {
       "id": "sec29",
