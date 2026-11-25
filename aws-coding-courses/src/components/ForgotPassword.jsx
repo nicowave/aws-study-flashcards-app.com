@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { sendPasswordReset, resetPassword } from '../services/sharedAuth';
 import { MailIcon, KeyIcon } from './Icons';
+import { useT } from '../engine/i18n';
 
 // Two steps: email -> code from the email + new password. Signs the user in
 // when the new password is saved. Uses the AuthScreen styles.
 const ForgotPassword = ({ initialEmail = '', onBack }) => {
+  const t = useT();
   const { login } = useAuth();
   const [step, setStep] = useState('request');
   const [email, setEmail] = useState(initialEmail);
@@ -20,7 +22,7 @@ const ForgotPassword = ({ initialEmail = '', onBack }) => {
     e.preventDefault();
     setError('');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email address');
+      setError(t('auth.emailInvalid'));
       return;
     }
     setBusy(true);
@@ -38,15 +40,15 @@ const ForgotPassword = ({ initialEmail = '', onBack }) => {
     e.preventDefault();
     setError('');
     if (!code.trim()) {
-      setError('Enter the code from the email');
+      setError(t('reset.codeMissing'));
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('auth.passwordShort'));
       return;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.passwordsDiffer'));
       return;
     }
     setBusy(true);
@@ -62,11 +64,11 @@ const ForgotPassword = ({ initialEmail = '', onBack }) => {
   return (
     <>
       <div className="auth-header">
-        <h1 className="auth-title">Reset Password</h1>
+        <h1 className="auth-title">{t('reset.title')}</h1>
         <p className="auth-subtitle">
           {step === 'request'
-            ? "Enter your account's email and we'll send you a reset code"
-            : 'Enter the code from the email and choose a new password'}
+            ? t('reset.requestLede')
+            : t('reset.confirmLede')}
         </p>
       </div>
 
@@ -75,7 +77,7 @@ const ForgotPassword = ({ initialEmail = '', onBack }) => {
           <div className="form-group">
             <label htmlFor="reset-email">
               <MailIcon size={18} />
-              <span>Email</span>
+              <span>{t('auth.email')}</span>
             </label>
             <input
               type="email"
@@ -90,7 +92,7 @@ const ForgotPassword = ({ initialEmail = '', onBack }) => {
           </div>
           {error && <div className="auth-error"><span>⚠️</span><span>{error}</span></div>}
           <button type="submit" className="auth-submit-btn" disabled={busy}>
-            {busy ? <span className="loading-spinner">⏳</span> : 'Send Reset Code'}
+            {busy ? <span className="loading-spinner">⏳</span> : t('reset.send')}
           </button>
         </form>
       ) : (
@@ -99,7 +101,7 @@ const ForgotPassword = ({ initialEmail = '', onBack }) => {
           <div className="form-group">
             <label htmlFor="reset-code">
               <KeyIcon size={18} />
-              <span>Code from the email</span>
+              <span>{t('reset.code')}</span>
             </label>
             <input
               type="text"
@@ -115,14 +117,14 @@ const ForgotPassword = ({ initialEmail = '', onBack }) => {
           <div className="form-group">
             <label htmlFor="reset-password">
               <KeyIcon size={18} />
-              <span>New password</span>
+              <span>{t('reset.newPassword')}</span>
             </label>
             <input
               type="password"
               id="reset-password"
               value={password}
               onChange={(e) => { setPassword(e.target.value); setError(''); }}
-              placeholder="At least 6 characters"
+              placeholder={t('reset.newPlaceholder')}
               autoComplete="new-password"
               disabled={busy}
             />
@@ -130,21 +132,21 @@ const ForgotPassword = ({ initialEmail = '', onBack }) => {
           <div className="form-group">
             <label htmlFor="reset-confirm">
               <KeyIcon size={18} />
-              <span>Confirm new password</span>
+              <span>{t('reset.confirm')}</span>
             </label>
             <input
               type="password"
               id="reset-confirm"
               value={confirmPassword}
               onChange={(e) => { setConfirmPassword(e.target.value); setError(''); }}
-              placeholder="Type it again"
+              placeholder={t('reset.confirmPlaceholder')}
               autoComplete="new-password"
               disabled={busy}
             />
           </div>
           {error && <div className="auth-error"><span>⚠️</span><span>{error}</span></div>}
           <button type="submit" className="auth-submit-btn" disabled={busy}>
-            {busy ? <span className="loading-spinner">⏳</span> : 'Save New Password'}
+            {busy ? <span className="loading-spinner">⏳</span> : t('reset.save')}
           </button>
           <button type="button" className="forgot-link" onClick={requestCode} disabled={busy}>
             Send a new code
@@ -153,8 +155,8 @@ const ForgotPassword = ({ initialEmail = '', onBack }) => {
       )}
 
       <div className="auth-toggle">
-        <span>Remembered it?</span>
-        <button type="button" onClick={onBack} disabled={busy}>Back to Sign In</button>
+        <span>{t('reset.remembered')}</span>
+        <button type="button" onClick={onBack} disabled={busy}>{t('reset.back')}</button>
       </div>
     </>
   );

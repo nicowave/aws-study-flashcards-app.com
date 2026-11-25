@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { startCheckout } from '../services/billing';
 import { DEVELOPER_PATH, currentPromotion, salePrice } from '../services/offers';
+import { useT } from './i18n';
 
 const Price = ({ price, percent }) => (percent ? (
   <>
@@ -12,6 +13,7 @@ const Price = ({ price, percent }) => (percent ? (
 ) : <span className="price">{price}</span>);
 
 const UnlockCard = ({ course, user, onSignIn, returnPath, compact = false }) => {
+  const t = useT(course);
   const [busy, setBusy] = useState(null); // the plan being checked out
   const [error, setError] = useState('');
   const paid = course.tutorials.filter((t) => !t.free);
@@ -20,7 +22,7 @@ const UnlockCard = ({ course, user, onSignIn, returnPath, compact = false }) => 
   const live = sale?.live ? sale.promo : null;
 
   const buy = async (plan) => {
-    if (!user) { onSignIn('Sign in or create a free account, then come back here to unlock the course.'); return; }
+    if (!user) { onSignIn(t('unlock.signInNote')); return; }
     setBusy(plan);
     setError('');
     try {
@@ -28,43 +30,43 @@ const UnlockCard = ({ course, user, onSignIn, returnPath, compact = false }) => 
     } catch (e) {
       setBusy(null);
       setError(/not available/i.test(e.message)
-        ? 'Purchases open very soon. The free tutorials are ready now.'
-        : 'Checkout could not start. Please try again in a minute.');
+        ? t('unlock.soon')
+        : t('unlock.failed'));
     }
   };
 
   return (
     <div className={`unlock ${compact ? 'compact' : ''}`}>
-      {live && <p className="sale-tag">{live.label}: {live.single}% off until {live.ends}</p>}
+      {live && <p className="sale-tag">{t('unlock.sale', live.label, live.single, live.ends)}</p>}
       <div className="unlock-price">
         <Price price={course.price} percent={live?.single} />
-        <span className="once">one time, yours to keep</span>
+        <span className="once">{t('unlock.once')}</span>
       </div>
       {!compact && (
         <ul className="unlock-list">
-          <li>All {count} tutorials, including {paid.map((t) => `“${t.title}”`).join(', ')}</li>
-          <li>Every practice task, quiz and flashcard deck</li>
-          <li>The real-AWS project at the end of each tutorial, for your GitHub portfolio</li>
-          <li>Progress saved to your Study Hub account on every device</li>
+          <li>{t('unlock.allTutorials', count, paid.map((tut) => `“${tut.title}”`).join(', '))}</li>
+          <li>{t('unlock.everyTask')}</li>
+          <li>{t('unlock.project')}</li>
+          <li>{t('unlock.progress')}</li>
         </ul>
       )}
       <button type="button" className="btn big" onClick={() => buy(course.id)} disabled={!!busy}>
-        {busy === course.id ? 'Opening secure checkout…' : user ? `Unlock ${course.title}` : 'Sign in to unlock'}
+        {busy === course.id ? t('unlock.opening') : user ? t('unlock.unlock', course.title) : t('unlock.signInToUnlock')}
       </button>
-      {!compact && (
+      {!compact && course.bundle !== false && (
         <div className="bundle">
           <div className="bundle-head">
-            <strong>Or the {DEVELOPER_PATH.title}</strong>
+            <strong>{t('unlock.orBundle', DEVELOPER_PATH.title)}</strong>
             <span className="bundle-price"><Price price={DEVELOPER_PATH.price} percent={live?.bundle} /></span>
           </div>
-          <p>{DEVELOPER_PATH.includes}. {DEVELOPER_PATH.separately} if bought one by one.</p>
+          <p>{t('unlock.bundleSeparately', DEVELOPER_PATH.includes, DEVELOPER_PATH.separately)}</p>
           <button type="button" className="btn ghost" onClick={() => buy(DEVELOPER_PATH.plan)} disabled={!!busy}>
-            {busy === DEVELOPER_PATH.plan ? 'Opening secure checkout…' : `Get the ${DEVELOPER_PATH.title}`}
+            {busy === DEVELOPER_PATH.plan ? t('unlock.opening') : t('unlock.getBundle', DEVELOPER_PATH.title)}
           </button>
         </div>
       )}
       {error && <p className="unlock-error">{error}</p>}
-      <p className="unlock-fine">Secure payment through Stripe. One sign-in works across every Level Up Study Hub site.{live ? ' The discount is applied at checkout automatically.' : ''}</p>
+      <p className="unlock-fine">{t('unlock.fine')}{live ? t('unlock.fineSale') : ''}</p>
     </div>
   );
 };

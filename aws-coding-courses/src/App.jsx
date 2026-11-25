@@ -12,6 +12,7 @@ import CourseHome from './engine/CourseHome';
 import TutorialPage from './engine/TutorialPage';
 import { currentPromotion } from './services/offers';
 import { onThisName } from './config/auth.config';
+import { LangProvider, useLang, useLocalized, useT } from './engine/i18n';
 
 // Written with the old name; onThisName keeps a visitor on the name they opened.
 const HUB_URL = onThisName('https://aws-study-flashcards-app.com');
@@ -26,7 +27,7 @@ const useCourseAccess = (user) => {
     const params = new URLSearchParams(window.location.search);
     const checkout = params.get('checkout');
     if (checkout) window.history.replaceState(null, '', window.location.pathname);
-    if (checkout === 'cancelled') setNotice({ kind: 'info', text: 'Checkout cancelled. Nothing was charged.' });
+    if (checkout === 'cancelled') setNotice({ kind: 'info', key: 'app.checkoutCancelled' });
 
     (async () => {
       if (checkout !== 'success') {
@@ -35,16 +36,16 @@ const useCourseAccess = (user) => {
         return;
       }
       // Stripe's webhook can take a few seconds; refresh the token until the purchase shows
-      setNotice({ kind: 'info', text: 'Payment received. Unlocking your course…' });
+      setNotice({ kind: 'info', key: 'app.unlocking' });
       for (let attempt = 0; attempt < 8 && live; attempt++) {
         if (await hasCourseAccess(course.id, { forceRefresh: true })) {
           setAccess(true);
-          setNotice({ kind: 'success', text: `Unlocked. Every ${course.language} tutorial is yours. Enjoy!` });
+          setNotice({ kind: 'success', key: 'app.unlocked' });
           return;
         }
         await new Promise((r) => setTimeout(r, 2500));
       }
-      if (live) setNotice({ kind: 'info', text: 'Payment received. It can take a minute to unlock: refresh this page shortly.' });
+      if (live) setNotice({ kind: 'info', key: 'app.unlockSlow' });
     })();
     return () => { live = false; };
   }, [user]);
@@ -59,70 +60,86 @@ const useCourseAccess = (user) => {
   return { access, notice, clearNotice: () => setNotice(null) };
 };
 
-const Header = ({ user, onSignIn, onSignOut }) => (
+// ES | EN switch, only on courses written in more than one language
+const LangSwitch = ({ t }) => {
+  const { lang, languages, setLang } = useLang();
+  if (languages.length < 2) return null;
+  return (
+    <span className="lang-switch" role="group" aria-label={t('nav.language')}>
+      {languages.map((l) => (
+        <button type="button" key={l} lang={l} aria-pressed={l === lang} onClick={() => setLang(l)}>{l.toUpperCase()}</button>
+      ))}
+    </span>
+  );
+};
+
+const Header = ({ course, t, user, onSignIn, onSignOut }) => (
   <header className="site-header">
     <a className="brand" {...linkProps('/')}>
       <span className="brand-mark" aria-hidden="true">{course.mark}</span>
       <span className="brand-text">{course.title}<small>Level Up Study Hub</small></span>
     </a>
     <nav>
-      <a href="/#tutorials" className="nav-link hide-sm" onClick={(e) => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('tutorials')?.scrollIntoView(), 0); }}>Tutorials</a>
-      <a href={HUB_URL} className="nav-link hide-sm">Study Hub</a>
+      <a href="/#tutorials" className="nav-link hide-sm" onClick={(e) => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('tutorials')?.scrollIntoView(), 0); }}>{t('nav.tutorials')}</a>
+      <a href={HUB_URL} className="nav-link hide-sm">{t('nav.hub')}</a>
+      <LangSwitch t={t} />
       {user ? (
         <span className="user-chip">
           <span className="avatar" aria-hidden="true">{(user.displayName || user.email || '?').charAt(0).toUpperCase()}</span>
           <span className="hide-sm">{user.displayName || user.email}</span>
-          <button type="button" className="link-btn" onClick={onSignOut}>Sign out</button>
+          <button type="button" className="link-btn" onClick={onSignOut}>{t('nav.signOut')}</button>
         </span>
       ) : (
-        <button type="button" className="btn small" onClick={() => onSignIn()}>Sign in</button>
+        <button type="button" className="btn small" onClick={() => onSignIn()}>{t('nav.signIn')}</button>
       )}
     </nav>
   </header>
 );
 
 // A sale about to start, or running: one line above every page
-const PromoBanner = ({ access }) => {
+const PromoBanner = ({ access, t }) => {
   const sale = currentPromotion();
   if (!sale) return null;
   const { promo, live } = sale;
-  const deal = `${promo.single}% off every course, ${promo.bundle}% off the Developer Path bundle`;
+  const deal = t('promo.deal', promo.single, promo.bundle);
   return (
     <div className="promo-banner" role="note">
       <span aria-hidden="true">🎃</span>
       {live
-        ? <span><strong>{promo.label}:</strong> {deal}, until {promo.ends}.</span>
-        : <span><strong>{promo.label}</strong> starts {promo.starts}: {deal}, for one week.</span>}
-      {live && !access && <a href="/#pricing" onClick={(e) => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('pricing')?.scrollIntoView(), 0); }}>See prices</a>}
+        ? <span><strong>{promo.label}:</strong> {deal}, {t('promo.until', promo.ends)}</span>
+        : <span><strong>{promo.label}</strong> {t('promo.starts', promo.starts)} {deal}, {t('promo.oneWeek')}</span>}
+      {live && !access && <a href="/#pricing" onClick={(e) => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('pricing')?.scrollIntoView(), 0); }}>{t('promo.seePrices')}</a>}
     </div>
   );
 };
 
-const Footer = () => (
+const Footer = ({ course, t }) => (
   <footer className="site-footer">
     <div>
-      <strong>More coding courses</strong>
+      <strong>{t('footer.moreCourses')}</strong>
       <ul>
         {course.siblings.map((s) => (
-          <li key={s.url}>{s.live ? <a href={onThisName(s.url)}>{s.title}</a> : <span>{s.title} <em>(coming soon)</em></span>}</li>
+          <li key={s.url}>{s.live ? <a href={onThisName(s.url)}>{s.title}</a> : <span>{s.title} <em>({t('footer.comingSoon')})</em></span>}</li>
         ))}
       </ul>
     </div>
     <div>
-      <strong>Certification games</strong>
+      <strong>{t('footer.games')}</strong>
       <ul>
-        <li><a href={onThisName('https://developer.aws-study-flashcards-app.com')}>Developer Associate</a></li>
-        <li><a href={onThisName('https://cloud.aws-study-flashcards-app.com')}>Cloud Practitioner</a></li>
-        <li><a href={HUB_URL}>All of Level Up Study Hub</a></li>
+        <li><a href={onThisName('https://developer.aws-study-flashcards-app.com')}>{t('footer.devAssociate')}</a></li>
+        <li><a href={onThisName('https://cloud.aws-study-flashcards-app.com')}>{t('footer.cloudPractitioner')}</a></li>
+        <li><a href={HUB_URL}>{t('footer.allHub')}</a></li>
       </ul>
     </div>
-    <p className="fine">© {new Date().getFullYear()} Nico Tek Solutions. Not affiliated with Amazon Web Services. AWS is a trademark of Amazon.com, Inc.</p>
+    <p className="fine">{t('footer.fine', new Date().getFullYear())}</p>
   </footer>
 );
 
 const Content = () => {
   const { user, logout, loading } = useAuth();
   const path = usePath();
+  const localized = useLocalized(course);
+  const t = useT(localized);
   const [authNote, setAuthNote] = useState(null); // null = closed, string = open with a note
   const { progress, markDone, setQuiz, setChecklist } = useProgress(course.id, user);
   const { access, notice, clearNotice } = useCourseAccess(user);
@@ -136,17 +153,17 @@ const Content = () => {
   }, [path]);
 
   const [, slug, stepId] = path.split('/');
-  const tutorial = slug ? course.tutorials.find((t) => t.slug === slug) : null;
+  const tutorial = slug ? localized.tutorials.find((x) => x.slug === slug) : null;
 
   useEffect(() => {
-    if (!slug) document.title = course.pageTitle;
-    else if (!tutorial) document.title = `Page not found · ${course.title}`;
-  }, [slug, tutorial]);
+    if (!slug) document.title = localized.pageTitle;
+    else if (!tutorial) document.title = t('app.pageNotFound', localized.title);
+  }, [slug, tutorial, localized, t]);
 
   if (authNote !== null && !user) {
     return (
       <div className="auth-wrap">
-        <button type="button" className="auth-back" onClick={() => setAuthNote(null)}>← Back to {course.title}</button>
+        <button type="button" className="auth-back" onClick={() => setAuthNote(null)}>{t('app.backTo', localized.title)}</button>
         {authNote && <p className="auth-note">{authNote}</p>}
         <AuthScreen />
       </div>
@@ -155,36 +172,38 @@ const Content = () => {
 
   return (
     <div className="site" style={{ '--accent': course.accent }}>
-      <PromoBanner access={access} />
-      <Header user={user} onSignIn={openSignIn} onSignOut={logout} />
+      <PromoBanner access={access} t={t} />
+      <Header course={localized} t={t} user={user} onSignIn={openSignIn} onSignOut={logout} />
       {notice && (
         <div className={`notice ${notice.kind}`} role="status">
-          <span>{notice.text}</span>
-          <button type="button" className="link-btn" onClick={clearNotice} aria-label="Dismiss">✕</button>
+          <span>{t(notice.key, localized.language)}</span>
+          <button type="button" className="link-btn" onClick={clearNotice} aria-label={t('app.dismiss')}>✕</button>
         </div>
       )}
       <div className="page">
-        {!slug && <CourseHome course={course} progress={progress} access={access} user={user} onSignIn={openSignIn} />}
+        {!slug && <CourseHome course={localized} progress={progress} access={access} user={user} onSignIn={openSignIn} />}
         {tutorial && (
-          <TutorialPage course={course} tutorial={tutorial} stepId={stepId} progress={progress} actions={actions} access={access} user={user} onSignIn={openSignIn} />
+          <TutorialPage course={localized} tutorial={tutorial} stepId={stepId} progress={progress} actions={actions} access={access} user={user} onSignIn={openSignIn} />
         )}
         {slug && !tutorial && (
           <div className="not-found">
-            <h1>That page isn't here</h1>
-            <p><a {...linkProps('/')}>Go to {course.title}</a></p>
+            <h1>{t('app.notFoundTitle')}</h1>
+            <p><a {...linkProps('/')}>{t('app.notFoundLink', localized.title)}</a></p>
           </div>
         )}
       </div>
-      <Footer />
-      {loading && <span className="sr-only">Checking sign-in…</span>}
+      <Footer course={localized} t={t} />
+      {loading && <span className="sr-only">{t('app.checkingSignIn')}</span>}
     </div>
   );
 };
 
 const App = () => (
-  <AuthProvider>
-    <Content />
-  </AuthProvider>
+  <LangProvider languages={course.languages} defaultLanguage={course.defaultLanguage}>
+    <AuthProvider>
+      <Content />
+    </AuthProvider>
+  </LangProvider>
 );
 
 export default App;

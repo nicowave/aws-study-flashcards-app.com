@@ -1,7 +1,7 @@
 {
   "name": "aws-coding-courses",
   "version": "1.0.0",
-  "description": "Coding courses for Level Up Study Hub: one tutorial engine, built once per course site (bash., python., js., typescript.)",
+  "description": "Coding courses for Level Up Study Hub: one tutorial engine, built once per course site (bash., python., js., typescript., spanish.)",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
     "dev:python": "COURSE=python vite",
     "dev:javascript": "COURSE=javascript vite",
     "dev:typescript": "COURSE=typescript vite",
+    "dev:tech-spanish": "COURSE=tech-spanish vite",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run"

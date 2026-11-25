@@ -2,8 +2,10 @@
 // format). Flip, then "Again" puts the card back at the end of the deck.
 import React, { useState } from 'react';
 import Markdown from '../Markdown';
+import { useT } from '../i18n';
 
 const Cards = ({ cards, onFinish }) => {
+  const t = useT();
   const [queue, setQueue] = useState(() => cards.map((c) => c.id));
   const [flipped, setFlipped] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -23,8 +25,8 @@ const Cards = ({ cards, onFinish }) => {
   if (!card) {
     return (
       <div className="cards-done">
-        <p><strong>Deck finished:</strong> all {cards.length} cards.</p>
-        <button type="button" className="btn ghost" onClick={() => { setQueue(cards.map((c) => c.id)); setKnown(0); }}>Go through them again</button>
+        <p><strong>{t('cards.deckFinished')}</strong> {t('cards.allCards', cards.length)}</p>
+        <button type="button" className="btn ghost" onClick={() => { setQueue(cards.map((c) => c.id)); setKnown(0); }}>{t('cards.again')}</button>
       </div>
     );
   }
@@ -32,22 +34,22 @@ const Cards = ({ cards, onFinish }) => {
   return (
     <div className="cards">
       <div className="cards-meta">
-        <span>{known} of {cards.length} known</span>
-        {card.tags?.length ? <span className="tags">{card.tags.map((t) => <span key={t} className="tag">{t}</span>)}</span> : null}
+        <span>{t('cards.known', known, cards.length)}</span>
+        {card.tags?.length ? <span className="tags">{card.tags.map((tag) => <span key={tag} className="tag">{tag}</span>)}</span> : null}
       </div>
-      <button type="button" className={`flashcard ${flipped ? 'flipped' : ''}`} onClick={() => setFlipped(!flipped)} aria-label={flipped ? 'Show the question' : 'Show the answer'}>
-        <span className="flashcard-side">{flipped ? 'Answer' : 'Question'}</span>
+      <button type="button" className={`flashcard ${flipped ? 'flipped' : ''}`} onClick={() => setFlipped(!flipped)} aria-label={flipped ? t('cards.showQuestion') : t('cards.showAnswer')}>
+        <span className="flashcard-side">{flipped ? t('cards.answer') : t('cards.question')}</span>
         <Markdown text={flipped ? card.back : card.front} />
-        {!flipped && <span className="flashcard-tap">Tap to flip</span>}
+        {!flipped && <span className="flashcard-tap">{t('cards.tap')}</span>}
       </button>
       <div className="cards-actions">
         {!flipped && card.hint && (showHint
-          ? <span className="cards-hint">Hint: {card.hint}</span>
-          : <button type="button" className="btn ghost" onClick={() => setShowHint(true)}>Hint</button>)}
+          ? <span className="cards-hint">{t('cards.hintLabel', card.hint)}</span>
+          : <button type="button" className="btn ghost" onClick={() => setShowHint(true)}>{t('cards.hint')}</button>)}
         {flipped && (
           <>
-            <button type="button" className="btn ghost" onClick={() => answer(false)}>Again</button>
-            <button type="button" className="btn" onClick={() => answer(true)}>Got it</button>
+            <button type="button" className="btn ghost" onClick={() => answer(false)}>{t('cards.notYet')}</button>
+            <button type="button" className="btn" onClick={() => answer(true)}>{t('cards.gotIt')}</button>
           </>
         )}
       </div>

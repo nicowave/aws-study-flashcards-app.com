@@ -4,8 +4,10 @@ import { linkProps } from './router';
 import { tutorialStats } from './progress';
 import UnlockCard from './UnlockCard';
 import Markdown from './Markdown';
+import { useT } from './i18n';
 
 const CourseHome = ({ course, progress, access, user, onSignIn }) => {
+  const t = useT(course);
   const firstOpen = course.tutorials.find((t) => !tutorialStats(t, progress).complete && (t.free || access)) || course.tutorials[0];
   return (
     <div className="home">
@@ -15,8 +17,8 @@ const CourseHome = ({ course, progress, access, user, onSignIn }) => {
           <h1>{course.headline}</h1>
           <p className="lede">{course.lede}</p>
           <div className="hero-actions">
-            <a className="btn big" {...linkProps(`/${firstOpen.slug}`)}>{Object.keys(progress.done).length ? 'Continue where you left off' : 'Start free'}</a>
-            <a className="btn big ghost" href="#tutorials">See what's inside</a>
+            <a className="btn big" {...linkProps(`/${firstOpen.slug}`)}>{Object.keys(progress.done).length ? t('home.continue') : t('home.startFree')}</a>
+            <a className="btn big ghost" href="#tutorials">{t('home.seeInside')}</a>
           </div>
           <p className="hero-note">{course.heroNote}</p>
         </div>
@@ -24,30 +26,30 @@ const CourseHome = ({ course, progress, access, user, onSignIn }) => {
       </section>
 
       <section className="outcomes">
-        <h2>By the end, you can</h2>
+        <h2>{t('home.outcomes')}</h2>
         <ul>{course.outcomes.map((o) => <li key={o}><Markdown text={o} className="inline" /></li>)}</ul>
       </section>
 
       <section id="tutorials" className="tutorial-list">
-        <h2>The tutorials</h2>
-        <p className="section-lede">Each one starts with a task someone really gets asked to do at work. Read a little, try it in the practice terminal, check yourself, then build it for real on your own AWS account.</p>
+        <h2>{t('home.tutorials')}</h2>
+        <p className="section-lede">{t('home.tutorialsLede')}</p>
         <ol>
-          {course.tutorials.map((t) => {
-            const stats = tutorialStats(t, progress);
-            const open = t.free || access;
+          {course.tutorials.map((tut) => {
+            const stats = tutorialStats(tut, progress);
+            const open = tut.free || access;
             return (
-              <li key={t.slug} className={`tut-card ${stats.complete ? 'complete' : ''}`}>
-                <a {...linkProps(`/${t.slug}`)}>
-                  <span className="tut-num">{t.number === 0 ? '0' : t.number}</span>
+              <li key={tut.slug} className={`tut-card ${stats.complete ? 'complete' : ''}`}>
+                <a {...linkProps(`/${tut.slug}`)}>
+                  <span className="tut-num">{tut.number === 0 ? '0' : tut.number}</span>
                   <span className="tut-body">
-                    <span className="tut-title">{t.title}</span>
-                    <span className="tut-situation">{t.situation}</span>
+                    <span className="tut-title">{tut.title}</span>
+                    <span className="tut-situation">{tut.situation}</span>
                     <span className="tut-meta">
-                      <span>{t.level}</span><span>~{t.hours} h</span>
-                      {t.free ? <span className="tag free">Free</span> : !access && <span className="tag lock">🔒 In the full course</span>}
-                      {stats.done > 0 && <span className="tag">{stats.complete ? '✓ Finished' : `${stats.done} of ${stats.total} steps`}</span>}
+                      <span>{tut.level}</span><span>~{tut.hours} h</span>
+                      {tut.free ? <span className="tag free">{t('home.free')}</span> : !access && <span className="tag lock">{t('home.locked')}</span>}
+                      {stats.done > 0 && <span className="tag">{stats.complete ? t('home.finished') : t('home.stepsDone', stats.done, stats.total)}</span>}
                     </span>
-                    <span className="tut-skills">{[...(t.skills || []), ...(t.aws || [])].join(' · ')}</span>
+                    <span className="tut-skills">{[...(tut.skills || []), ...(tut.aws || [])].join(' · ')}</span>
                   </span>
                   <span className="tut-go" aria-hidden="true">{open ? '→' : '🔒'}</span>
                 </a>
@@ -60,7 +62,7 @@ const CourseHome = ({ course, progress, access, user, onSignIn }) => {
       {!access && (
         <section className="pricing" id="pricing">
           <div>
-            <h2>The full course</h2>
+            <h2>{t('home.fullCourse')}</h2>
             <p className="section-lede">{course.pricingLede}</p>
           </div>
           <UnlockCard course={course} user={user} onSignIn={onSignIn} returnPath="/" />
@@ -68,7 +70,7 @@ const CourseHome = ({ course, progress, access, user, onSignIn }) => {
       )}
 
       <section className="faq">
-        <h2>Questions</h2>
+        <h2>{t('home.questions')}</h2>
         {course.faq.map((f) => (
           <details key={f.q}>
             <summary>{f.q}</summary>
