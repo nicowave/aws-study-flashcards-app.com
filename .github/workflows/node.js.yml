@@ -29,3 +29,6 @@ jobs:
         node-version: 20
     - run: npm install
     - run: npm run build
+    # Cloud Practitioner: every question and card must cite an official AWS page
+    - if: matrix.app == 'aws-cloud-practitioner-game'
+      run: npm test

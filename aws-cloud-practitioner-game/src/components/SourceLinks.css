@@ -1,0 +1,40 @@
+.source-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--md-border);
+  font-size: 0.8rem;
+}
+
+.source-links--compact {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.source-links-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--md-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.7rem;
+}
+
+.source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--md-primary);
+  text-decoration: none;
+  /* Long AWS page titles must wrap on phones instead of widening the page */
+  overflow-wrap: anywhere;
+}
+
+.source-link:hover,
+.source-link:focus-visible {
+  text-decoration: underline;
+}
