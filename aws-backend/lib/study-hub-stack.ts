@@ -46,6 +46,24 @@ const SITE_ORIGINS = [
   'http://localhost:5175',
 ];
 
+// The payments Lambda is uploaded as its folder, node_modules included
+// (Code.fromAsset doesn't install anything). If lambda/callables/node_modules
+// is missing a package, the upload still succeeds but the function crashes on
+// every request ("Internal Server Error": checkout, portal and the Stripe
+// webhook all down). Refuse to deploy instead. CI never deploys, so it skips this.
+function assertLambdaDepsInstalled(dir: string): void {
+  if (process.env.CI === 'true') return;
+  const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
+  const missing = Object.keys(pkg.dependencies || {}).filter(
+    (name) => !fs.existsSync(path.join(dir, 'node_modules', name, 'package.json')),
+  );
+  if (missing.length) {
+    throw new Error(
+      `${dir} is missing ${missing.join(', ')}. Run: (cd ${dir} && npm ci), then deploy again.`,
+    );
+  }
+}
+
 // Stripe price IDs aren't secret, but they live in the untracked
 // aws-backend/.env (STRIPE_PRICE_*=price_...). Refuse to deploy without them:
 // empty prices would switch checkout off. CI only builds (never deploys), so
@@ -374,10 +392,12 @@ export class StudyHubBackendStack extends cdk.Stack {
     // populated by the owner, never in git.
     // -----------------------------------------------------------------
     const billingSecret = secretsmanager.Secret.fromSecretNameV2(this, 'BillingSecret', 'study-hub/billing');
+    const callablesDir = path.join(__dirname, '../lambda/callables');
+    assertLambdaDepsInstalled(callablesDir);
     const callablesFn = new lambda.Function(this, 'CallablesFn', {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/callables')),
+      code: lambda.Code.fromAsset(callablesDir),
       environment: {
         SECRET_ID: 'study-hub/billing',
         TABLE_NAME: table.tableName,
