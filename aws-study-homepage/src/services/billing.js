@@ -42,6 +42,21 @@ export const startCheckout = async (plan = 'all-access') => {
   }
 };
 
+/**
+ * Whether checkout would give this signed-in person the free Pro week: true, false, or null when
+ * unknown. The server uses the same rule as checkout (nobody behind this account or email has had
+ * Pro), so the Pro card never promises a trial the person won't get.
+ */
+export const getProTrialStatus = async () => {
+  try {
+    const { data } = await callFunction('proTrialStatus', {});
+    return typeof data?.trialAvailable === 'boolean' ? data.trialAvailable : null;
+  } catch (err) {
+    console.warn('[billing] Trial status lookup failed:', err.message);
+    return null;
+  }
+};
+
 /** Opens the Stripe customer portal (manage / cancel / invoices). */
 export const openBillingPortal = async () => {
   // Come back to the hub on the name the member opened (on the old name that is the old hub, as
