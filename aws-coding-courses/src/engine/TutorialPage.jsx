@@ -6,10 +6,12 @@ import { stepKey, tutorialStats } from './progress';
 import StepView from './steps/StepView';
 import UnlockCard from './UnlockCard';
 import Markdown from './Markdown';
+import { useT } from './i18n';
 
-const KIND_ICON = { read: '📖', try: '⌨️', quiz: '✅', cards: '🃏', build: '🛠️' };
+const KIND_ICON = { read: '📖', try: '⌨️', quiz: '✅', cards: '🃏', build: '🛠️', register: '🎚️', rewrite: '✍️' };
 
 const TutorialPage = ({ course, tutorial, stepId, progress, actions, access, user, onSignIn }) => {
+  const t = useT(course);
   const open = tutorial.free || access;
   const index = Math.max(0, tutorial.steps.findIndex((s) => s.id === stepId));
   const step = tutorial.steps[index];
@@ -30,13 +32,13 @@ const TutorialPage = ({ course, tutorial, stepId, progress, actions, access, use
       <div className="tutorial locked">
         <a className="back" {...linkProps('/')}>← {course.title}</a>
         <header className="tutorial-head">
-          <p className="eyebrow">Tutorial {tutorial.number} · {tutorial.level} · ~{tutorial.hours} h</p>
+          <p className="eyebrow">{t('tut.meta', t('unit.name'), tutorial.number, tutorial.level, tutorial.hours)}</p>
           <h1>{tutorial.title}</h1>
           <p className="situation">{tutorial.situation}</p>
         </header>
         <div className="locked-grid">
           <div>
-            <h2>What you'll do</h2>
+            <h2>{t('tut.whatYouDo')}</h2>
             <Markdown text={tutorial.overview} />
             <ol className="outline">
               {tutorial.steps.map((s) => <li key={s.id}><span>{KIND_ICON[s.kind]}</span> {s.title}</li>)}
@@ -50,15 +52,15 @@ const TutorialPage = ({ course, tutorial, stepId, progress, actions, access, use
 
   const goTo = (i) => navigate(`/${tutorial.slug}/${tutorial.steps[i].id}`);
   const next = index < tutorial.steps.length - 1 ? () => goTo(index + 1) : nextTutorial ? () => navigate(`/${nextTutorial.slug}`) : null;
-  const nextLabel = index < tutorial.steps.length - 1 ? tutorial.steps[index + 1].title : nextTutorial ? `Tutorial ${nextTutorial.number}: ${nextTutorial.title}` : '';
+  const nextLabel = index < tutorial.steps.length - 1 ? tutorial.steps[index + 1].title : nextTutorial ? `${t('unit.name')} ${nextTutorial.number}: ${nextTutorial.title}` : '';
 
   return (
     <div className="tutorial">
       <aside className="steps-nav">
         <a className="back" {...linkProps('/')}>← {course.title}</a>
-        <p className="eyebrow">{tutorial.number === 0 ? 'Before you begin' : `Tutorial ${tutorial.number}`}</p>
+        <p className="eyebrow">{tutorial.number === 0 ? t('tut.beforeBegin') : `${t('unit.name')} ${tutorial.number}`}</p>
         <h1 className="steps-title">{tutorial.title}</h1>
-        <div className="meter" aria-label={`${stats.done} of ${stats.total} steps done`}><span style={{ width: `${(stats.done / stats.total) * 100}%` }} /></div>
+        <div className="meter" aria-label={t('tut.stepsDone', stats.done, stats.total)}><span style={{ width: `${(stats.done / stats.total) * 100}%` }} /></div>
         <ol>
           {tutorial.steps.map((s, i) => {
             const done = !!progress.done[stepKey(tutorial, s)];
@@ -73,7 +75,7 @@ const TutorialPage = ({ course, tutorial, stepId, progress, actions, access, use
           })}
         </ol>
         <label className="steps-select">
-          <span>Step</span>
+          <span>{t('tut.step')}</span>
           <select value={step.id} onChange={(e) => navigate(`/${tutorial.slug}/${e.target.value}`)}>
             {tutorial.steps.map((s, i) => <option key={s.id} value={s.id}>{i + 1}. {s.title}{progress.done[stepKey(tutorial, s)] ? ' ✓' : ''}</option>)}
           </select>
@@ -82,7 +84,7 @@ const TutorialPage = ({ course, tutorial, stepId, progress, actions, access, use
       <main className="step-main">
         {index === 0 && (
           <div className="situation-card">
-            <span className="eyebrow">The situation</span>
+            <span className="eyebrow">{t('tut.situation')}</span>
             <p>{tutorial.situation}</p>
           </div>
         )}
@@ -98,8 +100,8 @@ const TutorialPage = ({ course, tutorial, stepId, progress, actions, access, use
         />
         {stats.complete && index === tutorial.steps.length - 1 && (
           <div className="finished">
-            <h2>🎉 Tutorial finished</h2>
-            <p>{nextTutorial ? `Up next: ${nextTutorial.title}.` : `That's the whole course. Well done.`}</p>
+            <h2>{t('tut.finished')}</h2>
+            <p>{nextTutorial ? t('tut.upNext', nextTutorial.title) : t('tut.wholeCourse')}</p>
             {!nextTutorial && course.afterCourse && <Markdown text={course.afterCourse} />}
           </div>
         )}

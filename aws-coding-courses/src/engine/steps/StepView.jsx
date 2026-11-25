@@ -6,6 +6,8 @@
 //   quiz  — multiple-choice questions
 //   cards — flashcards
 //   build — do it for real on your computer and AWS account, with a checklist
+//   register — sort phrases into formal / with the team / slang (a quiz underneath)
+//   rewrite — write a short text; checked for the key terms it must (and mustn't) use
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import Markdown from '../Markdown';
 import Terminal from '../Terminal';
@@ -18,6 +20,9 @@ import { WebPracticeArea, NodePracticeArea } from './JsPractice';
 import Quiz from './Quiz';
 import Cards from './Cards';
 import Checklist from './Checklist';
+import Rewrite from './Rewrite';
+import { registerQuestions } from './register';
+import { useT } from '../i18n';
 
 const saveFile = (filename, text) => {
   const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
@@ -124,6 +129,7 @@ const PythonPracticeArea = forwardRef(({ step, storageId, done, onDone }, ref) =
 });
 
 const StepView = ({ tutorial, step, progressKey, progress, actions, onNext, nextLabel }) => {
+  const t = useT();
   const done = !!progress.done[progressKey];
   const markDone = useCallback(() => actions.markDone(progressKey), [actions, progressKey]);
   const practiceRef = useRef(null);
@@ -138,9 +144,9 @@ const StepView = ({ tutorial, step, progressKey, progress, actions, onNext, next
   return (
     <article className={`step step-${step.kind}`}>
       <header className="step-head">
-        <span className={`kind kind-${step.kind}`}>{{ read: 'Read', try: 'Try it', quiz: 'Check', cards: 'Flashcards', build: 'Build it' }[step.kind]}</span>
+        <span className={`kind kind-${step.kind}`}>{t(`kind.${step.kind}`)}</span>
         <h2>{step.title}</h2>
-        {step.minutes && <span className="step-time">{step.minutes} min</span>}
+        {step.minutes && <span className="step-time">{t('step.minutes', step.minutes)}</span>}
       </header>
 
       {step.body && <Markdown text={step.body} onRun={onRun} runLang={runLang} />}
@@ -156,6 +162,16 @@ const StepView = ({ tutorial, step, progressKey, progress, actions, onNext, next
           onFinish={(score, total) => { actions.setQuiz(progressKey, score, total); markDone(); }}
         />
       )}
+
+      {step.kind === 'register' && (
+        <Quiz
+          questions={registerQuestions(step.items, t)}
+          best={progress.quiz[progressKey]}
+          onFinish={(score, total) => { actions.setQuiz(progressKey, score, total); markDone(); }}
+        />
+      )}
+
+      {step.kind === 'rewrite' && <Rewrite step={step} storageId={storageId} done={done} onDone={markDone} />}
 
       {step.kind === 'cards' && <Cards cards={step.cards} onFinish={markDone} />}
 
@@ -182,9 +198,9 @@ const StepView = ({ tutorial, step, progressKey, progress, actions, onNext, next
 
       <footer className="step-foot">
         {(step.kind === 'read' || (step.kind === 'build' && !step.checklist)) && !done ? (
-          <button type="button" className="btn" onClick={() => { markDone(); onNext?.(); }}>{onNext ? `Done, next: ${nextLabel}` : 'Mark as done'}</button>
+          <button type="button" className="btn" onClick={() => { markDone(); onNext?.(); }}>{onNext ? t('step.doneNext', nextLabel) : t('step.markDone')}</button>
         ) : onNext ? (
-          <button type="button" className={`btn ${done ? '' : 'ghost'}`} onClick={onNext}>{done ? `Next: ${nextLabel}` : `Skip to: ${nextLabel}`}</button>
+          <button type="button" className={`btn ${done ? '' : 'ghost'}`} onClick={onNext}>{done ? t('step.next', nextLabel) : t('step.skipTo', nextLabel)}</button>
         ) : null}
       </footer>
     </article>

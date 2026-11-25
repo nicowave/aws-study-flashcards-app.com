@@ -332,3 +332,24 @@ section h2 { font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.01em; }
 .bundle-price { display: flex; align-items: baseline; gap: 8px; }
 .bundle-price .price { font-size: 1.3rem; font-weight: 700; }
 .bundle p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+/* Language switch (bilingual courses only) */
+.lang-switch { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.lang-switch button { background: transparent; color: var(--muted); border: 0; padding: 4px 10px; font: 600 0.78rem var(--mono); letter-spacing: 0.04em; cursor: pointer; }
+.lang-switch button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.lang-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* Rewrite steps: write a message, check its key terms */
+.rewrite { margin-top: 18px; display: grid; gap: 12px; max-width: 720px; }
+.rewrite-source { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; }
+.rewrite-source .eyebrow, .rewrite-model .eyebrow { display: block; margin-bottom: 4px; }
+.rewrite-label { font-weight: 600; }
+.rewrite textarea { width: 100%; box-sizing: border-box; min-height: 140px; resize: vertical; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; font: inherit; line-height: 1.5; }
+.rewrite textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.rewrite-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.rewrite-feedback { font-size: 0.94rem; border-left: 3px solid var(--line); padding: 4px 0 4px 12px; }
+.rewrite-feedback p { margin: 4px 0; }
+.rewrite-feedback.right { border-color: var(--ok); color: var(--ok); }
+.rewrite-feedback.wrong { border-color: var(--danger); }
+.rewrite-feedback.wrong strong { color: var(--danger); }
+.rewrite-model { border: 1px dashed var(--line); border-radius: var(--radius); padding: 12px 16px; }

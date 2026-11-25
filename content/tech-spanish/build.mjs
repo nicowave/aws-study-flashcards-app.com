@@ -3,7 +3,7 @@
 //   node build.mjs --check  → only validates (exit 1 on any problem)
 // Why one source: the readable doc, the flashcards and a future course must
 // never drift apart, so all of them are generated from the same entries.
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { GROUPS, TERMS } from './glossary.source.mjs';
 import { SOURCES, NOTES } from './sources.mjs';
 
@@ -46,7 +46,12 @@ const entries = GROUPS.flatMap((g) => TERMS[g.id].map((t) => {
     difficulty: LEVELS[t.lvl],
   };
 }));
-writeFileSync('glossary.json', JSON.stringify({ version: 1, groups: GROUPS, sources: SOURCES, terms: entries }, null, 2) + '\n');
+mkdirSync('../../aws-coding-courses/src/courses/tech-spanish', { recursive: true });
+const glossaryJson = JSON.stringify({ version: 1, groups: GROUPS, sources: SOURCES, terms: entries }, null, 2) + '\n';
+writeFileSync('glossary.json', glossaryJson);
+// The course site reads its own copy (Vite won't import files outside the app);
+// courses.test.js fails if the copy and this file ever differ.
+writeFileSync('../../aws-coding-courses/src/courses/tech-spanish/glossary.json', glossaryJson);
 
 // ---------- flashcards.json: {id, front, back, hint, tags, difficulty} ----------
 // Two cards per term, one per direction, so learners practice both ways.

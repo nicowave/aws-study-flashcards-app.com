@@ -1,6 +1,9 @@
 // Every "try" task must be solvable: running its answer passes its check,
 // and doing nothing doesn't. Also checks the course data is well formed.
 import { describe, it, expect, beforeAll } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { localize } from '../engine/i18n';
+import { tutorialProblems, missingTranslations, parityProblems } from './validate';
 import { Shell } from '../engine/shell/shell';
 import { nodePython } from '../engine/python/nodePython';
 import { nodeRunner, prepareFiles, transpile } from '../engine/js/nodeJs';
@@ -9,8 +12,9 @@ import bash from './bash/index';
 import pythonCourse from './python/index';
 import javascriptCourse from './javascript/index';
 import typescriptCourse from './typescript/index';
+import techSpanish from './tech-spanish/index';
 
-const COURSES = [bash, pythonCourse, javascriptCourse, typescriptCourse];
+const COURSES = [bash, pythonCourse, javascriptCourse, typescriptCourse, techSpanish];
 const JS_RUNTIMES = ['web', 'node'];
 
 const runCheck = (step, shell, result) => step.check({ shell, fs: shell.fs, aws: shell.aws, result, history: shell.history });
@@ -66,25 +70,28 @@ const jsAttempt = async (step, code) => {
 
 for (const course of COURSES) {
   describe(course.title, () => {
-    it('has well-formed tutorials', () => {
-      const slugs = new Set();
-      for (const t of course.tutorials) {
-        expect(slugs.has(t.slug)).toBe(false);
-        slugs.add(t.slug);
-        expect(t.title && t.situation && t.level && t.hours).toBeTruthy();
-        const ids = new Set();
-        for (const s of t.steps) {
-          expect(['read', 'try', 'quiz', 'cards', 'build']).toContain(s.kind);
-          expect(ids.has(s.id)).toBe(false);
-          ids.add(s.id);
-          if (s.kind === 'try') expect(s.task && s.check && s.solution && s.scenario).toBeTruthy();
-          if (s.kind === 'quiz') for (const q of s.questions) expect(q.options[q.answer]).toBeDefined();
-          if (s.kind === 'cards') for (const c of s.cards) expect(c.id && c.front && c.back && c.difficulty).toBeTruthy();
-        }
-      }
-      // At least one free tutorial so people can try before buying
-      expect(course.tutorials.some((t) => t.free && t.number > 0)).toBe(true);
-    });
+    // A bilingual course is checked once per language, as each visitor sees it
+    for (const lang of course.languages || ['en']) {
+      const view = course.languages ? localize(course, lang) : course;
+      it(`has well-formed tutorials${course.languages ? ` (${lang})` : ''}`, () => {
+        const slugs = view.tutorials.map((t) => t.slug);
+        expect(new Set(slugs).size).toBe(slugs.length);
+        expect(view.tutorials.flatMap((t) => tutorialProblems(t, lang))).toEqual([]);
+        // At least one free tutorial so people can try before buying
+        expect(view.tutorials.some((t) => t.free && t.number > 0)).toBe(true);
+      });
+    }
+
+    if (course.languages) {
+      it('has every text in both languages', () => {
+        expect(missingTranslations(course)).toEqual([]);
+      });
+
+      it('has the same steps, answers and cards in both languages', () => {
+        const [a, b] = course.languages.map((lang) => localize(course, lang));
+        expect(a.tutorials.flatMap((t, i) => parityProblems(t, b.tutorials[i]))).toEqual([]);
+      });
+    }
 
     for (const t of course.tutorials) {
       for (const step of t.steps.filter((s) => s.kind === 'try' && JS_RUNTIMES.includes(s.runtime))) {
@@ -161,3 +168,11 @@ for (const course of COURSES) {
     }
   });
 }
+
+describe('Tech Spanish glossary', () => {
+  it('uses the current glossary (run node build.mjs in content/tech-spanish after editing it)', () => {
+    const source = readFileSync(new URL('../../../content/tech-spanish/glossary.json', import.meta.url), 'utf8');
+    const copy = readFileSync(new URL('./tech-spanish/glossary.json', import.meta.url), 'utf8');
+    expect(copy).toBe(source);
+  });
+});

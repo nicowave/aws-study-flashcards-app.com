@@ -6,6 +6,7 @@
 import React, { useMemo } from 'react';
 import { Marked } from 'marked';
 import { onThisName } from '../config/auth.config';
+import { useLang, translate } from './i18n';
 
 const escapeHtml = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
@@ -18,7 +19,7 @@ const LABELS = {
 // Which fences get Run for each kind of practice area
 const RUNNABLE = { bash: ['bash'], python: ['python'], js: ['js', 'javascript'], ts: ['ts', 'typescript', 'js', 'javascript'] };
 
-const makeParser = (runLang) => {
+const makeParser = (runLang, lang = 'en') => {
   const marked = new Marked({ gfm: true, breaks: false });
   marked.use({
     renderer: {
@@ -26,10 +27,10 @@ const makeParser = (runLang) => {
         const language = (lang || '').trim();
         const label = LABELS[language] ?? language;
         const run = runLang && RUNNABLE[runLang].includes(language)
-          ? `<button type="button" class="code-btn run-code" data-code="${escapeHtml(text)}">▶ Run</button>`
+          ? `<button type="button" class="code-btn run-code" data-code="${escapeHtml(text)}">${translate(lang, 'code.run')}</button>`
           : '';
         return `<div class="code-block lang-${escapeHtml(language || 'text')}">` +
-          `<div class="code-bar"><span>${escapeHtml(label)}</span><span class="code-actions">${run}<button type="button" class="code-btn copy-code" data-code="${escapeHtml(text)}">Copy</button></span></div>` +
+          `<div class="code-bar"><span>${escapeHtml(label)}</span><span class="code-actions">${run}<button type="button" class="code-btn copy-code" data-code="${escapeHtml(text)}">${translate(lang, 'code.copy')}</button></span></div>` +
           `<pre><code>${escapeHtml(text)}</code></pre></div>`;
       },
       link({ href: written, title, tokens }) {
@@ -44,14 +45,21 @@ const makeParser = (runLang) => {
   return marked;
 };
 
-const parsers = Object.fromEntries([['none', makeParser(null)], ...Object.keys(RUNNABLE).map((lang) => [lang, makeParser(lang)])]);
+// One parser per practice language and interface language, made the first time it's needed
+const parsers = {};
+const parserFor = (runLang, lang) => {
+  const key = `${runLang || 'none'}:${lang}`;
+  if (!parsers[key]) parsers[key] = makeParser(runLang, lang);
+  return parsers[key];
+};
 
 const Markdown = ({ text, onRun, runLang = 'bash', className = '' }) => {
+  const { lang } = useLang();
   const inline = className.split(' ').includes('inline');
   const html = useMemo(() => {
-    const parser = parsers[onRun ? runLang : 'none'];
+    const parser = parserFor(onRun ? runLang : null, lang);
     return inline ? parser.parseInline(text || '') : parser.parse(text || '');
-  }, [text, onRun, runLang, inline]);
+  }, [text, onRun, runLang, inline, lang]);
   const onClick = (e) => {
     const btn = e.target.closest('.code-btn');
     if (!btn) return;
@@ -59,8 +67,8 @@ const Markdown = ({ text, onRun, runLang = 'bash', className = '' }) => {
     if (btn.classList.contains('run-code')) onRun?.(code);
     else {
       navigator.clipboard?.writeText(code).then(() => {
-        btn.textContent = 'Copied';
-        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+        btn.textContent = translate(lang, 'code.copied');
+        setTimeout(() => { btn.textContent = translate(lang, 'code.copy'); }, 1500);
       }).catch(() => {});
     }
   };

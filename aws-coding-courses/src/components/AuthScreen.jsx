@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { MailIcon, KeyIcon, UserIcon } from './Icons';
 import ForgotPassword from './ForgotPassword';
+import { useT } from '../engine/i18n';
 import './AuthScreen.css';
 
 // Eye icons for password visibility
@@ -20,6 +21,7 @@ const EyeOffIcon = ({ size = 24 }) => (
 );
 
 const AuthScreen = ({ onGuestContinue, hubUrl }) => {
+  const t = useT();
   const { login, register, googleSignIn, loading, error, clearError } = useAuth();
   
   const [isLogin, setIsLogin] = useState(true);
@@ -55,39 +57,39 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
 
     // Validation
     if (!username.trim()) {
-      setFormError('Username is required');
+      setFormError(t('auth.usernameRequired'));
       return;
     }
 
     if (username.length < 3) {
-      setFormError('Username must be at least 3 characters');
+      setFormError(t('auth.usernameShort'));
       return;
     }
 
     // Email is REQUIRED for both login and register
     if (!email.trim()) {
-      setFormError('Email is required');
+      setFormError(t('auth.emailRequired'));
       return;
     }
 
     if (!validateEmail(email)) {
-      setFormError('Please enter a valid email address');
+      setFormError(t('auth.emailInvalid'));
       return;
     }
 
     if (!password) {
-      setFormError('Password is required');
+      setFormError(t('auth.passwordRequired'));
       return;
     }
 
     if (password.length < 6) {
-      setFormError('Password must be at least 6 characters');
+      setFormError(t('auth.passwordShort'));
       return;
     }
 
     if (!isLogin) {
       if (password !== confirmPassword) {
-        setFormError('Passwords do not match');
+        setFormError(t('auth.passwordsDiffer'));
         return;
       }
     }
@@ -102,7 +104,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
       }
     } catch (err) {
       console.error('[AuthScreen] Auth error:', err);
-      setFormError(err.message || 'Authentication failed');
+      setFormError(err.message || t('auth.failed'));
     }
   };
 
@@ -141,12 +143,12 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
         )}
         <div className="auth-header">
           <h1 className="auth-title">
-            {isLogin ? 'Welcome Back' : 'Create Account'}
+            {isLogin ? t('auth.welcomeBack') : t('auth.createAccount')}
           </h1>
           <p className="auth-subtitle">
             {isLogin 
-              ? 'Sign in to sync your progress across devices' 
-              : 'Sign up to save your progress and achievements'}
+              ? t('auth.signInLede')
+              : t('auth.signUpLede')}
           </p>
         </div>
 
@@ -163,11 +165,11 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
           </svg>
-          <span>{isLogin ? 'Sign in with Google' : 'Sign up with Google'}</span>
+          <span>{isLogin ? t('auth.googleSignIn') : t('auth.googleSignUp')}</span>
         </button>
 
         <div className="divider auth-divider">
-          <span>or</span>
+          <span>{t('auth.or')}</span>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -175,7 +177,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
           <div className="form-group">
             <label htmlFor="username">
               <UserIcon size={18} />
-              <span>Username</span>
+              <span>{t('auth.username')}</span>
             </label>
             <input
               type="text"
@@ -183,7 +185,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
               name="username"
               value={formData.username}
               onChange={handleInputChange}
-              placeholder="Enter your username"
+              placeholder={t('auth.usernamePlaceholder')}
               autoComplete="username"
               disabled={loading}
             />
@@ -193,7 +195,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
           <div className="form-group">
             <label htmlFor="email">
               <MailIcon size={18} />
-              <span>Email <span className="required-star">*</span></span>
+              <span>{t('auth.email')} <span className="required-star">*</span></span>
             </label>
             <input
               type="email"
@@ -206,14 +208,14 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
               required
               disabled={loading}
             />
-            <span className="field-hint">Required for account verification</span>
+            <span className="field-hint">{t('auth.emailHint')}</span>
           </div>
 
           {/* Password Field with Toggle */}
           <div className="form-group">
             <label htmlFor="password">
               <KeyIcon size={18} />
-              <span>Password</span>
+              <span>{t('auth.password')}</span>
             </label>
             <div className="password-input-wrapper">
               <input
@@ -222,7 +224,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="Enter your password"
+                placeholder={t('auth.passwordPlaceholder')}
                 autoComplete={isLogin ? 'current-password' : 'new-password'}
                 disabled={loading}
               />
@@ -231,7 +233,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
                 className="password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
               >
                 {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
               </button>
@@ -243,7 +245,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
                 onClick={() => { setShowReset(true); setFormError(''); if (error) clearError(); }}
                 disabled={loading}
               >
-                Forgot password?
+                {t('auth.forgot')}
               </button>
             )}
           </div>
@@ -253,7 +255,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
             <div className="form-group">
               <label htmlFor="confirmPassword">
                 <KeyIcon size={18} />
-                <span>Confirm Password</span>
+                <span>{t('auth.confirmPassword')}</span>
               </label>
               <div className="password-input-wrapper">
                 <input
@@ -262,7 +264,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  placeholder="Confirm your password"
+                  placeholder={t('auth.confirmPlaceholder')}
                   autoComplete="new-password"
                   disabled={loading}
                 />
@@ -271,7 +273,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
                   className="password-toggle"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   tabIndex={-1}
-                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showConfirmPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                 >
                   {showConfirmPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
                 </button>
@@ -296,7 +298,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
             {loading ? (
               <span className="loading-spinner">⏳</span>
             ) : (
-              isLogin ? 'Sign In' : 'Create Account'
+              isLogin ? t('auth.signInButton') : t('auth.createAccount')
             )}
           </button>
         </form>
@@ -304,14 +306,14 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
         {/* Toggle Login/Register */}
         <div className="auth-toggle">
           <span>
-            {isLogin ? "Don't have an account?" : 'Already have an account?'}
+            {isLogin ? t('auth.noAccount') : t('auth.haveAccount')}
           </span>
           <button 
             type="button" 
             onClick={toggleMode}
             disabled={loading}
           >
-            {isLogin ? 'Sign Up' : 'Sign In'}
+            {isLogin ? t('auth.signUpButton') : t('auth.signInButton')}
           </button>
         </div>
 
@@ -319,7 +321,7 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
         {onGuestContinue && (
           <div className="guest-option">
             <div className="divider">
-              <span>or</span>
+              <span>{t('auth.or')}</span>
             </div>
             <button 
               type="button"
@@ -327,10 +329,10 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
               onClick={onGuestContinue}
               disabled={loading}
             >
-              Try It Free — No Account Needed
+              {t('auth.guest')}
             </button>
             <p className="guest-hint">
-              Preview the first domain and flashcard deck. Progress saves on this device.
+              {t('auth.guestHint')}
             </p>
           </div>
         )}

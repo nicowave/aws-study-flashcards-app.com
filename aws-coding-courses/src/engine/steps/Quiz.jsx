@@ -1,8 +1,10 @@
 // Multiple-choice check: instant feedback with an explanation per question.
 import React, { useState } from 'react';
 import Markdown from '../Markdown';
+import { useT } from '../i18n';
 
 const Quiz = ({ questions, onFinish, best }) => {
+  const t = useT();
   const [answers, setAnswers] = useState({});
   const [round, setRound] = useState(0);
   const answered = Object.keys(answers).length;
@@ -36,7 +38,7 @@ const Quiz = ({ questions, onFinish, best }) => {
             </div>
             {picked !== undefined && (
               <div className={`quiz-explain ${picked === q.answer ? 'right' : 'wrong'}`}>
-                <strong>{picked === q.answer ? 'Correct.' : 'Not quite.'}</strong> <Markdown text={q.explain} className="inline" />
+                <strong>{picked === q.answer ? t('quiz.correct') : t('quiz.wrong')}</strong> <Markdown text={q.explain} className="inline" />
               </div>
             )}
           </fieldset>
@@ -44,8 +46,8 @@ const Quiz = ({ questions, onFinish, best }) => {
       })}
       {answered === questions.length && (
         <div className="quiz-score">
-          <span>You got <strong>{score} of {questions.length}</strong>{best && best.score > score ? ` (your best: ${best.score})` : ''}.</span>
-          <button type="button" className="btn ghost" onClick={() => { setAnswers({}); setRound(round + 1); }}>Try again</button>
+          <span>{t('quiz.score')} <strong>{t('quiz.of', score, questions.length)}</strong>{best && best.score > score ? t('quiz.best', best.score) : ''}.</span>
+          <button type="button" className="btn ghost" onClick={() => { setAnswers({}); setRound(round + 1); }}>{t('quiz.retry')}</button>
         </div>
       )}
     </div>
