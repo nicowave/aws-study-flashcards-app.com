@@ -12,77 +12,119 @@ export const domain3 = {
       question: 'A media company wants the articles in its mobile app read aloud to users in a natural, lifelike voice. Which AWS service should it use?',
       options: ['Amazon Transcribe', 'Amazon Comprehend', 'Amazon Polly', 'Amazon Translate'],
       correct: 2,
-      explanation: 'Amazon Polly converts text into lifelike speech, including neural voices, and supports SSML for controlling pronunciation and pacing. Amazon Transcribe goes in the opposite direction (speech to text), Comprehend extracts insights from text, and Translate converts text between languages — none of them synthesize speech.'
+      explanation: 'Amazon Polly converts text into lifelike speech, including neural voices, and supports SSML for controlling pronunciation and pacing. Amazon Transcribe goes in the opposite direction (speech to text), Comprehend extracts insights from text, and Translate converts text between languages — none of them synthesize speech.',
+      sources: [
+        { title: 'What Is Amazon Polly? – Amazon Polly', url: 'https://docs.aws.amazon.com/polly/latest/dg/what-is.html', checked: '2026-11-25' },
+        { title: 'Generating speech from SSML documents – Amazon Polly', url: 'https://docs.aws.amazon.com/polly/latest/dg/ssml.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q2',
       question: 'A company wants a generative AI assistant that employees can ask questions about internal documents and policies, and that also helps its developers write and debug code. Which AWS offering is designed for exactly this?',
-      options: ['Amazon Q', 'Amazon Kendra', 'Amazon Lex', 'Amazon SageMaker'],
+      options: ['Amazon Q', 'Amazon Kendra', 'Amazon Lex', 'Amazon SageMaker AI'],
       correct: 0,
-      explanation: 'Amazon Q is AWS\'s generative AI assistant: Amazon Q Business answers questions grounded in company data, and Amazon Q Developer assists with writing and debugging code. Kendra is an intelligent search service that returns documents and passages rather than acting as a conversational generative assistant, Lex is a framework for building your own chatbots, and SageMaker is a platform for building and training ML models.'
+      explanation: 'Amazon Q is AWS\'s generative AI assistant: Amazon Q Business answers questions grounded in company data, and Amazon Q Developer assists with writing and debugging code. Kendra is an intelligent search service that returns documents and passages rather than acting as a conversational generative assistant, Lex is a framework for building your own chatbots, and SageMaker AI is a platform for building and training ML models. Note: Amazon Q Business is no longer open to new customers; AWS points them to AWS Quick, its next evolution, but the exam still names Amazon Q.',
+      sources: [
+        { title: 'What is Amazon Q Business? – Amazon Q Business', url: 'https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/what-is.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Q Developer? – Amazon Q Developer', url: 'https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q3',
       question: 'A photo-sharing platform must automatically detect faces in uploaded images and flag inappropriate visual content before photos are published. Which service provides these capabilities?',
       options: ['Amazon Textract', 'Amazon Rekognition', 'Amazon Comprehend', 'Amazon Kendra'],
       correct: 1,
-      explanation: 'Amazon Rekognition analyzes images and videos, providing face detection and analysis, object and scene detection, and content moderation for unsafe imagery. Textract extracts text and data from documents, Comprehend analyzes text rather than images, and Kendra is an enterprise search service.'
+      explanation: 'Amazon Rekognition analyzes images and videos, providing face detection and analysis, object and scene detection, and content moderation for unsafe imagery. Textract extracts text and data from documents, Comprehend analyzes text rather than images, and Kendra is an enterprise search service.',
+      sources: [
+        { title: 'What is Amazon Rekognition? – Amazon Rekognition', url: 'https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html', checked: '2026-11-25' },
+        { title: 'Moderating content – Amazon Rekognition', url: 'https://docs.aws.amazon.com/rekognition/latest/dg/moderation.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q4',
       question: 'Employees waste hours hunting for answers scattered across wikis, SharePoint sites, and file shares. The company wants ML-powered search that accepts natural-language questions and returns specific answers from that content. Which service fits?',
       options: ['Amazon Lex', 'Amazon Kendra', 'Amazon Textract', 'Amazon Comprehend'],
       correct: 1,
-      explanation: 'Amazon Kendra is an intelligent enterprise search service that connects to sources like SharePoint and S3, understands natural-language questions, and surfaces specific answers from enterprise content. Lex builds conversational chatbots but does not index enterprise repositories, Textract extracts data from scanned documents, and Comprehend analyzes individual texts rather than searching across them.'
+      explanation: 'Amazon Kendra is an intelligent enterprise search service that connects to sources like SharePoint and S3, understands natural-language questions, and surfaces specific answers from enterprise content. Lex builds conversational chatbots but does not index enterprise repositories, Textract extracts data from scanned documents, and Comprehend analyzes individual texts rather than searching across them. Note: Kendra is no longer open to new customers (AWS points new builds to Amazon Bedrock Knowledge Bases), but the exam still tests it as the enterprise search service.',
+      sources: [
+        { title: 'What is Amazon Kendra? – Amazon Kendra', url: 'https://docs.aws.amazon.com/kendra/latest/dg/what-is-kendra.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q5',
       question: 'An insurance company receives thousands of scanned claim forms and needs to automatically extract the text, form fields, and tables they contain. Which service should it use?',
       options: ['Amazon Comprehend', 'Amazon Rekognition', 'Amazon Translate', 'Amazon Textract'],
       correct: 3,
-      explanation: 'Amazon Textract goes beyond basic OCR to extract printed text, handwriting, key-value pairs from forms, and tables from scanned documents. Rekognition can detect text in natural-scene images but does not parse form structure, and Comprehend analyzes text only after it has already been extracted.'
+      explanation: 'Amazon Textract goes beyond basic OCR to extract printed text, handwriting, key-value pairs from forms, and tables from scanned documents. Rekognition can detect text in natural-scene images but does not parse form structure, and Comprehend analyzes text only after it has already been extracted.',
+      sources: [
+        { title: 'What is Amazon Textract? – Amazon Textract', url: 'https://docs.aws.amazon.com/textract/latest/dg/what-is.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Rekognition? – Amazon Rekognition', url: 'https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q6',
       question: 'A retailer wants a chatbot that lets customers check order status by voice or text, recognizing intents like \'track my order\' and capturing details such as the order number. Which service is built for this?',
-      options: ['Amazon Polly', 'Amazon Connect', 'Amazon Lex', 'Amazon Transcribe'],
+      options: ['Amazon Polly', 'Amazon Connect Customer', 'Amazon Lex', 'Amazon Transcribe'],
       correct: 2,
-      explanation: 'Amazon Lex builds conversational interfaces with intents, utterances, and slots for both voice and text, using the same technology that powers Alexa. Amazon Connect is a cloud contact-center service that can integrate a Lex bot but is not itself the bot builder, while Polly and Transcribe only convert text to speech and speech to text respectively.'
+      explanation: 'Amazon Lex builds conversational interfaces with intents, utterances, and slots for both voice and text, using the same technology that powers Alexa. Amazon Connect Customer (the contact-center product previously called Amazon Connect) can integrate a Lex bot but is not itself the bot builder, while Polly and Transcribe only convert text to speech and speech to text respectively.',
+      sources: [
+        { title: 'AI Chat Builder – Amazon Lex – AWS', url: 'https://aws.amazon.com/lex/', checked: '2026-11-25' },
+        { title: 'Add an Amazon Lex bot to Connect Customer – Amazon Connect Customer', url: 'https://docs.aws.amazon.com/connect/latest/adminguide/amazon-lex.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q7',
-      question: 'A support team wants to analyze incoming tickets to detect customer sentiment, extract entities such as product names, and group tickets by topic. Which service provides these NLP capabilities?',
+      question: 'A support team wants to analyze incoming tickets to detect customer sentiment, extract entities such as product names, and sort tickets into the company\'s own categories. Which service provides these NLP capabilities?',
       options: ['Amazon Textract', 'Amazon Polly', 'Amazon Comprehend', 'Amazon Rekognition'],
       correct: 2,
-      explanation: 'Amazon Comprehend uses natural language processing to extract insights from text, including sentiment analysis, entity recognition, key phrase extraction, and topic modeling. Textract extracts text from documents but does not analyze meaning, Polly synthesizes speech, and Rekognition analyzes images and video.'
+      explanation: 'Amazon Comprehend uses natural language processing to extract insights from text, including sentiment analysis, entity recognition, key phrase extraction, and custom classification into your own categories (its older topic-modeling feature is no longer open to new customers). Textract extracts text from documents but does not analyze meaning, Polly synthesizes speech, and Rekognition analyzes images and video.',
+      sources: [
+        { title: 'What is Amazon Comprehend? – Amazon Comprehend', url: 'https://docs.aws.amazon.com/comprehend/latest/dg/what-is.html', checked: '2026-11-25' },
+        { title: 'Amazon Comprehend feature availability change – Amazon Comprehend', url: 'https://docs.aws.amazon.com/comprehend/latest/dg/comprehend-availability-change.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q8',
       question: 'A call center records customer calls and needs text transcripts with speaker labels so conversations can be searched and analyzed. Which service performs this conversion?',
       options: ['Amazon Polly', 'Amazon Lex', 'Amazon Comprehend', 'Amazon Transcribe'],
       correct: 3,
-      explanation: 'Amazon Transcribe is an automatic speech recognition service that converts audio into text and supports speaker diarization (labeling who said what) and custom vocabularies. Polly performs the reverse conversion (text to speech), Lex builds chatbots, and Comprehend analyzes text but cannot process audio.'
+      explanation: 'Amazon Transcribe is an automatic speech recognition service that converts audio into text and supports speaker diarization (labeling who said what) and custom vocabularies. Polly performs the reverse conversion (text to speech), Lex builds chatbots, and Comprehend analyzes text but cannot process audio.',
+      sources: [
+        { title: 'Partitioning speakers (diarization) – Amazon Transcribe', url: 'https://docs.aws.amazon.com/transcribe/latest/dg/diarization.html', checked: '2026-11-25' },
+        { title: 'Custom vocabularies – Amazon Transcribe', url: 'https://docs.aws.amazon.com/transcribe/latest/dg/custom-vocabulary.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q9',
       question: 'An e-commerce company wants to automatically localize its product descriptions from English into a dozen other languages at scale. Which service should it use?',
       options: ['Amazon Comprehend', 'Amazon Translate', 'Amazon Transcribe', 'Amazon Polly'],
       correct: 1,
-      explanation: 'Amazon Translate is a neural machine translation service for fast, high-quality text translation between languages at scale. Comprehend can detect which language a text is written in but cannot translate it, Transcribe converts speech to text, and Polly converts text to speech.'
+      explanation: 'Amazon Translate is a neural machine translation service for fast, high-quality text translation between languages at scale. Comprehend can detect which language a text is written in but cannot translate it, Transcribe converts speech to text, and Polly converts text to speech.',
+      sources: [
+        { title: 'Machine Translation Service – Amazon Translate – AWS', url: 'https://aws.amazon.com/translate/', checked: '2026-11-25' },
+        { title: 'What is Amazon Comprehend? – Amazon Comprehend', url: 'https://docs.aws.amazon.com/comprehend/latest/dg/what-is.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q10',
       question: 'A streaming service wants to show each user a \'recommended for you\' row based on their viewing history, updated in real time, without building recommendation models itself. Which service is purpose-built for this?',
       options: ['Amazon Personalize', 'Amazon Kendra', 'Amazon Forecast', 'Amazon Comprehend'],
       correct: 0,
-      explanation: 'Amazon Personalize is a fully managed service for real-time personalized recommendations, using the same technology behind Amazon.com, and requires no ML expertise to operate. Forecast predicts future values from time-series data rather than recommending items, Kendra is enterprise search, and Comprehend analyzes text.'
+      explanation: 'Amazon Personalize is a fully managed service for real-time personalized recommendations, using the same technology behind Amazon.com, and requires no ML expertise to operate. Forecast predicts future values from time-series data rather than recommending items (and is no longer available to new customers), Kendra is enterprise search, and Comprehend analyzes text.',
+      sources: [
+        { title: 'Amazon Personalize FAQs – AWS', url: 'https://aws.amazon.com/personalize/faqs/', checked: '2026-11-25' },
+        { title: 'What Is Amazon Forecast? – Amazon Forecast', url: 'https://docs.aws.amazon.com/forecast/latest/dg/what-is-forecast.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q11',
       question: 'A team runs a compliance Q&A bot and a creative brainstorming bot on the same foundation model. Which inference parameter should be set low for the compliance bot and high for the brainstorming bot?',
       options: ['Max tokens', 'Stop sequences', 'Temperature', 'Embedding dimensions'],
       correct: 2,
-      explanation: 'Temperature controls the randomness of token sampling: low values (e.g., 0.1) produce focused, near-deterministic outputs suited to factual and compliance tasks, while high values (e.g., 0.9) produce more diverse, creative outputs for brainstorming. Max tokens only caps response length, stop sequences only mark where generation ends, and embedding dimensions relate to vector representations, not generation randomness.'
+      explanation: 'Temperature controls the randomness of token sampling: low values (e.g., 0.1) produce focused, near-deterministic outputs suited to factual and compliance tasks, while high values (e.g., 0.9) produce more diverse, creative outputs for brainstorming. Max tokens only caps response length, stop sequences only mark where generation ends, and embedding dimensions relate to vector representations, not generation randomness.',
+      sources: [
+        { title: 'Influence response generation with inference parameters – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q12',
@@ -94,7 +136,11 @@ export const domain3 = {
         'Apply Bedrock Guardrails so the model refuses to give outdated answers'
       ],
       correct: 1,
-      explanation: 'Amazon Bedrock Knowledge Bases is a managed RAG capability: it ingests, chunks, and embeds documents from sources like S3, retrieves relevant passages at query time, and returns source citations — re-syncing when documents change, with no retraining. Monthly fine-tuning is slow and expensive and bakes stale knowledge into weights, pasting whole documents into prompts is costly and limited by the context window, and Guardrails filter content but supply no knowledge.'
+      explanation: 'Amazon Bedrock Knowledge Bases is a managed RAG capability: it ingests, chunks, and embeds documents from sources like S3, retrieves relevant passages at query time, and returns source citations — re-syncing when documents change, with no retraining. Monthly fine-tuning is slow and expensive and bakes stale knowledge into weights, pasting whole documents into prompts is costly and limited by the context window, and Guardrails filter content but supply no knowledge.',
+      sources: [
+        { title: 'Retrieve data and generate AI responses with Amazon Bedrock Knowledge Bases – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html', checked: '2026-11-25' },
+        { title: 'Sync your data with your Amazon Bedrock knowledge base – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/kb-data-source-sync-ingest.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q13',
@@ -106,7 +152,11 @@ export const domain3 = {
         'Pre-training a new model from scratch'
       ],
       correct: 2,
-      explanation: 'Prompt engineering has zero training cost — you pay only for inference — and should be exhausted before costlier approaches. The cost hierarchy from cheapest to most expensive runs: prompt engineering, then RAG, then fine-tuning, then continued pre-training, then pre-training from scratch. Fine-tuning and continued pre-training both require paid training jobs and custom model hosting.'
+      explanation: 'Prompt engineering has zero training cost — you pay only for inference — and should be exhausted before costlier approaches. The cost hierarchy from cheapest to most expensive runs: prompt engineering, then RAG, then fine-tuning, then continued pre-training, then pre-training from scratch. Fine-tuning and continued pre-training both require paid training jobs (tokens processed × epochs) plus monthly custom model storage.',
+      sources: [
+        { title: 'GENOPS05-BP01 Learn when to customize models – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genops05-bp01.html', checked: '2026-11-25' },
+        { title: 'Customize your model to improve its performance for your use case – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q14',
@@ -118,14 +168,22 @@ export const domain3 = {
         'Orchestration that breaks tasks into steps and invokes APIs and Lambda functions'
       ],
       correct: 3,
-      explanation: 'Bedrock Agents let a foundation model plan a multi-step task, invoke action groups (typically Lambda-backed APIs), consult knowledge bases, and track state until the task completes. Agents do not unlock different models, do not fine-tune anything during conversations, and are not a caching or pricing feature.'
+      explanation: 'Bedrock Agents let a foundation model plan a multi-step task, invoke action groups (typically Lambda-backed APIs), consult knowledge bases, and track state until the task completes. Agents do not unlock different models, do not fine-tune anything during conversations, and are not a caching or pricing feature. Note: Bedrock Agents is now called Bedrock Agents Classic and has been closed to new customers since July 30, 2026; AWS recommends Amazon Bedrock AgentCore for new agents, but the exam may still say Bedrock Agents.',
+      sources: [
+        { title: 'Automate tasks in your application using AI agents – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock Agents Classic maintenance mode – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/agents-classic-maintenance-mode.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q15',
       question: 'An audit team must be able to review how an AI assistant reached its conclusions on loan-eligibility questions, not just its final answers. Which prompting technique makes the model\'s intermediate reasoning visible?',
       options: ['Zero-shot prompting', 'Few-shot prompting', 'Negative prompting', 'Chain-of-thought prompting'],
       correct: 3,
-      explanation: 'Chain-of-thought prompting instructs the model to work through explicit intermediate steps before its final answer, making the reasoning transparent and auditable while also improving multi-step accuracy. Zero-shot and few-shot prompting control how many examples are supplied, and negative prompting specifies what the model should avoid — none of them expose reasoning steps.'
+      explanation: 'Chain-of-thought prompting instructs the model to work through explicit intermediate steps before its final answer, making the reasoning transparent and auditable while also improving multi-step accuracy. Zero-shot and few-shot prompting control how many examples are supplied, and negative prompting specifies what the model should avoid — none of them expose reasoning steps.',
+      sources: [
+        { title: 'What is Prompt Engineering? – AWS', url: 'https://aws.amazon.com/what-is/prompt-engineering/', checked: '2026-11-25' },
+        { title: 'Prompt templates and examples for Amazon Bedrock text models – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-templates-and-examples.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q16',
@@ -137,7 +195,10 @@ export const domain3 = {
         'Moving from prompt engineering to retrieval-augmented generation'
       ],
       correct: 0,
-      explanation: 'Zero-shot prompting gives the model a task with no examples; few-shot prompting adds a handful of worked examples to the prompt so the model can follow the demonstrated pattern, improving consistency. No model weights were changed, so this is not fine-tuning, and no external documents were retrieved, so it is not RAG.'
+      explanation: 'Zero-shot prompting gives the model a task with no examples; few-shot prompting adds a handful of worked examples to the prompt so the model can follow the demonstrated pattern, improving consistency. No model weights were changed, so this is not fine-tuning, and no external documents were retrieved, so it is not RAG.',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q17',
@@ -149,14 +210,21 @@ export const domain3 = {
         'Knowledge distillation'
       ],
       correct: 1,
-      explanation: 'RLHF is exactly this pipeline: humans rank candidate outputs, a reward model learns those preferences, and reinforcement learning optimizes the FM against the reward model to align it with human values. Supervised fine-tuning trains directly on ideal example responses rather than rankings, continued pre-training uses unlabeled domain text, and distillation trains a small model to mimic a large one.'
+      explanation: 'RLHF is exactly this pipeline: humans rank candidate outputs, a reward model learns those preferences, and reinforcement learning optimizes the FM against the reward model to align it with human values. Supervised fine-tuning trains directly on ideal example responses rather than rankings, continued pre-training uses unlabeled domain text, and distillation trains a small model to mimic a large one.',
+      sources: [
+        { title: 'What is RLHF? – AWS', url: 'https://aws.amazon.com/what-is/reinforcement-learning-from-human-feedback/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q18',
       question: 'A company\'s large foundation model is accurate but too slow and expensive to serve at scale. The team trains a much smaller model to reproduce the large model\'s outputs so it can handle most production traffic. What is this technique called?',
       options: ['Quantization', 'Continued pre-training', 'Model distillation', 'Prompt caching'],
       correct: 2,
-      explanation: 'Model distillation trains a smaller \'student\' model to mimic a larger \'teacher\' model\'s behavior, retaining much of its quality at lower latency and cost. Quantization shrinks the same model by reducing the numerical precision of its weights rather than training a new one, continued pre-training adds domain knowledge, and prompt caching reuses prompt prefixes at inference time.'
+      explanation: 'Model distillation trains a smaller \'student\' model to mimic a larger \'teacher\' model\'s behavior, retaining much of its quality at lower latency and cost. Quantization shrinks the same model by reducing the numerical precision of its weights rather than training a new one, continued pre-training adds domain knowledge, and prompt caching reuses prompt prefixes at inference time.',
+      sources: [
+        { title: 'Customize a model with distillation in Amazon Bedrock – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/model-distillation.html', checked: '2026-11-25' },
+        { title: 'Prompt caching for faster model inference – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q19',
@@ -168,7 +236,10 @@ export const domain3 = {
         'Have each developer review the others\' prompt wording every week'
       ],
       correct: 2,
-      explanation: 'A prompt template is a reusable, parameterized prompt structure — fixed instructions plus placeholders for variable content — giving consistent outputs that are easy to version, maintain, and A/B test. Temperature 0 only removes sampling randomness and cannot reconcile five different prompts, per-developer fine-tuning is costly overkill, and manual peer review does not scale.'
+      explanation: 'A prompt template is a reusable, parameterized prompt structure — fixed instructions plus placeholders for variable content — giving consistent outputs that are easy to version, maintain, and A/B test. Temperature 0 only removes sampling randomness and cannot reconcile five different prompts, per-developer fine-tuning is costly overkill, and manual peer review does not scale.',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q20',
@@ -180,7 +251,11 @@ export const domain3 = {
         'It always produces higher accuracy than fine-tuning on specialized domain-specific tasks'
       ],
       correct: 0,
-      explanation: 'In-context learning changes behavior by editing the prompt, so updates apply instantly with zero training cost and nothing to retrain or redeploy — ideal when requirements shift often. It never modifies model weights, the examples are re-sent and re-processed (and billed) on every request, and heavily specialized tasks can still favor fine-tuning for accuracy.'
+      explanation: 'In-context learning changes behavior by editing the prompt, so updates apply instantly with zero training cost and nothing to retrain or redeploy — ideal when requirements shift often. It never modifies model weights, the examples are re-sent and re-processed (and billed) on every request, and heavily specialized tasks can still favor fine-tuning for accuracy.',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' },
+        { title: 'Customize Amazon Nova models with Amazon Bedrock fine-tuning – AWS Machine Learning Blog', url: 'https://aws.amazon.com/blogs/machine-learning/customize-amazon-nova-models-with-amazon-bedrock-fine-tuning/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q21',
@@ -192,21 +267,32 @@ export const domain3 = {
         'Send the question to all available models and return the most common answer'
       ],
       correct: 1,
-      explanation: 'RAG embeds the query, performs similarity search against a vector index, augments the prompt with the retrieved chunks, and only then generates. Retrieval happens before generation — verification-after-the-fact, per-question fine-tuning, and model voting are not how RAG works.'
+      explanation: 'RAG embeds the query, performs similarity search against a vector index, augments the prompt with the retrieved chunks, and only then generates. Retrieval happens before generation — verification-after-the-fact, per-question fine-tuning, and model voting are not how RAG works.',
+      sources: [
+        { title: 'How Amazon Bedrock knowledge bases work – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/kb-how-it-works.html', checked: '2026-11-25' },
+        { title: 'What is RAG? – AWS', url: 'https://aws.amazon.com/what-is/retrieval-augmented-generation/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q22',
       question: 'A team wants document Q&A over its S3-hosted manuals but doesn\'t want to build ingestion, chunking, embedding, or vector search themselves. Which Bedrock capability provides this as a managed workflow?',
       options: ['Amazon Bedrock Knowledge Bases', 'Amazon Bedrock Guardrails', 'Bedrock Provisioned Throughput', 'Bedrock Model Cards'],
       correct: 0,
-      explanation: 'Bedrock Knowledge Bases manages the entire RAG pipeline — ingesting documents from sources like S3, chunking, generating embeddings, storing them in a vector store, and serving retrieval at query time. Guardrails filter content, and Provisioned Throughput is a capacity option, not a RAG service.'
+      explanation: 'Bedrock Knowledge Bases manages the entire RAG pipeline — ingesting documents from sources like S3, chunking, generating embeddings, storing them in a vector store, and serving retrieval at query time. Guardrails filter content, Provisioned Throughput is a capacity option, and model cards are documentation; none of them is a RAG service.',
+      sources: [
+        { title: 'Retrieve data and generate AI responses with Amazon Bedrock Knowledge Bases – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html', checked: '2026-11-25' },
+        { title: 'How Amazon Bedrock knowledge bases work – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/kb-how-it-works.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q23',
-      question: 'When creating a Bedrock Knowledge Base and letting AWS create the vector store for you, which service is used by default?',
+      question: 'When creating a Bedrock knowledge base with the "Quick create a new vector store" option, which of these services can Bedrock set up as the vector store for you?',
       options: ['Amazon DynamoDB', 'Amazon RDS for MySQL', 'Amazon OpenSearch Serverless', 'Amazon S3 Glacier'],
       correct: 2,
-      explanation: 'Bedrock Knowledge Bases creates an Amazon OpenSearch Serverless vector index by default (alternatives like Aurora PostgreSQL with pgvector or Pinecone can be configured). DynamoDB and MySQL are not vector stores in this flow, and Glacier is archival storage.'
+      explanation: 'Quick create can set up an Amazon OpenSearch Serverless vector collection and index for you (it can also create Amazon Aurora PostgreSQL Serverless, Amazon Neptune Analytics, or Amazon S3 Vectors stores, and you can instead point to a store you created, such as Pinecone). DynamoDB and MySQL are not vector stores in this flow, and Glacier is archival storage.',
+      sources: [
+        { title: 'Create a knowledge base by connecting to a data source in Amazon Bedrock Knowledge Bases – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-create.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q24',
@@ -218,7 +304,10 @@ export const domain3 = {
         'Shorten the user\'s questions'
       ],
       correct: 1,
-      explanation: 'How documents are split determines what retrieval can return: chunks that are too small or split at bad boundaries lose context, so tuning chunk size, semantic boundaries, and overlap directly improves retrieved passages. Temperature, billing mode, and question length don\'t change what\'s in the index.'
+      explanation: 'How documents are split determines what retrieval can return: chunks that are too small or split at bad boundaries lose context, so tuning chunk size, semantic boundaries, and overlap directly improves retrieved passages. Temperature, billing mode, and question length don\'t change what\'s in the index.',
+      sources: [
+        { title: 'How content chunking works for knowledge bases – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/kb-chunking.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q25',
@@ -230,7 +319,11 @@ export const domain3 = {
         'Model distillation into a smaller booking model'
       ],
       correct: 0,
-      explanation: 'Bedrock Agents break a request into steps, decide which actions to take, and invoke action groups (typically Lambda-backed APIs) to complete tasks, optionally consulting knowledge bases. Knowledge bases alone only retrieve information — they can\'t take actions — and sampling parameters or distillation don\'t add orchestration.'
+      explanation: 'Bedrock Agents break a request into steps, decide which actions to take, and invoke action groups (typically Lambda-backed APIs) to complete tasks, optionally consulting knowledge bases. Knowledge bases alone only retrieve information — they can\'t take actions — and sampling parameters or distillation don\'t add orchestration. Note: Bedrock Agents is now called Bedrock Agents Classic and has been closed to new customers since July 30, 2026; AWS recommends Amazon Bedrock AgentCore for new agents, but the exam may still say Bedrock Agents.',
+      sources: [
+        { title: 'Automate tasks in your application using AI agents – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html', checked: '2026-11-25' },
+        { title: 'Use action groups to define actions for your agent to perform – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/agents-action-create.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q26',
@@ -242,7 +335,10 @@ export const domain3 = {
         'Route all traffic through a single, larger model'
       ],
       correct: 2,
-      explanation: 'Bedrock Guardrails defines content filters, denied topics, word filters, and PII redaction as a reusable policy that applies consistently across different models and applications. Prompt-based rules drift and can be bypassed, per-model fine-tuning is expensive to maintain, and consolidating models doesn\'t itself enforce policy.'
+      explanation: 'Bedrock Guardrails defines content filters, denied topics, word filters, and PII redaction as a reusable policy that applies consistently across different models and applications. Prompt-based rules drift and can be bypassed, per-model fine-tuning is expensive to maintain, and consolidating models doesn\'t itself enforce policy.',
+      sources: [
+        { title: 'Detect and filter harmful content by using Amazon Bedrock Guardrails – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q27',
@@ -254,7 +350,10 @@ export const domain3 = {
         'Screenshots of desired conversations'
       ],
       correct: 0,
-      explanation: 'Fine-tuning is supervised: it needs example inputs paired with desired outputs (prompt-completion pairs, usually JSONL). Raw unlabeled text is used for continued pre-training instead, and embeddings or screenshots are not training formats for fine-tuning.'
+      explanation: 'Fine-tuning is supervised: it needs example inputs paired with desired outputs in .jsonl files (prompt-completion pairs, or system/user/assistant messages for conversational models). Raw unlabeled text is used for continued pre-training instead, and embeddings or screenshots are not training formats for fine-tuning.',
+      sources: [
+        { title: 'Prepare data for fine-tuning your models – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/model-customization-prepare.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q28',
@@ -266,7 +365,11 @@ export const domain3 = {
         'Whenever prompt engineering takes more than a week'
       ],
       correct: 1,
-      explanation: 'Pre-training from scratch costs millions in compute and requires enormous datasets and expertise; prompt engineering, RAG, and fine-tuning cover nearly all business needs at a fraction of the cost. Brand voice is achievable with prompting or fine-tuning, and imperfect RAG calls for retrieval tuning, not a new model.'
+      explanation: 'Pre-training from scratch is expensive: it needs enormous compute, months of data collection and preparation, and deep expertise; prompt engineering, RAG, and fine-tuning cover nearly all business needs at a fraction of the cost. Brand voice is achievable with prompting or fine-tuning, and imperfect RAG calls for retrieval tuning, not a new model.',
+      sources: [
+        { title: 'What is an AI Model? – AWS', url: 'https://aws.amazon.com/what-is/ai-model/', checked: '2026-11-25' },
+        { title: 'GENOPS05-BP01 Learn when to customize models – Generative AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genops05-bp01.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q29',
@@ -278,7 +381,11 @@ export const domain3 = {
         'Remove the system prompt so there is nothing to leak'
       ],
       correct: 1,
-      explanation: 'This is prompt injection. Defenses layer: structurally separating system instructions from user content, input validation/filtering, least-privilege access for connected tools, and guardrails screening inputs and outputs. Bigger context windows and higher randomness don\'t help, and deleting the system prompt removes the app\'s behavior contract without stopping injection.'
+      explanation: 'This is prompt injection. Defenses layer: structurally separating system instructions from user content, input validation/filtering, least-privilege access for connected tools, and guardrails screening inputs and outputs. Bigger context windows and higher randomness don\'t help, and deleting the system prompt removes the app\'s behavior contract without stopping injection.',
+      sources: [
+        { title: 'Prompt injection security – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-injection.html', checked: '2026-11-25' },
+        { title: 'Detect prompt attacks with Amazon Bedrock Guardrails – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-prompt-attack.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q30',
@@ -290,7 +397,11 @@ export const domain3 = {
         'Lowering top-k to 1'
       ],
       correct: 0,
-      explanation: 'Showing the model concrete examples of the desired output format (few-shot prompting) is the most reliable prompt-level fix for format compliance. Max tokens controls length, chain-of-thought improves reasoning rather than formatting, and top-k tweaks sampling without conveying the schema.'
+      explanation: 'Showing the model concrete examples of the desired output format (few-shot prompting) is the most reliable prompt-level fix for format compliance. Max tokens controls length, chain-of-thought improves reasoning rather than formatting, and top-k tweaks sampling without conveying the schema. (Beyond prompting, Bedrock structured outputs can enforce a JSON schema on supported models.)',
+      sources: [
+        { title: 'Prompt engineering concepts – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html', checked: '2026-11-25' },
+        { title: 'Get validated JSON results from models – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/structured-output.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q31',
@@ -302,21 +413,32 @@ export const domain3 = {
         'Asking for a shorter answer'
       ],
       correct: 0,
-      explanation: 'Chain-of-thought prompting makes the model externalize intermediate reasoning, which measurably improves multi-step problem accuracy. Higher temperature adds randomness (worse for math), and fewer examples or shorter answers remove the structure that helps.'
+      explanation: 'Chain-of-thought prompting makes the model externalize intermediate reasoning, which measurably improves multi-step problem accuracy. Higher temperature adds randomness (worse for math), and fewer examples or shorter answers remove the structure that helps.',
+      sources: [
+        { title: 'What is Prompt Engineering? – AWS', url: 'https://aws.amazon.com/what-is/prompt-engineering/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q32',
       question: 'Which metric is the standard automatic measure for evaluating generated summaries against reference summaries?',
       options: ['BLEU', 'ROUGE', 'RMSE', 'Recall@k'],
       correct: 1,
-      explanation: 'ROUGE measures overlap between a generated summary and reference summaries and is the standard summarization metric. BLEU is the analogous metric for machine translation, RMSE evaluates regression, and Recall@k evaluates retrieval/recommendation ranking.'
+      explanation: 'ROUGE measures overlap between a generated summary and reference summaries and is the standard summarization metric. BLEU is the analogous metric for machine translation, RMSE evaluates regression, and Recall@k evaluates retrieval/recommendation ranking.',
+      sources: [
+        { title: 'Evaluating quality and reliability in generated outputs – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-experimenting-quality.html', checked: '2026-11-25' },
+        { title: 'Automatically generate impressions from findings in radiology reports using generative AI on AWS – AWS Machine Learning Blog', url: 'https://aws.amazon.com/blogs/machine-learning/automatically-generate-impressions-from-findings-in-radiology-reports-using-generative-ai-on-aws/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q33',
       question: 'A localization team wants an automatic quality score for machine-translated text against professional reference translations. Which metric applies?',
       options: ['ROUGE', 'F1 score', 'BLEU', 'Perplexity on the training set'],
       correct: 2,
-      explanation: 'BLEU compares n-gram overlap between candidate and reference translations and is the standard automatic translation metric. ROUGE targets summarization, F1 targets classification, and training-set perplexity measures language-model fit, not translation quality.'
+      explanation: 'BLEU compares n-gram overlap between candidate and reference translations and is the standard automatic translation metric. ROUGE targets summarization, F1 targets classification, and training-set perplexity measures language-model fit, not translation quality.',
+      sources: [
+        { title: 'Evaluating quality and reliability in generated outputs – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-experimenting-quality.html', checked: '2026-11-25' },
+        { title: 'Build a multilingual automatic translation pipeline with Amazon Translate Active Custom Translation – AWS Machine Learning Blog', url: 'https://aws.amazon.com/blogs/machine-learning/build-a-multilingual-automatic-translation-pipeline-with-amazon-translate-active-custom-translation/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q34',
@@ -328,7 +450,11 @@ export const domain3 = {
         'AWS requires human review before any model can be deployed'
       ],
       correct: 0,
-      explanation: 'Overlap-based metrics can\'t assess subjective, context-dependent qualities — two very different responses can both be excellent. Human (or carefully designed model-based) evaluation covers what automatic scores miss. It is more expensive, not cheaper, and no such parameter or deployment rules exist.'
+      explanation: 'Overlap-based metrics can\'t assess subjective, context-dependent qualities — two very different responses can both be excellent. Human (or carefully designed model-based) evaluation covers what automatic scores miss. It is more expensive, not cheaper, and no such parameter or deployment rules exist.',
+      sources: [
+        { title: 'Amazon Bedrock FAQs – AWS', url: 'https://aws.amazon.com/bedrock/faqs/', checked: '2026-11-25' },
+        { title: 'Evaluating quality and reliability in generated outputs – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-experimenting-quality.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q35',
@@ -340,7 +466,11 @@ export const domain3 = {
         'SageMaker Ground Truth labeling jobs'
       ],
       correct: 0,
-      explanation: 'Bedrock\'s built-in model evaluation runs automatic evaluations (accuracy, robustness, toxicity, and similar) or human-review workflows over your chosen models and datasets to support selection. CloudTrail is auditing, Provisioned Throughput is capacity, and Ground Truth labels training data.'
+      explanation: 'Bedrock\'s built-in model evaluation runs automatic evaluations (accuracy, robustness, toxicity, and similar), judge-model (LLM-as-a-judge) evaluations, or human-review workflows over your chosen models and datasets to support selection. CloudTrail is auditing, Provisioned Throughput is capacity, and Ground Truth labels training data.',
+      sources: [
+        { title: 'Evaluate the performance of Amazon Bedrock resources – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/evaluation.html', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock FAQs – AWS', url: 'https://aws.amazon.com/bedrock/faqs/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q36',
@@ -352,14 +482,21 @@ export const domain3 = {
         'Double the learning rate to escape the problem'
       ],
       correct: 1,
-      explanation: 'Falling training loss with rising validation loss is the classic overfitting signal — early stopping or fewer epochs preserves generalization. Training longer worsens it, removing validation just blinds you, and doubling the learning rate destabilizes training rather than fixing overfitting.'
+      explanation: 'Falling training loss with rising validation loss is the classic overfitting signal — early stopping or fewer epochs preserves generalization. Training longer worsens it, removing validation just blinds you, and doubling the learning rate destabilizes training rather than fixing overfitting.',
+      sources: [
+        { title: 'What is Overfitting? – AWS', url: 'https://aws.amazon.com/what-is/overfitting/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q37',
       question: 'Which Amazon model family would you use to generate the vector embeddings for a RAG document index on Bedrock?',
       options: ['Amazon Titan Text Embeddings', 'Amazon Polly voices', 'AWS Glue crawlers', 'Amazon Comprehend entities'],
       correct: 0,
-      explanation: 'Titan Text Embeddings models convert text chunks and queries into vectors for similarity search — the embedding step of RAG. Polly synthesizes speech, Glue crawlers catalog data schemas, and Comprehend extracts entities; none produce embeddings for vector search.'
+      explanation: 'Titan Text Embeddings models convert text chunks and queries into vectors for similarity search — the embedding step of RAG. Polly synthesizes speech, Glue crawlers catalog data schemas, and Comprehend extracts entities; none produce embeddings for vector search.',
+      sources: [
+        { title: 'Amazon Titan Text Embeddings models – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html', checked: '2026-11-25' },
+        { title: 'How Amazon Bedrock knowledge bases work – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/kb-how-it-works.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q38',
@@ -371,7 +508,10 @@ export const domain3 = {
         'Increasing the model\'s temperature'
       ],
       correct: 0,
-      explanation: 'Hybrid search blends lexical (keyword) scoring with semantic (vector) scoring, capturing exact identifiers and paraphrased meaning together. Removing part numbers or shrinking embeddings discards signal, and temperature is a generation parameter, not a retrieval one.'
+      explanation: 'Hybrid search blends lexical (keyword) scoring with semantic (vector) scoring, capturing exact identifiers and paraphrased meaning together. Removing part numbers or shrinking embeddings discards signal, and temperature is a generation parameter, not a retrieval one.',
+      sources: [
+        { title: 'Configure and customize queries and response generation – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-config.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q39',
@@ -383,7 +523,10 @@ export const domain3 = {
         'Streaming responses'
       ],
       correct: 0,
-      explanation: 'Attaching metadata (like department) to documents and filtering retrieval on it guarantees only eligible content reaches the prompt. Chunk overlap, reasoning style, and streaming have no access-scoping effect.'
+      explanation: 'Attaching metadata (like department) to documents and filtering retrieval on it guarantees only eligible content reaches the prompt. Chunk overlap, reasoning style, and streaming have no access-scoping effect.',
+      sources: [
+        { title: 'Configure and customize queries and response generation – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/kb-test-config.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q40',
@@ -395,7 +538,11 @@ export const domain3 = {
         'The agent must be fine-tuned on the expense API documentation first'
       ],
       correct: 0,
-      explanation: 'A Bedrock Agent orchestrates both: it consults attached knowledge bases when it needs information and invokes action groups when it needs to act, deciding per step. Knowledge bases are retrieval-only, and neither user-side model switching nor fine-tuning is how tool use is wired.'
+      explanation: 'A Bedrock Agent orchestrates both: it consults attached knowledge bases when it needs information and invokes action groups when it needs to act, deciding per step. Knowledge bases are retrieval-only, and neither user-side model switching nor fine-tuning is how tool use is wired. Note: Bedrock Agents is now called Bedrock Agents Classic and has been closed to new customers since July 30, 2026; AWS recommends Amazon Bedrock AgentCore for new agents, but the exam may still say Bedrock Agents.',
+      sources: [
+        { title: 'Automate tasks in your application using AI agents – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock Agents Classic maintenance mode – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/agents-classic-maintenance-mode.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q41',
@@ -407,7 +554,10 @@ export const domain3 = {
         'A billing feature that charges per function rather than per token'
       ],
       correct: 0,
-      explanation: 'With function calling, developers describe available tools; the model emits a structured invocation (name plus arguments), the application runs it and feeds results back for the model to use. The model never executes code itself — the application stays in control — and it is neither recursion nor a billing construct.'
+      explanation: 'With function calling, developers describe available tools; the model emits a structured invocation (name plus arguments), the application runs it and feeds results back for the model to use. The model never runs the tool itself — your application (or Bedrock, in server-side tool use) runs it — and it is neither recursion nor a billing construct.',
+      sources: [
+        { title: 'Use a tool to complete an Amazon Bedrock model response – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/tool-use.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'd3q42',
@@ -419,7 +569,11 @@ export const domain3 = {
         'Whether billing is on-demand or provisioned'
       ],
       correct: 0,
-      explanation: 'RAG failures split into retrieval problems (the right content never reached the prompt) and generation problems (the model misused good content). Inspecting retrieved chunks first tells you which half to fix — tuning chunking/search versus prompting/model choice. Parameter count, streaming, and billing mode don\'t isolate the fault.'
+      explanation: 'RAG failures split into retrieval problems (the right content never reached the prompt) and generation problems (the model misused good content). Inspecting retrieved chunks first tells you which half to fix — tuning chunking/search versus prompting/model choice. Parameter count, streaming, and billing mode don\'t isolate the fault.',
+      sources: [
+        { title: 'Evaluate the performance of RAG sources using Amazon Bedrock evaluations – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/evaluation-kb.html', checked: '2026-11-25' },
+        { title: 'How Amazon Bedrock knowledge bases work – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/kb-how-it-works.html', checked: '2026-11-25' }
+      ]
     }
   ]
 };
