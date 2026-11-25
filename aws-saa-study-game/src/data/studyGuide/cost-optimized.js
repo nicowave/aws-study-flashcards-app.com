@@ -12,6 +12,11 @@ export const costOptimizedGuide = {
     {
       id: 'costs1',
       title: 'Amazon S3 Storage Classes and Lifecycle',
+      sources: [
+        { title: 'Understanding and managing Amazon S3 storage classes – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html', checked: '2026-11-25' },
+        { title: 'How S3 Intelligent-Tiering works – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/intelligent-tiering-overview.html', checked: '2026-11-25' },
+        { title: 'Understanding archive retrieval options – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/restoring-objects-retrieval-options.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'S3 cost questions are about matching a storage class to how often data is read, how fast it must come back, and how long it lives. Cheaper storage classes trade a lower per-GB price for retrieval fees, minimum storage durations, slower access, or less resilience. The right answer is the cheapest class that still meets every stated constraint.' },
         { type: 'table', headers: ['Storage class', 'Best for', 'Retrieval', 'Minimum duration', 'AZs'], rows: [
@@ -22,7 +27,7 @@ export const costOptimizedGuide = {
           ['S3 Glacier Instant Retrieval', 'Archive read about once a quarter, needs ms access', 'Milliseconds, higher per-GB fee', '90 days', '3 or more'],
           ['S3 Glacier Flexible Retrieval', 'Archive, minutes to hours acceptable', 'Expedited 1-5 min, Standard 3-5 h, Bulk 5-12 h', '90 days', '3 or more'],
           ['S3 Glacier Deep Archive', 'Long-term retention, rarely or never read', 'Standard within 12 h, Bulk within 48 h', '180 days', '3 or more'],
-          ['S3 Express One Zone', 'Latency-sensitive, request-heavy workloads in one AZ', 'Consistent single-digit ms', 'N/A (higher per-GB price, lower request prices)', '1 (directory buckets)']
+          ['S3 Express One Zone', 'Latency-sensitive, request-heavy workloads in one AZ', 'Consistent single-digit ms', 'None (higher per-GB price, lower request prices)', '1 (directory buckets)']
         ]},
         { type: 'keyTerm', term: 'Minimum storage duration', definition: 'An object deleted, overwritten or transitioned before the minimum is still billed for the remaining days. Short-lived data belongs in S3 Standard even if it is rarely read.' },
         { type: 'keyTerm', term: 'Minimum billable object size', definition: 'Standard-IA, One Zone-IA and Glacier Instant Retrieval bill each object as at least 128 KB, so millions of tiny objects can cost more in an IA class than in Standard.' },
@@ -39,6 +44,11 @@ export const costOptimizedGuide = {
     {
       id: 'costs2',
       title: 'Block and File Storage Costs',
+      sources: [
+        { title: 'Amazon EBS General Purpose SSD volumes – Amazon EBS', url: 'https://docs.aws.amazon.com/ebs/latest/userguide/general-purpose.html', checked: '2026-11-25' },
+        { title: 'Archive Amazon EBS snapshots – Amazon EBS', url: 'https://docs.aws.amazon.com/ebs/latest/userguide/snapshot-archive.html', checked: '2026-11-25' },
+        { title: 'Managing storage lifecycle – Amazon Elastic File System', url: 'https://docs.aws.amazon.com/efs/latest/ug/lifecycle-management-efs.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'EBS and EFS bills are driven by provisioned or stored capacity, so savings come from choosing the right volume type, deleting what is unused, and moving cold data to cheaper tiers. You pay for provisioned EBS capacity whether or not the space is used.' },
         { type: 'comparison', title: 'gp2 vs gp3 General Purpose SSD', items: [
@@ -67,6 +77,11 @@ export const costOptimizedGuide = {
     {
       id: 'costs3',
       title: 'Compute Purchasing Options and Right-Sizing',
+      sources: [
+        { title: 'Savings Plans types – Savings Plans', url: 'https://docs.aws.amazon.com/savingsplans/latest/userguide/plan-types.html', checked: '2026-11-25' },
+        { title: 'Amazon EC2 Reserved Instances – Amazon EC2 Pricing', url: 'https://aws.amazon.com/ec2/pricing/reserved-instances/', checked: '2026-11-25' },
+        { title: 'Amazon EC2 Dedicated Hosts – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/dedicated-hosts-overview.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'The exam expects you to match a purchase model to the shape of the workload: steady baseline, predictable peaks, interruptible batch, or licensing constraints. Most real designs combine them, for example a Savings Plan for the baseline, On-Demand for peaks and Spot for fault-tolerant work.' },
         { type: 'table', headers: ['Option', 'Discount vs On-Demand', 'Commitment', 'Use when'], rows: [
@@ -80,7 +95,7 @@ export const costOptimizedGuide = {
         ]},
         { type: 'comparison', title: 'Savings Plans vs Reserved Instances', items: [
           { label: 'Savings Plans', description: 'Commit to a dollar amount per hour. Discounts apply automatically to matching usage; Compute Savings Plans follow you across families, Regions, Fargate and Lambda. Usually the preferred modern answer for EC2.' },
-          { label: 'Reserved Instances', description: 'Commit to an instance configuration. Still required for some services (RDS, ElastiCache, OpenSearch and Redshift use reservations of their own), and zonal RIs also reserve capacity in an AZ.' }
+          { label: 'Reserved Instances', description: 'Commit to an instance configuration. RDS, ElastiCache, OpenSearch and Redshift have reservations of their own (Database Savings Plans, up to 35% off for a 1-year term, now also cover RDS, Aurora, DynamoDB, ElastiCache, OpenSearch and other database services), and zonal RIs also reserve capacity in an AZ.' }
         ]},
         { type: 'bulletList', title: 'Spot Instances done right:', items: [
           'EC2 gives a two-minute interruption notice through instance metadata and EventBridge; a rebalance recommendation may arrive earlier.',
@@ -89,7 +104,7 @@ export const costOptimizedGuide = {
           'Design work to checkpoint or be stateless; never rely on Spot for a single critical stateful server.'
         ]},
         { type: 'keyTerm', term: 'Dedicated Hosts vs Dedicated Instances', definition: 'Both run on hardware dedicated to your account. Only Dedicated Hosts expose sockets and cores and let you pin instances to a specific host, which per-core or per-socket licensing requires. Dedicated Instances are simpler and billed per instance.' },
-        { type: 'awsService', name: 'AWS Compute Optimizer', description: 'Uses machine learning on CloudWatch utilization history to recommend right-sized EC2 instances and Auto Scaling groups, EBS volume types, Lambda memory and ECS on Fargate task sizes, including Graviton alternatives.' },
+        { type: 'awsService', name: 'AWS Compute Optimizer', description: 'Analyzes CloudWatch utilization history (the last 14 days by default) to recommend right-sized EC2 instances and Auto Scaling groups, EBS volume types, Lambda memory and ECS on Fargate task sizes, including Graviton alternatives.' },
         { type: 'comparison', title: 'Lambda vs Fargate vs EC2 on cost', items: [
           { label: 'AWS Lambda', description: 'Pay per request and per GB-second, nothing when idle. Cheapest for spiky, event-driven or low-volume workloads; becomes expensive at constant high volume.' },
           { label: 'AWS Fargate', description: 'Pay per second for the vCPU and memory of running tasks with no servers to manage. Fargate Spot discounts interruptible tasks, and Compute Savings Plans apply.' },
@@ -107,10 +122,15 @@ export const costOptimizedGuide = {
     {
       id: 'costs4',
       title: 'Cost-Optimized Databases',
+      sources: [
+        { title: 'Amazon Aurora storage – Amazon Aurora', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.StorageReliability.html', checked: '2026-11-25' },
+        { title: 'Stopping an Amazon RDS DB instance temporarily – Amazon Relational Database Service', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html', checked: '2026-11-25' },
+        { title: 'Savings Plans types – Savings Plans', url: 'https://docs.aws.amazon.com/savingsplans/latest/userguide/plan-types.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Database cost depends on whether load is steady or variable, how much is spent on I/O versus compute and storage, and whether repeated reads can be served from a cache instead of more database instances.' },
         { type: 'table', headers: ['Situation', 'Most cost-effective choice'], rows: [
-          ['RDS or Aurora running 24/7 for 1-3 years', 'Database Reserved Instances'],
+          ['RDS or Aurora running 24/7 for 1-3 years', 'Database Reserved Instances (or a Database Savings Plan for flexibility across engines and Regions)'],
           ['Aurora with variable, intermittent or unpredictable load', 'Aurora Serverless v2 (ACUs scale automatically, billed per second)'],
           ['Aurora where I/O is more than about 25% of the spend', 'Aurora I/O-Optimized storage configuration'],
           ['Dev or test databases used only in working hours', 'Scheduled stop and start (auto restart after 7 days)'],
@@ -133,12 +153,17 @@ export const costOptimizedGuide = {
           'Redshift RA3 separates compute from managed storage, so you size nodes for compute; Redshift Serverless bills only while queries run.',
           'Use the Multi-AZ setting for production only; dev and test rarely need a standby.'
         ]},
-        { type: 'examTip', text: 'Compute Savings Plans never cover RDS or Aurora; database discounts come from Reserved Instances for those engines. If a question mentions I/O charges as a large share of Aurora cost, the answer is I/O-Optimized, not more replicas.' }
+        { type: 'examTip', text: 'Compute Savings Plans never cover RDS or Aurora; database discounts come from Reserved Instances or the separate Database Savings Plans (up to 35% off, 1-year term). If a question mentions I/O charges as a large share of Aurora cost, the answer is I/O-Optimized, not more replicas.' }
       ]
     },
     {
       id: 'costs5',
       title: 'Cost-Optimized Networking and Data Transfer',
+      sources: [
+        { title: 'EC2 On-Demand Instance Pricing', url: 'https://aws.amazon.com/ec2/pricing/on-demand/', checked: '2026-11-25' },
+        { title: 'Gateway endpoints – Amazon Virtual Private Cloud', url: 'https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html', checked: '2026-11-25' },
+        { title: 'Amazon VPC Pricing', url: 'https://aws.amazon.com/vpc/pricing/', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Data transfer is the most overlooked line on an AWS bill. The exam tests whether you know which paths are free, which are billed, and which managed network components add per-GB processing charges on top of transfer.' },
         { type: 'table', headers: ['Traffic path', 'Charge'], rows: [
@@ -174,6 +199,11 @@ export const costOptimizedGuide = {
     {
       id: 'costs6',
       title: 'Cost Management and Governance Tools',
+      sources: [
+        { title: 'Configuring budget actions – AWS Cost Management', url: 'https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-controls.html', checked: '2026-11-25' },
+        { title: 'Detecting unusual spend with AWS Cost Anomaly Detection – AWS Cost Management', url: 'https://docs.aws.amazon.com/cost-management/latest/userguide/manage-ad.html', checked: '2026-11-25' },
+        { title: 'What is AWS Data Exports? – AWS Data Exports', url: 'https://docs.aws.amazon.com/cur/latest/userguide/what-is-data-exports.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Expect questions that describe a cost management need and ask which tool fits. Separate estimating, analyzing, alerting, enforcing and exporting: each has its own service.' },
         { type: 'table', headers: ['Need', 'Tool'], rows: [
@@ -197,7 +227,7 @@ export const costOptimizedGuide = {
           'Turn on Cost Anomaly Detection for unexpected spikes.',
           'Right-size with Compute Optimizer and remove idle resources flagged by Trusted Advisor.',
           'Commit to Savings Plans or Reserved Instances for the remaining steady baseline using Cost Explorer recommendations.',
-          'Export CUR 2.0 data to S3 for detailed chargeback reporting with Athena or QuickSight.'
+          'Export CUR 2.0 data to S3 for detailed chargeback reporting with Athena or AWS Quick Sight (formerly Amazon QuickSight).'
         ]},
         { type: 'examTip', text: 'Budgets and billing alarms are threshold based; Cost Anomaly Detection is pattern based. Only Budgets actions enforce anything automatically. "Before deployment" means Pricing Calculator, and "query billing data with SQL" means the Cost and Usage Report with Athena.' }
       ]
