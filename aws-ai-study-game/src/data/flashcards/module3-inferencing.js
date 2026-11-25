@@ -1,5 +1,6 @@
 // Module 3: Inferencing - Using Trained Models
 // Source: AWS Skill Builder - Certified AI Practitioner Course #1
+// Sources: official AWS documentation, linked on each card
 // Includes visual diagram references for enhanced learning
 
 export const module3 = {
@@ -9,7 +10,7 @@ export const module3 = {
   icon: '⚡',
   color: '#a78bfa',
   gradient: 'linear-gradient(135deg, #9370DB 0%, #7B68EE 100%)',
-  source: 'AWS Skill Builder - Certified AI Practitioner Course #1',
+  source: 'Official AWS documentation (linked on each card)',
   cards: [
     {
       id: 'm3c1',
@@ -18,6 +19,10 @@ export const module3 = {
       hint: 'Training = learning, Inferencing = applying what was learned',
       tags: ['inference', 'core-concept'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Overview of machine learning with Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-mlconcepts.html', checked: '2026-11-25' },
+        { title: 'Content Domain 1: Fundamentals of AI and ML – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain1.html', checked: '2026-11-25' }
+      ],
       hasVisual: true,
       visualType: 'ml-pipeline'
     },
@@ -28,25 +33,36 @@ export const module3 = {
       hint: 'Data → Algorithm → Model',
       tags: ['ml-pipeline', 'training', 'visual'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Overview of machine learning with Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-mlconcepts.html', checked: '2026-11-25' }
+      ],
       hasVisual: true,
       visualType: 'training-pipeline'
     },
     {
       id: 'm3c3',
       front: 'What are the 2 main types of inferencing?',
-      back: '1. BATCH Inferencing\n   • Processes large amounts of data at once\n   • Results delivered as a set\n   • Speed less critical than accuracy\n\n2. REAL-TIME Inferencing\n   • Processes data immediately as it arrives\n   • Decisions made almost instantaneously\n   • Speed is critical',
+      back: '1. BATCH Inferencing\n   • Processes large amounts of data at once\n   • Results delivered as a set\n   • Speed (latency) is not critical\n\n2. REAL-TIME Inferencing\n   • Processes data immediately as it arrives\n   • Decisions made almost instantaneously\n   • Speed is critical\n\nThe exam guide also lists ASYNCHRONOUS (queued requests, large payloads, long processing) and SERVERLESS (intermittent traffic, pay only for use) inference.',
       hint: 'Batch = bulk/later, Real-time = immediate',
       tags: ['inference', 'deployment'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Inference options in Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model-options.html', checked: '2026-11-25' },
+        { title: 'Content Domain 1: Fundamentals of AI and ML – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain1.html', checked: '2026-11-25' }
+      ],
       hasVisual: false
     },
     {
       id: 'm3c4',
       front: 'What is BATCH Inferencing?',
-      back: 'When the computer takes a LARGE AMOUNT of data (images, text, etc.) and analyzes it ALL AT ONCE to provide a set of results.\n\nKey characteristics:\n• Not time-sensitive\n• Accuracy prioritized over speed\n• Processes data in bulk\n\nUse cases: Data analysis, report generation, bulk predictions',
+      back: 'When the computer takes a LARGE AMOUNT of data (images, text, etc.) and analyzes it ALL AT ONCE to provide a set of results.\n\nKey characteristics:\n• Not time-sensitive\n• Throughput and cost matter more than speed (course material may say "accuracy over speed")\n• Processes data in bulk, no persistent endpoint needed\n\nUse cases: Data analysis, report generation, bulk predictions',
       hint: 'Think: overnight batch jobs, bulk processing',
       tags: ['inference', 'batch'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Batch transform for inference with Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/batch-transform.html', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock Pricing', url: 'https://aws.amazon.com/bedrock/pricing/', checked: '2026-11-25' }
+      ],
       hasVisual: false
     },
     {
@@ -56,6 +72,10 @@ export const module3 = {
       hint: 'Think: instant responses, live predictions',
       tags: ['inference', 'real-time'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Real-time inference – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html', checked: '2026-11-25' },
+        { title: 'Inference options in Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model-options.html', checked: '2026-11-25' }
+      ],
       hasVisual: false
     },
     {
@@ -65,6 +85,10 @@ export const module3 = {
       hint: 'When you can wait for results',
       tags: ['inference', 'batch', 'use-cases'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Batch transform for inference with Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/batch-transform.html', checked: '2026-11-25' },
+        { title: 'Process multiple prompts with batch inference – Amazon Bedrock User Guide', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/batch-inference.html', checked: '2026-11-25' }
+      ],
       hasVisual: false
     },
     {
@@ -74,15 +98,23 @@ export const module3 = {
       hint: 'When delays could cause problems',
       tags: ['inference', 'real-time', 'use-cases'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Real-time inference – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html', checked: '2026-11-25' },
+        { title: 'Inference options in Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model-options.html', checked: '2026-11-25' }
+      ],
       hasVisual: false
     },
     {
       id: 'm3c8',
       front: 'EXAM SCENARIO:\n\nA company wants to analyze customer purchase history overnight to predict next month\'s inventory needs.\n\nWhich inferencing type?',
-      back: 'BATCH Inferencing ✓\n\nWhy?\n• "Overnight" = not time-sensitive\n• "Purchase history" = large dataset to analyze\n• "Next month" = results don\'t need to be immediate\n• Accuracy of predictions matters more than speed',
+      back: 'BATCH Inferencing ✓\n\nWhy?\n• "Overnight" = not time-sensitive\n• "Purchase history" = large dataset to analyze\n• "Next month" = results don\'t need to be immediate\n• Low latency isn\'t needed, so a lower-cost batch job fits',
       hint: 'Look for time-sensitivity clues',
       tags: ['inference', 'exam-tip', 'scenario'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Inference options in Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model-options.html', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock Pricing', url: 'https://aws.amazon.com/bedrock/pricing/', checked: '2026-11-25' }
+      ],
       hasVisual: false
     },
     {
@@ -92,15 +124,22 @@ export const module3 = {
       hint: 'Transaction approval = instant decision',
       tags: ['inference', 'exam-tip', 'scenario'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Real-time inference – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html', checked: '2026-11-25' }
+      ],
       hasVisual: false
     },
     {
       id: 'm3c10',
       front: 'What determines which inferencing type to use?',
-      back: 'YOUR USE CASE determines the inferencing type:\n\nChoose BATCH when:\n• Time is flexible\n• Processing large datasets\n• Accuracy > Speed\n• Scheduled/periodic tasks\n\nChoose REAL-TIME when:\n• Immediate response required\n• User is waiting\n• Safety-critical decisions\n• Continuous data streams',
+      back: 'YOUR USE CASE determines the inferencing type:\n\nChoose BATCH when:\n• Time is flexible\n• Processing large datasets\n• Latency is not critical\n• Scheduled/periodic tasks\n\nChoose REAL-TIME when:\n• Immediate response required\n• User is waiting\n• Safety-critical decisions\n• Continuous data streams',
       hint: 'Match the solution to the problem\'s timing needs',
       tags: ['inference', 'decision-making', 'exam-tip'],
       difficulty: 'intermediate',
+      sources: [
+        { title: 'Inference options in Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model-options.html', checked: '2026-11-25' },
+        { title: 'Content Domain 1: Fundamentals of AI and ML – AWS Certified AI Practitioner exam guide', url: 'https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01/ai-practitioner-01-domain1.html', checked: '2026-11-25' }
+      ],
       hasVisual: false
     },
     {
@@ -110,6 +149,9 @@ export const module3 = {
       hint: 'What processes the data to create the model?',
       tags: ['ml-pipeline', 'training', 'visual'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Overview of machine learning with Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-mlconcepts.html', checked: '2026-11-25' }
+      ],
       hasVisual: true,
       visualType: 'training-pipeline'
     },
@@ -120,6 +162,10 @@ export const module3 = {
       hint: 'The model is now ready to be USED',
       tags: ['ml-pipeline', 'inference', 'lifecycle'],
       difficulty: 'beginner',
+      sources: [
+        { title: 'Well-Architected machine learning lifecycle – Machine Learning Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/machine-learning-lifecycle.html', checked: '2026-11-25' },
+        { title: 'Overview of machine learning with Amazon SageMaker AI – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-mlconcepts.html', checked: '2026-11-25' }
+      ],
       hasVisual: false
     }
   ]
@@ -143,7 +189,7 @@ export const moduleVisuals = {
       { 
         label: 'Batch', 
         icon: '📦', 
-        characteristics: ['Large datasets', 'Scheduled', 'Accuracy focus'],
+        characteristics: ['Large datasets', 'Scheduled', 'Latency not critical'],
         examples: ['Reports', 'Bulk analysis']
       },
       { 
