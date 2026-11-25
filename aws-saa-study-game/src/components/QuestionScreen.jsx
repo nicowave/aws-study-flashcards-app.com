@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowLeftIcon, ArrowRightIcon, FlameIcon, TargetIcon } from './Icons';
+import SourceLinks from './SourceLinks';
 
 const QuestionScreen = ({
   domain,
@@ -104,6 +105,7 @@ const QuestionScreen = ({
           <div className="explanation-box">
             <h4>Explanation</h4>
             <p>{question.explanation}</p>
+            <SourceLinks sources={question.sources} />
           </div>
         )}
 
