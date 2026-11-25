@@ -23,8 +23,9 @@ const makeParser = (runLang, lang = 'en') => {
   const marked = new Marked({ gfm: true, breaks: false });
   marked.use({
     renderer: {
-      code({ text, lang }) {
-        const language = (lang || '').trim();
+      // `fence` is the code block's word (```bash); `lang` stays the interface language
+      code({ text, lang: fence }) {
+        const language = (fence || '').trim();
         const label = LABELS[language] ?? language;
         const run = runLang && RUNNABLE[runLang].includes(language)
           ? `<button type="button" class="code-btn run-code" data-code="${escapeHtml(text)}">${translate(lang, 'code.run')}</button>`

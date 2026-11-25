@@ -12,6 +12,17 @@ describe('rewrite checks', () => {
     expect(hasTerm('pull   request', ['pull request'])).toBe(true);
   });
 
+  it('accepts curly apostrophes, hyphen or space variants, and * on any word', () => {
+    expect(hasTerm('We can’t create orders', ["can't create"])).toBe(true);
+    expect(hasTerm('one trade off', ['trade-off*'])).toBe(true);
+    expect(hasTerm('the tradeoffs', ['trade-off*'])).toBe(true);
+    expect(hasTerm('we roll out today', ['roll-out*'])).toBe(true);
+    expect(hasTerm('Blocking writes for an hour', ['block* writes'])).toBe(true);
+    expect(hasTerm('disabled   writes', ['disable* writes'])).toBe(true);
+    expect(hasTerm('unblock writes', ['block* writes'])).toBe(false);
+    expect(hasTerm('3.4 GB', ['3.4'])).toBe(true);
+  });
+
   it('counts words in both languages', () => {
     expect(countWords('Fusioné la rama y la desplegué en producción.')).toBe(8);
     expect(countWords('  ')).toBe(0);
