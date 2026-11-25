@@ -290,7 +290,7 @@ export const domain1 = {
       question: 'A team has 100,000 unlabeled product images and needs high-quality labels to train a classifier. Which AWS service manages human labeling workflows, including workforce options and automated labeling?',
       options: ['Amazon Rekognition', 'SageMaker Ground Truth', 'Amazon Textract', 'SageMaker Model Monitor'],
       correct: 1,
-      explanation: 'SageMaker Ground Truth manages data-labeling jobs with human workforces (a vendor workforce from AWS Marketplace or your own private team) and its automated data labeling can label part of the data to cut cost and time. Rekognition analyzes images with pre-trained models but doesn\'t create training labels, Textract extracts document text, and Model Monitor watches production models.',
+      explanation: 'SageMaker Ground Truth manages data-labeling jobs with human workforces (a vendor workforce from AWS Marketplace or your own private team) and its automated data labeling can label part of the data to cut cost and time. Rekognition analyzes images with pre-trained models but doesn\'t create training labels, Textract extracts document text, and Model Monitor watches production models. Note: Ground Truth is no longer open to new customers; existing customers can keep using it, and exam questions may still name it.',
       sources: [
         { title: 'Training data labeling using humans with Amazon SageMaker Ground Truth – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/sms.html', checked: '2026-11-25' },
         { title: 'Automate data labeling – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/sms-automated-labeling.html', checked: '2026-11-25' }

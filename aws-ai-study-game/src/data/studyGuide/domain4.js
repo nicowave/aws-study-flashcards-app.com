@@ -10,6 +10,11 @@ export const domain4Guide = {
     {
       id: 'd4s1',
       title: 'AI Bias and Fairness',
+      sources: [
+        { title: 'What Is AI Bias? – AWS', url: 'https://aws.amazon.com/what-is/ai-bias/', checked: '2026-11-25' },
+        { title: 'MLREL03-BP04 Establish data bias detection and mitigation – Machine Learning Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlrel03-bp04.html', checked: '2026-11-25' },
+        { title: 'Pre-training Data Bias – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-detect-data-bias.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Bias in AI systems occurs when model outputs systematically favor or disadvantage particular groups. Bias can enter at any stage of the machine learning pipeline — from data collection and labeling to model training and deployment. Identifying and mitigating bias is a core responsibility when building AI systems, and the exam tests your ability to recognize different bias types and their origins.' },
         { type: 'keyTerm', term: 'Selection Bias', definition: 'Occurs when the training data is not representative of the real-world population the model will serve. For example, training a hiring model only on data from one geographic region creates selection bias because it does not reflect the diversity of the full applicant pool.' },
@@ -28,7 +33,7 @@ export const domain4Guide = {
         { type: 'bulletList', title: 'Bias Detection Strategies:', items: [
           'Analyze training data distributions across demographic groups before training',
           'Compute fairness metrics (demographic parity, equalized odds, disparate impact ratio) after training',
-          'Use AWS SageMaker Clarify to detect pre-training and post-training bias automatically',
+          'Use Amazon SageMaker Clarify to detect pre-training and post-training bias automatically (Clarify is no longer open to new customers; the same standard bias metrics can be computed in your own code)',
           'Perform disaggregated evaluation — measure model performance separately for each subgroup',
           'Conduct adversarial testing with edge cases and underrepresented scenarios',
           'Establish continuous monitoring for bias drift after deployment'
@@ -39,6 +44,11 @@ export const domain4Guide = {
     {
       id: 'd4s2',
       title: 'Model Explainability and Interpretability',
+      sources: [
+        { title: 'What is Explainable AI? – AWS', url: 'https://aws.amazon.com/what-is/explainable-ai/', checked: '2026-11-25' },
+        { title: 'RAISP02-BP07 Incorporate explainability mechanisms into the core AI system – Responsible AI Lens', url: 'https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raisp02-bp07.html', checked: '2026-11-25' },
+        { title: 'Model Explainability – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-model-explainability.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'As AI models are used in more consequential decisions, stakeholders need to understand why a model produces a specific prediction. Explainability and interpretability are related but distinct concepts that address this need. Both are critical for building trust, meeting regulatory requirements, and debugging model behavior.' },
         { type: 'comparison', title: 'Interpretability vs. Explainability', items: [
@@ -69,10 +79,15 @@ export const domain4Guide = {
     {
       id: 'd4s3',
       title: 'Amazon Bedrock Guardrails',
+      sources: [
+        { title: 'Detect and filter harmful content by using Amazon Bedrock Guardrails – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html', checked: '2026-11-25' },
+        { title: 'How Amazon Bedrock Guardrails works – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-how.html', checked: '2026-11-25' },
+        { title: 'Block harmful words and conversations with content filters – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-content-filters.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Amazon Bedrock Guardrails provide configurable safeguards that wrap around foundation model (FM) invocations to enforce responsible AI policies. Guardrails evaluate both user inputs and model outputs, blocking or filtering content that violates your defined policies. They are the primary AWS mechanism for implementing content safety controls on generative AI applications.' },
         { type: 'awsService', name: 'Amazon Bedrock Guardrails', description: 'A feature of Amazon Bedrock that lets you define and enforce content policies for your generative AI applications. Guardrails sit between the user and the foundation model, filtering both inputs and outputs. You can create multiple guardrails with different configurations and apply them to different use cases within the same application.' },
-        { type: 'keyTerm', term: 'Content Filtering', definition: 'Guardrails can filter harmful content across categories such as hate speech, insults, sexual content, violence, and misconduct. Each category can be configured with adjustable strength levels (none, low, medium, high) independently for both inputs and outputs.' },
+        { type: 'keyTerm', term: 'Content Filtering', definition: 'Guardrails can filter harmful text and image content across the categories hate, insults, sexual, violence, and misconduct, plus a prompt attack filter for user prompts. Each category can be configured with adjustable strength levels (none, low, medium, high) independently for both inputs and outputs.' },
         { type: 'keyTerm', term: 'Denied Topics', definition: 'Custom topics that you define as off-limits for your application. You provide a natural language description of each denied topic, and the guardrail blocks any user inputs or model responses that touch on those subjects. For example, a customer service chatbot could deny topics related to competitor comparisons or investment advice.' },
         { type: 'keyTerm', term: 'Word Filters', definition: 'Exact word or phrase blocklists that prevent specific terms from appearing in inputs or outputs. Also includes a managed profanity filter. Useful for blocking brand-specific terms, competitor names, or inappropriate language.' },
         { type: 'keyTerm', term: 'Sensitive Information Filters (PII)', definition: 'Guardrails can detect and handle personally identifiable information (PII) such as names, email addresses, phone numbers, social security numbers, and credit card numbers. PII can be either blocked entirely or redacted (masked) in the output, depending on configuration.' },
@@ -100,11 +115,16 @@ export const domain4Guide = {
     {
       id: 'd4s4',
       title: 'Amazon SageMaker Clarify',
+      sources: [
+        { title: 'Pre-training Bias Metrics – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-measure-data-bias.html', checked: '2026-11-25' },
+        { title: 'Post-training Data and Model Bias Metrics – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-measure-post-training-bias.html', checked: '2026-11-25' },
+        { title: 'Clarify availability change – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-availability-change.html', checked: '2026-11-25' }
+      ],
       content: [
-        { type: 'paragraph', text: 'Amazon SageMaker Clarify is a purpose-built tool for detecting bias in ML datasets and models, and for providing feature-level explanations of model predictions. It integrates directly into the SageMaker ML workflow and can be used during data preparation, after training, and during production monitoring.' },
+        { type: 'paragraph', text: 'Amazon SageMaker Clarify is a purpose-built tool for detecting bias in ML datasets and models, and for providing feature-level explanations of model predictions. It integrates directly into the SageMaker AI ML workflow and can be used during data preparation, after training, and during production monitoring. Note: SageMaker Clarify is no longer open to new customers. Existing customers can keep using it, but AWS plans no new features. AWS now points new projects to the open-source SHAP library and standard bias-metric formulas for classic ML, and to Amazon Bedrock Evaluations and Guardrails for foundation models. The exam may still name Clarify.' },
         { type: 'awsService', name: 'Amazon SageMaker Clarify', description: 'Detects potential bias in data and ML models, and provides explanations for model predictions using SHAP values. Works across the ML lifecycle — pre-training (data analysis), post-training (model evaluation), and in production (monitoring for bias drift). Integrates with SageMaker Pipelines, Studio, and Model Monitor.' },
         { type: 'keyTerm', term: 'Pre-Training Bias Detection', definition: 'Analyzes the raw training data before any model is built. Identifies imbalances and potential sources of bias in the dataset by computing metrics like Class Imbalance (CI), Difference in Proportions of Labels (DPL), and Kullback-Leibler Divergence (KL). Helps you fix data issues before they propagate into the model.' },
-        { type: 'keyTerm', term: 'Post-Training Bias Detection', definition: 'Evaluates the trained model\'s predictions for bias by comparing outcomes across different groups. Uses metrics like Disparate Impact (DI), Difference in Conditional Acceptance (DCA), and Treatment Equality (TE). Reveals whether the model treats different groups fairly in its predictions.' },
+        { type: 'keyTerm', term: 'Post-Training Bias Detection', definition: 'Evaluates the trained model\'s predictions for bias by comparing outcomes across different groups. Uses metrics like Disparate Impact (DI), Difference in Conditional Acceptance (DCAcc), and Treatment Equality (TE). Reveals whether the model treats different groups fairly in its predictions.' },
         { type: 'comparison', title: 'Pre-Training vs. Post-Training Bias Detection', items: [
           { label: 'Pre-Training Bias Detection', description: 'Examines the data before model training. Answers the question: "Is the training data fair and representative?" Catches issues like underrepresentation, label imbalance, and distribution differences across groups. Does not require a trained model.' },
           { label: 'Post-Training Bias Detection', description: 'Examines the model\'s predictions after training. Answers the question: "Does the trained model produce fair outcomes?" A model can introduce or amplify bias even when trained on relatively balanced data, so post-training checks are essential.' }
@@ -114,8 +134,8 @@ export const domain4Guide = {
           'Class Imbalance (CI) — Measures whether one group has significantly more or fewer samples than another',
           'Difference in Proportions of Labels (DPL) — Compares the proportion of positive outcomes between groups in the training data',
           'Disparate Impact (DI) — Ratio of positive outcome rates between groups in model predictions; a value far from 1.0 suggests bias',
-          'Difference in Conditional Acceptance (DCA) — Compares acceptance rates between groups for individuals the model predicts as positive',
-          'Counterfactual Fliptest (FT) — Checks whether changing a sensitive attribute (e.g., gender) flips the model prediction'
+          'Difference in Conditional Acceptance (DCAcc) — Compares the observed labels with the labels the model predicted, and checks whether this is the same across groups for predicted positive outcomes (acceptances)',
+          'Counterfactual Fliptest (FT) — For each member of the disfavored group, checks whether similar members of the favored group get a different model prediction'
         ]},
         { type: 'numberedList', title: 'SageMaker Clarify Integration Points:', items: [
           'SageMaker Data Wrangler — Run pre-training bias analysis as part of data preparation.',
@@ -130,6 +150,11 @@ export const domain4Guide = {
     {
       id: 'd4s5',
       title: 'Human-in-the-Loop and Amazon A2I',
+      sources: [
+        { title: 'Using Amazon Augmented AI for Human Review – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/a2i-use-augmented-ai-a2i-human-review-loops.html', checked: '2026-11-25' },
+        { title: 'Core Components of Amazon A2I – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/a2i-getting-started-core-components.html', checked: '2026-11-25' },
+        { title: 'Amazon A2I features – AWS', url: 'https://aws.amazon.com/augmented-ai/features/', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Human-in-the-loop (HITL) refers to the practice of incorporating human judgment into AI workflows, particularly at points where automated decisions could have significant consequences or where model confidence is low. Rather than fully automating every decision, HITL systems route certain predictions to human reviewers for validation, correction, or override.' },
         { type: 'keyTerm', term: 'Human-in-the-Loop (HITL)', definition: 'A design pattern where humans are integrated into the AI decision-making process. Humans review, validate, or correct AI predictions before they are acted upon. This is essential for maintaining accuracy, accountability, and fairness in high-stakes or ambiguous situations.' },
@@ -141,7 +166,7 @@ export const domain4Guide = {
           'Model improvement — human feedback on edge cases and errors feeds back into the training process, improving the model over time',
           'New deployment — during initial rollout of an AI system, human review catches errors before the model is trusted to operate autonomously'
         ]},
-        { type: 'awsService', name: 'Amazon Augmented AI (Amazon A2I)', description: 'A managed service that makes it easy to build human review workflows for ML predictions. A2I lets you define conditions that trigger human review (e.g., confidence thresholds), route predictions to human reviewers (private teams, AWS Marketplace vendors, or Amazon Mechanical Turk), and collect structured feedback. Integrates directly with Amazon Rekognition, Amazon Textract, and any custom ML model.' },
+        { type: 'awsService', name: 'Amazon Augmented AI (Amazon A2I)', description: 'A managed service that makes it easy to build human review workflows for ML predictions. A2I lets you define conditions that trigger human review (e.g., confidence thresholds), route predictions to human reviewers (private teams, AWS Marketplace vendors, or Amazon Mechanical Turk), and collect structured feedback. Integrates directly with Amazon Rekognition, Amazon Textract, and any custom ML model. Note: Amazon A2I is no longer open to new customers; existing customers can keep using it, but AWS plans no new features.' },
         { type: 'numberedList', title: 'Amazon A2I Workflow Components:', items: [
           'Worker Task Template — Defines the UI that human reviewers see, including the data to review and the response options available.',
           'Flow Definition — Specifies the conditions that trigger human review (e.g., confidence score below 0.90) and which workforce should perform the review.',
@@ -155,7 +180,7 @@ export const domain4Guide = {
         ]},
         { type: 'table', headers: ['A2I Integration', 'Use Case', 'Default Trigger'], rows: [
           ['Amazon Rekognition', 'Content moderation — review flagged images', 'Confidence below threshold for unsafe content'],
-          ['Amazon Textract', 'Document processing — review low-confidence extractions', 'Confidence below threshold for key-value pairs or tables'],
+          ['Amazon Textract', 'Document processing — review low-confidence extractions', 'Confidence below threshold for key-value pairs'],
           ['Custom Models', 'Any ML model — review predictions via custom conditions', 'You define the trigger conditions in the flow definition']
         ]},
         { type: 'examTip', text: 'Amazon A2I is the answer when the exam asks about adding human review to ML predictions, routing low-confidence results to reviewers, or building human oversight workflows. Remember the three workforce options (private, Marketplace, Mechanical Turk) and the built-in integrations with Rekognition and Textract. For custom models, you define your own trigger conditions.' }
@@ -164,6 +189,11 @@ export const domain4Guide = {
     {
       id: 'd4s6',
       title: 'Transparency, Intellectual Property, and Sustainability',
+      sources: [
+        { title: 'Amazon SageMaker Model Cards – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/model-cards.html', checked: '2026-11-25' },
+        { title: 'Amazon Bedrock FAQs – AWS', url: 'https://aws.amazon.com/bedrock/faqs/', checked: '2026-11-25' },
+        { title: 'AWS Sustainability Console – AWS', url: 'https://aws.amazon.com/sustainability/tools/console/', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Responsible AI extends beyond model performance and fairness. Organizations must also address transparency in how models are built and used, intellectual property (IP) considerations around training data and generated outputs, and the environmental impact of large-scale model training. These topics are increasingly relevant on the exam as AI governance matures.' },
         { type: 'keyTerm', term: 'Model Documentation (Model Cards)', definition: 'Structured documentation that describes a model\'s intended use, training data, performance metrics, limitations, and ethical considerations. Model cards promote transparency by making it clear what a model can and cannot do, and under what conditions it was evaluated.' },
@@ -191,7 +221,7 @@ export const domain4Guide = {
           'Choose energy-efficient instance types and AWS Regions powered by renewable energy',
           'Apply model compression techniques (distillation, quantization, pruning) to reduce inference compute requirements',
           'Use managed services like Amazon Bedrock that optimize resource utilization across customers',
-          'Monitor and report on the carbon footprint of ML workloads using tools like the AWS Customer Carbon Footprint Tool'
+          'Monitor and report on the carbon footprint of ML workloads using the AWS Sustainability console (which builds on the Customer Carbon Footprint Tool)'
         ]},
         { type: 'table', headers: ['Responsible AI Pillar', 'Key Concern', 'AWS Approach'], rows: [
           ['Transparency', 'Users and stakeholders understand how AI works', 'Model cards, SageMaker Model Registry, CloudWatch logging'],

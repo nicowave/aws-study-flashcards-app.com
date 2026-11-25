@@ -10,15 +10,20 @@ export const domain5Guide = {
     {
       id: 'd5s1',
       title: 'Data Privacy and Encryption',
+      sources: [
+        { title: 'Protecting data with server-side encryption – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html', checked: '2026-11-25' },
+        { title: 'AWS KMS keys – AWS Key Management Service', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html', checked: '2026-11-25' },
+        { title: 'Rotate AWS KMS keys – AWS Key Management Service', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Protecting data is foundational to AI security. AWS provides encryption capabilities for data at rest (stored on disk) and data in transit (moving across the network). Understanding encryption options, key management, and data classification is essential for the exam.' },
         { type: 'keyTerm', term: 'Encryption at Rest', definition: 'Protecting stored data by converting it into an unreadable format using encryption keys. Even if physical storage media is compromised, the data remains inaccessible without the decryption key. Applies to S3 objects, EBS volumes, RDS databases, SageMaker training data, and model artifacts.' },
         { type: 'keyTerm', term: 'Encryption in Transit', definition: 'Protecting data as it moves between systems over a network. Uses protocols like TLS (Transport Layer Security) to encrypt data during transmission. Prevents eavesdropping and man-in-the-middle attacks. All AWS API calls use HTTPS (TLS) by default.' },
-        { type: 'keyTerm', term: 'AWS Key Management Service (KMS)', definition: 'A managed service for creating, managing, and controlling encryption keys used to encrypt your data. KMS integrates with most AWS services. You can use AWS managed keys (automatic), customer managed keys (you control rotation and policies), or customer provided keys (SSE-C). Supports automatic annual key rotation.' },
+        { type: 'keyTerm', term: 'AWS Key Management Service (KMS)', definition: 'A managed service for creating, managing, and controlling encryption keys used to encrypt your data. KMS integrates with most AWS services. KMS keys are customer managed keys (you control rotation and policies), AWS managed keys (a legacy type) or AWS owned keys (used by services by default). Customer-provided keys (S3 SSE-C) are not KMS keys. For customer managed keys you can turn on automatic rotation: yearly by default, or on a custom period you choose.' },
         { type: 'table', headers: ['S3 Encryption Option', 'Key Management', 'When to Use'], rows: [
           ['SSE-S3', 'AWS manages keys entirely', 'Default encryption, simplest option, no additional cost'],
           ['SSE-KMS', 'AWS KMS manages keys, you control policies', 'Need audit trail of key usage, fine-grained access control, regulatory compliance'],
-          ['SSE-C', 'Customer provides and manages keys', 'Must manage your own keys outside AWS, full control over key lifecycle'],
+          ['SSE-C', 'Customer provides and manages keys', 'Must manage your own keys outside AWS, full control over key lifecycle. Disabled by default on new buckets since April 2026, so you must turn it on first'],
           ['Client-Side Encryption', 'Customer encrypts before upload', 'Data must be encrypted before it reaches AWS, strictest compliance needs']
         ]},
         { type: 'bulletList', title: 'Data classification best practices for AI workloads:', items: [
@@ -28,13 +33,18 @@ export const domain5Guide = {
           'Restrict access to sensitive training data using IAM policies and S3 bucket policies',
           'Maintain an inventory of where sensitive data is stored and processed'
         ]},
-        { type: 'awsService', name: 'AWS Key Management Service (KMS)', description: 'Centralized service for creating and managing encryption keys. Integrates natively with S3, EBS, SageMaker, Bedrock, and 100+ other AWS services. Provides an audit trail of key usage via CloudTrail. Supports both symmetric and asymmetric keys.' },
+        { type: 'awsService', name: 'AWS Key Management Service (KMS)', description: 'Centralized service for creating and managing encryption keys. Integrates natively with S3, EBS, SageMaker AI, Bedrock, and many other AWS services. Provides an audit trail of key usage via CloudTrail. Supports both symmetric and asymmetric keys.' },
         { type: 'examTip', text: 'Know the difference between encryption at rest and in transit. SSE-S3 is the default and simplest, SSE-KMS gives you audit trails and key control, and SSE-C means you manage keys entirely. TLS encrypts data in transit. All SageMaker training jobs and model artifacts can be encrypted with KMS keys.' }
       ]
     },
     {
       id: 'd5s2',
       title: 'IAM and the Shared Responsibility Model',
+      sources: [
+        { title: 'Shared Responsibility Model – AWS', url: 'https://aws.amazon.com/compliance/shared-responsibility-model/', checked: '2026-11-25' },
+        { title: 'How to use SageMaker AI execution roles – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-roles.html', checked: '2026-11-25' },
+        { title: 'IAM roles – AWS Identity and Access Management', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'The AWS Shared Responsibility Model defines the boundary between what AWS secures and what the customer must secure. For AI/ML workloads, this boundary is critical to understand. AWS handles the security of the underlying infrastructure, while customers are responsible for securing their data, models, access controls, and application configurations.' },
         { type: 'keyTerm', term: 'Shared Responsibility Model', definition: 'AWS is responsible for security OF the cloud (hardware, networking, facilities, managed service infrastructure). The customer is responsible for security IN the cloud (data, identity management, application configuration, encryption settings, network controls). For AI services, the customer owns data security, model access, and IAM policies.' },
@@ -56,13 +66,18 @@ export const domain5Guide = {
           'Regularly audit permissions with IAM Access Analyzer',
           'Avoid embedding credentials in code — use IAM roles instead'
         ]},
-        { type: 'keyTerm', term: 'Service-Linked Role', definition: 'A predefined IAM role that is linked directly to an AWS service. The service creates and manages this role automatically. It contains all permissions the service needs to call other AWS services on your behalf. You cannot modify the permissions of a service-linked role.' },
+        { type: 'keyTerm', term: 'Service-Linked Role', definition: 'A predefined IAM role that is linked directly to an AWS service. The service predefines the role (and often creates it for you). It contains all permissions the service needs to call other AWS services on your behalf. An IAM administrator can view, but not edit, the permissions of a service-linked role.' },
         { type: 'examTip', text: 'The exam will ask you to determine whether AWS or the customer is responsible for a given security task. AWS manages the physical infrastructure and managed service platforms. The customer manages IAM policies, data encryption choices, network configurations, and model access controls. For SageMaker, the customer is responsible for configuring execution roles with least privilege.' }
       ]
     },
     {
       id: 'd5s3',
       title: 'Network Security for AI Workloads',
+      sources: [
+        { title: 'Run Training and Inference Containers in Internet-Free Mode – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/mkt-algo-model-internet-free.html', checked: '2026-11-25' },
+        { title: 'Gateway endpoints – Amazon Virtual Private Cloud', url: 'https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html', checked: '2026-11-25' },
+        { title: 'Infrastructure security in Amazon VPC – Amazon Virtual Private Cloud', url: 'https://docs.aws.amazon.com/vpc/latest/userguide/infrastructure-security.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'AI workloads often process sensitive data, making network isolation critical. AWS provides mechanisms to keep traffic private, prevent data from traversing the public internet, and isolate training and inference environments within your VPC.' },
         { type: 'keyTerm', term: 'VPC (Virtual Private Cloud)', definition: 'A logically isolated virtual network within AWS where you can launch resources. You control IP addressing, subnets, route tables, and network gateways. Running SageMaker training jobs and endpoints inside a VPC keeps traffic within your private network.' },
@@ -88,12 +103,17 @@ export const domain5Guide = {
     {
       id: 'd5s4',
       title: 'Auditing and Monitoring',
+      sources: [
+        { title: 'Logging Amazon SageMaker AI API calls using AWS CloudTrail – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/logging-using-cloudtrail.html', checked: '2026-11-25' },
+        { title: 'Monitor Amazon Bedrock API calls using CloudTrail – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/logging-using-cloudtrail.html', checked: '2026-11-25' },
+        { title: 'Data and model quality monitoring with Amazon SageMaker Model Monitor – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Continuous auditing and monitoring are essential for maintaining security posture, detecting anomalies, and meeting compliance requirements. AWS provides several services that log, monitor, and evaluate AI/ML workloads in real time.' },
-        { type: 'awsService', name: 'AWS CloudTrail', description: 'Records all API calls made in your AWS account as events. Captures who made the call, when, from which IP, and what parameters were used. Essential for security auditing and forensics. For AI workloads, CloudTrail logs every SageMaker API call (CreateTrainingJob, InvokeEndpoint) and Bedrock API call (InvokeModel).' },
+        { type: 'awsService', name: 'AWS CloudTrail', description: 'Records all API calls made in your AWS account as events. Captures who made the call, when, from which IP, and what parameters were used. Essential for security auditing and forensics. For AI workloads, CloudTrail logs SageMaker AI management calls such as CreateTrainingJob by default, while SageMaker InvokeEndpoint is a data event that you must turn on (data events are not logged by default). Bedrock logs InvokeModel and Converse as management events, and agent calls such as InvokeAgent as data events.' },
         { type: 'awsService', name: 'Amazon CloudWatch', description: 'Monitoring and observability service for AWS resources. Collects metrics (CPU, memory, latency, invocation count), stores logs, and triggers alarms. For AI workloads: monitors SageMaker endpoint latency and error rates, training job GPU utilization, and model inference metrics.' },
         { type: 'awsService', name: 'AWS Config', description: 'Continuously evaluates the configuration of your AWS resources against desired settings (Config Rules). Records configuration changes over time. For AI security: ensures S3 buckets storing training data have encryption enabled, SageMaker endpoints are in a VPC, and KMS keys have proper rotation policies.' },
-        { type: 'awsService', name: 'AWS Audit Manager', description: 'Automates evidence collection for compliance audits. Maps AWS resource configurations and CloudTrail logs to compliance frameworks (SOC 2, HIPAA, GDPR, ISO 27001). Generates audit-ready reports. Reduces manual effort in proving compliance for AI workloads.' },
+        { type: 'awsService', name: 'AWS Audit Manager', description: 'Automates evidence collection for compliance audits. Maps AWS resource configurations and CloudTrail logs to prebuilt compliance frameworks (for example HIPAA and GDPR). Generates audit-ready reports. Reduces manual effort in proving compliance for AI workloads. Note: Audit Manager is no longer open to new customers; existing customers can keep using it.' },
         { type: 'numberedList', title: 'Setting up monitoring for AI workloads:', items: [
           'Enable CloudTrail in all regions and store logs in a centralized, encrypted S3 bucket',
           'Create CloudWatch alarms for SageMaker endpoint errors, latency spikes, and invocation anomalies',
@@ -103,16 +123,21 @@ export const domain5Guide = {
           'Configure SNS notifications for critical alarm thresholds'
         ]},
         { type: 'keyTerm', term: 'Model Monitoring', definition: 'The practice of tracking a deployed model\'s performance and data quality over time. Detects data drift (input data distribution changes), model drift (prediction quality degrades), bias drift (fairness metrics shift), and feature attribution drift. SageMaker Model Monitor automates this with scheduled monitoring jobs.' },
-        { type: 'awsService', name: 'Amazon SageMaker Model Monitor', description: 'Automatically monitors deployed models for data quality, model quality, bias, and feature attribution drift. Compares incoming inference data against a baseline and triggers CloudWatch alarms when violations are detected. Supports real-time and batch monitoring.' },
-        { type: 'examTip', text: 'CloudTrail is for API call auditing (who did what and when). CloudWatch is for metrics, logs, and alarms (how is the system performing). AWS Config is for configuration compliance (are resources configured correctly). Know that CloudTrail logs every SageMaker and Bedrock API call — this is the primary service for security auditing.' }
+        { type: 'awsService', name: 'Amazon SageMaker Model Monitor', description: 'Automatically monitors deployed models for data quality, model quality, bias, and feature attribution drift. Compares incoming inference data against a baseline and triggers CloudWatch alarms when violations are detected. Supports real-time endpoints and batch transform jobs. Note: Model Monitor is no longer open to new customers; existing customers can keep using it, but AWS plans no new features.' },
+        { type: 'examTip', text: 'CloudTrail is for API call auditing (who did what and when). CloudWatch is for metrics, logs, and alarms (how is the system performing). AWS Config is for configuration compliance (are resources configured correctly). CloudTrail is the primary service for auditing SageMaker AI and Bedrock API calls, but some calls (such as SageMaker InvokeEndpoint) are data events that are logged only if you turn data events on.' }
       ]
     },
     {
       id: 'd5s5',
       title: 'Sensitive Data Protection',
+      sources: [
+        { title: 'What is Amazon Macie? – Amazon Macie', url: 'https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Inspector? – Amazon Inspector', url: 'https://docs.aws.amazon.com/inspector/latest/user/what-is-inspector.html', checked: '2026-11-25' },
+        { title: 'Detecting PII entities – Amazon Comprehend', url: 'https://docs.aws.amazon.com/comprehend/latest/dg/how-pii.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'AI workloads frequently process personally identifiable information (PII), protected health information (PHI), and other sensitive data. AWS provides services to discover, classify, and protect sensitive data throughout the ML lifecycle. Understanding data anonymization techniques is also important for the exam.' },
-        { type: 'awsService', name: 'Amazon Macie', description: 'An ML-powered data security service that automatically discovers, classifies, and protects sensitive data stored in Amazon S3. Macie identifies PII (names, addresses, credit card numbers, SSNs), PHI, credentials, and API keys. It generates findings with severity ratings and integrates with Security Hub for centralized alerts.' },
+        { type: 'awsService', name: 'Amazon Macie', description: 'An ML-powered data security service that automatically discovers, classifies, and protects sensitive data stored in Amazon S3. Macie identifies PII (names, addresses, SSNs), financial information such as credit card numbers, and credentials data. It generates findings with severity ratings and integrates with Security Hub for centralized alerts.' },
         { type: 'awsService', name: 'Amazon Inspector', description: 'An automated vulnerability management service that continuously scans EC2 instances, container images (in ECR), and Lambda functions for software vulnerabilities and unintended network exposure. For AI workloads, it scans custom training container images for known CVEs and configuration issues.' },
         { type: 'keyTerm', term: 'Data Anonymization', definition: 'The process of irreversibly removing or modifying personally identifiable information so that individuals cannot be re-identified. Techniques include data masking (replacing values with fictional data), generalization (broadening values, e.g., exact age to age range), and suppression (removing fields entirely). Once anonymized, data is no longer considered personal data under most regulations.' },
         { type: 'keyTerm', term: 'Pseudonymization', definition: 'Replacing identifiable fields with artificial identifiers (pseudonyms) while keeping a separate mapping table that can restore the original values. Unlike anonymization, pseudonymization is reversible with the mapping key. Data is still considered personal data under GDPR because re-identification is possible.' },
@@ -136,6 +161,11 @@ export const domain5Guide = {
     {
       id: 'd5s6',
       title: 'Model Governance and Security Threats',
+      sources: [
+        { title: 'Amazon SageMaker ML Lineage Tracking – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/lineage-tracking.html', checked: '2026-11-25' },
+        { title: 'Update the Approval Status of a Model – Amazon SageMaker AI', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry-approve.html', checked: '2026-11-25' },
+        { title: 'Prompt injection security – Amazon Bedrock', url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-injection.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Model governance ensures that AI models are documented, tracked, and managed throughout their lifecycle. Security threats against AI systems are also an important exam topic. Understanding both governance practices and adversarial threats is critical for building secure, auditable AI systems.' },
         { type: 'keyTerm', term: 'SageMaker Model Cards', definition: 'Standardized documentation for machine learning models that captures the model\'s intended use, training details, evaluation metrics, ethical considerations, and limitations. Model Cards promote transparency and accountability by providing stakeholders with essential information about how a model was built and how it should (and should not) be used.' },

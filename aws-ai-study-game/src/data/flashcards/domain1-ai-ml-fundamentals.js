@@ -415,14 +415,15 @@ export const domain1 = {
       {
         id: 'd1c32',
         front: 'What is Amazon SageMaker AI?',
-        back: 'A fully managed AWS platform for building, training, and deploying ML models at scale.\n\nKey capabilities:\n• Jupyter notebooks for exploration\n• Built-in algorithms and framework support\n• Managed training infrastructure\n• One-click model deployment\n• AutoML with SageMaker Autopilot (its UI now lives in SageMaker Canvas)\n• Ground Truth for data labeling\n\nCovers the ENTIRE ML lifecycle from data prep to production',
+        back: 'A fully managed AWS platform for building, training, and deploying ML models at scale.\n\nKey capabilities:\n• Jupyter notebooks for exploration\n• Built-in algorithms and framework support\n• Managed training infrastructure\n• One-click model deployment\n• AutoML with SageMaker Autopilot (its UI now lives in SageMaker Canvas)\n• Ground Truth for data labeling (no longer open to new customers)\n\nCovers the ENTIRE ML lifecycle from data prep to production',
         hint: 'End-to-end ML platform',
         tags: ['aws-services', 'sagemaker', 'ml-platform'],
         difficulty: 'intermediate',
         sources: [
           { title: 'What is Amazon SageMaker AI? – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html', checked: '2026-11-25' },
           { title: 'Amazon SageMaker AI Features – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/whatis-features.html', checked: '2026-11-25' },
-          { title: 'SageMaker Autopilot – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/autopilot-automate-model-development.html', checked: '2026-11-25' }
+          { title: 'SageMaker Autopilot – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/autopilot-automate-model-development.html', checked: '2026-11-25' },
+          { title: 'Training data labeling using humans with Amazon SageMaker Ground Truth – Amazon SageMaker AI Developer Guide', url: 'https://docs.aws.amazon.com/sagemaker/latest/dg/sms.html', checked: '2026-11-25' }
         ],
         taskStatement: '1.2'
       },
