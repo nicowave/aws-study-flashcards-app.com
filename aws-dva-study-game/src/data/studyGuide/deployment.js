@@ -10,6 +10,11 @@ export const deploymentGuide = {
     {
       id: 'deps1',
       title: 'Packaging Lambda Functions and AWS SAM',
+      sources: [
+        { title: 'Lambda quotas – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html', checked: '2026-11-25' },
+        { title: 'AWS SAM template anatomy – AWS Serverless Application Model', url: 'https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy.html', checked: '2026-11-25' },
+        { title: 'sam package – AWS Serverless Application Model', url: 'https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-package.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Before anything can be deployed it has to be packaged. For Lambda the first decision is the package type, and the deciding factors are size, dependencies and how your team already builds software. AWS SAM then describes the function and its event sources in a short template that becomes CloudFormation.' },
         { type: 'table', headers: ['Factor', '.zip archive', 'Container image'], rows: [
@@ -33,6 +38,11 @@ export const deploymentGuide = {
     {
       id: 'deps2',
       title: 'CloudFormation, CDK, AppConfig and ECR',
+      sources: [
+        { title: 'Get exported outputs from a deployed CloudFormation stack – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-stack-exports.html', checked: '2026-11-25' },
+        { title: 'DeletionPolicy attribute – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-attribute-deletionpolicy.html', checked: '2026-11-25' },
+        { title: 'What is AWS AppConfig? – AWS AppConfig', url: 'https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'CloudFormation is the engine underneath SAM, the CDK and many pipelines. The exam tests how to make one template work in many environments, how to share values between stacks, and how to change or delete stacks safely.' },
         { type: 'table', headers: ['Template feature', 'What it does', 'Typical use'], rows: [
@@ -49,7 +59,7 @@ export const deploymentGuide = {
         ]},
         { type: 'keyTerm', term: 'Change set', definition: 'A preview of the changes an update will make, including whether each resource is modified or replaced. Nothing changes until you execute it.' },
         { type: 'keyTerm', term: 'Drift detection', definition: 'Compares live resource configuration with the template and flags resources changed outside CloudFormation. It reports drift but does not correct it.' },
-        { type: 'keyTerm', term: 'DeletionPolicy', definition: 'Delete, Retain or Snapshot (for supported data resources such as RDS and EBS). UpdateReplacePolicy applies the same options when an update replaces the resource.' },
+        { type: 'keyTerm', term: 'DeletionPolicy', definition: 'Delete, Retain or Snapshot (for supported data resources such as RDS and EBS). Delete is the default, except Snapshot for RDS DB clusters and for DB instances that are not in a cluster. UpdateReplacePolicy applies the same options when an update replaces the resource.' },
         { type: 'awsService', name: 'AWS CDK', description: 'Define infrastructure in TypeScript, Python, Java, C# or Go using constructs (L1 raw Cfn resources, L2 with defaults, L3 patterns). cdk synth produces a CloudFormation template, cdk bootstrap prepares each account and Region with staging resources, and cdk deploy deploys through CloudFormation.' },
         { type: 'awsService', name: 'AWS AppConfig', description: 'Deploys configuration and feature flags separately from code, with validators (JSON Schema or Lambda), deployment strategies (all at once, linear, exponential, with bake time) and automatic rollback on CloudWatch alarms.' },
         { type: 'awsService', name: 'Amazon ECR', description: 'Private registry for container images used by ECS, EKS and Lambda. Enable tag immutability so a tag such as v1.4.2 can never be overwritten, or deploy by image digest. Lifecycle policies expire old or untagged images.' },
@@ -59,9 +69,14 @@ export const deploymentGuide = {
     {
       id: 'deps3',
       title: 'Testing in Development Environments',
+      sources: [
+        { title: 'Introduction to testing with the sam local command – AWS Serverless Application Model', url: 'https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local.html', checked: '2026-11-25' },
+        { title: 'Create an alias for a Lambda Event Function – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html', checked: '2026-11-25' },
+        { title: 'Use stage variables for a REST API in API Gateway – Amazon API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Developers test code locally first, then in an isolated dev environment in AWS, and only then promote the same artifact. Lambda versions and aliases plus API Gateway stages make that promotion safe.' },
-        { type: 'bulletList', title: 'Local testing with the SAM CLI (requires Docker):', items: [
+        { type: 'bulletList', title: 'Testing with the SAM CLI (running functions locally requires Docker):', items: [
           'sam local invoke -e event.json MyFunction: run one function once with an event',
           'sam local generate-event: create sample payloads for S3, SQS, SNS, API Gateway, DynamoDB Streams and more',
           'sam local start-api: run a local HTTP server that emulates API Gateway routes',
@@ -83,8 +98,13 @@ export const deploymentGuide = {
     {
       id: 'deps4',
       title: 'Automating Builds and Tests: CodeBuild and CodePipeline',
+      sources: [
+        { title: 'Build specification reference for CodeBuild – AWS CodeBuild', url: 'https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html', checked: '2026-11-25' },
+        { title: 'Add a manual approval action to a stage – AWS CodePipeline', url: 'https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html', checked: '2026-11-25' },
+        { title: 'The Future of AWS CodeCommit | AWS DevOps & Developer Productivity Blog', url: 'https://aws.amazon.com/blogs/devops/aws-codecommit-returns-to-general-availability/', checked: '2026-11-25' }
+      ],
       content: [
-        { type: 'paragraph', text: 'A pipeline turns each commit into a tested, deployable artifact. CodePipeline orchestrates stages; CodeBuild runs the build and test commands defined in buildspec.yml. Sources are typically GitHub, GitLab or Bitbucket through a CodeConnections connection, or an S3 object or ECR image. AWS CodeCommit stopped accepting new customers in 2024, so new pipelines should not depend on it.' },
+        { type: 'paragraph', text: 'A pipeline turns each commit into a tested, deployable artifact. CodePipeline orchestrates stages; CodeBuild runs the build and test commands defined in buildspec.yml. Sources are typically GitHub, GitLab or Bitbucket through a CodeConnections connection, or an S3 object or ECR image. AWS CodeCommit closed to new customers in July 2024 but returned to full general availability in November 2025, so it is again an option for new repositories alongside external Git providers.' },
         { type: 'table', headers: ['buildspec section', 'Purpose', 'Example'], rows: [
           ['env', 'Plain variables and references to Parameter Store or Secrets Manager', 'secrets-manager: DB_PASS: prod/db:password'],
           ['phases: install', 'Install runtimes and tools', 'runtime-versions: nodejs: 20; npm ci'],
@@ -111,6 +131,11 @@ export const deploymentGuide = {
     {
       id: 'deps5',
       title: 'CodeDeploy and Deployment Strategies',
+      sources: [
+        { title: 'AppSpec \'hooks\' section – AWS CodeDeploy', url: 'https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html', checked: '2026-11-25' },
+        { title: 'Working with deployment configurations in CodeDeploy – AWS CodeDeploy', url: 'https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html', checked: '2026-11-25' },
+        { title: 'Deploying serverless applications gradually with AWS SAM – AWS Serverless Application Model', url: 'https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/automating-updates-to-serverless-apps.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'AWS CodeDeploy deploys to EC2 and on-premises servers (through the CodeDeploy agent), Lambda functions (by shifting alias traffic) and ECS services (by shifting traffic between task sets). The appspec file defines what to deploy and which lifecycle hooks to run.' },
         { type: 'table', headers: ['Platform', 'Lifecycle hooks (in order)', 'Deployment configurations'], rows: [
@@ -135,6 +160,11 @@ export const deploymentGuide = {
     {
       id: 'deps6',
       title: 'Elastic Beanstalk, ECS, CloudFormation Rollback and Amplify',
+      sources: [
+        { title: 'Deploying applications to Elastic Beanstalk environments – AWS Elastic Beanstalk', url: 'https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html', checked: '2026-11-25' },
+        { title: 'CodeDeploy blue/green deployments for Amazon ECS – Amazon Elastic Container Service', url: 'https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-bluegreen.html', checked: '2026-11-25' },
+        { title: 'Roll back your CloudFormation stack on alarm breach with rollback triggers – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-rollback-triggers.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Several services deploy code for you, each with its own controls. The exam usually describes a constraint (capacity, cost, rollback speed, no downtime) and expects you to pick the matching policy.' },
         { type: 'table', headers: ['Elastic Beanstalk policy', 'Capacity during deploy', 'Extra cost', 'Rollback'], rows: [
@@ -147,7 +177,7 @@ export const deploymentGuide = {
         ]},
         { type: 'keyTerm', term: '.ebextensions', definition: 'A folder at the root of the source bundle containing YAML or JSON .config files that install packages, create files, run commands and set option_settings (including environment properties) on every instance.' },
         { type: 'keyTerm', term: 'Swap environment URLs', definition: 'The Elastic Beanstalk blue/green mechanism: deploy to a cloned environment, test it, then swap CNAMEs so its URL serves production. Used for major platform changes and fast rollback.' },
-        { type: 'awsService', name: 'Amazon ECS deployments', description: 'Rolling updates are managed by ECS itself (minimum healthy and maximum percent). Blue/green with CodeDeploy uses an Application or Network Load Balancer, two target groups, a production listener and an optional test listener; hooks such as AfterAllowTestTraffic run Lambda tests before production traffic shifts. ECS also offers built-in blue/green deployments without CodeDeploy.' },
+        { type: 'awsService', name: 'Amazon ECS deployments', description: 'Rolling updates are managed by ECS itself (minimum healthy and maximum percent). Blue/green with CodeDeploy uses an Application or Network Load Balancer, two target groups, a production listener and an optional test listener; hooks such as AfterAllowTestTraffic run Lambda tests before production traffic shifts. ECS also offers built-in blue/green deployments without CodeDeploy, which AWS now recommends.' },
         { type: 'keyTerm', term: 'CloudFormation rollback', definition: 'A failed create or update rolls back automatically by default. Rollback triggers add CloudWatch alarms that are watched during the operation and a monitoring period afterwards. If an update rollback itself fails (UPDATE_ROLLBACK_FAILED), fix the cause and use continue-update-rollback.' },
         { type: 'awsService', name: 'AWS Amplify Hosting', description: 'Git-based CI/CD and hosting for static and server-side rendered front ends (React, Next.js, Vue, Angular): builds on every push, branch environments, pull request previews, custom domains with managed certificates, and a CDN.' },
         { type: 'examTip', text: 'Full capacity at low cost → rolling with additional batch. Safest, quickest rollback on Beanstalk → immutable. Major platform change → blue/green with Swap environment URLs. Roll back a stack update on an alarm → CloudFormation rollback triggers. Front end from GitHub with previews → Amplify Hosting.' }
