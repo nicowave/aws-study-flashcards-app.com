@@ -10,6 +10,11 @@ export const securityGuide = {
     {
       id: 'secs1',
       title: 'Authentication with Amazon Cognito',
+      sources: [
+        { title: 'What is Amazon Cognito? – Amazon Cognito Developer Guide', url: 'https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html', checked: '2026-11-25' },
+        { title: 'Understanding user pool JSON web tokens (JWTs) – Amazon Cognito Developer Guide', url: 'https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-with-identity-providers.html', checked: '2026-11-25' },
+        { title: 'Customizing user pool workflows with Lambda triggers – Amazon Cognito Developer Guide', url: 'https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-working-with-lambda-triggers.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Most DVA-C02 authentication questions come down to one decision: does the app need to know who the user is, or does it need AWS credentials so the user can call AWS services directly? Amazon Cognito answers both with two separate components that are often used together.' },
         { type: 'comparison', title: 'User pools vs identity pools', items: [
@@ -37,6 +42,11 @@ export const securityGuide = {
     {
       id: 'secs2',
       title: 'Authorizing API Calls with API Gateway',
+      sources: [
+        { title: 'Control and manage access to REST APIs in API Gateway – Amazon API Gateway Developer Guide', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-to-api.html', checked: '2026-11-25' },
+        { title: 'Use API Gateway Lambda authorizers – Amazon API Gateway Developer Guide', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html', checked: '2026-11-25' },
+        { title: 'Control access to HTTP APIs with JWT authorizers in API Gateway – Amazon API Gateway Developer Guide', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'API Gateway decides whether a request reaches your backend before any integration runs. The exam tests which authorizer fits the caller and the information available in the request.' },
         { type: 'table', headers: ['Mechanism', 'How it works', 'Choose it when'], rows: [
@@ -60,6 +70,11 @@ export const securityGuide = {
     {
       id: 'secs3',
       title: 'IAM for Application Code: Roles, STS and Policies',
+      sources: [
+        { title: 'Policy evaluation logic – AWS Identity and Access Management User Guide', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html', checked: '2026-11-25' },
+        { title: 'Identity-based policies and resource-based policies – AWS Identity and Access Management User Guide', url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_identity-vs-resource.html', checked: '2026-11-25' },
+        { title: 'AWS SDKs and Tools standardized credential providers – AWS SDKs and Tools Reference Guide', url: 'https://docs.aws.amazon.com/sdkref/latest/guide/standardized-credentials.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Application code should never hold long-term access keys. Every compute service can hand your code temporary role credentials that the SDK finds automatically and refreshes before they expire.' },
         { type: 'table', headers: ['Compute', 'Where the code gets credentials', 'Common trap'], rows: [
@@ -77,7 +92,7 @@ export const securityGuide = {
         { type: 'numberedList', title: 'Policy evaluation order', items: [
           'Every request starts as an implicit deny.',
           'If any applicable policy has a matching explicit Deny, the request is denied. Nothing overrides this.',
-          'Organizations SCPs, permissions boundaries and session policies must allow the action; they only limit and never grant.',
+          'Organizations SCPs and RCPs, permissions boundaries and session policies must allow the action; they only limit and never grant.',
           'An identity-based or resource-based policy must allow the action. In the same account either is usually enough; across accounts both sides must allow.',
           'If no Allow remains, the implicit deny applies.'
         ]},
@@ -95,6 +110,11 @@ export const securityGuide = {
     {
       id: 'secs4',
       title: 'AWS KMS and Envelope Encryption',
+      sources: [
+        { title: 'AWS KMS keys – AWS Key Management Service Developer Guide', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html', checked: '2026-11-25' },
+        { title: 'Key policies in AWS KMS – AWS Key Management Service Developer Guide', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html', checked: '2026-11-25' },
+        { title: 'Rotate AWS KMS keys – AWS Key Management Service Developer Guide', url: 'https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'AWS KMS creates and protects keys in hardware security modules; key material for KMS-generated keys never leaves KMS unencrypted. Developers need to know which API to call for which data size, who controls access to a key, and how to stay inside request quotas.' },
         { type: 'table', headers: ['API', 'What it does', 'Use it for'], rows: [
@@ -115,7 +135,7 @@ export const securityGuide = {
           { label: 'AWS managed key', description: 'Created by a service in your account (aws/s3, aws/lambda, aws/secretsmanager). Visible and logged, rotated automatically, but you cannot edit its key policy or use it cross-account.' },
           { label: 'AWS owned key', description: 'Owned and used by a service across many accounts. Free and invisible to you; no audit trail or control. The DynamoDB default.' }
         ]},
-        { type: 'keyTerm', term: 'Key policy', definition: 'Every KMS key has exactly one key policy and it is the primary access control. IAM policies grant KMS permissions only if the key policy allows the account to delegate through IAM, which the default key policy does.' },
+        { type: 'keyTerm', term: 'Key policy', definition: 'Every KMS key has a key policy and it is the primary access control (a key shared through AWS RAM also gets a second, RAM-managed key policy named AWS_RAM). IAM policies grant KMS permissions only if the key policy allows the account to delegate through IAM, which the default key policy does.' },
         { type: 'keyTerm', term: 'Grants', definition: 'Programmatic, fine-grained delegation of specific operations on one key to a principal, without editing the key policy. Services such as EBS use them; you retire or revoke a grant when it is no longer needed. A grant token lets you use a new grant before it propagates.' },
         { type: 'keyTerm', term: 'Encryption context', definition: 'Non-secret key-value pairs bound to ciphertext as additional authenticated data. Decrypt fails if the context does not match, the context is recorded in CloudTrail, and policies can require it with kms:EncryptionContext conditions.' },
         { type: 'keyTerm', term: 'Automatic key rotation', definition: 'For symmetric customer managed keys, KMS generates new key material on a schedule (yearly by default, with a configurable period) and also supports on-demand rotation. The key ID and ARN stay the same and old material is kept, so existing ciphertext still decrypts with no code change.' },
@@ -132,13 +152,18 @@ export const securityGuide = {
     {
       id: 'secs5',
       title: 'Encryption at Rest and in Transit for S3, DynamoDB and APIs',
+      sources: [
+        { title: 'Protecting data with server-side encryption – Amazon S3 User Guide', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html', checked: '2026-11-25' },
+        { title: 'DynamoDB encryption at rest – Amazon DynamoDB Developer Guide', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/EncryptionAtRest.html', checked: '2026-11-25' },
+        { title: 'What is AWS Certificate Manager? – AWS Certificate Manager User Guide', url: 'https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Server-side encryption means the service receives plaintext over TLS and encrypts it before storing it. Client-side encryption means your code encrypts before sending, so the service only ever stores ciphertext. Questions usually hinge on who must control or hold the key.' },
         { type: 'table', headers: ['S3 option', 'Key managed by', 'Key points'], rows: [
           ['SSE-S3', 'Amazon S3', 'Default for all new objects; no KMS cost or KMS audit trail'],
           ['SSE-KMS', 'AWS KMS (AWS managed or customer managed key)', 'Key policy control and CloudTrail logging; enable Bucket Keys to reduce KMS requests'],
-          ['DSSE-KMS', 'AWS KMS', 'Two independent layers of server-side encryption for multilayer compliance requirements'],
-          ['SSE-C', 'You, outside AWS', 'The key is sent on every request over HTTPS; S3 keeps only a salted HMAC to validate it'],
+          ['DSSE-KMS', 'AWS KMS (first layer) and Amazon S3 (second layer)', 'Two independent layers of server-side encryption for multilayer compliance requirements'],
+          ['SSE-C', 'You, outside AWS', 'The key is sent on every request over HTTPS; S3 keeps only a salted HMAC to validate it. Blocked by default on new buckets since April 2026, so enable it first'],
           ['Client-side', 'You or KMS through your code', 'Use the Amazon S3 Encryption Client; S3 never receives plaintext']
         ]},
         { type: 'bulletList', title: 'Bucket policies that enforce encryption', items: [
@@ -160,13 +185,18 @@ export const securityGuide = {
     {
       id: 'secs6',
       title: 'Managing Secrets and Sensitive Data in Code',
+      sources: [
+        { title: 'Lambda rotation functions – AWS Secrets Manager User Guide', url: 'https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotate-secrets_lambda-functions.html', checked: '2026-11-25' },
+        { title: 'Choosing parameter tiers in Parameter Store – AWS Systems Manager User Guide', url: 'https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-advanced-parameters.html', checked: '2026-11-25' },
+        { title: 'Securing Lambda environment variables – AWS Lambda Developer Guide', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars-encryption.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Credentials, connection strings and API keys never belong in source code, container images or plaintext configuration. Store them in a managed service, grant the code role read access, retrieve them at runtime, and cache them to control latency and cost.' },
         { type: 'table', headers: ['Feature', 'AWS Secrets Manager', 'SSM Parameter Store'], rows: [
           ['Primary purpose', 'Secrets such as database credentials and API keys', 'Configuration values and simple secrets'],
           ['Encryption', 'Always encrypted with a KMS key', 'SecureString parameters encrypted with a KMS key; String and StringList are not'],
           ['Rotation', 'Built in, using a rotation Lambda function or managed rotation', 'None built in'],
-          ['Cross-account access', 'Resource policy on the secret plus a customer managed key', 'Limited; Secrets Manager is the usual cross-account choice'],
+          ['Cross-account access', 'Resource policy on the secret plus a customer managed key', 'Advanced-tier parameters can be shared through AWS RAM; Secrets Manager is the usual cross-account choice'],
           ['Size', 'Up to 64 KB per secret', 'Standard 4 KB, advanced 8 KB'],
           ['Cost', 'Charged per secret per month plus API calls', 'Standard tier free; advanced tier charged'],
           ['Other', 'Multi-Region replication, random password generation', 'Hierarchies, versions, parameter policies on the advanced tier']

@@ -20,7 +20,11 @@ export const development = {
         'Send each step to its own SQS queue and have every consumer forward its message on to the next queue'
       ],
       correctAnswer: 2,
-      explanation: 'Step Functions provides orchestration: a central state machine controls the sequence, runs compensating steps from Catch blocks and records a visual execution history for every order. EventBridge choreography decouples services but leaves no single place that owns the sequence or the rollback. Chaining Lambda functions synchronously couples them, wastes compute while waiting and loses state on timeouts, and hand-forwarding SQS messages rebuilds a workflow engine with no history.'
+      explanation: 'Step Functions provides orchestration: a central state machine controls the sequence, runs compensating steps from Catch blocks and records a visual execution history for every order. EventBridge choreography decouples services but leaves no single place that owns the sequence or the rollback. Chaining Lambda functions synchronously couples them, wastes compute while waiting and loses state on timeouts, and hand-forwarding SQS messages rebuilds a workflow engine with no history.',
+      sources: [
+        { title: 'Saga orchestration pattern', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga-orchestration.html', checked: '2026-11-25' },
+        { title: 'Choosing workflow type in Step Functions', url: 'https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev2',
@@ -32,7 +36,11 @@ export const development = {
         'Write to a Kinesis data stream with one shard reserved for each service'
       ],
       correctAnswer: 0,
-      explanation: 'The SNS-to-SQS fan-out pattern delivers a copy of every message to each subscribed queue, and each queue buffers messages durably until its service is back. A single shared queue delivers each message to only one consumer, so the services would split the work instead of each getting a copy. HTTPS subscriptions only retry within the limits of the delivery policy and then drop or dead-letter the message, so they are not a durable buffer for each service, and Kinesis shards are chosen by partition key, not assigned per consumer.'
+      explanation: 'The SNS-to-SQS fan-out pattern delivers a copy of every message to each subscribed queue, and each queue buffers messages durably until its service is back. A single shared queue delivers each message to only one consumer, so the services would split the work instead of each getting a copy. HTTPS subscriptions only retry within the limits of the delivery policy and then drop or dead-letter the message, so they are not a durable buffer for each service, and Kinesis shards are chosen by partition key, not assigned per consumer.',
+      sources: [
+        { title: 'Fanout Amazon SNS notifications to Amazon SQS queues for asynchronous processing', url: 'https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html', checked: '2026-11-25' },
+        { title: 'Amazon SNS message delivery retries', url: 'https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev3',
@@ -44,7 +52,11 @@ export const development = {
         'Raise the visibility timeout above the message processing time'
       ],
       correctAnswer: 3,
-      explanation: 'The default visibility timeout is 30 seconds, so the message becomes visible again while the first worker is still working and a second worker receives it. Setting the visibility timeout longer than the processing time (or extending it with ChangeMessageVisibility) fixes the duplicates. Long polling only reduces empty receives, FIFO deduplication applies to sends within a 5-minute window rather than to re-delivery after a timeout, and a lower maxReceiveCount would push good messages to the DLQ.'
+      explanation: 'The default visibility timeout is 30 seconds, so the message becomes visible again while the first worker is still working and a second worker receives it. Setting the visibility timeout longer than the processing time (or extending it with ChangeMessageVisibility) fixes the duplicates. Long polling only reduces empty receives, FIFO deduplication applies to sends within a 5-minute window rather than to re-delivery after a timeout, and a lower maxReceiveCount would push good messages to the DLQ.',
+      sources: [
+        { title: 'Amazon SQS visibility timeout', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html', checked: '2026-11-25' },
+        { title: 'Using the message deduplication ID in Amazon SQS', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/using-messagededuplicationid-property.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev4',
@@ -56,7 +68,10 @@ export const development = {
         'Raise MaxNumberOfMessages to 10 so each call returns more messages'
       ],
       correctAnswer: 1,
-      explanation: 'Long polling (WaitTimeSeconds up to 20 on the call, or ReceiveMessageWaitTimeSeconds on the queue) makes ReceiveMessage wait for a message to arrive, which removes most empty responses and their cost. A fixed sleep adds latency and still makes empty calls. A delivery delay only postpones messages, and MaxNumberOfMessages helps when traffic is high but does nothing for empty receives.'
+      explanation: 'Long polling (WaitTimeSeconds up to 20 on the call, or ReceiveMessageWaitTimeSeconds on the queue) makes ReceiveMessage wait for a message to arrive, which removes most empty responses and their cost. A fixed sleep adds latency and still makes empty calls. A delivery delay only postpones messages, and MaxNumberOfMessages helps when traffic is high but does nothing for empty receives.',
+      sources: [
+        { title: 'Amazon SQS short and long polling', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev5',
@@ -68,7 +83,10 @@ export const development = {
         'A visibility timeout of zero so the message is retried immediately'
       ],
       correctAnswer: 1,
-      explanation: 'A redrive policy with a dead-letter queue moves a message after it has been received maxReceiveCount times without being deleted, isolating poison messages for inspection and later redrive. A short retention period would silently delete good messages too. Lambda destinations apply to asynchronous invocations, not to SQS queues, and a zero visibility timeout makes the failing loop faster rather than removing the message.'
+      explanation: 'A redrive policy with a dead-letter queue moves a message after it has been received maxReceiveCount times without being deleted, isolating poison messages for inspection and later redrive. A short retention period would silently delete good messages too. Lambda destinations apply to asynchronous invocations, not to SQS queues, and a zero visibility timeout makes the failing loop faster rather than removing the message.',
+      sources: [
+        { title: 'Using dead-letter queues in Amazon SQS', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev6',
@@ -80,7 +98,11 @@ export const development = {
         'Set MessageGroupId to the account ID so each account forms its own group'
       ],
       correctAnswer: 3,
-      explanation: 'FIFO queues guarantee order within a message group and let different groups be processed in parallel, so using the account ID as the group ID keeps per-account order and spreads work across consumers. A standard queue gives best-effort ordering and possible duplicates. The deduplication ID controls duplicate suppression, not ordering or parallelism, and extra consumers cannot help because one group is delivered to only one consumer at a time.'
+      explanation: 'FIFO queues guarantee order within a message group and let different groups be processed in parallel, so using the account ID as the group ID keeps per-account order and spreads work across consumers. A standard queue gives best-effort ordering and possible duplicates. The deduplication ID controls duplicate suppression, not ordering or parallelism, and extra consumers cannot help because one group is delivered to only one consumer at a time.',
+      sources: [
+        { title: 'Using the message group ID with Amazon SQS FIFO Queues', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/using-messagegroupid-property.html', checked: '2026-11-25' },
+        { title: 'Using the message deduplication ID in Amazon SQS', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/using-messagededuplicationid-property.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev7',
@@ -92,7 +114,11 @@ export const development = {
         'Switch the queue to a FIFO queue, which supports larger message payloads'
       ],
       correctAnswer: 0,
-      explanation: 'The SQS Extended Client Library automatically stores large payloads in S3 and sends a pointer in the message, then retrieves the object on receive, so the application code barely changes. Compression may not shrink 50 MB below the limit, and splitting and reassembling messages is custom code that must handle ordering and loss. FIFO queues have the same message size limit as standard queues.'
+      explanation: 'The SQS Extended Client Library automatically stores large payloads in S3 and sends a pointer in the message, then retrieves the object on receive, so the application code barely changes. Compression may not shrink 50 MB below the limit, and splitting and reassembling messages is custom code that must handle ordering and loss. FIFO queues have the same message size limit as standard queues.',
+      sources: [
+        { title: 'Amazon SQS message quotas', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/quotas-messages.html', checked: '2026-11-25' },
+        { title: 'Managing large Amazon SQS messages using Java and Amazon S3', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-s3-messages.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev8',
@@ -104,7 +130,11 @@ export const development = {
         'Configure a delivery policy on the topic that skips non-matching messages'
       ],
       correctAnswer: 2,
-      explanation: 'An SNS subscription filter policy matches on message attributes or the message body, including numeric ranges and anything-but conditions, so only matching messages are delivered to that subscriber. A second topic requires publisher or relay changes. Filtering in the consumer still pays for and processes every delivery, and delivery policies control retry behavior for HTTP endpoints, not which messages are sent.'
+      explanation: 'An SNS subscription filter policy matches on message attributes or the message body, including numeric ranges and anything-but conditions, so only matching messages are delivered to that subscriber. A second topic requires publisher or relay changes. Filtering in the consumer still pays for and processes every delivery, and delivery policies control retry behavior for HTTP endpoints, not which messages are sent.',
+      sources: [
+        { title: 'Amazon SNS message filtering', url: 'https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html', checked: '2026-11-25' },
+        { title: 'Amazon SNS subscription filter policies', url: 'https://docs.aws.amazon.com/sns/latest/dg/sns-subscription-filter-policies.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev9',
@@ -116,7 +146,11 @@ export const development = {
         'An EventBridge pipe with filtering, Lambda enrichment and a state machine target'
       ],
       correctAnswer: 3,
-      explanation: 'EventBridge Pipes connects a point-to-point source such as SQS to a target, with built-in filtering and an optional enrichment step, so no polling or glue code is needed. An EventBridge rule matches events on a bus and cannot poll an SQS queue as a source. SNS cannot read from a queue, and a Lambda consumer that calls StartExecution is exactly the glue code the team wants to avoid.'
+      explanation: 'EventBridge Pipes connects a point-to-point source such as SQS to a target, with built-in filtering and an optional enrichment step, so no polling or glue code is needed. An EventBridge rule matches events on a bus and cannot poll an SQS queue as a source. SNS cannot read from a queue, and a Lambda consumer that calls StartExecution is exactly the glue code the team wants to avoid.',
+      sources: [
+        { title: 'Amazon EventBridge Pipes', url: 'https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html', checked: '2026-11-25' },
+        { title: 'Event enrichment in Amazon EventBridge Pipes', url: 'https://docs.aws.amazon.com/eventbridge/latest/userguide/pipes-enrichment.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev10',
@@ -128,7 +162,10 @@ export const development = {
         'Write every record to a single shard by passing a fixed partition key'
       ],
       correctAnswer: 0,
-      explanation: 'Kinesis hashes the partition key to choose a shard and preserves order within a shard, so using the device ID keeps each device in order while spreading devices across shards. A random UUID or a timestamp distributes records well but scatters one device across shards and loses its order. A fixed key preserves order but puts all traffic on one shard and caps throughput.'
+      explanation: 'Kinesis hashes the partition key to choose a shard and preserves order within a shard, so using the device ID keeps each device in order while spreading devices across shards. A random UUID or a timestamp distributes records well but scatters one device across shards and loses its order. A fixed key preserves order but puts all traffic on one shard and caps throughput.',
+      sources: [
+        { title: 'Amazon Kinesis Data Streams terminology and concepts', url: 'https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev11',
@@ -140,7 +177,10 @@ export const development = {
         'Express workflow nested as a child of a Standard workflow'
       ],
       correctAnswer: 1,
-      explanation: 'Express workflows are built for high-volume, short-lived (up to 5 minutes) event processing, are billed by requests and duration, and their asynchronous mode has at-least-once semantics, which the idempotent steps tolerate. Standard workflows are billed per state transition and are designed for long-running, exactly-once workflows, which would be expensive at this volume. Wrapping an Express workflow in a Standard parent still pays Standard transitions for every event.'
+      explanation: 'Express workflows are built for high-volume, short-lived (up to 5 minutes) event processing, are billed by requests and duration, and their asynchronous mode has at-least-once semantics, which the idempotent steps tolerate. Standard workflows are billed per state transition and are designed for long-running, exactly-once workflows, which would be expensive at this volume. Wrapping an Express workflow in a Standard parent still pays Standard transitions for every event.',
+      sources: [
+        { title: 'Choosing workflow type in Step Functions', url: 'https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev12',
@@ -152,7 +192,11 @@ export const development = {
         'Wrap the Lambda call in a Parallel state that contains a second fallback branch'
       ],
       correctAnswer: 2,
-      explanation: 'A Retry field with ErrorEquals, MaxAttempts, IntervalSeconds and BackoffRate retries the Task with exponential delays, and a Catch field with Next and ResultPath routes the final failure and its error output to NotifyFailure. TimeoutSeconds limits runtime but does not retry, and a Choice state cannot inspect an unhandled failure. Lambda async retries do not apply because Step Functions invokes the function synchronously, and a Parallel state runs both branches rather than falling back.'
+      explanation: 'A Retry field with ErrorEquals, MaxAttempts, IntervalSeconds and BackoffRate retries the Task with exponential delays, and a Catch field with Next and ResultPath routes the final failure and its error output to NotifyFailure. TimeoutSeconds limits runtime but does not retry, and a Choice state cannot inspect an unhandled failure. Lambda async retries do not apply because the Task invokes the function synchronously by default, and a Parallel state runs both branches rather than falling back.',
+      sources: [
+        { title: 'Handling errors in Step Functions workflows', url: 'https://docs.aws.amazon.com/step-functions/latest/dg/concepts-error-handling.html', checked: '2026-11-25' },
+        { title: 'Invoke an AWS Lambda function with Step Functions', url: 'https://docs.aws.amazon.com/step-functions/latest/dg/connect-lambda.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev13',
@@ -164,7 +208,11 @@ export const development = {
         'Disable the SDK retry logic and fail the job on the first error'
       ],
       correctAnswer: 0,
-      explanation: 'Exponential backoff with jitter randomizes each client\'s wait so retries spread out instead of arriving together, which is the AWS-recommended pattern and what the AWS SDKs implement by default. Immediate or fixed-interval retries keep every client synchronized and make throttling worse. Failing on the first error avoids collisions but turns transient throttling into job failures.'
+      explanation: 'Exponential backoff with jitter randomizes each client\'s wait so retries spread out instead of arriving together, which is the AWS-recommended pattern and what the AWS SDKs implement by default. Immediate or fixed-interval retries keep every client synchronized and make throttling worse. Failing on the first error avoids collisions but turns transient throttling into job failures.',
+      sources: [
+        { title: 'Retry behavior', url: 'https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html', checked: '2026-11-25' },
+        { title: 'Retry with backoff pattern', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/retry-backoff.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev14',
@@ -176,7 +224,11 @@ export const development = {
         'Store an idempotency key with a conditional write and skip known keys'
       ],
       correctAnswer: 3,
-      explanation: 'Recording a unique idempotency key (for example the payment ID) with a conditional write such as attribute_not_exists lets the function detect a repeated event and return the earlier result without charging again; Powertools for AWS Lambda provides this pattern. Serializing invocations does not stop the same event arriving twice. Disabling retries loses events after transient errors, and a longer timeout does not prevent at-least-once delivery.'
+      explanation: 'Recording a unique idempotency key (for example the payment ID) with a conditional write such as attribute_not_exists lets the function detect a repeated event and return the earlier result without charging again; Powertools for AWS Lambda provides this pattern. Serializing invocations does not stop the same event arriving twice. Disabling retries loses events after transient errors, and a longer timeout does not prevent at-least-once delivery.',
+      sources: [
+        { title: 'Best practices for working with AWS Lambda Event Functions', url: 'https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html', checked: '2026-11-25' },
+        { title: 'DynamoDB condition expression CLI example', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev15',
@@ -188,19 +240,27 @@ export const development = {
         'Use a VPC link to the backend and enable content encoding on the stage'
       ],
       correctAnswer: 2,
-      explanation: 'A non-proxy (custom) integration in a REST API lets VTL mapping templates transform the request into the XML the backend expects and transform the response back to JSON, with no extra compute. A proxy integration passes the request through unchanged, which the backend cannot accept. A Lambda converter is the code the developer wants to avoid, and VPC links and content encoding handle connectivity and compression, not field mapping.'
+      explanation: 'A non-proxy (custom) integration in a REST API lets VTL mapping templates transform the request into the XML the backend expects and transform the response back to JSON, with no extra compute. A proxy integration passes the request through unchanged, which the backend cannot accept. A Lambda converter is the code the developer wants to avoid, and VPC links and content encoding handle connectivity and compression, not field mapping.',
+      sources: [
+        { title: 'Mapping template transformations for REST APIs in API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/models-mappings.html', checked: '2026-11-25' },
+        { title: 'Choose an API Gateway API integration type', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-integration-types.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev16',
       question: 'An API Gateway endpoint starts a report that takes several minutes to generate, but clients receive a timeout error because the API waits for the work to finish. Clients can check back later for the result. Which change best fits this requirement?',
       options: [
-        'Raise the Lambda function timeout to 15 minutes and keep the synchronous API call',
+        'Raise the Lambda function timeout to 30 minutes and keep the synchronous API call',
         'Queue the request in SQS, return 202 with a job ID, and process it asynchronously',
         'Enable API caching on the stage so repeated requests return the stored report',
         'Switch the endpoint to a Lambda function URL so the response has no time limit'
       ],
       correctAnswer: 1,
-      explanation: 'Accepting the request, queuing the work and returning 202 Accepted with a job ID decouples the client from the long-running task, and the client can poll a status endpoint or be notified later. A longer Lambda timeout does not help because API Gateway integrations are designed for short requests and the integration timeout still ends the call. Caching only helps repeated identical requests, and a function URL is still bound by the Lambda maximum timeout and keeps clients waiting in a fragile synchronous design.'
+      explanation: 'Accepting the request, queuing the work and returning 202 Accepted with a job ID decouples the client from the long-running task, and the client can poll a status endpoint or be notified later. A longer Lambda timeout does not help because the REST API integration timeout (29 seconds by default) still ends the call; it can be raised for Regional and private APIs, but that can lower the account throttle quota and still keeps clients waiting on a fragile connection. Caching only helps repeated identical requests, and a function URL is still bound by the Lambda maximum timeout and keeps clients waiting in a fragile synchronous design.',
+      sources: [
+        { title: 'Quotas for configuring and running a REST API in API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-execution-service-limits-table.html', checked: '2026-11-25' },
+        { title: 'Configure Lambda Event Function timeout', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html', checked: '2026-11-25' }
+      ]
     },
 
     // ── Task 2: Develop code for AWS Lambda ──
@@ -214,7 +274,10 @@ export const development = {
         'Increase the function timeout so each invocation can finish its processing'
       ],
       correctAnswer: 0,
-      explanation: 'Lambda allocates CPU in proportion to configured memory, so raising memory speeds up CPU-bound work, often with little or no extra cost because duration drops. Ephemeral storage only adds /tmp disk space. Provisioned concurrency removes cold starts but does not speed up the handler itself, and a longer timeout only lets a slow function keep running.'
+      explanation: 'Lambda allocates CPU in proportion to configured memory, so raising memory speeds up CPU-bound work, often with little or no extra cost because duration drops. Ephemeral storage only adds /tmp disk space. Provisioned concurrency removes cold starts but does not speed up the handler itself, and a longer timeout only lets a slow function keep running.',
+      sources: [
+        { title: 'Configure Lambda Event Function memory', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev18',
@@ -226,7 +289,10 @@ export const development = {
         'Package the libraries as a Lambda layer and attach the layer to each function'
       ],
       correctAnswer: 3,
-      explanation: 'A Lambda layer packages shared libraries once and can be attached to many functions, keeping each deployment package small; functions pick up a new library version when their layer version reference is updated. Downloading from S3 or copying into /tmp adds latency and custom loading code to every cold start. Environment variables are small key-value settings and cannot hold library code.'
+      explanation: 'A Lambda layer packages shared libraries once and can be attached to many functions, keeping each deployment package small; functions pick up a new library version when their layer version reference is updated. Downloading from S3 or copying into /tmp adds latency and custom loading code to every cold start. Environment variables are small key-value settings and cannot hold library code.',
+      sources: [
+        { title: 'Managing Lambda Event Function dependencies with layers', url: 'https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev19',
@@ -238,7 +304,11 @@ export const development = {
         'Download the dependencies to /tmp from Amazon S3 on every function invocation'
       ],
       correctAnswer: 2,
-      explanation: 'Lambda container images can be up to 10 GB, are stored in ECR and fit a team that already builds Docker images. Layers count toward the same 250 MB unzipped limit as the function code, and uploading the .zip to S3 changes where it is stored, not the unzipped limit. Downloading 3 GB on each invocation is slow, and the default /tmp size is far smaller than that.'
+      explanation: 'Lambda container images can be up to 10 GB, are stored in ECR and fit a team that already builds Docker images. Layers count toward the same 250 MB unzipped limit as the function code, and uploading the .zip to S3 changes where it is stored, not the unzipped limit. Downloading 3 GB on each invocation is slow, and the default /tmp size is far smaller than that.',
+      sources: [
+        { title: 'Create a Lambda Event Function using a container image', url: 'https://docs.aws.amazon.com/lambda/latest/dg/images-create.html', checked: '2026-11-25' },
+        { title: 'Lambda quotas', url: 'https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev20',
@@ -250,7 +320,10 @@ export const development = {
         'Set the event source mapping batch size to 50 for the function'
       ],
       correctAnswer: 1,
-      explanation: 'Reserved concurrency both guarantees and caps the number of concurrent executions for one function, so setting it to 50 protects the database while leaving other functions unaffected. Provisioned concurrency pre-initializes environments to reduce cold starts but does not cap scaling. Lowering the account quota throttles every function, and batch size controls records per invocation rather than concurrency.'
+      explanation: 'Reserved concurrency both guarantees and caps the number of concurrent executions for one function, so setting it to 50 protects the database while leaving other functions unaffected. Provisioned concurrency pre-initializes environments to reduce cold starts but does not cap scaling. Lowering the account quota throttles every function, and batch size controls records per invocation rather than concurrency.',
+      sources: [
+        { title: 'Configuring reserved concurrency for an Event Function', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev21',
@@ -262,7 +335,10 @@ export const development = {
         'Configure provisioned concurrency on an alias, scaled up on a schedule'
       ],
       correctAnswer: 3,
-      explanation: 'Provisioned concurrency keeps a set number of execution environments initialized on a version or alias, and Application Auto Scaling can raise it on a schedule before the predictable spike. Reserved concurrency limits scaling but does not pre-warm anything. A once-a-minute ping keeps at most a few environments warm, not the many needed at peak, and more memory may shorten initialization but does not remove it.'
+      explanation: 'Provisioned concurrency keeps a set number of execution environments initialized on a version or alias, and Application Auto Scaling can raise it on a schedule before the predictable spike. Reserved concurrency limits scaling but does not pre-warm anything. A once-a-minute ping keeps at most a few environments warm, not the many needed at peak, and more memory may shorten initialization but does not remove it.',
+      sources: [
+        { title: 'Configuring provisioned concurrency for an Event Function', url: 'https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev22',
@@ -274,7 +350,11 @@ export const development = {
         'Arm64 architecture with a larger ephemeral storage allocation'
       ],
       correctAnswer: 0,
-      explanation: 'SnapStart snapshots the initialized execution environment when a version is published and resumes new environments from that snapshot, cutting Java cold starts sharply without paying for idle capacity. Provisioned concurrency charges for warm environments even when idle and cannot be set on $LATEST. Extensions run alongside the function but cannot skip its initialization, and Arm64 or more /tmp space does not remove a slow framework startup.'
+      explanation: 'SnapStart snapshots the initialized execution environment when a version is published and resumes new environments from that snapshot, cutting Java cold starts sharply without paying for idle capacity. Provisioned concurrency charges for warm environments even when idle and cannot be set on $LATEST. Extensions run alongside the function but cannot skip its initialization, and Arm64 or more /tmp space does not remove a slow framework startup.',
+      sources: [
+        { title: 'Improving startup performance with Lambda SnapStart', url: 'https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html', checked: '2026-11-25' },
+        { title: 'Configuring provisioned concurrency for an Event Function', url: 'https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev23',
@@ -286,11 +366,15 @@ export const development = {
         'Configure an on-failure destination for the event source mapping'
       ],
       correctAnswer: 2,
-      explanation: 'With ReportBatchItemFailures enabled on the event source mapping, the function returns batchItemFailures listing only the failed message IDs, and Lambda deletes the rest. A batch size of 1 avoids reprocessing but sharply lowers throughput and raises cost. Manually deleting messages works but is error-prone custom code, and an on-failure destination captures failed batches without stopping the successful messages from being retried.'
+      explanation: 'With ReportBatchItemFailures enabled on the event source mapping, the function returns batchItemFailures listing only the failed message IDs, and Lambda deletes the rest. A batch size of 1 avoids reprocessing but sharply lowers throughput and raises cost. Manually deleting messages works but is error-prone custom code, and on-failure destinations are not available for SQS event source mappings (failed messages go to the queue\'s DLQ through its redrive policy), so they would not stop the successful messages from being retried.',
+      sources: [
+        { title: 'Handling errors for an SQS event source in Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html', checked: '2026-11-25' },
+        { title: 'Capturing records of Lambda asynchronous invocations', url: 'https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-retain-records.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev24',
-      question: 'S3 invokes a Lambda function asynchronously. When an event still fails after all retries, the team wants the original event, the error message and the stack trace delivered to another Lambda function for alerting. What should the developer configure?',
+      question: 'S3 invokes a Lambda function asynchronously. When an event still fails after all retries, the team wants the original event and the function\'s error response delivered to another Lambda function for alerting. What should the developer configure?',
       options: [
         'A dead-letter queue on the function that uses an SNS topic',
         'An on-failure destination that targets the alerting function',
@@ -298,11 +382,14 @@ export const development = {
         'A CloudWatch Logs subscription filter that forwards all ERROR log lines'
       ],
       correctAnswer: 1,
-      explanation: 'Lambda destinations for asynchronous invocations send a record that includes the request payload plus the response with the error message and stack trace, and can target another Lambda function directly. A function DLQ can only target SQS or SNS and carries the event with only a few error attributes, not the full error response. S3 notifications have no redrive policy, and a log subscription filter would require parsing logs to rebuild the event.'
+      explanation: 'Lambda destinations for asynchronous invocations send an invocation record that includes the request payload plus the response payload with the error details, and can target another Lambda function directly. A function DLQ can only target SQS or SNS and carries the event with only a few error attributes, not the full error response. S3 notifications have no redrive policy, and a log subscription filter would require parsing logs to rebuild the event.',
+      sources: [
+        { title: 'Capturing records of Lambda asynchronous invocations', url: 'https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-retain-records.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev25',
-      question: 'A Lambda function was attached to private subnets so it can reach an RDS database. Since the change, its calls to DynamoDB time out. The VPC has no NAT gateway, and the security team does not want traffic to leave the AWS network. What should the developer add?',
+      question: 'A Lambda function was attached to private subnets so it can reach an RDS database. Since the change, its calls to DynamoDB time out. The VPC has no NAT gateway or internet gateway, and the security team does not want to add either one. What should the developer add?',
       options: [
         'A gateway VPC endpoint for DynamoDB added to the private route tables',
         'An internet gateway attached to the VPC and a public IP address on the function',
@@ -310,7 +397,11 @@ export const development = {
         'A DynamoDB Accelerator cluster in the same subnets as the Lambda function'
       ],
       correctAnswer: 0,
-      explanation: 'A VPC-attached Lambda function has no internet access, and a gateway VPC endpoint gives private, no-cost access to DynamoDB (and S3) through route table entries. Lambda functions cannot be given public IP addresses, so an internet gateway alone does not help. A NAT gateway would work but routes traffic to public endpoints and adds cost, and DAX is a cache that still needs DynamoDB access.'
+      explanation: 'A VPC-attached Lambda function has no internet access, and a gateway VPC endpoint gives private, no-cost access to DynamoDB (and S3) through route table entries. Lambda functions cannot be given public IP addresses, so an internet gateway alone does not help. A NAT gateway would work but needs an internet gateway, which the team ruled out, and adds cost, and DAX is a cache that still needs DynamoDB access.',
+      sources: [
+        { title: 'Gateway endpoints for Amazon DynamoDB', url: 'https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-ddb.html', checked: '2026-11-25' },
+        { title: 'Giving Lambda Event Functions access to resources in an Amazon VPC', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev26',
@@ -322,7 +413,11 @@ export const development = {
         'Create a function URL with auth type NONE and verify signatures in code'
       ],
       correctAnswer: 3,
-      explanation: 'A Lambda function URL gives the function its own HTTPS endpoint with no other service, and the NONE auth type suits callers that cannot use SigV4, as long as the function validates the provider\'s signature. API Gateway and an ALB work but add services the developer wanted to avoid, and an IAM authorizer would still require AWS signing. Sharing long-term access keys with a third party is a security anti-pattern.'
+      explanation: 'A Lambda function URL gives the function its own HTTPS endpoint with no other service, and the NONE auth type suits callers that cannot use SigV4, as long as the function validates the provider\'s signature. API Gateway and an ALB work but add services the developer wanted to avoid, and an IAM authorizer would still require AWS signing. Sharing long-term access keys with a third party is a security anti-pattern.',
+      sources: [
+        { title: 'Control access to Lambda function URLs', url: 'https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html', checked: '2026-11-25' },
+        { title: 'Tutorial: Creating a webhook endpoint using a Lambda function URL', url: 'https://docs.aws.amazon.com/lambda/latest/dg/urls-webhook-tutorial.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev27',
@@ -334,7 +429,10 @@ export const development = {
         'Close the connection at the end of every invocation to free database resources'
       ],
       correctAnswer: 1,
-      explanation: 'Code outside the handler runs once per execution environment during initialization, so clients and connections created there are reused by every warm invocation. A longer timeout does not reduce churn. Environment variables hold strings set at deployment and cannot store live objects, and closing connections each time makes the churn worse.'
+      explanation: 'Code outside the handler runs once per execution environment during initialization, so clients and connections created there are reused by every warm invocation. A longer timeout does not reduce churn. Environment variables hold strings set at deployment and cannot store live objects, and closing connections each time makes the churn worse.',
+      sources: [
+        { title: 'Best practices for working with AWS Lambda Event Functions', url: 'https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev28',
@@ -346,7 +444,11 @@ export const development = {
         'An EventBridge rule that forwards Lambda invocation events to the vendor'
       ],
       correctAnswer: 2,
-      explanation: 'Lambda extensions run as companion processes in the execution environment, are distributed as layers, and can receive logs, metrics and traces through the Telemetry API and send them asynchronously without code changes. A log subscription filter only covers CloudWatch Logs and adds another delivery service. A wrapper script changes how the runtime starts rather than collecting telemetry in the background, and EventBridge does not emit an event for every invocation.'
+      explanation: 'Lambda extensions run as companion processes in the execution environment, are distributed as layers, and can receive logs, metrics and traces through the Telemetry API and send them asynchronously without code changes. A log subscription filter only covers CloudWatch Logs and adds another delivery service. A wrapper script changes how the runtime starts rather than collecting telemetry in the background, and EventBridge does not emit an event for every invocation.',
+      sources: [
+        { title: 'Augment Lambda Event Functions using Lambda extensions', url: 'https://docs.aws.amazon.com/lambda/latest/dg/lambda-extensions.html', checked: '2026-11-25' },
+        { title: 'Accessing real-time telemetry data for extensions using the Telemetry API', url: 'https://docs.aws.amazon.com/lambda/latest/dg/telemetry-api.html', checked: '2026-11-25' }
+      ]
     },
 
     // ── Task 3: Use data stores in application development ──
@@ -360,7 +462,11 @@ export const development = {
         'Shard the key with a random suffix on the poll ID and sum on read'
       ],
       correctAnswer: 3,
-      explanation: 'A single hot partition key is limited by per-partition throughput, so write sharding (pollId#1 to pollId#N) spreads writes across partitions, and the app sums the shards when reading. More table-level capacity does not lift the per-partition limit. An LSI shares the same partition key and adds writes rather than spreading them, and a Scan is a read operation that does nothing for write throttling.'
+      explanation: 'A single hot partition key is limited by per-partition throughput, so write sharding (pollId#1 to pollId#N) spreads writes across partitions, and the app sums the shards when reading. More table-level capacity does not lift the per-partition limit. An LSI shares the same partition key and adds writes rather than spreading them, and a Scan is a read operation that does nothing for write throttling.',
+      sources: [
+        { title: 'Using write sharding to distribute workloads evenly in your DynamoDB table', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-sharding.html', checked: '2026-11-25' },
+        { title: 'Best practices for designing and using partition keys effectively in DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev30',
@@ -372,7 +478,11 @@ export const development = {
         'Query with customerId in the key condition and a filter expression on orderDate'
       ],
       correctAnswer: 0,
-      explanation: 'A Query with the partition key and a BETWEEN key condition on the sort key reads only the matching items, so it is the cheapest option. A Scan reads every item in the table before filtering. GetItem needs the exact sort key and would require dozens of calls, and a filter expression is applied after items are read, so it still consumes capacity for every order the customer has ever placed.'
+      explanation: 'A Query with the partition key and a BETWEEN key condition on the sort key reads only the matching items, so it is the cheapest option. A Scan reads every item in the table before filtering. GetItem needs the exact sort key and would require dozens of calls, and a filter expression is applied after items are read, so it still consumes capacity for every order the customer has ever placed.',
+      sources: [
+        { title: 'Key condition expressions for the Query operation in DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.KeyConditionExpressions.html', checked: '2026-11-25' },
+        { title: 'Filter expressions for the Query operation in DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.FilterExpression.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev31',
@@ -384,7 +494,10 @@ export const development = {
         'A DynamoDB stream that copies each email into a lookup attribute'
       ],
       correctAnswer: 2,
-      explanation: 'A global secondary index can use a different partition key, such as email, and can be added to an existing table at any time. A local secondary index must be created with the table and keeps the same partition key, so it cannot look up by email alone. A Scan with a filter reads the whole table, and a stream that copies attributes does not create a new way to query.'
+      explanation: 'A global secondary index can use a different partition key, such as email, and can be added to an existing table at any time. A local secondary index must be created with the table and keeps the same partition key, so it cannot look up by email alone. A Scan with a filter reads the whole table, and a stream that copies attributes does not create a new way to query.',
+      sources: [
+        { title: 'Improving data access with secondary indexes in DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SecondaryIndexes.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev32',
@@ -396,7 +509,11 @@ export const development = {
         '80 RCU'
       ],
       correctAnswer: 1,
-      explanation: 'One RCU is one strongly consistent read per second of up to 4 KB, so a 7 KB item rounds up to 8 KB and needs 2 RCU per read; 20 reads x 2 = 40 RCU. 20 RCU is the eventually consistent figure, which costs half as much. 35 RCU comes from dividing 7 KB exactly instead of rounding up to 4 KB blocks, and 80 RCU would be correct for transactional reads, which cost double.'
+      explanation: 'One RCU is one strongly consistent read per second of up to 4 KB, so a 7 KB item rounds up to 8 KB and needs 2 RCU per read; 20 reads x 2 = 40 RCU. 20 RCU is the eventually consistent figure, which costs half as much. 35 RCU comes from dividing 7 KB exactly instead of rounding up to 4 KB blocks, and 80 RCU would be correct for transactional reads, which cost double.',
+      sources: [
+        { title: 'DynamoDB read and write operations', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/read-write-operations.html', checked: '2026-11-25' },
+        { title: 'DynamoDB provisioned capacity mode', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/provisioned-capacity-mode.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev33',
@@ -408,7 +525,11 @@ export const development = {
         'Update with a condition on the expected version, then increment it'
       ],
       correctAnswer: 3,
-      explanation: 'Optimistic locking uses a ConditionExpression such as version = :expected and increments the version in the same UpdateItem; if another writer got there first, the call fails with ConditionalCheckFailedException and the app can reload and retry. A strongly consistent read still leaves a race between the read and the write. BatchWriteItem does not support conditions, and rolling back from a stream after the fact is complex and leaves a window of bad data.'
+      explanation: 'Optimistic locking uses a ConditionExpression such as version = :expected and increments the version in the same UpdateItem; if another writer got there first, the call fails with ConditionalCheckFailedException and the app can reload and retry. A strongly consistent read still leaves a race between the read and the write. BatchWriteItem does not support conditions, and rolling back from a stream after the fact is complex and leaves a window of bad data.',
+      sources: [
+        { title: 'DynamoDB and optimistic locking with version number', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.OptimisticLocking.html', checked: '2026-11-25' },
+        { title: 'DynamoDB condition expression CLI example', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev34',
@@ -420,7 +541,10 @@ export const development = {
         'PutItem on both tables with ReturnValues set to ALL_OLD'
       ],
       correctAnswer: 0,
-      explanation: 'TransactWriteItems applies a group of writes across one or more tables atomically, and a condition on the Update (for example points >= :cost) cancels the whole transaction if it fails. BatchWriteItem is not atomic, does not support updates or conditions, and can leave some items unprocessed. Separate calls with retries can leave one write applied without the other, and ReturnValues only returns old attributes.'
+      explanation: 'TransactWriteItems applies a group of writes across one or more tables atomically, and a condition on the Update (for example points >= :cost) cancels the whole transaction if it fails. BatchWriteItem is not atomic, does not support updates or conditions, and can leave some items unprocessed. Separate calls with retries can leave one write applied without the other, and ReturnValues only returns old attributes.',
+      sources: [
+        { title: 'Amazon DynamoDB Transactions: How it works', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev35',
@@ -432,7 +556,10 @@ export const development = {
         'The query uses eventual consistency; set ConsistentRead to true'
       ],
       correctAnswer: 2,
-      explanation: 'A single Query or Scan returns at most 1 MB of data, and LastEvaluatedKey in the response means more results exist; the app must call again with ExclusiveStartKey until LastEvaluatedKey is absent, which SDK paginators do automatically. Throttling raises an error instead of returning partial results silently. Limit has no default of 1,000 and cannot exceed the 1 MB page size, and consistency affects freshness, not result count.'
+      explanation: 'A single Query or Scan returns at most 1 MB of data, and LastEvaluatedKey in the response means more results exist; the app must call again with ExclusiveStartKey until LastEvaluatedKey is absent, which SDK paginators do automatically. Throttling raises an error instead of returning partial results silently. Limit has no default of 1,000 and cannot exceed the 1 MB page size, and consistency affects freshness, not result count.',
+      sources: [
+        { title: 'Paginating table query results in DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.Pagination.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev36',
@@ -444,7 +571,10 @@ export const development = {
         'A global secondary index projecting the leaderboard attributes for reads'
       ],
       correctAnswer: 1,
-      explanation: 'DAX is an in-memory cache for DynamoDB that is API-compatible, so the app swaps in the DAX client and gets microsecond reads for eventually consistent requests. ElastiCache can be just as fast but requires custom caching logic and a different API. Global tables reduce cross-Region latency but still return in milliseconds, and a GSI is another DynamoDB read path, not a cache.'
+      explanation: 'DAX is an in-memory cache for DynamoDB that is API-compatible, so the app swaps in the DAX client and gets microsecond reads for eventually consistent requests. ElastiCache can be just as fast but requires custom caching logic and a different API. Global tables reduce cross-Region latency but still return in milliseconds, and a GSI is another DynamoDB read path, not a cache.',
+      sources: [
+        { title: 'In-memory acceleration with DynamoDB Accelerator (DAX)', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev37',
@@ -456,7 +586,11 @@ export const development = {
         'Enable S3 Transfer Acceleration and grant the bucket to all users'
       ],
       correctAnswer: 0,
-      explanation: 'A presigned URL grants time-limited permission to perform one operation on one object using the permissions of the identity that signed it, so the browser uploads straight to S3 without credentials. Public PUT access lets anyone write to the bucket, and embedding access keys exposes long-term credentials. Transfer Acceleration speeds up uploads over distance but does not handle authorization.'
+      explanation: 'A presigned URL grants time-limited permission to perform one operation on one object using the permissions of the identity that signed it, so the browser uploads straight to S3 without credentials. Public PUT access lets anyone write to the bucket, and embedding access keys exposes long-term credentials. Transfer Acceleration speeds up uploads over distance but does not handle authorization.',
+      sources: [
+        { title: 'Uploading objects with presigned URLs', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html', checked: '2026-11-25' },
+        { title: 'Download and upload objects with presigned URLs', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev38',
@@ -468,7 +602,11 @@ export const development = {
         'Use multipart upload so that failed parts can be retried alone'
       ],
       correctAnswer: 3,
-      explanation: 'A single PUT is limited to 5 GB, and multipart upload splits a file into parts that upload in parallel, so only a failed part is retried; the SDK transfer managers do this automatically. Transfer Acceleration improves network path speed but does not lift the single-PUT limit. Compression may not bring a backup under 5 GB, and a presigned URL changes authorization, not the size limit.'
+      explanation: 'A single PUT is limited to 5 GB, and multipart upload splits a file into parts that upload in parallel, so only a failed part is retried; the SDK transfer managers do this automatically. Transfer Acceleration improves network path speed but does not lift the single-PUT limit. Compression may not bring a backup under 5 GB, and a presigned URL changes authorization, not the size limit.',
+      sources: [
+        { title: 'Uploading and copying objects using multipart upload in Amazon S3', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html', checked: '2026-11-25' },
+        { title: 'Uploading objects', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev39',
@@ -480,7 +618,10 @@ export const development = {
         'Increase the node size of the cluster so more items can be held in memory'
       ],
       correctAnswer: 2,
-      explanation: 'Write-through updates the cache at the same time as the database, so reads see new prices immediately, and a TTL still evicts items that are rarely read. Removing the TTL makes staleness and memory use worse. Lazy loading already reads the database on a miss, which is the cause of the stale data, and a bigger node holds more stale data rather than fixing it.'
+      explanation: 'Write-through updates the cache at the same time as the database, so reads see new prices immediately, and a TTL still evicts items that are rarely read. Removing the TTL makes staleness and memory use worse. Lazy loading already reads the database on a miss, which is the cause of the stale data, and a bigger node holds more stale data rather than fixing it.',
+      sources: [
+        { title: 'Caching strategies for Memcached', url: 'https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev40',
@@ -492,7 +633,11 @@ export const development = {
         'Set the Lambda timeout lower so connections are closed more quickly'
       ],
       correctAnswer: 1,
-      explanation: 'RDS Proxy pools and shares database connections across many Lambda executions, so the app only changes its connection endpoint. Secrets Manager improves credential handling but not connection counts. Aurora Replicas cannot accept writes, and a shorter timeout fails requests without reducing how many connections are open at the same time.'
+      explanation: 'RDS Proxy pools and shares database connections across many Lambda executions, so the app only changes its connection endpoint. Secrets Manager improves credential handling but not connection counts. Aurora Replicas cannot accept writes, and a shorter timeout fails requests without reducing how many connections are open at the same time.',
+      sources: [
+        { title: 'Amazon RDS Proxy for Aurora', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/rds-proxy.html', checked: '2026-11-25' },
+        { title: 'Using AWS Lambda with Amazon RDS', url: 'https://docs.aws.amazon.com/lambda/latest/dg/services-rds.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev41',
@@ -504,7 +649,10 @@ export const development = {
         'Enable DynamoDB Streams with NEW_AND_OLD_IMAGES and add a Lambda trigger'
       ],
       correctAnswer: 3,
-      explanation: 'DynamoDB Streams captures every item-level change, and the NEW_AND_OLD_IMAGES view type gives the Lambda function both the before and after values. Scheduled scans are slow, expensive and can miss intermediate changes. TTL only produces deletions of expired items, and publishing from every code path is easy to miss and does not include the old value reliably.'
+      explanation: 'DynamoDB Streams captures every item-level change, and the NEW_AND_OLD_IMAGES view type gives the Lambda function both the before and after values. Scheduled scans are slow, expensive and can miss intermediate changes. TTL only produces deletions of expired items, and publishing from every code path is easy to miss and does not include the old value reliably.',
+      sources: [
+        { title: 'Change data capture for DynamoDB Streams', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dev42',
@@ -516,7 +664,11 @@ export const development = {
         'Cache the catalog in DAX and filter the cached items in application code'
       ],
       correctAnswer: 0,
-      explanation: 'OpenSearch Service provides full-text search, fuzzy matching, relevance scoring and aggregations for facets, and DynamoDB data can be replicated to it with the zero-ETL integration or a stream-driven Lambda. A GSI only supports exact key matches and prefix conditions on sort keys. A Scan with contains() reads the whole table and has no ranking or typo tolerance, and DAX caches items without adding any search features.'
+      explanation: 'OpenSearch Service provides full-text search, fuzzy matching, relevance scoring and aggregations for facets, and DynamoDB data can be replicated to it with the zero-ETL integration or a stream-driven Lambda. A GSI only supports exact key matches and prefix conditions on sort keys. A Scan with contains() reads the whole table and has no ranking or typo tolerance, and DAX caches items without adding any search features.',
+      sources: [
+        { title: 'DynamoDB zero-ETL integration with Amazon OpenSearch Service', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/OpenSearchIngestionForDynamoDB.html', checked: '2026-11-25' },
+        { title: 'What is OpenSearch? - Open Source Search Engine Explained', url: 'https://aws.amazon.com/what-is/opensearch/', checked: '2026-11-25' }
+      ]
     }
   ]
 };

@@ -10,13 +10,18 @@ export const developmentGuide = {
     {
       id: 'devs1',
       title: 'Messaging and Event-Driven Patterns',
+      sources: [
+        { title: 'Amazon SQS queue types', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-queue-types.html', checked: '2026-11-25' },
+        { title: 'Amazon SQS message quotas', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/quotas-messages.html', checked: '2026-11-25' },
+        { title: 'What Is Amazon EventBridge?', url: 'https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Most DVA-C02 architecture questions are really messaging questions: which service decouples the producer from the consumer, who gets a copy of each message, and what happens when a consumer is slow or broken. Learn the delivery model of each service first, then the settings you change in code.' },
         { type: 'table', headers: ['Service', 'Delivery model', 'Ordering', 'Pick it when'], rows: [
           ['Amazon SQS standard', 'Consumers poll (pull); each message goes to one consumer', 'Best effort, at-least-once', 'Buffer work, absorb spikes, decouple one producer from a worker fleet'],
           ['Amazon SQS FIFO', 'Pull, exactly-once processing within the deduplication interval', 'Strict per MessageGroupId', 'Order matters per entity (account, order) and duplicates must be suppressed'],
           ['Amazon SNS', 'Push to every subscriber (SQS, Lambda, HTTPS, email, SMS)', 'None (FIFO topics for ordered fan-out to FIFO queues)', 'Fan-out: many independent consumers need a copy'],
-          ['Amazon EventBridge', 'Event bus with content-based rules routing to targets', 'None', 'Route events from AWS services, SaaS partners or your apps by content; archive and replay'],
+          ['Amazon EventBridge', 'Event bus routing events to targets by content (rules on default and Classic buses, subscribers with filters on the new Custom Event Bus)', 'None on default and Classic buses; FIFO subscribers on the Custom Event Bus keep order per event group', 'Route events from AWS services, SaaS partners or your apps by content; archive and replay'],
           ['Kinesis Data Streams', 'Consumers read shards; data retained for replay', 'Strict per shard (partition key)', 'High-throughput ordered streams with multiple consumers and replay']
         ]},
         { type: 'keyTerm', term: 'Visibility timeout', definition: 'After a consumer receives an SQS message, the message is hidden for this period (default 30 seconds, max 12 hours). If it is not deleted before the timeout ends, it becomes visible and is delivered again. Set it longer than your processing time, or extend it with ChangeMessageVisibility. With a Lambda trigger, AWS recommends at least six times the function timeout.' },
@@ -37,6 +42,11 @@ export const developmentGuide = {
     {
       id: 'devs2',
       title: 'Workflows, APIs and Resilient Code',
+      sources: [
+        { title: 'Choosing workflow type in Step Functions', url: 'https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html', checked: '2026-11-25' },
+        { title: 'Handling errors in Step Functions workflows', url: 'https://docs.aws.amazon.com/step-functions/latest/dg/concepts-error-handling.html', checked: '2026-11-25' },
+        { title: 'Mapping template transformations for REST APIs in API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/models-mappings.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Code on AWS must assume that calls fail, time out and get retried. The exam rewards stateless handlers, idempotent operations, asynchronous hand-offs for slow work, and the right integration between API Gateway and the backend.' },
         { type: 'comparison', title: 'Choreography vs orchestration', items: [
@@ -70,11 +80,16 @@ export const developmentGuide = {
     {
       id: 'devs3',
       title: 'Lambda Configuration and Performance',
+      sources: [
+        { title: 'Lambda quotas', url: 'https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html', checked: '2026-11-25' },
+        { title: 'Configuring provisioned concurrency for an Event Function', url: 'https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html', checked: '2026-11-25' },
+        { title: 'Improving startup performance with Lambda SnapStart', url: 'https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Lambda questions on DVA-C02 are about the knobs a developer turns: memory, timeout, packaging, concurrency and networking. Know what each setting changes and, just as important, what it does not change.' },
         { type: 'table', headers: ['Setting', 'Range or default', 'What it controls'], rows: [
           ['Memory', '128 MB to 10,240 MB', 'Memory and proportional CPU; more memory often lowers duration for CPU-bound code'],
-          ['Timeout', 'Default 3 s, max 15 min', 'Maximum run time per invocation'],
+          ['Timeout', 'Default 3 s, max 30 min (raised from 15 min; older material may still say 15)', 'Maximum run time per invocation'],
           ['Ephemeral storage (/tmp)', '512 MB default, up to 10,240 MB', 'Scratch disk, reused while the environment stays warm'],
           ['.zip package', '50 MB zipped upload, 250 MB unzipped with layers', 'Code plus dependencies; up to 5 layers'],
           ['Container image', 'Up to 10 GB, stored in ECR', 'Large dependencies, existing Docker tooling'],
@@ -85,7 +100,7 @@ export const developmentGuide = {
         { type: 'comparison', title: 'Concurrency controls', items: [
           { label: 'Reserved concurrency', description: 'Sets aside and caps concurrency for one function. Use it to protect a downstream system or to guarantee capacity. No extra charge. Setting it to 0 stops all invocations.' },
           { label: 'Provisioned concurrency', description: 'Keeps initialized environments ready on a version or alias, removing cold starts for predictable traffic. Billed while configured; scale it on a schedule with Application Auto Scaling.' },
-          { label: 'SnapStart', description: 'Snapshots the initialized environment when you publish a version and resumes from it on cold start (Java, Python, .NET). No idle cost. Use runtime hooks to refresh unique state such as random seeds and connections after restore.' }
+          { label: 'SnapStart', description: 'Snapshots the initialized environment when you publish a version and resumes from it on cold start (Java 11+, Python 3.12+, .NET 8+). No extra cost for Java; Python and .NET pay for snapshot caching and restores. Use runtime hooks to refresh unique state such as random seeds and connections after restore.' }
         ]},
         { type: 'keyTerm', term: 'VPC access', definition: 'Attach a function to subnets to reach private resources such as RDS. It then has only the network access of those subnets and never a public IP: add gateway endpoints for S3 and DynamoDB, interface endpoints for other services, or a NAT gateway for the internet. The execution role needs ENI permissions (AWSLambdaVPCAccessExecutionRole).' },
         { type: 'awsService', name: 'Lambda function URLs', description: 'A dedicated HTTPS endpoint for one function with auth type AWS_IAM (SigV4 signed callers) or NONE (public; validate requests in code, for example webhook signatures). Supports CORS and response streaming. Choose API Gateway when you need usage plans, request validation, caching or WAF on many routes.' },
@@ -96,6 +111,11 @@ export const developmentGuide = {
     {
       id: 'devs4',
       title: 'Lambda Invocation Models and Error Handling',
+      sources: [
+        { title: 'Capturing records of Lambda asynchronous invocations', url: 'https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-retain-records.html', checked: '2026-11-25' },
+        { title: 'How Lambda processes records from stream and queue-based event sources', url: 'https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html', checked: '2026-11-25' },
+        { title: 'Handling errors for an SQS event source in Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'How a function is invoked decides who retries, how often, and where failures go. Many exam questions describe a failure symptom and expect you to recognize the invocation model behind it.' },
         { type: 'table', headers: ['Model', 'Examples', 'Who retries', 'Failure handling'], rows: [
@@ -104,13 +124,13 @@ export const developmentGuide = {
           ['Event source mapping (poll-based)', 'SQS, Kinesis, DynamoDB Streams, MSK', 'Lambda retries the batch per source settings', 'Partial batch response, SQS redrive to DLQ, stream on-failure destination']
         ]},
         { type: 'comparison', title: 'Destinations vs dead-letter queue (async)', items: [
-          { label: 'Destinations', description: 'On-success and on-failure targets (SQS, SNS, Lambda, EventBridge, and S3 for failures). The record includes the request payload and the response, with error message and stack trace on failure.' },
+          { label: 'Destinations', description: 'On-success and on-failure targets (SQS, SNS, Lambda, EventBridge, and S3 for failures). The record includes the request payload and the response, with the function\'s error response on failure.' },
           { label: 'Dead-letter queue', description: 'Failures only, SQS or SNS only. Carries the original event with a few error attributes. Still valid, but destinations are the recommended choice for new designs.' }
         ]},
         { type: 'bulletList', title: 'Event source mapping settings:', items: [
           'BatchSize: records per invocation; larger batches mean fewer invocations but bigger retry units.',
           'MaximumBatchingWindowInSeconds: wait to fill a batch, trading latency for cost.',
-          'FunctionResponseTypes = ReportBatchItemFailures: return batchItemFailures with the failed itemIdentifier so only those records are retried.',
+          'FunctionResponseTypes = ReportBatchItemFailures: return batchItemFailures with the failed itemIdentifier so only the failed SQS messages are retried (for streams, Lambda retries from the first failed sequence number).',
           'Streams only: BisectBatchOnFunctionError, MaximumRetryAttempts, MaximumRecordAgeInSeconds and an on-failure destination keep a bad record from blocking the shard.',
           'Filter criteria drop unwanted records before your function is invoked, so you do not pay for them.'
         ]},
@@ -126,6 +146,11 @@ export const developmentGuide = {
     {
       id: 'devs5',
       title: 'Amazon DynamoDB for Developers',
+      sources: [
+        { title: 'Improving data access with secondary indexes in DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SecondaryIndexes.html', checked: '2026-11-25' },
+        { title: 'DynamoDB read and write operations', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/read-write-operations.html', checked: '2026-11-25' },
+        { title: 'Amazon DynamoDB Transactions: How it works', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'DynamoDB is the most heavily tested data store on DVA-C02. Expect questions on key design, choosing Query over Scan, index types, capacity math, and the API calls that give you conditions, transactions and pagination.' },
         { type: 'keyTerm', term: 'Partition key and sort key', definition: 'The partition key is hashed to place items; choose a high-cardinality, evenly accessed value to avoid hot partitions. The sort key orders items within a partition and allows range conditions (between, begins_with, comparisons). For a single very hot key, use write sharding with a suffix.' },
@@ -159,6 +184,11 @@ export const developmentGuide = {
     {
       id: 'devs6',
       title: 'Amazon S3, Caching and Relational Data from Code',
+      sources: [
+        { title: 'Download and upload objects with presigned URLs', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html', checked: '2026-11-25' },
+        { title: 'Caching strategies for Memcached', url: 'https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html', checked: '2026-11-25' },
+        { title: 'Amazon RDS Proxy for Aurora', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/rds-proxy.html', checked: '2026-11-25' }
+      ],
       content: [
         { type: 'paragraph', text: 'Beyond DynamoDB, the exam expects you to work with S3 from the SDK, add a cache in front of a database, manage relational connections from Lambda, and pick a search engine when key-value lookups are not enough.' },
         { type: 'keyTerm', term: 'Presigned URL', definition: 'A URL signed with the credentials of the identity that created it, granting time-limited access to one operation on one object (GET or PUT). Browsers and mobile apps upload or download directly without AWS credentials. It can never grant more than the signer has, and it stops working when the signing credentials expire.' },

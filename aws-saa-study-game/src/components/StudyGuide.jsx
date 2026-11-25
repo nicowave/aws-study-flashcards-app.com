@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { studyGuides } from '../data/studyGuide';
 import { ArrowLeftIcon, ChevronDownIcon } from './Icons';
+import SourceLinks from './SourceLinks';
 import './StudyGuide.css';
 
 // Content Block Renderer
@@ -197,6 +198,7 @@ const ArticleReader = ({ guide, onBack }) => {
               {section.content.map((block, i) => (
                 <ContentBlock key={i} block={block} domainColor={guide.color} />
               ))}
+              <SourceLinks sources={section.sources} />
             </section>
           ))}
         </div>

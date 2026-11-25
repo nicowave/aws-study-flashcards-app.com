@@ -20,7 +20,11 @@ export const costOptimized = {
         'S3 One Zone-IA'
       ],
       correctAnswer: 1,
-      explanation: 'S3 Intelligent-Tiering moves each object between access tiers automatically based on its own access history, charges no retrieval fees, and adds only a small per-object monitoring fee, which makes it the default answer for unknown or changing access patterns. Standard-IA and Glacier Instant Retrieval charge per-GB retrieval fees that would spike during the bursts of heavy querying. One Zone-IA also charges retrieval fees and stores data in a single Availability Zone.'
+      explanation: 'S3 Intelligent-Tiering moves each object between access tiers automatically based on its own access history, charges no retrieval fees, and adds only a small per-object monitoring fee, which makes it the default answer for unknown or changing access patterns. Standard-IA and Glacier Instant Retrieval charge per-GB retrieval fees that would spike during the bursts of heavy querying. One Zone-IA also charges retrieval fees and stores data in a single Availability Zone.',
+      sources: [
+        { title: 'How S3 Intelligent-Tiering works – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/intelligent-tiering-overview.html', checked: '2026-11-25' },
+        { title: 'Understanding and managing Amazon S3 storage classes – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost2',
@@ -32,7 +36,11 @@ export const costOptimized = {
         'S3 One Zone-IA'
       ],
       correctAnswer: 0,
-      explanation: 'S3 Glacier Deep Archive is the lowest-cost S3 storage class, with standard retrievals completing within 12 hours and bulk retrievals within 48 hours, and its 180-day minimum storage duration is irrelevant for a 10-year retention period. Glacier Flexible Retrieval and Glacier Instant Retrieval offer faster access the firm does not need at a higher per-GB price. One Zone-IA costs far more per GB and keeps data in only one Availability Zone.'
+      explanation: 'S3 Glacier Deep Archive is the lowest-cost S3 storage class, with standard retrievals completing within 12 hours and bulk retrievals within 48 hours, and its 180-day minimum storage duration is irrelevant for a 10-year retention period. Glacier Flexible Retrieval and Glacier Instant Retrieval offer faster access the firm does not need at a higher per-GB price. One Zone-IA costs far more per GB and keeps data in only one Availability Zone.',
+      sources: [
+        { title: 'Understanding S3 Glacier storage classes for long-term data storage – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/glacier-storage-classes.html', checked: '2026-11-25' },
+        { title: 'Understanding archive retrieval options – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/restoring-objects-retrieval-options.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost3',
@@ -44,7 +52,11 @@ export const costOptimized = {
         'S3 Glacier Instant Retrieval'
       ],
       correctAnswer: 3,
-      explanation: 'S3 Glacier Instant Retrieval is designed for long-lived data accessed about once a quarter that still needs millisecond retrieval, and it stores data across multiple Availability Zones at a lower per-GB price than Standard-IA. Standard-IA meets the latency and durability needs but costs more to store. One Zone-IA fails the requirement to survive an AZ loss, and Expedited retrievals from Glacier Flexible Retrieval take minutes, not milliseconds.'
+      explanation: 'S3 Glacier Instant Retrieval is designed for long-lived data accessed about once a quarter that still needs millisecond retrieval, and it stores data across multiple Availability Zones at a lower per-GB price than Standard-IA. Standard-IA meets the latency and durability needs but costs more to store. One Zone-IA fails the requirement to survive an AZ loss, and Expedited retrievals from Glacier Flexible Retrieval take minutes, not milliseconds.',
+      sources: [
+        { title: 'Understanding S3 Glacier storage classes for long-term data storage – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/glacier-storage-classes.html', checked: '2026-11-25' },
+        { title: 'Understanding and managing Amazon S3 storage classes – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost4',
@@ -56,7 +68,10 @@ export const costOptimized = {
         'Standard-IA requires S3 Versioning, so the deleted files keep accruing storage charges'
       ],
       correctAnswer: 2,
-      explanation: 'Standard-IA charges for at least 30 days of storage even when an object is deleted sooner, and it adds a per-GB retrieval fee on every read, so short-lived, frequently read files cost more there than in S3 Standard. A per-object monitoring fee belongs to S3 Intelligent-Tiering, not Standard-IA. Standard-IA stores data across multiple AZs in one Region, not in a second Region, and it does not require versioning.'
+      explanation: 'Standard-IA charges for at least 30 days of storage even when an object is deleted sooner, and it adds a per-GB retrieval fee on every read, so short-lived, frequently read files cost more there than in S3 Standard. A per-object monitoring fee belongs to S3 Intelligent-Tiering, not Standard-IA. Standard-IA stores data across multiple AZs in one Region, not in a second Region, and it does not require versioning.',
+      sources: [
+        { title: 'Understanding and managing Amazon S3 storage classes – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost5',
@@ -68,7 +83,11 @@ export const costOptimized = {
         'Replicate the bucket into each partner account with S3 Cross-Region Replication'
       ],
       correctAnswer: 1,
-      explanation: 'With Requester Pays enabled, the requester pays the request and data transfer charges while the bucket owner pays only for storage; anonymous access is not allowed, so partners must use authenticated requests from their own accounts. CloudFront would still bill the institute for delivery. Transfer Acceleration adds a per-GB fee on top of normal transfer charges, and replication charges the source bucket owner for the replicated data transfer and requests.'
+      explanation: 'With Requester Pays enabled, the requester pays the request and data transfer charges while the bucket owner pays only for storage; anonymous access is not allowed, so partners must use authenticated requests from their own accounts. CloudFront would still bill the institute for delivery. Transfer Acceleration adds a per-GB fee on top of normal transfer charges, and replication charges the source bucket owner for the replicated data transfer and requests.',
+      sources: [
+        { title: 'Using Requester Pays general purpose buckets for storage transfers and usage – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/RequesterPaysBuckets.html', checked: '2026-11-25' },
+        { title: 'S3 Pricing', url: 'https://aws.amazon.com/s3/pricing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost6',
@@ -80,7 +99,11 @@ export const costOptimized = {
         'Modify each volume to gp3 in place by using Elastic Volumes'
       ],
       correctAnswer: 3,
-      explanation: 'gp3 includes a baseline of 3,000 IOPS and 125 MiB/s regardless of volume size at a lower per-GB price than gp2, and Elastic Volumes changes the type while the volume stays attached and in use. io2 adds a charge for every provisioned IOPS and costs more. st1 is an HDD type that performs poorly for random I/O, and a smaller gp2 volume would lose IOPS (gp2 scales at 3 IOPS per GiB) and require a restore with downtime.'
+      explanation: 'gp3 includes a baseline of 3,000 IOPS and 125 MiB/s regardless of volume size at a lower per-GB price than gp2, and Elastic Volumes changes the type while the volume stays attached and in use. io2 adds a charge for every provisioned IOPS and costs more. st1 is an HDD type that performs poorly for random I/O, and a smaller gp2 volume would lose IOPS (gp2 scales at 3 IOPS per GiB) and require a restore with downtime.',
+      sources: [
+        { title: 'Amazon EBS General Purpose SSD volumes – Amazon EBS', url: 'https://docs.aws.amazon.com/ebs/latest/userguide/general-purpose.html', checked: '2026-11-25' },
+        { title: 'Modify an Amazon EBS volume using Elastic Volumes operations – Amazon EBS', url: 'https://docs.aws.amazon.com/ebs/latest/userguide/ebs-modify-volume.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost7',
@@ -92,7 +115,11 @@ export const costOptimized = {
         'Move the snapshots into the Recycle Bin, which stores retained snapshots at a lower rate'
       ],
       correctAnswer: 0,
-      explanation: 'EBS Snapshots Archive stores full snapshots at a much lower price than the standard tier, has a 90-day minimum, and restores within 24 to 72 hours, which fits rarely restored long-term retention; Data Lifecycle Manager can archive snapshots on a schedule. Fast Snapshot Restore adds cost to make restores faster. EBS snapshots are not stored in a bucket you can manage with S3 lifecycle rules, and the Recycle Bin protects against accidental deletion while billing snapshots at the normal rate.'
+      explanation: 'EBS Snapshots Archive stores full snapshots at a much lower price than the standard tier, has a 90-day minimum, and restores within 24 to 72 hours, which fits rarely restored long-term retention; Data Lifecycle Manager can archive snapshots on a schedule. Fast Snapshot Restore adds cost to make restores faster. EBS snapshots are not stored in a bucket you can manage with S3 lifecycle rules, and the Recycle Bin protects against accidental deletion while billing snapshots at the normal rate.',
+      sources: [
+        { title: 'Archive Amazon EBS snapshots – Amazon EBS', url: 'https://docs.aws.amazon.com/ebs/latest/userguide/snapshot-archive.html', checked: '2026-11-25' },
+        { title: 'Amazon EBS FAQs – Amazon Web Services', url: 'https://aws.amazon.com/ebs/faqs/', checked: '2026-11-25' }
+      ]
     },
 
     // ---------- Task 4.2: Cost-optimized compute ----------
@@ -106,7 +133,10 @@ export const costOptimized = {
         'Convertible Reserved Instances exchanged as workloads move'
       ],
       correctAnswer: 2,
-      explanation: 'A Compute Savings Plan applies automatically to EC2 usage in any instance family, size, Region, operating system, or tenancy, and also to Fargate and Lambda, so it follows the workload through all three planned changes. Standard Reserved Instances and EC2 Instance Savings Plans are tied to an instance family in a Region. Convertible Reserved Instances can be exchanged for other EC2 configurations, but they never apply to Fargate.'
+      explanation: 'A Compute Savings Plan applies automatically to EC2 usage in any instance family, size, Region, operating system, or tenancy, and also to Fargate and Lambda, so it follows the workload through all three planned changes. Standard Reserved Instances and EC2 Instance Savings Plans are tied to an instance family in a Region. Convertible Reserved Instances can be exchanged for other EC2 configurations, but they never apply to Fargate.',
+      sources: [
+        { title: 'Savings Plans types – Savings Plans', url: 'https://docs.aws.amazon.com/savingsplans/latest/userguide/plan-types.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost9',
@@ -118,7 +148,11 @@ export const costOptimized = {
         'Spot Instances requested through an EC2 Fleet'
       ],
       correctAnswer: 1,
-      explanation: 'An EC2 Instance Savings Plan commits to one instance family in one Region and offers the deepest Savings Plans discount, while still applying across sizes, operating systems, and tenancy within that family. A Compute Savings Plan is more flexible but gives a smaller discount, which the company does not need. Zonal Reserved Instances apply only to an exact instance size in one AZ, and Spot Instances can be interrupted, which does not suit a steady platform.'
+      explanation: 'An EC2 Instance Savings Plan commits to one instance family in one Region and offers the deepest Savings Plans discount, while still applying across sizes, operating systems, and tenancy within that family. A Compute Savings Plan is more flexible but gives a smaller discount, which the company does not need. Zonal Reserved Instances apply only to an exact instance size in one AZ, and Spot Instances can be interrupted, which does not suit a steady platform.',
+      sources: [
+        { title: 'Savings Plans types – Savings Plans', url: 'https://docs.aws.amazon.com/savingsplans/latest/userguide/plan-types.html', checked: '2026-11-25' },
+        { title: 'Regional and zonal Reserved Instances (scope) – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/reserved-instances-scope.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost10',
@@ -130,7 +164,11 @@ export const costOptimized = {
         'Dedicated Instances launched each night by a scheduled Auto Scaling action'
       ],
       correctAnswer: 0,
-      explanation: 'Interruptible, checkpointed batch work with a flexible deadline is the textbook Spot use case, and diversifying across instance types and AZs with price-capacity-optimized allocation picks low-priced pools that are least likely to be interrupted. Restricting Spot to one type in one AZ with lowest-price allocation concentrates the risk of interruption. A Savings Plan bills the commitment every hour of the day, and Dedicated Instances cost more than On-Demand.'
+      explanation: 'Interruptible, checkpointed batch work with a flexible deadline is the textbook Spot use case, and diversifying across instance types and AZs with price-capacity-optimized allocation picks low-priced pools that are least likely to be interrupted. Restricting Spot to one type in one AZ with lowest-price allocation concentrates the risk of interruption. A Savings Plan bills the commitment every hour of the day, and Dedicated Instances cost more than On-Demand.',
+      sources: [
+        { title: 'Use allocation strategies to determine how EC2 Fleet or Spot Fleet fulfills Spot and On-Demand capacity – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-fleet-allocation-strategy.html', checked: '2026-11-25' },
+        { title: 'Best practices for Amazon EC2 Spot – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-best-practices.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost11',
@@ -142,7 +180,11 @@ export const costOptimized = {
         'Enable Capacity Rebalancing and use a termination lifecycle hook to drain instances'
       ],
       correctAnswer: 3,
-      explanation: 'Capacity Rebalancing launches a replacement as soon as EC2 sends a rebalance recommendation for an at-risk Spot Instance, and a termination lifecycle hook gives the instance time to deregister from the load balancer and drain during the two-minute interruption notice. Moving to On-Demand removes the savings the company wants to keep. Spot blocks are no longer offered, and scale-in protection only stops the Auto Scaling group from choosing the instance during scale-in; it cannot prevent EC2 from reclaiming Spot capacity.'
+      explanation: 'Capacity Rebalancing launches a replacement as soon as EC2 sends a rebalance recommendation for an at-risk Spot Instance, and a termination lifecycle hook gives the instance time to deregister from the load balancer and drain during the two-minute interruption notice. Moving to On-Demand removes the savings the company wants to keep. Spot blocks are no longer offered, and scale-in protection only stops the Auto Scaling group from choosing the instance during scale-in; it cannot prevent EC2 from reclaiming Spot capacity.',
+      sources: [
+        { title: 'Capacity Rebalancing in Auto Scaling to replace at-risk Spot Instances – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-capacity-rebalancing.html', checked: '2026-11-25' },
+        { title: 'Use instance scale-in protection to control instance termination – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-instance-protection.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost12',
@@ -154,11 +196,15 @@ export const costOptimized = {
         'On-Demand Capacity Reservations in a single Availability Zone'
       ],
       correctAnswer: 2,
-      explanation: 'Dedicated Hosts give you a physical server with visibility into its sockets and cores, and host affinity keeps an instance on the same host after it stops and starts, which is what per-core, server-bound BYOL licensing requires. Dedicated Instances run on single-tenant hardware but do not expose cores or keep you on the same host. License-included instances make you pay for licenses you already own, and Capacity Reservations run on shared hardware.'
+      explanation: 'Dedicated Hosts give you a physical server with visibility into its sockets and cores, and host affinity keeps an instance on the same host after it stops and starts, which is what per-core, server-bound BYOL licensing requires. Dedicated Instances run on single-tenant hardware but do not expose cores or keep you on the same host. License-included instances make you pay for licenses you already own, and Capacity Reservations only reserve capacity in an Availability Zone, with no core visibility or host affinity.',
+      sources: [
+        { title: 'Amazon EC2 Dedicated Hosts – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/dedicated-hosts-overview.html', checked: '2026-11-25' },
+        { title: 'Amazon EC2 Dedicated Host auto-placement and host affinity – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/dedicated-hosts-understanding.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost13',
-      question: 'An operations team wants machine learning based recommendations, built from actual utilization metrics, to right-size its EC2 instances (including Graviton-based alternatives), choose better EBS volume types, and tune Lambda memory settings. Which AWS service should the team use?',
+      question: 'An operations team wants recommendations, built from actual utilization metrics, to right-size its EC2 instances (including Graviton-based alternatives), choose better EBS volume types, and tune Lambda memory settings. Which AWS service should the team use?',
       options: [
         'AWS Compute Optimizer',
         'AWS Trusted Advisor',
@@ -166,7 +212,11 @@ export const costOptimized = {
         'Amazon CloudWatch Container Insights'
       ],
       correctAnswer: 0,
-      explanation: 'AWS Compute Optimizer analyzes historical CloudWatch utilization and recommends optimal configurations for EC2 instances, Auto Scaling groups, EBS volumes, Lambda functions, and ECS services on Fargate, including Graviton options. Trusted Advisor flags low-utilization instances but does not produce EBS type or Lambda memory recommendations. Cost Anomaly Detection watches spending patterns, and Container Insights only collects container metrics.'
+      explanation: 'AWS Compute Optimizer analyzes historical CloudWatch utilization and recommends optimal configurations for EC2 instances, Auto Scaling groups, EBS volumes, Lambda functions, and ECS services on Fargate, including Graviton options. Trusted Advisor can show some of these findings, but its over-provisioned EBS and Lambda checks come from Compute Optimizer, which must be opted in; Trusted Advisor is not the service that generates them. Cost Anomaly Detection watches spending patterns, and Container Insights only collects container metrics.',
+      sources: [
+        { title: 'What is AWS Compute Optimizer? – AWS Compute Optimizer', url: 'https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html', checked: '2026-11-25' },
+        { title: 'Cost optimization – AWS Support', url: 'https://docs.aws.amazon.com/awssupport/latest/user/cost-optimization-checks.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost14',
@@ -178,7 +228,11 @@ export const costOptimized = {
         'Enable Lambda SnapStart to reduce the initialization time of each function'
       ],
       correctAnswer: 1,
-      explanation: 'Lambda pricing per request and per GB-second is ideal for spiky or intermittent traffic, but constant high utilization is usually cheaper on always-on containers, and Fargate keeps the no-servers model while a Compute Savings Plan discounts the steady baseline. Raising memory raises the price of every GB-second and does not change the per-request economics. Lambda@Edge is priced higher than regional Lambda, and SnapStart improves cold-start latency rather than steady-state cost.'
+      explanation: 'Lambda pricing per request and per GB-second is ideal for spiky or intermittent traffic, but constant high utilization is usually cheaper on always-on containers, and Fargate keeps the no-servers model while a Compute Savings Plan discounts the steady baseline. Raising memory raises the price of every GB-second and does not change the per-request economics. Lambda@Edge is priced higher than regional Lambda, and SnapStart improves cold-start latency rather than steady-state cost. (Lambda Managed Instances, which runs functions on EC2 capacity that Lambda manages and that Savings Plans can cover, is a newer option for this same pattern.)',
+      sources: [
+        { title: 'AWS Lambda Pricing', url: 'https://aws.amazon.com/lambda/pricing/', checked: '2026-11-25' },
+        { title: 'Savings Plans types – Savings Plans', url: 'https://docs.aws.amazon.com/savingsplans/latest/userguide/plan-types.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost15',
@@ -190,7 +244,11 @@ export const costOptimized = {
         'Use Auto Scaling with scheduled or predictive scaling'
       ],
       correctAnswer: 3,
-      explanation: 'Scheduled or predictive scaling adds capacity before the weekday peak and removes it afterward, so the company stops paying for 20 instances during the many idle hours each week. Reserved Instances discount the rate but still pay for the full fleet around the clock. Fewer, larger instances do not reduce total capacity, and running a business application entirely on Spot risks interruptions during working hours.'
+      explanation: 'Scheduled or predictive scaling adds capacity before the weekday peak and removes it afterward, so the company stops paying for 20 instances during the many idle hours each week. Reserved Instances discount the rate but still pay for the full fleet around the clock. Fewer, larger instances do not reduce total capacity, and running a business application entirely on Spot risks interruptions during working hours.',
+      sources: [
+        { title: 'Scheduled scaling for Amazon EC2 Auto Scaling – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-scheduled-scaling.html', checked: '2026-11-25' },
+        { title: 'Predictive scaling for Amazon EC2 Auto Scaling – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-predictive-scaling.html', checked: '2026-11-25' }
+      ]
     },
 
     // ---------- Task 4.3: Cost-optimized databases ----------
@@ -204,7 +262,11 @@ export const costOptimized = {
         'Spot pricing for development and On-Demand for production'
       ],
       correctAnswer: 2,
-      explanation: 'RDS Reserved Instances discount a database that runs steadily, and stopping the development instances outside business hours ends their instance-hour charges (storage and backups are still billed); because a stopped RDS instance starts again automatically after seven days, the stop must be scheduled, for example with EventBridge Scheduler. Compute Savings Plans do not cover RDS. Reserving the development instances pays for 24/7 capacity that is used about a third of the week, and RDS has no Spot pricing.'
+      explanation: 'RDS Reserved Instances discount a database that runs steadily, and stopping the development instances outside business hours ends their instance-hour charges (storage and backups are still billed); because a stopped RDS instance starts again automatically after seven days, the stop must be scheduled, for example with EventBridge Scheduler. Compute Savings Plans do not cover RDS (the separate Database Savings Plans do, but a commitment sized for all five instances would still pay for idle development hours). Reserving the development instances pays for 24/7 capacity that is used about a third of the week, and RDS has no Spot pricing.',
+      sources: [
+        { title: 'Stopping an Amazon RDS DB instance temporarily – Amazon Relational Database Service', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html', checked: '2026-11-25' },
+        { title: 'Reserved DB instances for Amazon RDS – Amazon Relational Database Service', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithReservedDBInstances.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost17',
@@ -216,7 +278,11 @@ export const costOptimized = {
         'An RDS for MySQL Multi-AZ DB cluster on larger instances'
       ],
       correctAnswer: 0,
-      explanation: 'Aurora Serverless v2 scales capacity in fine-grained Aurora capacity units (ACUs) within the range you set and bills per second for the capacity in use, so idle periods cost little. Reserved Instances lock in provisioned capacity sized for the peak. Replica auto scaling adds and removes readers, but the writer is still a fixed provisioned instance, and a Multi-AZ DB cluster on larger instances is billed around the clock.'
+      explanation: 'Aurora Serverless v2 scales capacity in fine-grained Aurora capacity units (ACUs) within the range you set and bills per second for the capacity in use, so idle periods cost little. Reserved Instances lock in provisioned capacity sized for the peak. Replica auto scaling adds and removes readers, but the writer is still a fixed provisioned instance, and a Multi-AZ DB cluster on larger instances is billed around the clock.',
+      sources: [
+        { title: 'How Aurora serverless works – Amazon Aurora', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.how-it-works.html', checked: '2026-11-25' },
+        { title: 'Amazon Aurora Pricing', url: 'https://aws.amazon.com/rds/aurora/pricing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost18',
@@ -228,7 +294,11 @@ export const costOptimized = {
         'Enable Aurora Backtrack to reduce the number of write operations'
       ],
       correctAnswer: 1,
-      explanation: 'Aurora I/O-Optimized removes per-request I/O charges in exchange for higher instance and storage prices, and AWS recommends it when I/O is more than about 25% of Aurora spend; the change is a cluster setting with no application changes. Adding replicas adds instance cost while the shared storage still bills the I/O. Serverless v2 on the Standard configuration still pays for I/O, and Backtrack adds cost without reducing I/O.'
+      explanation: 'Aurora I/O-Optimized removes per-request I/O charges in exchange for higher instance and storage prices, and AWS recommends it when I/O is more than about 25% of Aurora spend; the change is a cluster setting with no application changes. Adding replicas adds instance cost while the shared storage still bills the I/O. Serverless v2 on the Standard configuration still pays for I/O, and Backtrack adds cost without reducing I/O.',
+      sources: [
+        { title: 'Amazon Aurora storage – Amazon Aurora', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.StorageReliability.html', checked: '2026-11-25' },
+        { title: 'Amazon Aurora Pricing', url: 'https://aws.amazon.com/rds/aurora/pricing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost19',
@@ -240,7 +310,11 @@ export const costOptimized = {
         'Convert the table to a global table so that traffic is spread across Regions'
       ],
       correctAnswer: 2,
-      explanation: 'For steady, predictable traffic, provisioned capacity with auto scaling tracks the daily curve at a lower unit price than on-demand, and reserved capacity further discounts the always-present baseline. DAX adds node charges and helps only with repeated reads. The Standard-IA table class lowers storage cost but raises the price of reads and writes, and global tables add replicated write and transfer charges.'
+      explanation: 'For steady, predictable traffic, provisioned capacity with auto scaling tracks the daily curve at a lower unit price than on-demand, and reserved capacity further discounts the always-present baseline. DAX adds node charges and helps only with repeated reads. The Standard-IA table class lowers storage cost but raises the price of reads and writes, and global tables add replicated write and transfer charges.',
+      sources: [
+        { title: 'DynamoDB throughput capacity – Amazon DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html', checked: '2026-11-25' },
+        { title: 'DynamoDB reserved capacity – Amazon DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/reserved-capacity.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost20',
@@ -252,7 +326,11 @@ export const costOptimized = {
         'Change the table class to DynamoDB Standard-Infrequent Access'
       ],
       correctAnswer: 3,
-      explanation: 'The DynamoDB Standard-IA table class offers much lower storage prices with somewhat higher read and write prices, keeps the same API and performance, and is a simple table setting, so it fits storage-dominated tables with no code changes. Exporting to S3 and querying with Athena would require application changes. DAX adds cost and does nothing for storage, and the capacity mode affects throughput charges, not storage.'
+      explanation: 'The DynamoDB Standard-IA table class offers much lower storage prices with somewhat higher read and write prices, keeps the same API and performance, and is a simple table setting, so it fits storage-dominated tables with no code changes. Exporting to S3 and querying with Athena would require application changes. DAX adds cost and does nothing for storage, and the capacity mode affects throughput charges, not storage.',
+      sources: [
+        { title: 'DynamoDB table classes – Amazon DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.TableClasses.html', checked: '2026-11-25' },
+        { title: 'Amazon DynamoDB Pricing | NoSQL Key-Value Database | Amazon Web Services', url: 'https://aws.amazon.com/dynamodb/pricing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost21',
@@ -264,7 +342,11 @@ export const costOptimized = {
         'Convert the DB instance to a Multi-AZ deployment with a standby instance'
       ],
       correctAnswer: 0,
-      explanation: 'When the same queries repeat, an in-memory cache serves them in microseconds and absorbs most of the read load, and a small cache cluster usually costs less than several full-size read replicas. Each read replica is billed as a full DB instance, and scaling up roughly doubles the instance price. The standby in a Multi-AZ DB instance deployment does not serve reads, so it adds cost without reducing load.'
+      explanation: 'When the same queries repeat, an in-memory cache serves them in microseconds and absorbs most of the read load, and a small cache cluster usually costs less than several full-size read replicas. Each read replica is billed as a full DB instance, and scaling up roughly doubles the instance price. The standby in a Multi-AZ DB instance deployment does not serve reads, so it adds cost without reducing load.',
+      sources: [
+        { title: 'Database Caching – Amazon Web Services', url: 'https://aws.amazon.com/caching/database-caching/', checked: '2026-11-25' },
+        { title: 'Multi-AZ DB instance deployments for Amazon RDS – Amazon Relational Database Service', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZSingleStandby.html', checked: '2026-11-25' }
+      ]
     },
 
     // ---------- Task 4.4: Cost-optimized network ----------
@@ -278,7 +360,11 @@ export const costOptimized = {
         'Enable S3 Transfer Acceleration on the bucket used by the instances'
       ],
       correctAnswer: 2,
-      explanation: 'Gateway VPC endpoints for S3 and DynamoDB have no hourly or data processing charges, so routing S3 traffic through one removes the NAT gateway processing fee for that traffic. Interface endpoints bill per endpoint-hour in each AZ and per GB processed. A NAT instance adds operational overhead and becomes a bottleneck, and Transfer Acceleration adds a fee while the traffic still flows through the NAT gateway.'
+      explanation: 'Gateway VPC endpoints for S3 and DynamoDB have no hourly or data processing charges, so routing S3 traffic through one removes the NAT gateway processing fee for that traffic. Interface endpoints bill per endpoint-hour in each AZ and per GB processed. A NAT instance adds operational overhead and becomes a bottleneck, and Transfer Acceleration adds a fee while the traffic still flows through the NAT gateway.',
+      sources: [
+        { title: 'Gateway endpoints – Amazon Virtual Private Cloud', url: 'https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html', checked: '2026-11-25' },
+        { title: 'Pricing for NAT gateways – Amazon Virtual Private Cloud', url: 'https://docs.aws.amazon.com/vpc/latest/userguide/nat-gateway-pricing.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost23',
@@ -290,7 +376,11 @@ export const costOptimized = {
         'Place AWS Global Accelerator in front of the bucket'
       ],
       correctAnswer: 1,
-      explanation: 'Data transfer from S3 to CloudFront is free, CloudFront caches content at edge locations so fewer requests reach the origin, and its delivery rates are typically lower than serving directly from S3, while latency drops for users. Transfer Acceleration adds a per-GB fee and mainly speeds long-distance uploads. Cross-Region Replication adds replication transfer and extra storage, and Global Accelerator does not cache content and adds its own hourly and per-GB fees.'
+      explanation: 'Data transfer from S3 to CloudFront is free, CloudFront caches content at edge locations so fewer requests reach the origin, and its delivery rates are typically lower than serving directly from S3, while latency drops for users. Transfer Acceleration adds a per-GB fee and mainly speeds long-distance uploads. Cross-Region Replication adds replication transfer and extra storage, and Global Accelerator does not cache content and adds its own hourly and per-GB fees.',
+      sources: [
+        { title: 'CDN Pricing, Plans & Free Tier – Amazon CloudFront – AWS', url: 'https://aws.amazon.com/cloudfront/pricing/', checked: '2026-11-25' },
+        { title: 'S3 Pricing', url: 'https://aws.amazon.com/s3/pricing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost24',
@@ -302,7 +392,10 @@ export const costOptimized = {
         'Have the instances communicate over private IP addresses'
       ],
       correctAnswer: 3,
-      explanation: 'Traffic between instances in the same Availability Zone over private IP addresses is free, while traffic sent to public or Elastic IP addresses is billed as data transfer even inside the same AZ. A cluster placement group improves latency, and ENA improves throughput, but neither changes how public IP traffic is billed. VPC peering connects separate VPCs and does not apply to two instances in the same VPC.'
+      explanation: 'Traffic between instances in the same Availability Zone over private IP addresses is free, while traffic sent to public or Elastic IP addresses is billed as data transfer even inside the same AZ. A cluster placement group improves latency, and ENA improves throughput, but neither changes how public IP traffic is billed. VPC peering connects separate VPCs and does not apply to two instances in the same VPC.',
+      sources: [
+        { title: 'EC2 On-Demand Instance Pricing', url: 'https://aws.amazon.com/ec2/pricing/on-demand/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost25',
@@ -314,7 +407,11 @@ export const costOptimized = {
         'S3 Transfer Acceleration for all downloads'
       ],
       correctAnswer: 0,
-      explanation: 'Data transfer out over AWS Direct Connect is billed at lower per-GB rates than internet data transfer, and the private connection gives consistent performance, so the port-hour cost is quickly offset at this steady volume. Site-to-Site VPN still pays internet data transfer rates, and accelerated tunnels add Global Accelerator charges. Snowball suits one-time or occasional bulk moves, not a continuous monthly flow, and Transfer Acceleration adds fees on top of internet rates.'
+      explanation: 'Data transfer out over AWS Direct Connect is billed at lower per-GB rates than internet data transfer, and the private connection gives consistent performance, so the port-hour cost is quickly offset at this steady volume. Site-to-Site VPN still pays internet data transfer rates, and accelerated tunnels add Global Accelerator charges. Snowball suited one-time or occasional bulk moves, not a continuous monthly flow, and AWS Snowball Edge is no longer available to new customers, and Transfer Acceleration adds fees on top of internet rates.',
+      sources: [
+        { title: 'Dedicated Network Connections – AWS Direct Connect – AWS', url: 'https://aws.amazon.com/directconnect/', checked: '2026-11-25' },
+        { title: 'What is Snowball Edge? – AWS Snowball Edge Developer Guide', url: 'https://docs.aws.amazon.com/snowball/latest/developer-guide/whatisedge.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost26',
@@ -326,7 +423,11 @@ export const costOptimized = {
         'Software VPN appliances on EC2 in each VPC'
       ],
       correctAnswer: 2,
-      explanation: 'VPC peering has no hourly charge and no data processing charge; you pay only standard data transfer, and traffic within the same Availability Zone is free. Transit Gateway charges per attachment-hour plus a per-GB processing fee, which pays off only when many VPCs need hub-and-spoke routing. PrivateLink adds endpoint-hour and per-GB charges and exposes individual services, and VPN appliances add EC2 cost and operational overhead.'
+      explanation: 'VPC peering has no hourly charge and no data processing charge; you pay only standard data transfer, and traffic within the same Availability Zone is free. Transit Gateway charges per attachment-hour plus a per-GB processing fee, which pays off only when many VPCs need hub-and-spoke routing. PrivateLink adds endpoint-hour and per-GB charges and exposes individual services, and VPN appliances add EC2 cost and operational overhead.',
+      sources: [
+        { title: 'Amazon VPC Pricing', url: 'https://aws.amazon.com/vpc/pricing/', checked: '2026-11-25' },
+        { title: 'AWS Transit Gateway pricing', url: 'https://aws.amazon.com/transit-gateway/pricing/', checked: '2026-11-25' }
+      ]
     },
 
     // ---------- Task 4.5: Cost management tooling ----------
@@ -340,7 +441,10 @@ export const costOptimized = {
         'A Trusted Advisor cost optimization check with weekly email notifications'
       ],
       correctAnswer: 1,
-      explanation: 'AWS Budgets actions run automatically (or after approval) when a threshold is crossed and can apply an IAM policy or service control policy, or stop specific EC2 or RDS instances, so no custom code is needed. Cost Anomaly Detection and CloudWatch billing alarms only send notifications. Trusted Advisor reports optimization opportunities but does not enforce spending limits.'
+      explanation: 'AWS Budgets actions run automatically (or after approval) when a threshold is crossed and can apply an IAM policy or service control policy, or stop specific EC2 or RDS instances, so no custom code is needed. Cost Anomaly Detection and CloudWatch billing alarms only send notifications. Trusted Advisor reports optimization opportunities but does not enforce spending limits.',
+      sources: [
+        { title: 'Configuring budget actions – AWS Cost Management', url: 'https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-controls.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost28',
@@ -352,7 +456,11 @@ export const costOptimized = {
         'Activate the tag as a cost allocation tag in Billing'
       ],
       correctAnswer: 3,
-      explanation: 'User-defined tags appear in Cost Explorer, Budgets, and the Cost and Usage Report only after they are activated as cost allocation tags, which in an organization is done from the management account. AWS Config records resource configuration, not billing dimensions. A tag policy standardizes tag keys and values but does not activate them for billing, and hourly granularity is unrelated to tag grouping.'
+      explanation: 'User-defined tags appear in Cost Explorer, Budgets, and the Cost and Usage Report only after they are activated as cost allocation tags, which in an organization is done from the management account. AWS Config records resource configuration, not billing dimensions. A tag policy standardizes tag keys and values but does not activate them for billing, and hourly granularity is unrelated to tag grouping.',
+      sources: [
+        { title: 'Activating user-defined cost allocation tags – AWS Billing', url: 'https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/activating-tags.html', checked: '2026-11-25' },
+        { title: 'Organizing and tracking costs using AWS cost allocation tags – AWS Billing', url: 'https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost29',
@@ -364,7 +472,11 @@ export const costOptimized = {
         'A weekly manual review of the daily cost graphs in AWS Cost Explorer'
       ],
       correctAnswer: 0,
-      explanation: 'Cost Anomaly Detection uses machine learning to learn normal spending for each service and alerts through email or SNS when spend deviates, with root-cause details and no thresholds to maintain. Per-service budgets and CloudWatch billing alarms both depend on fixed thresholds that someone must set and keep current. A manual weekly review is slow and is the opposite of least effort.'
+      explanation: 'Cost Anomaly Detection uses machine learning to learn normal spending for each service and alerts through email or SNS when spend deviates, with root-cause details and no thresholds to maintain. Per-service budgets and CloudWatch billing alarms both depend on fixed thresholds that someone must set and keep current. A manual weekly review is slow and is the opposite of least effort.',
+      sources: [
+        { title: 'Detecting unusual spend with AWS Cost Anomaly Detection – AWS Cost Management', url: 'https://docs.aws.amazon.com/cost-management/latest/userguide/manage-ad.html', checked: '2026-11-25' },
+        { title: 'Getting started with AWS Cost Anomaly Detection – AWS Cost Management', url: 'https://docs.aws.amazon.com/cost-management/latest/userguide/getting-started-ad.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cost30',
@@ -376,7 +488,11 @@ export const costOptimized = {
         'Use AWS Pricing Calculator to produce an itemized estimate for each workload'
       ],
       correctAnswer: 2,
-      explanation: 'The Cost and Usage Report (CUR 2.0, delivered through AWS Data Exports) is the most detailed billing dataset, with hourly, resource-level line items and amortized commitment costs, and it lands in S3 where Athena can query it and QuickSight can visualize it. Cost Explorer is an interactive analysis tool rather than a SQL dataset. Budgets reports summarize budget status, and Pricing Calculator estimates planned costs instead of reporting actual usage.'
+      explanation: 'The Cost and Usage Report (CUR 2.0, delivered through AWS Data Exports) is the most detailed billing dataset, with hourly, resource-level line items and amortized commitment costs, and it lands in S3 where Athena can query it and AWS Quick Sight (formerly Amazon QuickSight) can visualize it. Cost Explorer is an interactive analysis tool rather than a SQL dataset. Budgets reports summarize budget status, and Pricing Calculator estimates planned costs instead of reporting actual usage.',
+      sources: [
+        { title: 'Cost and Usage Report (CUR) 2.0 – AWS Data Exports', url: 'https://docs.aws.amazon.com/cur/latest/userguide/table-dictionary-cur2.html', checked: '2026-11-25' },
+        { title: 'What is AWS Data Exports? – AWS Data Exports', url: 'https://docs.aws.amazon.com/cur/latest/userguide/what-is-data-exports.html', checked: '2026-11-25' }
+      ]
     }
   ]
 };

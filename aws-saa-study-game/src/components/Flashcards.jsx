@@ -14,6 +14,7 @@ import {
   RefreshIcon,
   FlashcardIcon
 } from './Icons';
+import SourceLinks from './SourceLinks';
 import './Flashcards.css';
 
 const REVIEW_DECK_ID = '__review__';
@@ -306,6 +307,8 @@ const Flashcards = ({ onBack, isGuest = false, onGuestUnlock }) => {
           <div className="flashcard-face flashcard-back">
             <div className="flashcard-face-label">Answer</div>
             <div className="flashcard-content">{card.back}</div>
+            {/* Only on the visible face, so a hidden link can't take keyboard focus */}
+            {flipped && <SourceLinks sources={card.sources} compact />}
           </div>
         </div>
       </div>

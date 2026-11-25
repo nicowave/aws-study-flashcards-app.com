@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { domains } from '../data';
 import { ArrowLeftIcon, ArrowRightIcon, RefreshIcon, BookOpenIcon } from './Icons';
+import SourceLinks from './SourceLinks';
 
 const StudyGuide = ({ onBack }) => {
   const [selectedDomain, setSelectedDomain] = useState(null);
@@ -18,7 +19,8 @@ const StudyGuide = ({ onBack }) => {
         // Convert questions to flashcard format
         const questionCards = domain.questions.map(q => ({
           front: q.question,
-          back: q.options[q.correctAnswer] + (q.explanation ? `\n\n${q.explanation}` : '')
+          back: q.options[q.correctAnswer] + (q.explanation ? `\n\n${q.explanation}` : ''),
+          sources: q.sources
         }));
         setCards(questionCards);
       } else {
@@ -122,6 +124,7 @@ const StudyGuide = ({ onBack }) => {
               </div>
               <div className="flashcard-back">
                 <p className="card-content">{currentCard?.back}</p>
+                {isFlipped && <SourceLinks sources={currentCard?.sources} compact />}
                 <span className="flip-hint">Tap to see question</span>
               </div>
             </div>

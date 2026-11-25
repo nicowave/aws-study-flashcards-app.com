@@ -19,7 +19,11 @@ export const deployment = {
         'Store the libraries in /tmp and download them from Amazon S3 on every cold start'
       ],
       correctAnswer: 2,
-      explanation: 'Lambda container images can be up to 10 GB, so a 1.5 GB set of dependencies fits as an image stored in Amazon ECR. A .zip package, even when uploaded through S3, is limited to 250 MB unzipped, and that limit includes all layers, so splitting the code across layers does not help. Downloading libraries into /tmp on every cold start adds latency and complexity, and /tmp storage still has to be sized for it.'
+      explanation: 'Lambda container images can be up to 10 GB, so a 1.5 GB set of dependencies fits as an image stored in Amazon ECR. A .zip package, even when uploaded through S3, is limited to 250 MB unzipped, and that limit includes all layers, so splitting the code across layers does not help. Downloading libraries into /tmp on every cold start adds latency and complexity, and /tmp storage still has to be sized for it.',
+      sources: [
+        { title: 'Lambda quotas – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html', checked: '2026-11-25' },
+        { title: 'Create a Lambda Event Function using a container image – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/images-create.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep2',
@@ -31,7 +35,11 @@ export const deployment = {
         'Mount an Amazon EBS volume containing the shared code on each Lambda function'
       ],
       correctAnswer: 0,
-      explanation: 'A Lambda layer packages libraries once and lets many functions reference a specific layer version, so the shared code is deployed and versioned separately from each function. Invoking a separate function for every library call adds latency, cost and coupling. AppConfig is for configuration data and feature flags, not code, and Lambda cannot mount EBS volumes (it supports Amazon EFS for shared file systems).'
+      explanation: 'A Lambda layer packages libraries once and lets many functions reference a specific layer version, so the shared code is deployed and versioned separately from each function. Invoking a separate function for every library call adds latency, cost and coupling. AppConfig is for configuration data and feature flags, not code, and Lambda cannot mount EBS volumes (it supports Amazon EFS for shared file systems).',
+      sources: [
+        { title: 'Managing Lambda Event Function dependencies with layers – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html', checked: '2026-11-25' },
+        { title: 'Configuring file system access for Lambda Event Functions – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep3',
@@ -43,7 +51,11 @@ export const deployment = {
         'A Transform: AWS::Serverless-2016-10-31 declaration at the top level of the template'
       ],
       correctAnswer: 3,
-      explanation: 'The Transform: AWS::Serverless-2016-10-31 declaration tells CloudFormation to run the AWS SAM transform, which expands serverless resource types into standard CloudFormation resources. Globals only sets shared properties and is itself SAM syntax that needs the transform. The Metadata section does not change how resources are processed, and AWSTemplateFormatVersion (2010-09-09) describes the template format, not the SAM transform.'
+      explanation: 'The Transform: AWS::Serverless-2016-10-31 declaration tells CloudFormation to run the AWS SAM transform, which expands serverless resource types into standard CloudFormation resources. Globals only sets shared properties and is itself SAM syntax that needs the transform. The Metadata section does not change how resources are processed, and AWSTemplateFormatVersion (2010-09-09) describes the template format, not the SAM transform.',
+      sources: [
+        { title: 'AWS::Serverless transform – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/transform-aws-serverless.html', checked: '2026-11-25' },
+        { title: 'AWS SAM template anatomy – AWS Serverless Application Model', url: 'https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep4',
@@ -55,7 +67,11 @@ export const deployment = {
         'sam sync, to push the code directly to the deployed functions without a template'
       ],
       correctAnswer: 1,
-      explanation: 'sam package (equivalent to aws cloudformation package) uploads the local build artifacts to S3 and outputs a new template whose CodeUri properties reference those S3 objects, which a later CloudFormation action can deploy. sam local invoke only runs a function locally. sam init scaffolds a new project, and sam sync is a development shortcut that updates a stack quickly, not a way to produce a packaged template for a pipeline.'
+      explanation: 'sam package (equivalent to aws cloudformation package) uploads the local build artifacts to S3 and outputs a new template whose CodeUri properties reference those S3 objects, which a later CloudFormation action can deploy. sam local invoke only runs a function locally. sam init scaffolds a new project, and sam sync is a development shortcut that updates a stack quickly, not a way to produce a packaged template for a pipeline.',
+      sources: [
+        { title: 'sam package – AWS Serverless Application Model', url: 'https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-package.html', checked: '2026-11-25' },
+        { title: 'package – AWS CLI Command Reference', url: 'https://docs.aws.amazon.com/cli/latest/reference/cloudformation/package.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep5',
@@ -67,7 +83,11 @@ export const deployment = {
         'Add a stack policy that denies Update:Replace and read the error message'
       ],
       correctAnswer: 1,
-      explanation: 'A change set previews the exact actions CloudFormation will take, including whether each resource will be modified or replaced (Replacement: True, False or Conditional), without changing anything until it is executed. Drift detection compares live resources with the template and says nothing about a pending update. Termination protection only blocks stack deletion, and a stack policy can prevent a replacement but is a guard rail, not a preview.'
+      explanation: 'A change set previews the exact actions CloudFormation will take, including whether each resource will be modified or replaced (Replacement: True, False or Conditional), without changing anything until it is executed. Drift detection compares live resources with the template and says nothing about a pending update. Termination protection only blocks stack deletion, and a stack policy can prevent a replacement but is a guard rail, not a preview.',
+      sources: [
+        { title: 'Update CloudFormation stacks using change sets – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html', checked: '2026-11-25' },
+        { title: 'Example change sets for CloudFormation stacks – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets-samples.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep6',
@@ -79,7 +99,10 @@ export const deployment = {
         'Set the DeletionPolicy attribute of the DB instance to Snapshot'
       ],
       correctAnswer: 3,
-      explanation: 'DeletionPolicy: Snapshot makes CloudFormation take a final snapshot of the DB instance before deleting it, so the data can be restored later while the running instance stops incurring cost. Retain keeps the whole instance running and billing after the stack is gone. Termination protection blocks the deletion entirely, and exporting an endpoint preserves nothing once the database is deleted.'
+      explanation: 'DeletionPolicy: Snapshot makes CloudFormation take a final snapshot of the DB instance before deleting it, so the data can be restored later while the running instance stops incurring cost. (Snapshot is already the default for an AWS::RDS::DBInstance that is not part of a DB cluster, but setting it explicitly documents the intent.) Retain keeps the whole instance running and billing after the stack is gone. Termination protection blocks the deletion entirely, and exporting an endpoint preserves nothing once the database is deleted.',
+      sources: [
+        { title: 'DeletionPolicy attribute – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-attribute-deletionpolicy.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep7',
@@ -91,7 +114,11 @@ export const deployment = {
         'Use a Mappings section in each application template that lists the subnet IDs per Region'
       ],
       correctAnswer: 0,
-      explanation: 'Cross-stack references let one stack export values in Outputs and other independently managed stacks read them with Fn::ImportValue, and CloudFormation prevents the exporting stack from deleting or changing an export that is still in use. Hard-coded parameters and Mappings go stale when the network changes. Nesting the network template in every application stack would create a separate VPC per stack instead of sharing one.'
+      explanation: 'Cross-stack references let one stack export values in Outputs and other independently managed stacks read them with Fn::ImportValue, and CloudFormation prevents the exporting stack from deleting or changing an export that is still in use. Hard-coded parameters and Mappings go stale when the network changes. Nesting the network template in every application stack would create a separate VPC per stack instead of sharing one.',
+      sources: [
+        { title: 'Get exported outputs from a deployed CloudFormation stack – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-stack-exports.html', checked: '2026-11-25' },
+        { title: 'Split a template into reusable pieces using nested stacks – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-nested-stacks.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep8',
@@ -103,7 +130,10 @@ export const deployment = {
         'A rollback trigger with a CloudWatch alarm'
       ],
       correctAnswer: 2,
-      explanation: 'Drift detection compares the actual configuration of supported resources with the expected configuration in the stack template and reports each resource as IN_SYNC, MODIFIED or DELETED. A change set only previews differences between templates, not out-of-band changes. CloudTrail shows who made API calls but does not compare against the template, and rollback triggers only watch alarms during a stack operation.'
+      explanation: 'Drift detection compares the actual configuration of supported resources with the expected configuration in the stack template and reports each resource as IN_SYNC, MODIFIED or DELETED. A change set only previews differences between templates, not out-of-band changes. CloudTrail shows who made API calls but does not compare against the template, and rollback triggers only watch alarms during a stack operation.',
+      sources: [
+        { title: 'Detect unmanaged configuration changes to stacks and resources with drift detection – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-stack-drift.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep9',
@@ -115,7 +145,10 @@ export const deployment = {
         'Run cdk bootstrap for that account and Region, then run cdk deploy again'
       ],
       correctAnswer: 3,
-      explanation: 'cdk bootstrap deploys the CDKToolkit stack, which creates the S3 bucket, ECR repository and IAM roles the CDK uses to stage assets and deploy, and it is required once per account and Region. cdk synth only produces the template and does not create the staging resources. cdk diff compares stacks, and a manually created bucket does not provide the roles and naming the CDK expects.'
+      explanation: 'cdk bootstrap deploys the CDKToolkit stack, which creates the S3 bucket, ECR repository and IAM roles the CDK uses to stage assets and deploy, and it is required once per account and Region. cdk synth only produces the template and does not create the staging resources. cdk diff compares stacks, and a manually created bucket does not provide the roles and naming the CDK expects.',
+      sources: [
+        { title: 'AWS CDK bootstrapping – AWS Cloud Development Kit (AWS CDK) v2', url: 'https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep10',
@@ -127,7 +160,11 @@ export const deployment = {
         'Use a CloudFormation parameter for the flag and update the stack when the value changes'
       ],
       correctAnswer: 2,
-      explanation: 'AWS AppConfig deploys configuration and feature flags separately from code, validates values before deployment, rolls them out with a deployment strategy (for example, linear with bake time), and rolls back automatically when a CloudWatch alarm fires. Changing a Lambda environment variable or a CloudFormation parameter is effectively a redeployment and has no built-in validation or gradual rollout. Polling an S3 object provides neither validation nor controlled rollout.'
+      explanation: 'AWS AppConfig deploys configuration and feature flags separately from code, validates values before deployment, rolls them out with a deployment strategy (for example, linear with bake time), and rolls back automatically when a CloudWatch alarm fires. Changing a Lambda environment variable or a CloudFormation parameter is effectively a redeployment and has no built-in validation or gradual rollout. Polling an S3 object provides neither validation nor controlled rollout.',
+      sources: [
+        { title: 'What is AWS AppConfig? – AWS AppConfig', url: 'https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html', checked: '2026-11-25' },
+        { title: 'Working with deployment strategies – AWS AppConfig', url: 'https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-creating-deployment-strategy.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep11',
@@ -139,7 +176,10 @@ export const deployment = {
         'Enable cross-Region replication for the ECR repository'
       ],
       correctAnswer: 0,
-      explanation: 'With tag immutability enabled, ECR rejects any push that would reuse an existing tag, so v2.3.1 always refers to the same image (referencing images by digest gives the same guarantee). Image scanning finds vulnerabilities but does not protect tags. Lifecycle policies clean up old images, and replication copies images to other Regions without stopping a tag from being moved.'
+      explanation: 'With tag immutability enabled, ECR rejects any push that would reuse an existing tag, so v2.3.1 always refers to the same image (referencing images by digest gives the same guarantee). Image scanning finds vulnerabilities but does not protect tags. Lifecycle policies clean up old images, and replication copies images to other Regions without stopping a tag from being moved.',
+      sources: [
+        { title: 'Preventing image tags from being overwritten in Amazon ECR – Amazon ECR', url: 'https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-tag-mutability.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep12',
@@ -151,7 +191,11 @@ export const deployment = {
         'Run sam validate with the event file to check that the function handles it'
       ],
       correctAnswer: 1,
-      explanation: 'sam local generate-event produces sample payloads for event sources such as S3, and sam local invoke -e runs the function once in a local Lambda-like container (Docker is required) with that payload. sam deploy deploys to AWS, which the developer wants to avoid. sam local start-api emulates API Gateway HTTP endpoints, not S3 notifications, and sam validate only checks the template syntax.'
+      explanation: 'sam local generate-event produces sample payloads for event sources such as S3, and sam local invoke -e runs the function once in a local Lambda-like container (Docker is required) with that payload. sam deploy deploys to AWS, which the developer wants to avoid. sam local start-api emulates API Gateway HTTP endpoints, not S3 notifications, and sam validate only checks the template syntax.',
+      sources: [
+        { title: 'Introduction to testing with sam local generate-event – AWS Serverless Application Model', url: 'https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-generate-event.html', checked: '2026-11-25' },
+        { title: 'Introduction to testing with sam local invoke – AWS Serverless Application Model', url: 'https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep13',
@@ -163,7 +207,10 @@ export const deployment = {
         'sam logs --tail'
       ],
       correctAnswer: 0,
-      explanation: 'sam local start-api starts a local HTTP server that emulates API Gateway and runs the matching Lambda function in a container for each request, so the browser can call real routes locally. sam local invoke runs one function with one event and exposes no HTTP endpoint. sam build --use-container compiles dependencies but runs nothing, and sam logs reads CloudWatch logs from functions already deployed to AWS.'
+      explanation: 'sam local start-api starts a local HTTP server that emulates API Gateway and runs the matching Lambda function in a container for each request, so the browser can call real routes locally. sam local invoke runs one function with one event and exposes no HTTP endpoint. sam build --use-container compiles dependencies but runs nothing, and sam logs reads CloudWatch logs from functions already deployed to AWS.',
+      sources: [
+        { title: 'sam local start-api – AWS Serverless Application Model', url: 'https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-start-api.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep14',
@@ -175,7 +222,11 @@ export const deployment = {
         'A stage variable per stage used in the integration ARN, plus invoke permission per alias'
       ],
       correctAnswer: 3,
-      explanation: 'Setting a stage variable such as lambdaAlias in each stage and using ${stageVariables.lambdaAlias} in the Lambda integration ARN lets one API definition target a different alias per stage; each alias also needs a resource-based policy that allows API Gateway to invoke it. Two copies of the API is the duplication the team wants to avoid. Usage plans control throttling and quotas, and a canary release splits traffic within a single stage.'
+      explanation: 'Setting a stage variable such as lambdaAlias in each stage and using ${stageVariables.lambdaAlias} in the Lambda integration ARN lets one API definition target a different alias per stage; each alias also needs a resource-based policy that allows API Gateway to invoke it. Two copies of the API is the duplication the team wants to avoid. Usage plans control throttling and quotas, and a canary release splits traffic within a single stage.',
+      sources: [
+        { title: 'API Gateway stage variables reference for REST APIs in API Gateway – Amazon API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/aws-api-gateway-stage-variables-reference.html', checked: '2026-11-25' },
+        { title: 'Use stage variables for a REST API in API Gateway – Amazon API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep15',
@@ -187,7 +238,11 @@ export const deployment = {
         'Store each release as a separate layer version and change the layer attached to the function'
       ],
       correctAnswer: 2,
-      explanation: 'Published Lambda versions are immutable snapshots of code and configuration, and an alias is a stable pointer that clients invoke by ARN; moving the alias between versions promotes or rolls back without client changes. $LATEST changes with every code update, so production would receive untested code. Creating new functions forces client changes, and swapping layers changes the function code itself rather than giving a stable, versioned release.'
+      explanation: 'Published Lambda versions are immutable snapshots of code and configuration, and an alias is a stable pointer that clients invoke by ARN; moving the alias between versions promotes or rolls back without client changes. $LATEST changes with every code update, so production would receive untested code. Creating new functions forces client changes, and swapping layers changes the function code itself rather than giving a stable, versioned release.',
+      sources: [
+        { title: 'Manage Lambda Event Function versions – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html', checked: '2026-11-25' },
+        { title: 'Create an alias for a Lambda Event Function – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep16',
@@ -199,7 +254,10 @@ export const deployment = {
         'An AWS service integration that reads the sample JSON from DynamoDB'
       ],
       correctAnswer: 1,
-      explanation: 'A mock integration makes API Gateway return a response generated entirely from the integration response and its mapping template, with no backend at all, which is ideal for unblocking client teams. A placeholder EC2 instance, a Lambda function or a DynamoDB table would all work but add resources, cost and code that the requirement does not need.'
+      explanation: 'A mock integration makes API Gateway return a response generated entirely from the integration response and its mapping template, with no backend at all, which is ideal for unblocking client teams. A placeholder EC2 instance, a Lambda function or a DynamoDB table would all work but add resources, cost and code that the requirement does not need.',
+      sources: [
+        { title: 'Mock integrations for REST APIs in API Gateway – Amazon API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep17',
@@ -211,7 +269,10 @@ export const deployment = {
         'Hard-code the prod values and override them in dev and test with manual console changes'
       ],
       correctAnswer: 2,
-      explanation: 'Parameters (often combined with Conditions or Mappings keyed on an environment parameter) let one template produce a separate stack per environment, ideally in separate accounts, so every environment is built from the same reviewed code. Template copies drift apart over time. A single stack for all environments means one update or failure affects all of them, and manual console changes cause drift from the template.'
+      explanation: 'Parameters (often combined with Conditions or Mappings keyed on an environment parameter) let one template produce a separate stack per environment, ideally in separate accounts, so every environment is built from the same reviewed code. Template copies drift apart over time. A single stack for all environments means one update or failure affects all of them, and manual console changes cause drift from the template.',
+      sources: [
+        { title: 'CloudFormation template Parameters syntax – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/parameters-section-structure.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep18',
@@ -223,7 +284,10 @@ export const deployment = {
         'In the cache section, so test results are reused by the next build run'
       ],
       correctAnswer: 1,
-      explanation: 'buildspec phases run in order (install, pre_build, build, post_build), and any command that exits with a non-zero code fails that phase and the build, so running the test command in pre_build or build after install stops a bad build. The env section only defines variables. The artifacts section lists output files, and the cache section stores files such as dependencies between builds; neither runs commands.'
+      explanation: 'buildspec phases run in order (install, pre_build, build, post_build), and any command that exits with a non-zero code fails that phase and the build, so running the test command in pre_build or build after install stops a bad build. The env section only defines variables. The artifacts section lists output files, and the cache section stores files such as dependencies between builds; neither runs commands.',
+      sources: [
+        { title: 'Build specification reference for CodeBuild – AWS CodeBuild', url: 'https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep19',
@@ -235,7 +299,11 @@ export const deployment = {
         'A reports section that defines a report group with the JUNITXML file format'
       ],
       correctAnswer: 3,
-      explanation: 'The reports section of a buildspec points CodeBuild at test result files (JUnit XML, Cucumber JSON, TestNG and other supported formats) and creates test reports in a report group, which the console shows with pass rates and trends. Uploading the files to S3 or SNS just moves the raw XML, and CloudWatch Logs contains plain log lines without test reporting.'
+      explanation: 'The reports section of a buildspec points CodeBuild at test result files (JUnit XML, Cucumber JSON, TestNG and other supported formats) and creates test reports in a report group, which the console shows with pass rates and trends. Uploading the files to S3 or SNS just moves the raw XML, and CloudWatch Logs contains plain log lines without test reporting.',
+      sources: [
+        { title: 'Test reports in AWS CodeBuild – AWS CodeBuild', url: 'https://docs.aws.amazon.com/codebuild/latest/userguide/test-reporting.html', checked: '2026-11-25' },
+        { title: 'Build specification reference for CodeBuild – AWS CodeBuild', url: 'https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep20',
@@ -247,7 +315,11 @@ export const deployment = {
         'Set the paths as exported variables in the env section of the buildspec'
       ],
       correctAnswer: 0,
-      explanation: 'The artifacts section selects which files become the build output artifact (with options such as base-directory and discard-paths), and CodePipeline passes that artifact to the next stage through its artifact store in S3. Files left in /tmp disappear with the build container. The cache speeds up future builds and is not passed to other stages, and exported variables carry small string values, not files.'
+      explanation: 'The artifacts section selects which files become the build output artifact (with options such as base-directory and discard-paths), and CodePipeline passes that artifact to the next stage through its artifact store in S3. Files left in /tmp disappear with the build container. The cache speeds up future builds and is not passed to other stages, and exported variables carry small string values, not files.',
+      sources: [
+        { title: 'Build specification reference for CodeBuild – AWS CodeBuild', url: 'https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html', checked: '2026-11-25' },
+        { title: 'Input and output artifacts – AWS CodePipeline', url: 'https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome-introducing-artifacts.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep21',
@@ -259,7 +331,10 @@ export const deployment = {
         'Create a second pipeline for production that the release manager starts by hand'
       ],
       correctAnswer: 1,
-      explanation: 'A manual approval action stops the pipeline at that point until an authorized user approves or rejects it, and it can notify reviewers through Amazon SNS with a link to the staging URL, giving an auditable record. Disabling transitions works mechanically but is not a per-release approval record. A sleeping CodeBuild action wastes build minutes and has no approval semantics, and a separate manual pipeline breaks traceability from one artifact to production.'
+      explanation: 'A manual approval action stops the pipeline at that point until an authorized user approves or rejects it, and it can notify reviewers through Amazon SNS with a link to the staging URL, giving an auditable record. Disabling transitions works mechanically but is not a per-release approval record. A sleeping CodeBuild action wastes build minutes and has no approval semantics, and a separate manual pipeline breaks traceability from one artifact to production.',
+      sources: [
+        { title: 'Add a manual approval action to a stage – AWS CodePipeline', url: 'https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep22',
@@ -271,7 +346,10 @@ export const deployment = {
         'Add a CloudWatch Synthetics canary to production and roll back the release if it fails'
       ],
       correctAnswer: 0,
-      explanation: 'A CodeBuild test action placed after the staging deployment runs the integration suite against the live staging endpoint, and a failing command fails the action so the pipeline never reaches production. Testing only after the production deployment exposes users to the defect. Local runs are not enforced and do not test real AWS integrations, and a production canary detects problems after release instead of preventing it.'
+      explanation: 'A CodeBuild test action placed after the staging deployment runs the integration suite against the live staging endpoint, and a failing command fails the action so the pipeline never reaches production. Testing only after the production deployment exposes users to the defect. Local runs are not enforced and do not test real AWS integrations, and a production canary detects problems after release instead of preventing it.',
+      sources: [
+        { title: 'AWS CodeBuild build and test action reference – AWS CodePipeline', url: 'https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodeBuild.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep23',
@@ -283,7 +361,10 @@ export const deployment = {
         'ValidateService'
       ],
       correctAnswer: 2,
-      explanation: 'For EC2 and on-premises deployments the hooks run in the order ApplicationStop, BeforeInstall, (Install), AfterInstall, ApplicationStart and ValidateService. AfterInstall runs after the revision files are copied but before ApplicationStart, which is the right place to configure the new files. ApplicationStop and BeforeInstall run before the new files exist, and ValidateService runs after the application has started, to verify it.'
+      explanation: 'For EC2 and on-premises deployments the hooks run in the order ApplicationStop, BeforeInstall, (Install), AfterInstall, ApplicationStart and ValidateService. AfterInstall runs after the revision files are copied but before ApplicationStart, which is the right place to configure the new files. ApplicationStop and BeforeInstall run before the new files are installed, and ValidateService runs after the application has started, to verify it.',
+      sources: [
+        { title: 'AppSpec \'hooks\' section – AWS CodeDeploy', url: 'https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep24',
@@ -295,7 +376,10 @@ export const deployment = {
         'CodeDeployDefault.HalfAtATime'
       ],
       correctAnswer: 3,
-      explanation: 'HalfAtATime deploys to up to half of the instances at once, so the other half keep serving traffic and the deployment completes in about two batches. AllAtOnce takes every instance out at the same time, and OneAtATime keeps the most capacity but takes the longest. The Lambda linear configuration applies only to Lambda deployments, not EC2.'
+      explanation: 'HalfAtATime deploys to up to half of the instances at once, so the other half keep serving traffic and the deployment completes in about two batches. AllAtOnce takes every instance out at the same time, and OneAtATime keeps the most capacity but takes the longest. The Lambda linear configuration applies only to Lambda deployments, not EC2.',
+      sources: [
+        { title: 'Working with deployment configurations in CodeDeploy – AWS CodeDeploy', url: 'https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep25',
@@ -307,7 +391,10 @@ export const deployment = {
         'Set AutoPublishAlias and a Canary10Percent5Minutes DeploymentPreference listing the alarm'
       ],
       correctAnswer: 3,
-      explanation: 'AutoPublishAlias publishes a new version on each deployment, and DeploymentPreference makes CodeDeploy shift alias traffic with a canary configuration while monitoring the listed CloudWatch alarms, rolling back automatically if one fires. A linear configuration shifts traffic in repeated increments rather than one 10 percent step, and without alarms there is no automatic rollback. Provisioned concurrency controls cold starts, not traffic shifting, and an API Gateway canary does not roll back on its own.'
+      explanation: 'AutoPublishAlias publishes a new version on each deployment, and DeploymentPreference makes CodeDeploy shift alias traffic with a canary configuration while monitoring the listed CloudWatch alarms, rolling back automatically if one fires. A linear configuration shifts traffic in repeated increments rather than one 10 percent step, and without alarms there is no automatic rollback. Provisioned concurrency controls cold starts, not traffic shifting, and an API Gateway canary does not roll back on its own.',
+      sources: [
+        { title: 'Deploying serverless applications gradually with AWS SAM – AWS Serverless Application Model', url: 'https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/automating-updates-to-serverless-apps.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep26',
@@ -319,7 +406,10 @@ export const deployment = {
         'All at once'
       ],
       correctAnswer: 1,
-      explanation: 'Rolling with additional batch first launches an extra batch of instances, then updates the existing instances batch by batch, so full capacity is maintained while only one extra batch is paid for. Plain rolling takes each batch out of service and reduces capacity. Immutable launches a full parallel set of new instances, which costs more and takes longer, and all at once causes downtime.'
+      explanation: 'Rolling with additional batch first launches an extra batch of instances, then updates the existing instances batch by batch, so full capacity is maintained while only one extra batch is paid for. Plain rolling takes each batch out of service and reduces capacity. Immutable launches a full parallel set of new instances, which costs more and takes longer, and all at once causes downtime.',
+      sources: [
+        { title: 'Deployment policies and settings – AWS Elastic Beanstalk', url: 'https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep27',
@@ -331,7 +421,11 @@ export const deployment = {
         'All at once'
       ],
       correctAnswer: 0,
-      explanation: 'An immutable deployment launches new instances in a temporary Auto Scaling group and moves them into the environment only after they pass health checks, so the original instances are never modified and a failure is undone by terminating the new instances. Rolling and rolling with additional batch update existing instances in place, so a failure can leave mixed versions that must be redeployed. All at once updates every instance at the same time and risks a full outage.'
+      explanation: 'An immutable deployment launches new instances in a temporary Auto Scaling group and moves them into the environment only after they pass health checks, so the original instances are never modified and a failure is undone by terminating the new instances. Rolling and rolling with additional batch update existing instances in place, so a failure can leave mixed versions that must be redeployed. All at once updates every instance at the same time and risks a full outage.',
+      sources: [
+        { title: 'Immutable environment updates – AWS Elastic Beanstalk', url: 'https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/environmentmgmt-updates-immutable.html', checked: '2026-11-25' },
+        { title: 'Deploying applications to Elastic Beanstalk environments – AWS Elastic Beanstalk', url: 'https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep28',
@@ -343,7 +437,10 @@ export const deployment = {
         'Create a second Auto Scaling group in the same environment and shift weighted traffic with Route 53'
       ],
       correctAnswer: 2,
-      explanation: 'A blue/green deployment with a cloned environment lets the team test the new platform separately, and Swap environment URLs (a CNAME swap) moves traffic to it; swapping back reverses the cut-over quickly. Rolling and all at once deployments modify the live environment in place, so the old version is not standing by. Elastic Beanstalk manages its own Auto Scaling group, so a second group inside the same environment is not a supported pattern.'
+      explanation: 'A blue/green deployment with a cloned environment lets the team test the new platform separately, and Swap environment URLs (a CNAME swap) moves traffic to it; swapping back reverses the cut-over quickly. Rolling and all at once deployments modify the live environment in place, so the old version is not standing by. Elastic Beanstalk manages its own Auto Scaling group, so a second group inside the same environment is not a supported pattern.',
+      sources: [
+        { title: 'Blue/Green deployments with Elastic Beanstalk – AWS Elastic Beanstalk', url: 'https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.CNAMESwap.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep29',
@@ -355,7 +452,10 @@ export const deployment = {
         'In the EC2 user data field of the environment launch template'
       ],
       correctAnswer: 0,
-      explanation: 'Elastic Beanstalk reads YAML or JSON .config files from the .ebextensions folder at the root of the source bundle, where they can install packages, run commands and set option_settings such as environment properties. appspec.yml is read by CodeDeploy, not Elastic Beanstalk, and buildspec.yml is for CodeBuild. Elastic Beanstalk manages the launch configuration itself, so editing user data directly is not version-controlled with the code.'
+      explanation: 'Elastic Beanstalk reads YAML or JSON .config files from the .ebextensions folder at the root of the source bundle, where they can install packages, run commands and set option_settings such as environment properties. appspec.yml is read by CodeDeploy, not Elastic Beanstalk, and buildspec.yml is for CodeBuild. Elastic Beanstalk manages the launch template itself, so editing user data directly is not version-controlled with the code.',
+      sources: [
+        { title: 'Advanced environment customization with configuration files (.ebextensions) – AWS Elastic Beanstalk', url: 'https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep30',
@@ -367,7 +467,11 @@ export const deployment = {
         'Add a test listener and run Lambda tests in the AfterAllowTestTraffic hook'
       ],
       correctAnswer: 3,
-      explanation: 'In an ECS blue/green deployment, CodeDeploy can route a test listener to the replacement (green) task set, and the AfterAllowTestTraffic hook invokes a Lambda function that runs the tests and reports success or failure, stopping the deployment on failure before production traffic shifts. ValidateService is an EC2/on-premises hook and rolling updates do not create a separate task set. Hooks are defined in appspec, not buildspec, and Auto Scaling replaces unhealthy tasks but does not test a new release.'
+      explanation: 'In an ECS blue/green deployment, CodeDeploy can route a test listener to the replacement (green) task set, and the AfterAllowTestTraffic hook invokes a Lambda function that runs the tests and reports success or failure, stopping the deployment on failure before production traffic shifts. ValidateService is an EC2/on-premises hook and rolling updates do not create a separate task set. Hooks are defined in appspec, not buildspec, and Auto Scaling replaces unhealthy tasks but does not test a new release.',
+      sources: [
+        { title: 'CodeDeploy blue/green deployments for Amazon ECS – Amazon Elastic Container Service', url: 'https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-bluegreen.html', checked: '2026-11-25' },
+        { title: 'AppSpec \'hooks\' section – AWS CodeDeploy', url: 'https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep31',
@@ -379,7 +483,10 @@ export const deployment = {
         'Drift detection that runs on a schedule after each update'
       ],
       correctAnswer: 1,
-      explanation: 'Rollback triggers let CloudFormation monitor specified CloudWatch alarms during a stack create or update and for a monitoring period afterwards, rolling the stack back if any alarm goes into ALARM. DeletionPolicy controls what happens to resources when they are removed, a stack policy only blocks updates, and drift detection reports out-of-band changes without rolling anything back.'
+      explanation: 'Rollback triggers let CloudFormation monitor specified CloudWatch alarms during a stack create or update and for a monitoring period afterwards, rolling the stack back if any alarm goes into ALARM. DeletionPolicy controls what happens to resources when they are removed, a stack policy only blocks updates, and drift detection reports out-of-band changes without rolling anything back.',
+      sources: [
+        { title: 'Roll back your CloudFormation stack on alarm breach with rollback triggers – AWS CloudFormation', url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-rollback-triggers.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dep32',
@@ -391,7 +498,11 @@ export const deployment = {
         'Amazon ECS on AWS Fargate with an Application Load Balancer'
       ],
       correctAnswer: 2,
-      explanation: 'Amplify Hosting connects to a Git repository and provides managed build and deploy on each push, branch and pull request previews, and custom domains with managed certificates for static and server-side rendered front ends. S3 with CloudFront and a custom CodeBuild project can host the app but requires building the pipeline and previews yourself. Elastic Beanstalk and ECS run servers or containers that a static single-page app does not need.'
+      explanation: 'Amplify Hosting connects to a Git repository and provides managed build and deploy on each push, branch and pull request previews, and custom domains with managed certificates for static and server-side rendered front ends. S3 with CloudFront and a custom CodeBuild project can host the app but requires building the pipeline and previews yourself. Elastic Beanstalk and ECS run servers or containers that a static single-page app does not need.',
+      sources: [
+        { title: 'Welcome to AWS Amplify Hosting – AWS Amplify Hosting', url: 'https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html', checked: '2026-11-25' },
+        { title: 'Web previews for pull requests – AWS Amplify Hosting', url: 'https://docs.aws.amazon.com/amplify/latest/userguide/pr-previews.html', checked: '2026-11-25' }
+      ]
     }
   ]
 };

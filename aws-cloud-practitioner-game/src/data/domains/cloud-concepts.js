@@ -19,7 +19,11 @@ export const cloudConcepts = {
         'Rehost, replatform, repurchase, refactor, retire, and retain'
       ],
       correctAnswer: 2,
-      explanation: 'AWS\'s six advantages of cloud computing are: trade fixed expense for variable expense, benefit from massive economies of scale, stop guessing capacity, increase speed and agility, stop spending money running and maintaining data centers, and go global in minutes. The other lists are real AWS six-item frameworks but answer different questions: the Well-Architected Framework pillars, the Cloud Adoption Framework perspectives, and the six common migration strategies (the "6 Rs").'
+      explanation: 'AWS\'s six advantages of cloud computing are: trade fixed expense for variable expense, benefit from massive economies of scale, stop guessing capacity, increase speed and agility, stop spending money running and maintaining data centers, and go global in minutes. The other lists are real AWS frameworks but answer different questions: the six Well-Architected Framework pillars, the six Cloud Adoption Framework perspectives, and the migration strategies (AWS now lists seven, the "7 Rs", which add relocate).',
+      sources: [
+        { title: 'Six advantages of cloud computing – Overview of Amazon Web Services', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html', checked: '2026-11-25' },
+        { title: 'About the migration strategies – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc2',
@@ -31,7 +35,10 @@ export const cloudConcepts = {
         'Acquiring resources as demand increases and releasing them when demand drops'
       ],
       correctAnswer: 3,
-      explanation: 'Elasticity means resources expand and contract with actual demand, so you pay only for what you use at any moment. Automatic recovery from failure describes fault tolerance, permanently adding capacity is traditional fixed scaling rather than elasticity, and cross-Region data copies describe replication.'
+      explanation: 'Elasticity means resources expand and contract with actual demand, so you pay only for what you use at any moment. Automatic recovery from failure describes fault tolerance, permanently adding capacity is traditional fixed scaling rather than elasticity, and cross-Region data copies describe replication.',
+      sources: [
+        { title: 'What is Cloud Computing? – AWS', url: 'https://aws.amazon.com/what-is-cloud-computing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc3',
@@ -43,7 +50,10 @@ export const cloudConcepts = {
         'Function as a Service (FaaS)'
       ],
       correctAnswer: 0,
-      explanation: 'IaaS (such as Amazon EC2) provides the most control: the customer manages the operating system, installed software, and patching while AWS manages the physical hardware and virtualization. PaaS abstracts away the OS, FaaS abstracts away servers entirely, and SaaS delivers a finished application with no infrastructure access at all.'
+      explanation: 'IaaS (such as Amazon EC2) provides the most control: the customer manages the operating system, installed software, and patching while AWS manages the physical hardware and virtualization. PaaS abstracts away the OS, FaaS abstracts away servers entirely, and SaaS delivers a finished application with no infrastructure access at all.',
+      sources: [
+        { title: 'SaaS vs PaaS vs IaaS – Types of Cloud Computing – AWS', url: 'https://aws.amazon.com/types-of-cloud-computing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc4',
@@ -55,7 +65,11 @@ export const cloudConcepts = {
         'A set of best practices, organized into six pillars, for designing and operating cloud workloads'
       ],
       correctAnswer: 3,
-      explanation: 'The Well-Architected Framework is documented guidance — design principles and best practices across the Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability pillars. It is not a service that fixes issues automatically (the Well-Architected Tool only reviews and reports), not a template library, and not a paid consulting engagement.'
+      explanation: 'The Well-Architected Framework is documented guidance — design principles and best practices across the Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability pillars. It is not a service that fixes issues automatically (the Well-Architected Tool only reviews and reports), not a template library, and not a paid consulting engagement.',
+      sources: [
+        { title: 'Cloud Workloads – AWS Well-Architected Framework', url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/workloads.html', checked: '2026-11-25' },
+        { title: 'What is AWS Well-Architected? – AWS Well-Architected', url: 'https://docs.aws.amazon.com/wellarchitected/latest/userguide/well-architected.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc5',
@@ -67,7 +81,11 @@ export const cloudConcepts = {
         'The two terms describe the same architecture sold at different support tiers'
       ],
       correctAnswer: 0,
-      explanation: 'High availability keeps downtime minimal but accepts brief interruptions during failover; fault tolerance keeps the system fully operational through a component failure, typically by running redundant components simultaneously. This zero-downtime requirement calls for fault tolerance, which generally costs more than high availability — not less — and the terms are not interchangeable.'
+      explanation: 'High availability keeps downtime minimal but accepts brief interruptions during failover; fault tolerance keeps the system fully operational through a component failure, typically by running redundant components simultaneously. This zero-downtime requirement calls for fault tolerance, which generally costs more than high availability — not less — and the terms are not interchangeable.',
+      sources: [
+        { title: 'Fault tolerance and fault isolation – Availability and Beyond: Understanding and Improving the Resilience of Distributed Systems on AWS', url: 'https://docs.aws.amazon.com/whitepapers/latest/availability-and-beyond-improving-resilience/fault-tolerance-and-fault-isolation.html', checked: '2026-11-25' },
+        { title: 'What is High Availability? – AWS', url: 'https://aws.amazon.com/what-is/high-availability/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc6',
@@ -79,7 +97,11 @@ export const cloudConcepts = {
         'Savings Plans'
       ],
       correctAnswer: 1,
-      explanation: 'On-Demand Instances charge by the hour or second with no long-term commitment, making them right for short-term, uninterruptible workloads. Spot Instances are cheaper but can be reclaimed by AWS with a two-minute warning, while Reserved Instances and Savings Plans both require a one- or three-year commitment.'
+      explanation: 'On-Demand Instances charge by the hour or second with no long-term commitment, making them right for short-term, uninterruptible workloads. Spot Instances are cheaper but can be reclaimed by AWS with a two-minute warning, while Reserved Instances and Savings Plans both require a one- or three-year commitment.',
+      sources: [
+        { title: 'Purchasing On-Demand Instances for Amazon EC2 – Amazon EC2 User Guide', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-on-demand-instances.html', checked: '2026-11-25' },
+        { title: 'Spot Instance interruption notices – Amazon EC2 User Guide', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-instance-termination-notices.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc7',
@@ -91,7 +113,11 @@ export const cloudConcepts = {
         'The application keeps serving traffic if one Availability Zone fails'
       ],
       correctAnswer: 3,
-      explanation: 'Spreading instances across multiple AZs provides high availability: if one AZ suffers an outage, the load balancer routes traffic to healthy instances in the others. Cross-AZ data transfer actually incurs a charge rather than saving money, serving distant continents is addressed by additional Regions or edge locations, and service quotas are unrelated to AZ placement.'
+      explanation: 'Spreading instances across multiple AZs provides high availability: if one AZ suffers an outage, the load balancer routes traffic to healthy instances in the others. Cross-AZ data transfer actually incurs a charge rather than saving money, serving distant continents is addressed by additional Regions or edge locations, and service quotas are unrelated to AZ placement.',
+      sources: [
+        { title: 'Regions and Zones – Amazon EC2 User Guide', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html', checked: '2026-11-25' },
+        { title: 'Amazon EC2 On-Demand Pricing', url: 'https://aws.amazon.com/ec2/pricing/on-demand/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc8',
@@ -103,7 +129,10 @@ export const cloudConcepts = {
         'A minimum monthly spend must be met before resources can be launched'
       ],
       correctAnswer: 0,
-      explanation: 'Pay-as-you-go means paying only for the individual services used, for as long as they are used, with no long-term contracts or complex licensing. There is no flat unlimited-use fee, no required annual prepayment (upfront payment is an optional feature of Reserved Instances), and no minimum spend to start using AWS.'
+      explanation: 'Pay-as-you-go means paying only for the individual services used, for as long as they are used, with no long-term contracts or complex licensing. There is no flat fee for unlimited use of every service (AWS\'s flat-rate plans cover only select bundles with usage allowances), no required annual prepayment (upfront payment is an optional feature of Reserved Instances), and no minimum spend to start using AWS.',
+      sources: [
+        { title: 'AWS Pricing – How does AWS pricing work?', url: 'https://aws.amazon.com/pricing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc9',
@@ -115,7 +144,10 @@ export const cloudConcepts = {
         'Multi-cloud'
       ],
       correctAnswer: 2,
-      explanation: 'A private cloud (on-premises) deployment keeps all infrastructure in the organization\'s own data center while applying cloud-like virtualization and management. Hybrid would require connecting that facility to resources running in a public cloud, which the mandate forbids, and public cloud or multi-cloud would place the workloads on provider-owned infrastructure.'
+      explanation: 'A private cloud (on-premises) deployment keeps all infrastructure in the organization\'s own data center while applying cloud-like virtualization and management. Hybrid would require connecting that facility to resources running in a public cloud, which the mandate forbids, and public cloud or multi-cloud would place the workloads on provider-owned infrastructure.',
+      sources: [
+        { title: 'Types of cloud computing – Overview of Amazon Web Services', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc10',
@@ -127,7 +159,10 @@ export const cloudConcepts = {
         'Dedicated physical servers included at no additional charge'
       ],
       correctAnswer: 1,
-      explanation: 'Because AWS buys and operates infrastructure at massive scale, its unit costs are lower, and that translates into lower pay-as-you-go prices for customers than most could achieve on their own. Economies of scale does not guarantee capacity, trigger architecture reviews, or provide free dedicated hardware — Dedicated Hosts are a separately billed option.'
+      explanation: 'Because AWS buys and operates infrastructure at massive scale, its unit costs are lower, and that translates into lower pay-as-you-go prices for customers than most could achieve on their own. Economies of scale does not guarantee capacity, trigger architecture reviews, or provide free dedicated hardware — Dedicated Hosts are a separately billed option.',
+      sources: [
+        { title: 'Six advantages of cloud computing – Overview of Amazon Web Services', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc11',
@@ -139,7 +174,11 @@ export const cloudConcepts = {
         'A logically isolated virtual network defined inside an AWS account'
       ],
       correctAnswer: 0,
-      explanation: 'A Region is a physical geographic area that contains multiple isolated Availability Zones, and each Region is isolated from the others. A single data center is smaller than an AZ, a cache site describes an edge location, and an isolated virtual network describes a VPC.'
+      explanation: 'A Region is a physical geographic area that contains multiple isolated Availability Zones, and each Region is isolated from the others. A single data center is smaller than an AZ, a cache site describes an edge location, and an isolated virtual network describes a VPC.',
+      sources: [
+        { title: 'Global infrastructure – Overview of Amazon Web Services', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html', checked: '2026-11-25' },
+        { title: 'Regions and Zones – Amazon EC2 User Guide', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc12',
@@ -151,7 +190,10 @@ export const cloudConcepts = {
         'A virtual network segment reserved for a single customer\'s resources'
       ],
       correctAnswer: 2,
-      explanation: 'An Availability Zone consists of one or more discrete data centers with redundant power, networking, and connectivity, physically separated from other AZs in the Region and linked by low-latency networking. The hierarchy runs the other way — Regions contain AZs — and edge sites and virtual network segments describe edge locations and subnets, respectively.'
+      explanation: 'An Availability Zone consists of one or more discrete data centers with redundant power, networking, and connectivity, physically separated from other AZs in the Region and linked by low-latency networking. The hierarchy runs the other way — Regions contain AZs — and edge sites and virtual network segments describe edge locations and subnets, respectively.',
+      sources: [
+        { title: 'Global infrastructure – Overview of Amazon Web Services', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc13',
@@ -163,7 +205,11 @@ export const cloudConcepts = {
         'Security'
       ],
       correctAnswer: 3,
-      explanation: 'Encryption at rest and least-privilege access control are core practices of the Security pillar, which covers protecting data, systems, and assets. Operational Excellence concerns running and improving operations, Reliability concerns recovery from failure, and Performance Efficiency concerns using resources effectively — none of them addresses these access and encryption gaps.'
+      explanation: 'Encryption at rest and least-privilege access control are core practices of the Security pillar, which covers protecting data, systems, and assets. Operational Excellence concerns running and improving operations, Reliability concerns recovery from failure, and Performance Efficiency concerns using resources effectively — none of them addresses these access and encryption gaps.',
+      sources: [
+        { title: 'Security design principles – AWS Well-Architected Framework', url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sec-design-principles.html', checked: '2026-11-25' },
+        { title: 'Cloud Workloads – AWS Well-Architected Framework', url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/workloads.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc14',
@@ -175,7 +221,10 @@ export const cloudConcepts = {
         'Trade fixed expense for variable expense'
       ],
       correctAnswer: 1,
-      explanation: '"Go global in minutes" means deploying an application into AWS Regions around the world with a few clicks, putting it closer to international users without building data centers abroad. Economies of scale is about AWS\'s buying power lowering prices, capacity guessing is about matching resource levels to demand, and the expense trade-off describes the CapEx-to-OpEx shift rather than geographic reach.'
+      explanation: '"Go global in minutes" means deploying an application into AWS Regions around the world with a few clicks, putting it closer to international users without building data centers abroad. Economies of scale is about AWS\'s buying power lowering prices, capacity guessing is about matching resource levels to demand, and the expense trade-off describes the CapEx-to-OpEx shift rather than geographic reach.',
+      sources: [
+        { title: 'Six advantages of cloud computing – Overview of Amazon Web Services', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc15',
@@ -187,7 +236,10 @@ export const cloudConcepts = {
         'Security duties are negotiated individually in each customer\'s support agreement'
       ],
       correctAnswer: 2,
-      explanation: 'The Shared Responsibility Model makes AWS responsible for security "of" the cloud — facilities, hardware, and the virtualization layer including the hypervisor — while customers handle security "in" the cloud, such as security group rules, data encryption, and access management. AWS never takes over customer-side controls, customers never manage AWS\'s physical data centers, and the split is a standard model, not a per-contract negotiation.'
+      explanation: 'The Shared Responsibility Model makes AWS responsible for security "of" the cloud — facilities, hardware, and the virtualization layer including the hypervisor — while customers handle security "in" the cloud, such as security group rules, data encryption, and access management. AWS never takes over customer-side controls, customers never manage AWS\'s physical data centers, and the split is a standard model, not a per-contract negotiation.',
+      sources: [
+        { title: 'Shared Responsibility Model – AWS', url: 'https://aws.amazon.com/compliance/shared-responsibility-model/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc16',
@@ -199,14 +251,21 @@ export const cloudConcepts = {
         'Costs become fixed at the size of the original hardware quote'
       ],
       correctAnswer: 1,
-      explanation: 'Moving to the cloud trades capital expense (buying hardware upfront) for variable operational expense (paying only for what you consume). Costs aren\'t eliminated or fixed — they scale with actual usage, which is the point.'
+      explanation: 'Moving to the cloud trades capital expense (buying hardware upfront) for variable operational expense (paying only for what you consume). Costs aren\'t eliminated or fixed — they scale with actual usage, which is the point.',
+      sources: [
+        { title: 'Six advantages of cloud computing – Overview of Amazon Web Services', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html', checked: '2026-11-25' },
+        { title: 'What is the Difference Between Cloud And On Premises? – AWS', url: 'https://aws.amazon.com/what-is/cloud-vs-on-premises/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc17',
       question: 'A ticketing site sees traffic spike 20x during on-sale events and drop overnight. Which cloud capability lets capacity grow and shrink automatically to match this demand?',
       options: ['Fault tolerance', 'Elasticity', 'Data durability', 'Consolidated billing'],
       correctAnswer: 1,
-      explanation: 'Elasticity is the ability to automatically acquire resources as demand rises and release them as it falls, paying only for what\'s used. Fault tolerance is about surviving failures, durability protects stored data, and consolidated billing is a payment feature.'
+      explanation: 'Elasticity is the ability to automatically acquire resources as demand rises and release them as it falls, paying only for what\'s used. Fault tolerance is about surviving failures, durability protects stored data, and consolidated billing is a payment feature.',
+      sources: [
+        { title: 'What is Cloud Computing? – AWS', url: 'https://aws.amazon.com/what-is-cloud-computing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc18',
@@ -218,21 +277,32 @@ export const cloudConcepts = {
         'They are two names for the same technique'
       ],
       correctAnswer: 2,
-      explanation: 'Scaling up (vertical) means moving to a larger, more powerful instance; scaling out (horizontal) means adding more instances behind a load balancer. Horizontal scaling generally offers better availability because no single machine is a bottleneck or single point of failure.'
+      explanation: 'Scaling up (vertical) means moving to a larger, more powerful instance; scaling out (horizontal) means adding more instances behind a load balancer. Horizontal scaling generally offers better availability because no single machine is a bottleneck or single point of failure.',
+      sources: [
+        { title: 'FAQ – Modern data-centric use cases – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/modern-data-centric-use-cases/faq.html', checked: '2026-11-25' },
+        { title: 'Reliability design principles – AWS Well-Architected Framework', url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel-design-principles.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc19',
       question: 'A media company wants its static content cached physically close to users worldwide to cut latency. Which part of the AWS global infrastructure serves this purpose?',
       options: ['Availability Zones', 'Edge locations', 'AWS Regions', 'Subnets'],
       correctAnswer: 1,
-      explanation: 'Edge locations are content-delivery sites (used by CloudFront and Route 53) placed in far more cities than Regions, caching content near end users. Regions and Availability Zones host the core infrastructure, and subnets are network segments inside a VPC.'
+      explanation: 'Edge locations are content-delivery sites (used by CloudFront and Route 53) placed in far more cities than Regions, caching content near end users. Regions and Availability Zones host the core infrastructure, and subnets are network segments inside a VPC.',
+      sources: [
+        { title: 'What is Amazon CloudFront? – Amazon CloudFront Developer Guide', url: 'https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html', checked: '2026-11-25' },
+        { title: 'AWS Global Infrastructure', url: 'https://aws.amazon.com/about-aws/global-infrastructure/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc20',
       question: 'A regulated firm must run some workloads on-premises but wants the same AWS APIs, hardware, and tools in its own data center. Which offering provides this?',
       options: ['AWS Outposts', 'Amazon CloudFront', 'AWS Fargate', 'Amazon WorkSpaces'],
       correctAnswer: 0,
-      explanation: 'AWS Outposts brings AWS-managed racks with native AWS services and APIs into the customer\'s own facility — the hybrid option for residency or latency constraints. CloudFront is a CDN, Fargate runs containers in the cloud, and WorkSpaces provides virtual desktops.'
+      explanation: 'AWS Outposts brings AWS-managed racks with native AWS services and APIs into the customer\'s own facility — the hybrid option for residency or latency constraints. CloudFront is a CDN, Fargate runs containers in the cloud, and WorkSpaces provides virtual desktops.',
+      sources: [
+        { title: 'What is AWS Outposts? – AWS Outposts User Guide', url: 'https://docs.aws.amazon.com/outposts/latest/userguide/what-is-outposts.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc21',
@@ -244,14 +314,20 @@ export const cloudConcepts = {
         'Deploying every workload to a single large server'
       ],
       correctAnswer: 0,
-      explanation: 'Operational Excellence emphasizes operations as code, small reversible changes, frequent refinement of procedures, and learning from failures. Reserved Instances relate to cost optimization and encryption to the security pillar; a single large server contradicts reliability guidance.'
+      explanation: 'Operational Excellence emphasizes operations as code, small reversible changes, frequent refinement of procedures, and learning from failures. Reserved Instances relate to cost optimization and encryption to the security pillar; a single large server contradicts reliability guidance.',
+      sources: [
+        { title: 'Operational excellence design principles – AWS Well-Architected Framework', url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/ops-design-principles.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc22',
       question: 'A review finds most EC2 instances running at 5% CPU around the clock. Which Well-Architected pillar does right-sizing these instances address?',
       options: ['Security', 'Performance Efficiency', 'Cost Optimization', 'Sustainability only'],
       correctAnswer: 2,
-      explanation: 'Paying for far more capacity than a workload uses is a cost-optimization problem — right-sizing matches resources to actual demand. It also helps sustainability, but the primary pillar for eliminating wasted spend is Cost Optimization; security and performance aren\'t the issue at 5% utilization.'
+      explanation: 'Paying for far more capacity than a workload uses is a cost-optimization problem — right-sizing matches resources to actual demand. It also helps sustainability, but the primary pillar for eliminating wasted spend is Cost Optimization; security and performance aren\'t the issue at 5% utilization.',
+      sources: [
+        { title: 'Cost optimization design principles – AWS Well-Architected Framework', url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-design-principles.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc23',
@@ -263,14 +339,20 @@ export const cloudConcepts = {
         'Avoid making changes once a system is stable'
       ],
       correctAnswer: 0,
-      explanation: 'Reliability focuses on a workload\'s ability to recover from failures — automatic recovery, tested procedures, horizontal scaling, and capacity management. Cheapest-Region selection is cost-related, broad permissions violate security, and freezing changes contradicts operational excellence.'
+      explanation: 'Reliability focuses on a workload\'s ability to recover from failures — automatic recovery, tested procedures, horizontal scaling, and capacity management. Cheapest-Region selection is cost-related, broad permissions violate security, and freezing changes contradicts operational excellence.',
+      sources: [
+        { title: 'Reliability design principles – AWS Well-Architected Framework', url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel-design-principles.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc24',
       question: 'A company moves its application servers to EC2 with no code changes, keeping the same architecture. Which migration strategy is this?',
       options: ['Refactoring (re-architecting)', 'Rehosting ("lift and shift")', 'Repurchasing (moving to SaaS)', 'Retiring'],
       correctAnswer: 1,
-      explanation: 'Rehosting — lift and shift — moves applications as-is onto cloud infrastructure without redesign. Refactoring changes the architecture (e.g., to serverless), repurchasing replaces the app with a SaaS product, and retiring decommissions it.'
+      explanation: 'Rehosting — lift and shift — moves applications as-is onto cloud infrastructure without redesign. Refactoring changes the architecture (e.g., to serverless), repurchasing replaces the app with a SaaS product, and retiring decommissions it.',
+      sources: [
+        { title: 'About the migration strategies – AWS Prescriptive Guidance', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc25',
@@ -282,7 +364,10 @@ export const cloudConcepts = {
         'To certify employees on AWS services'
       ],
       correctAnswer: 1,
-      explanation: 'The CAF organizes cloud adoption guidance into perspectives (Business, People, Governance, Platform, Security, Operations) to help organizations plan and de-risk their transformation. Pricing tools handle cost estimates, DMS migrates databases, and AWS Training handles certification.'
+      explanation: 'The CAF organizes cloud adoption guidance into perspectives (Business, People, Governance, Platform, Security, Operations) to help organizations plan and de-risk their transformation. Pricing tools handle cost estimates, DMS migrates databases, and AWS Training handles certification.',
+      sources: [
+        { title: 'Foundational capabilities – An Overview of the AWS Cloud Adoption Framework', url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/foundational-capabilities.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc26',
@@ -294,7 +379,11 @@ export const cloudConcepts = {
         'Per-query charges for using one\'s own on-premises database'
       ],
       correctAnswer: 1,
-      explanation: 'On-prem TCO includes far more than server purchase price: data-center space, power, cooling, network gear, and the staff time spent racking, patching, and replacing hardware. The console is free, inbound data transfer is free, and on-prem databases don\'t bill per query.'
+      explanation: 'On-prem TCO includes far more than server purchase price: data-center space, power, cooling, network gear, and the staff time spent racking, patching, and replacing hardware. The console is free, inbound data transfer is free, and on-prem databases don\'t bill per query.',
+      sources: [
+        { title: 'What is the Difference Between Cloud And On Premises? – AWS', url: 'https://aws.amazon.com/what-is/cloud-vs-on-premises/', checked: '2026-11-25' },
+        { title: 'Exploring Data Transfer Costs for AWS Managed Databases – AWS Architecture Blog', url: 'https://aws.amazon.com/blogs/architecture/exploring-data-transfer-costs-for-aws-managed-databases/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc27',
@@ -306,14 +395,20 @@ export const cloudConcepts = {
         'Compute is free for workloads under 24 hours per day'
       ],
       correctAnswer: 0,
-      explanation: 'Serverless means AWS manages all underlying infrastructure — provisioning, scaling, patching — and bills only for actual execution. Servers still exist (you just don\'t manage them), code is still required, and there is no free-if-under-24-hours rule.'
+      explanation: 'Serverless means AWS manages all underlying infrastructure — provisioning, scaling, patching — and bills only for actual execution. Servers still exist (you just don\'t manage them), code is still required, and there is no free-if-under-24-hours rule.',
+      sources: [
+        { title: 'What is AWS Lambda? – AWS Lambda Developer Guide', url: 'https://docs.aws.amazon.com/lambda/latest/dg/welcome.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc28',
       question: 'An architect places a queue between a web front end and a video-processing back end so each part can fail or scale independently. Which design principle is this?',
       options: ['Tight coupling', 'Loose coupling', 'Vertical integration', 'Single point of failure'],
       correctAnswer: 1,
-      explanation: 'Loose coupling connects components through intermediaries like queues (SQS) or load balancers so a failure or slowdown in one doesn\'t cascade to others. Tight coupling is the anti-pattern being avoided, and a queue removes rather than creates single points of failure.'
+      explanation: 'Loose coupling connects components through intermediaries like queues (SQS) or load balancers so a failure or slowdown in one doesn\'t cascade to others. Tight coupling is the anti-pattern being avoided, and a queue removes rather than creates single points of failure.',
+      sources: [
+        { title: 'REL04-BP02 Implement loosely coupled dependencies – AWS Well-Architected Framework', url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel04-bp02.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc29',
@@ -325,7 +420,11 @@ export const cloudConcepts = {
         'The application must run on-premises instead'
       ],
       correctAnswer: 1,
-      explanation: 'Surviving a Region-level event requires presence in a second Region — from backups and pilot-light standby up to active-active deployments. Multi-AZ protects against data-center failures within a Region but not the Region itself, and no infrastructure is immune to failure.'
+      explanation: 'Surviving a Region-level event requires presence in a second Region — from backups and pilot-light standby up to active-active deployments. Multi-AZ protects against data-center failures within a Region but not the Region itself, and no infrastructure is immune to failure.',
+      sources: [
+        { title: 'Disaster recovery is different in the cloud – Disaster Recovery of Workloads on AWS', url: 'https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-is-different-in-the-cloud.html', checked: '2026-11-25' },
+        { title: 'Disaster recovery options in the cloud – Disaster Recovery of Workloads on AWS', url: 'https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc30',
@@ -337,14 +436,21 @@ export const cloudConcepts = {
         'The Region\'s founding date, since older Regions are always cheaper'
       ],
       correctAnswer: 0,
-      explanation: 'Region choice balances compliance (where data must legally reside), proximity to users (latency), whether needed services are offered there, and cost, which varies by Region. Edge locations sit outside Regions, and age or names are irrelevant.'
+      explanation: 'Region choice balances compliance (where data must legally reside), proximity to users (latency), whether needed services are offered there, and cost, which varies by Region. Edge locations sit outside Regions, and age or names are irrelevant.',
+      sources: [
+        { title: 'COST07-BP02 Choose Regions based on cost – AWS Well-Architected Framework', url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/cost07-bp02.html', checked: '2026-11-25' },
+        { title: 'What to Consider when Selecting a Region for your Workloads – AWS Architecture Blog', url: 'https://aws.amazon.com/blogs/architecture/what-to-consider-when-selecting-a-region-for-your-workloads/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc31',
       question: 'Before the cloud, a team waited 8 weeks for hardware procurement to test a new product idea. On AWS they provision in minutes. Which cloud advantage does this illustrate?',
       options: ['Increased speed and agility', 'Massive economies of scale', 'Consolidated billing', 'Fault tolerance'],
       correctAnswer: 0,
-      explanation: 'Provisioning resources in minutes instead of weeks lets teams experiment, fail fast, and innovate more often — the "increase speed and agility" advantage. Economies of scale is about AWS\'s purchasing power lowering prices, and the others are unrelated to provisioning speed.'
+      explanation: 'Provisioning resources in minutes instead of weeks lets teams experiment, fail fast, and innovate more often — the "increase speed and agility" advantage. Economies of scale is about AWS\'s purchasing power lowering prices, and the others are unrelated to provisioning speed.',
+      sources: [
+        { title: 'Six advantages of cloud computing – Overview of Amazon Web Services', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc32',
@@ -356,14 +462,20 @@ export const cloudConcepts = {
         'Customers must purchase for the worst-case scenario'
       ],
       correctAnswer: 1,
-      explanation: '"Stop guessing capacity" is a core cloud advantage: scale to what demand actually is, in minutes, instead of buying hardware for a forecast. There are no fixed reservations required at signup, no free unlimited launch capacity, and worst-case purchasing is exactly the on-prem problem the cloud removes.'
+      explanation: '"Stop guessing capacity" is a core cloud advantage: scale to what demand actually is, in minutes, instead of buying hardware for a forecast. There are no fixed reservations required at signup, no free unlimited launch capacity, and worst-case purchasing is exactly the on-prem problem the cloud removes.',
+      sources: [
+        { title: 'Six advantages of cloud computing – Overview of Amazon Web Services', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc33',
       question: 'A company subscribes to a web-based CRM that it merely configures and uses — no servers, runtimes, or application code to manage. Which cloud service model is this?',
       options: ['Infrastructure as a Service (IaaS)', 'Platform as a Service (PaaS)', 'Software as a Service (SaaS)', 'Function as a Service (FaaS)'],
       correctAnswer: 2,
-      explanation: 'SaaS delivers a complete application managed entirely by the provider — the customer just uses it. IaaS provides raw infrastructure (like EC2), PaaS provides a managed platform for your own code (like Elastic Beanstalk), and FaaS runs individual functions (like Lambda).'
+      explanation: 'SaaS delivers a complete application managed entirely by the provider — the customer just uses it. IaaS provides raw infrastructure (like EC2), PaaS provides a managed platform for your own code (like Elastic Beanstalk), and FaaS runs individual functions (like Lambda).',
+      sources: [
+        { title: 'SaaS vs PaaS vs IaaS – Types of Cloud Computing – AWS', url: 'https://aws.amazon.com/types-of-cloud-computing/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc34',
@@ -375,19 +487,26 @@ export const cloudConcepts = {
         'They only run on-premises'
       ],
       correctAnswer: 0,
-      explanation: 'Microservices split an application into small independent services, so teams deploy separately, scale only what\'s hot, and contain failures. The single deployable unit describes the monolith itself, communication between services increases (not disappears), and microservices run anywhere.'
+      explanation: 'Microservices split an application into small independent services, so teams deploy separately, scale only what\'s hot, and contain failures. The single deployable unit describes the monolith itself, communication between services increases (not disappears), and microservices run anywhere.',
+      sources: [
+        { title: 'What are Microservices? – AWS', url: 'https://aws.amazon.com/microservices/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc35',
       question: 'Which practice aligns with the Sustainability pillar of the Well-Architected Framework?',
       options: [
-        'Maximizing utilization of provisioned resources and using managed services to reduce wasted energy',
+        'Maximizing utilization of provisioned resources and eliminating idle resources to reduce wasted energy',
         'Running all instances at maximum size continuously to be safe',
         'Storing every log forever in hot storage',
         'Printing infrastructure diagrams on recycled paper'
       ],
       correctAnswer: 0,
-      explanation: 'The Sustainability pillar targets reducing the environmental footprint of workloads: high utilization, right-sizing, efficient storage tiering, and managed/serverless services that share infrastructure efficiently. Perpetually oversized instances and hot-storing all data forever waste energy — the opposite of the pillar\'s guidance.'
+      explanation: 'The Sustainability pillar targets reducing the energy and resources a workload consumes: right-sizing for high utilization, eliminating idle resources, and keeping only data that has a business purpose. Perpetually oversized instances and keeping every log forever waste energy and storage — the opposite of the pillar\'s guidance.',
+      sources: [
+        { title: 'Design principles for sustainability in the cloud – AWS Well-Architected Framework', url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sus-design-principles.html', checked: '2026-11-25' },
+        { title: 'SUS04-BP01 Eliminate unnecessary data – AWS Well-Architected Framework', url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sus04-bp01.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'cc36',
@@ -399,7 +518,11 @@ export const cloudConcepts = {
         'Local Zones run customer-owned hardware'
       ],
       correctAnswer: 0,
-      explanation: 'Local Zones extend a parent Region\'s infrastructure into metro areas so latency-sensitive workloads (media, gaming, real-time apps) run near users. They aren\'t free, aren\'t S3-only, and use AWS-owned infrastructure — customer-site hardware is Outposts.'
+      explanation: 'Local Zones extend a parent Region\'s infrastructure into metro areas so latency-sensitive workloads (media, gaming, real-time apps) run near users. They aren\'t free, aren\'t S3-only, and use AWS-owned infrastructure — customer-site hardware is Outposts.',
+      sources: [
+        { title: 'AWS Local Zones FAQs', url: 'https://aws.amazon.com/about-aws/global-infrastructure/localzones/faqs/', checked: '2026-11-25' },
+        { title: 'What is AWS Local Zones? – AWS Local Zones User Guide', url: 'https://docs.aws.amazon.com/local-zones/latest/ug/what-is-aws-local-zones.html', checked: '2026-11-25' }
+      ]
     }
   ]
 };

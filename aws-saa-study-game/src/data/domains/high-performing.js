@@ -19,7 +19,11 @@ export const highPerforming = {
         'Move the objects to the S3 Intelligent-Tiering class'
       ],
       correctAnswer: 2,
-      explanation: 'S3 scales request throughput per prefix (at least 3,500 PUT/COPY/POST/DELETE and 5,500 GET/HEAD requests per second per partitioned prefix), so spreading keys across many prefixes multiplies the achievable rate. There is no account quota to raise for per-prefix request rates, Transfer Acceleration speeds long-distance transfers rather than request rates, and a storage class change does nothing for request throughput.'
+      explanation: 'S3 scales request throughput per prefix (at least 3,500 PUT/COPY/POST/DELETE or 11,000 GET/HEAD requests per second per partitioned prefix), so spreading keys across many prefixes multiplies the achievable rate. There is no account quota to raise for per-prefix request rates, Transfer Acceleration speeds long-distance transfers rather than request rates, and a storage class change does nothing for request throughput.',
+      sources: [
+        { title: 'Performance design patterns for Amazon S3 – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance-design-patterns.html', checked: '2026-11-25' },
+        { title: 'Best practices design patterns: optimizing Amazon S3 performance – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf2',
@@ -31,7 +35,11 @@ export const highPerforming = {
         'Upload through an AWS Site-to-Site VPN to the us-east-1 VPC'
       ],
       correctAnswer: 0,
-      explanation: 'Transfer Acceleration routes uploads into the nearest CloudFront edge location and across the AWS backbone, and multipart upload sends parts in parallel and retries only failed parts, which is required anyway for objects over 5 GB. Regional buckets with replication require the tool to choose buckets per location, Direct Connect is impractical for temporary global sites, and a VPN still runs over the same congested internet path.'
+      explanation: 'Transfer Acceleration routes uploads into the nearest CloudFront edge location and across the AWS backbone, and multipart upload sends parts in parallel and retries only failed parts, which is required anyway for objects over 5 GB. Regional buckets with replication require the tool to choose buckets per location, Direct Connect is impractical for temporary global sites, and a VPN still runs over the same congested internet path.',
+      sources: [
+        { title: 'Configuring fast, secure file transfers using Amazon S3 Transfer Acceleration – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html', checked: '2026-11-25' },
+        { title: 'Uploading objects – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf3',
@@ -43,7 +51,11 @@ export const highPerforming = {
         'Parallel byte-range GET requests per object'
       ],
       correctAnswer: 3,
-      explanation: 'Byte-range fetches use the HTTP Range header to request specific parts of an object, so clients can fetch only the first segment and jobs can download many ranges in parallel for higher aggregate throughput. Multipart upload is only for writing objects, copying to EBS adds a slow extra step, and Transfer Acceleration helps long-distance internet transfers rather than in-Region EC2 reads.'
+      explanation: 'Byte-range fetches use the HTTP Range header to request specific parts of an object, so clients can fetch only the first segment and jobs can download many ranges in parallel for higher aggregate throughput. Multipart upload is only for writing objects, copying to EBS adds a slow extra step, and Transfer Acceleration helps long-distance internet transfers rather than in-Region EC2 reads.',
+      sources: [
+        { title: 'Downloading objects – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/download-objects.html', checked: '2026-11-25' },
+        { title: 'Performance design patterns for Amazon S3 – Amazon Simple Storage Service', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance-design-patterns.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf4',
@@ -55,7 +67,11 @@ export const highPerforming = {
         'Instance store NVMe volumes on an I-family instance'
       ],
       correctAnswer: 1,
-      explanation: 'io2 Block Express is built for the most demanding databases, offering sub-millisecond latency, the highest IOPS and throughput of any EBS type, and 99.999% durability. gp3 is cost-effective for most workloads but has lower durability and performance ceilings, st1 is an HDD type for sequential throughput rather than random IOPS, and instance store data is lost when the instance stops or fails.'
+      explanation: 'io2 Block Express is built for the most demanding databases, offering sub-millisecond latency, the highest IOPS and throughput of any EBS type, and 99.999% durability. gp3 is cost-effective for most workloads but has lower durability and performance ceilings, st1 is an HDD type for sequential throughput rather than random IOPS, and instance store data is lost when the instance stops or fails.',
+      sources: [
+        { title: 'Amazon EBS Provisioned IOPS SSD volumes – Amazon EBS', url: 'https://docs.aws.amazon.com/ebs/latest/userguide/provisioned-iops.html', checked: '2026-11-25' },
+        { title: 'Amazon EBS volume types – Amazon EBS', url: 'https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf5',
@@ -67,7 +83,11 @@ export const highPerforming = {
         'General Purpose SSD (gp3)'
       ],
       correctAnswer: 1,
-      explanation: 'st1 is a low-cost HDD volume designed for frequently accessed, throughput-intensive sequential workloads such as log processing, big data, and data warehouses. sc1 is cheaper but intended for infrequently accessed cold data, while io2 and gp3 are SSD types priced for random IOPS performance that this workload does not need.'
+      explanation: 'st1 is a low-cost HDD volume designed for frequently accessed, throughput-intensive sequential workloads such as log processing, big data, and data warehouses. sc1 is cheaper but intended for infrequently accessed cold data, while io2 and gp3 are SSD types priced for random IOPS performance that this workload does not need.',
+      sources: [
+        { title: 'Amazon EBS Throughput Optimized HDD and Cold HDD volumes – Amazon EBS', url: 'https://docs.aws.amazon.com/ebs/latest/userguide/hdd-vols.html', checked: '2026-11-25' },
+        { title: 'Amazon EBS volume types – Amazon EBS', url: 'https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf6',
@@ -79,7 +99,11 @@ export const highPerforming = {
         'NVMe instance store volumes on I-family instances'
       ],
       correctAnswer: 3,
-      explanation: 'Instance store is physically attached to the host, so it delivers the lowest latency and very high random I/O at no extra storage charge, and the database replication covers the fact that instance store data does not survive a stop or host failure. io2 Block Express and striped gp3 add network-attached latency and per-GB or per-IOPS charges, and EFS is a shared network file system with far higher latency than local NVMe.'
+      explanation: 'Instance store is physically attached to the host, so it delivers the lowest latency and very high random I/O at no extra storage charge, and the database replication covers the fact that instance store data does not survive a stop or host failure. io2 Block Express and striped gp3 add network-attached latency and per-GB or per-IOPS charges, and EFS is a shared network file system with far higher latency than local NVMe.',
+      sources: [
+        { title: 'Data persistence for Amazon EC2 instance store volumes – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-store-lifetime.html', checked: '2026-11-25' },
+        { title: 'Instance store temporary block storage for EC2 instances – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf7',
@@ -91,7 +115,10 @@ export const highPerforming = {
         'Recreate the file system in Max I/O performance mode'
       ],
       correctAnswer: 0,
-      explanation: 'Elastic throughput scales throughput up and down automatically with the workload and bills for the throughput actually used, which suits spiky, unpredictable access to a small file system. Provisioned throughput sized for peak charges for that peak all the time, inflating storage just to earn burst credits is wasteful, and Max I/O is a performance mode for parallelism that does not fix throughput credit exhaustion.'
+      explanation: 'Elastic throughput scales throughput up and down automatically with the workload and bills for the throughput actually used, which suits spiky, unpredictable access to a small file system. Provisioned throughput sized for peak charges for that peak all the time, inflating storage just to earn burst credits is wasteful, and Max I/O is a performance mode for parallelism that does not fix throughput credit exhaustion.',
+      sources: [
+        { title: 'Amazon EFS performance specifications – Amazon Elastic File System', url: 'https://docs.aws.amazon.com/efs/latest/ug/performance.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf8',
@@ -103,7 +130,11 @@ export const highPerforming = {
         'Amazon S3 File Gateway mounted on each instance'
       ],
       correctAnswer: 2,
-      explanation: 'FSx for Lustre is a parallel file system built for HPC and ML, and a data repository association lets it lazily load objects from S3 and export results back to S3. EFS is a general-purpose NFS file system without Lustre-level parallel throughput, FSx for Windows File Server targets SMB Windows workloads, and S3 File Gateway is a hybrid cache for on-premises clients rather than an HPC scratch file system.'
+      explanation: 'FSx for Lustre is a parallel file system built for HPC and ML, and a data repository association lets it lazily load objects from S3 and export results back to S3. EFS is a general-purpose NFS file system without Lustre-level parallel throughput, FSx for Windows File Server targets SMB Windows workloads, and S3 File Gateway is a hybrid cache for on-premises clients rather than an HPC scratch file system.',
+      sources: [
+        { title: 'What is Amazon FSx for Lustre? – FSx for Lustre', url: 'https://docs.aws.amazon.com/fsx/latest/LustreGuide/what-is.html', checked: '2026-11-25' },
+        { title: 'Linking your file system to an Amazon S3 bucket – FSx for Lustre', url: 'https://docs.aws.amazon.com/fsx/latest/LustreGuide/create-dra-linked-data-repo.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf9',
@@ -115,7 +146,11 @@ export const highPerforming = {
         'Amazon FSx for NetApp ONTAP'
       ],
       correctAnswer: 3,
-      explanation: 'FSx for NetApp ONTAP runs the ONTAP file system, supports multiprotocol NFS, SMB, and iSCSI access, and keeps NetApp features such as SnapMirror, FlexClone, and deduplication. FSx for Windows File Server is SMB-focused, EFS supports only NFS for Linux clients, and FSx for OpenZFS is NFS-based and suited to ZFS migrations rather than NetApp tooling.'
+      explanation: 'FSx for NetApp ONTAP runs the ONTAP file system, supports multiprotocol NFS, SMB, and iSCSI access, and keeps NetApp features such as SnapMirror replication, cloning, and deduplication. FSx for Windows File Server is SMB-focused, EFS supports only NFS for Linux clients, and FSx for OpenZFS is NFS-based and suited to ZFS migrations rather than NetApp tooling.',
+      sources: [
+        { title: 'What is Amazon FSx for NetApp ONTAP? – FSx for ONTAP', url: 'https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/what-is-fsx-ontap.html', checked: '2026-11-25' },
+        { title: 'Help Me Choose An Amazon FSx File System | Amazon Web Services', url: 'https://aws.amazon.com/fsx/when-to-choose-fsx/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf10',
@@ -127,7 +162,11 @@ export const highPerforming = {
         'Set up AWS Transfer Family with SFTP and upload with a client'
       ],
       correctAnswer: 0,
-      explanation: 'DataSync is a managed online transfer service that copies NFS, SMB, HDFS, and object data directly to EFS, FSx, or S3 with encryption, integrity checks, scheduling, and bandwidth throttling. S3 File Gateway writes to S3 rather than EFS and is meant for ongoing hybrid access, rsync requires custom scripting and validation, and Transfer Family is for partner file exchange over SFTP, FTPS, or FTP rather than bulk migration.'
+      explanation: 'DataSync is a managed online transfer service that copies NFS, SMB, HDFS, and object data directly to EFS, FSx, or S3 with encryption, integrity checks, scheduling, and bandwidth throttling. S3 File Gateway writes to S3 rather than EFS and is meant for ongoing hybrid access, rsync requires custom scripting and validation, and Transfer Family is for partner file exchange over SFTP, FTPS, or FTP rather than bulk migration.',
+      sources: [
+        { title: 'What is AWS DataSync? – AWS DataSync', url: 'https://docs.aws.amazon.com/datasync/latest/userguide/what-is-datasync.html', checked: '2026-11-25' },
+        { title: 'Online Data Transfer and Migration – AWS DataSync – Amazon Web Services', url: 'https://aws.amazon.com/datasync/features/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf11',
@@ -139,7 +178,11 @@ export const highPerforming = {
         'Instances in several AZs connected through a Network Load Balancer'
       ],
       correctAnswer: 2,
-      explanation: 'A cluster placement group packs instances close together in one Availability Zone for low-latency, high-bandwidth networking, and Elastic Fabric Adapter adds OS-bypass so MPI traffic skips the kernel network stack. Spread and partition groups deliberately place instances on separate hardware, which increases latency, and routing node-to-node traffic across AZs through a load balancer adds latency rather than removing it.'
+      explanation: 'A cluster placement group packs instances close together in one Availability Zone for low-latency, high-bandwidth networking, and Elastic Fabric Adapter adds OS-bypass so MPI traffic skips the kernel network stack. Spread and partition groups deliberately place instances on separate hardware, which increases latency, and routing node-to-node traffic across AZs through a load balancer adds latency rather than removing it.',
+      sources: [
+        { title: 'Placement strategies for your placement groups – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-strategies.html', checked: '2026-11-25' },
+        { title: 'Elastic Fabric Adapter for AI/ML and HPC workloads on Amazon EC2 – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf12',
@@ -151,7 +194,10 @@ export const highPerforming = {
         'Dedicated Hosts with host affinity'
       ],
       correctAnswer: 1,
-      explanation: 'Partition placement groups divide instances into logical partitions that do not share racks, and expose partition information so rack-aware systems like Cassandra, HDFS, and Kafka can place replicas safely at large scale. Cluster groups concentrate instances on close hardware, increasing correlated failure risk, spread groups are limited to seven running instances per AZ per group, and Dedicated Hosts address licensing rather than rack isolation.'
+      explanation: 'Partition placement groups divide instances into logical partitions that do not share racks, and expose partition information so rack-aware systems like Cassandra, HDFS, and HBase can place replicas safely at large scale. Cluster groups concentrate instances on close hardware, increasing correlated failure risk, spread groups are limited to seven running instances per AZ per group, and Dedicated Hosts address licensing rather than rack isolation.',
+      sources: [
+        { title: 'Placement strategies for your placement groups – Amazon Elastic Compute Cloud', url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-strategies.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf13',
@@ -163,7 +209,10 @@ export const highPerforming = {
         'Increase the timeout setting of the function'
       ],
       correctAnswer: 0,
-      explanation: 'Lambda allocates CPU power in proportion to configured memory, so raising memory gives a CPU-bound function more compute and often lowers total cost because it runs for less time. Provisioned concurrency only removes cold-start initialization, reserved concurrency only controls how many copies can run at once, and a longer timeout lets the function run longer without making it faster.'
+      explanation: 'Lambda allocates CPU power in proportion to configured memory, so raising memory gives a CPU-bound function more compute and often lowers total cost because it runs for less time. Provisioned concurrency only removes cold-start initialization, reserved concurrency only controls how many copies can run at once, and a longer timeout lets the function run longer without making it faster.',
+      sources: [
+        { title: 'Configure Lambda Event Function memory – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf14',
@@ -175,7 +224,11 @@ export const highPerforming = {
         'Enable Lambda SnapStart on published function versions'
       ],
       correctAnswer: 3,
-      explanation: 'SnapStart snapshots the initialized execution environment when a version is published and resumes new environments from that snapshot, cutting cold-start latency for Java without paying for idle capacity. Provisioned concurrency also removes cold starts but bills continuously for the environments it keeps warm, more memory speeds initialization only modestly, and Lambda@Edge is for CloudFront request processing, not for fixing initialization time.'
+      explanation: 'SnapStart snapshots the initialized execution environment when a version is published and resumes new environments from that snapshot, cutting cold-start latency for Java without paying for idle capacity. Provisioned concurrency also removes cold starts but bills continuously for the environments it keeps warm, more memory speeds initialization only modestly, and Lambda@Edge is for CloudFront request processing, not for fixing initialization time.',
+      sources: [
+        { title: 'Improving startup performance with Lambda SnapStart – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html', checked: '2026-11-25' },
+        { title: 'Configuring provisioned concurrency for an Event Function – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf15',
@@ -187,7 +240,11 @@ export const highPerforming = {
         'Docker installed on EC2 instances in an Auto Scaling group'
       ],
       correctAnswer: 1,
-      explanation: 'Fargate is serverless compute for containers, so AWS provisions and patches the underlying capacity while ECS service auto scaling adjusts task counts. ECS on EC2, EKS self-managed nodes, and plain Docker on EC2 all leave the team responsible for the instances, their AMIs, and capacity scaling.'
+      explanation: 'Fargate is serverless compute for containers, so AWS provisions and patches the underlying capacity while ECS service auto scaling adjusts task counts. ECS on EC2, EKS self-managed nodes, and plain Docker on EC2 all leave the team responsible for the instances, their AMIs, and capacity scaling.',
+      sources: [
+        { title: 'Architect for AWS Fargate for Amazon ECS – Amazon Elastic Container Service', url: 'https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html', checked: '2026-11-25' },
+        { title: 'Automatically scale your Amazon ECS service – Amazon Elastic Container Service', url: 'https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-auto-scaling.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf16',
@@ -199,7 +256,11 @@ export const highPerforming = {
         'A longer health check grace period for the Auto Scaling group'
       ],
       correctAnswer: 2,
-      explanation: 'Predictive scaling uses historical load to forecast recurring daily and weekly patterns and launches capacity ahead of the forecasted demand, which compensates for long instance warm-up times, while target tracking still handles unexpected changes. Simple and step scaling are still reactive to alarms that fire after load arrives, and a longer grace period only delays health checks rather than adding capacity sooner.'
+      explanation: 'Predictive scaling uses historical load to forecast recurring daily and weekly patterns and launches capacity ahead of the forecasted demand, which compensates for long instance warm-up times, while target tracking still handles unexpected changes. Simple and step scaling are still reactive to alarms that fire after load arrives, and a longer grace period only delays health checks rather than adding capacity sooner.',
+      sources: [
+        { title: 'Predictive scaling for Amazon EC2 Auto Scaling – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-predictive-scaling.html', checked: '2026-11-25' },
+        { title: 'Dynamic scaling for Amazon EC2 Auto Scaling – Amazon EC2 Auto Scaling', url: 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scale-based-on-demand.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf17',
@@ -211,7 +272,11 @@ export const highPerforming = {
         'A long-running Amazon EMR cluster with Spark jobs'
       ],
       correctAnswer: 2,
-      explanation: 'AWS Batch manages job queues and dependencies and provisions right-sized EC2, Spot, or Fargate capacity for each job, scaling to zero when work finishes. A single cron instance cannot scale or right-size, Lambda functions stop at 15 minutes so multi-hour jobs fail, and an always-on EMR cluster is built for big data frameworks rather than general containerized batch jobs.'
+      explanation: 'AWS Batch manages job queues and dependencies and provisions right-sized EC2, Spot, or Fargate capacity for each job, scaling to zero when work finishes. A single cron instance cannot scale or right-size, Lambda functions stop at 30 minutes (raised from 15; older material may still say 15) so multi-hour jobs fail, and an always-on EMR cluster is built for big data frameworks rather than general containerized batch jobs.',
+      sources: [
+        { title: 'What is AWS Batch? – AWS Batch', url: 'https://docs.aws.amazon.com/batch/latest/userguide/what-is-batch.html', checked: '2026-11-25' },
+        { title: 'Lambda quotas – AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf18',
@@ -223,7 +288,11 @@ export const highPerforming = {
         'Place Amazon RDS Proxy in front of the writer for the reports'
       ],
       correctAnswer: 0,
-      explanation: 'Aurora Replicas share the cluster storage volume, and the reader endpoint load-balances read-only connections across them, so reports no longer compete with writes on the writer. The cluster endpoint always points to the writer, so adding a replica alone does not move the reports; a larger writer still shares one instance between both loads, and RDS Proxy pools connections but does not offload query processing.'
+      explanation: 'Aurora Replicas share the cluster storage volume, and the reader endpoint load-balances read-only connections across them, so reports no longer compete with writes on the writer. The cluster endpoint always points to the writer, so adding a replica alone does not move the reports; a larger writer still shares one instance between both loads, and RDS Proxy pools connections but does not offload query processing.',
+      sources: [
+        { title: 'Amazon Aurora endpoint connections – Amazon Aurora', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Endpoints.html', checked: '2026-11-25' },
+        { title: 'Replication with Amazon Aurora – Amazon Aurora', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf19',
@@ -235,7 +304,10 @@ export const highPerforming = {
         'Use Amazon RDS Proxy to pool and share database connections'
       ],
       correctAnswer: 3,
-      explanation: 'RDS Proxy maintains a warm pool of database connections and multiplexes many Lambda connections onto them, protecting the database from connection storms; functions only change their endpoint. A larger instance just moves the ceiling, read replicas do not help write connections and still each face the storm, and ElastiCache requires caching logic and does not manage database connections.'
+      explanation: 'RDS Proxy maintains a warm pool of database connections and multiplexes many Lambda connections onto them, protecting the database from connection storms; functions only change their endpoint. A larger instance just moves the ceiling, read replicas do not help write connections and still each face the storm, and ElastiCache requires caching logic and does not manage database connections.',
+      sources: [
+        { title: 'Amazon RDS Proxy – Amazon Relational Database Service', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf20',
@@ -247,7 +319,10 @@ export const highPerforming = {
         'Amazon DynamoDB tables in on-demand capacity mode'
       ],
       correctAnswer: 1,
-      explanation: 'Aurora Serverless v2 scales capacity in fine-grained Aurora Capacity Unit increments as load changes, without instance sizing, while keeping full Aurora PostgreSQL compatibility. Replica auto scaling adds whole read replicas and does not resize the writer, RDS storage autoscaling grows storage rather than compute, and DynamoDB would require rewriting a relational application.'
+      explanation: 'Aurora Serverless v2 (now simply called Aurora Serverless in the AWS docs) scales capacity in fine-grained Aurora Capacity Unit (ACU) increments, as small as half an ACU, as load changes, without instance sizing, while keeping full Aurora PostgreSQL compatibility. Replica auto scaling adds whole read replicas and does not resize the writer, RDS storage autoscaling grows storage rather than compute, and DynamoDB would require rewriting a relational application.',
+      sources: [
+        { title: 'Using Aurora serverless – Amazon Aurora', url: 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf21',
@@ -259,7 +334,11 @@ export const highPerforming = {
         'Use a high-cardinality partition key such as the order ID'
       ],
       correctAnswer: 3,
-      explanation: 'With only three key values, nearly all traffic lands on a few hot partitions, and each partition has its own throughput limit regardless of total table capacity; a high-cardinality key spreads writes evenly. On-demand mode still enforces per-partition limits, an LSI keeps the same partition key and must be defined at table creation, and DAX caches reads but does not reduce write pressure.'
+      explanation: 'With only three key values, nearly all traffic lands on a few hot partitions, and each partition has its own throughput limit regardless of total table capacity; a high-cardinality key spreads writes evenly. On-demand mode still enforces per-partition limits, an LSI keeps the same partition key and must be defined at table creation, and DAX caches reads but does not reduce write pressure.',
+      sources: [
+        { title: 'Designing partition keys to distribute your workload in DynamoDB – Amazon DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-uniform-load.html', checked: '2026-11-25' },
+        { title: 'Best practices for designing and using partition keys effectively in DynamoDB – Amazon DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf22',
@@ -271,7 +350,10 @@ export const highPerforming = {
         'Higher provisioned read capacity units'
       ],
       correctAnswer: 0,
-      explanation: 'DAX is an in-memory cache built for DynamoDB that is API-compatible, so the application swaps in the DAX client and gets microsecond reads for cached items. ElastiCache can be fast but requires writing and maintaining caching logic, global tables replicate data across Regions for multi-Region access rather than caching, and more read capacity keeps single-digit millisecond latency instead of microseconds.'
+      explanation: 'DAX is an in-memory cache built for DynamoDB that is API-compatible, so the application swaps in the DAX client and gets microsecond reads for cached items. ElastiCache can be fast but requires writing and maintaining caching logic, global tables replicate data across Regions for multi-Region access rather than caching, and more read capacity keeps single-digit millisecond latency instead of microseconds.',
+      sources: [
+        { title: 'In-memory acceleration with DynamoDB Accelerator (DAX) – Amazon DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf23',
@@ -283,7 +365,10 @@ export const highPerforming = {
         'Memcached with Auto Discovery and client-side hashing'
       ],
       correctAnswer: 1,
-      explanation: 'Write-through updates the cache whenever the database is written, so cached prices are always current at the cost of extra write work; adding a TTL also expires items that are never read. Lazy loading only refreshes an item after a cache miss, so a long TTL or no TTL serves stale prices, and Memcached Auto Discovery is a node discovery feature, not a consistency strategy.'
+      explanation: 'Write-through updates the cache whenever the database is written, so cached prices are always current at the cost of extra write work; adding a TTL also expires items that are never read. Lazy loading only refreshes an item after a cache miss, so a long TTL or no TTL serves stale prices, and Memcached Auto Discovery is a node discovery feature, not a consistency strategy.',
+      sources: [
+        { title: 'Caching strategies for Memcached – Amazon ElastiCache', url: 'https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf24',
@@ -295,7 +380,11 @@ export const highPerforming = {
         'Amazon Timestream'
       ],
       correctAnswer: 2,
-      explanation: 'Neptune is a managed graph database that stores relationships natively and traverses them quickly using Gremlin, openCypher, or SPARQL, making it the fit for social graphs and fraud rings. DocumentDB is a MongoDB-compatible document store, Keyspaces is a Cassandra-compatible wide-column store, and Timestream is built for time series data, none of which handle deep multi-hop traversals efficiently.'
+      explanation: 'Neptune is a managed graph database that stores relationships natively and traverses them quickly using Gremlin, openCypher, or SPARQL, making it the fit for social graphs and fraud rings. DocumentDB is a MongoDB-compatible document store, Keyspaces is a Cassandra-compatible wide-column store, and Timestream is built for time series data, none of which handle deep multi-hop traversals efficiently.',
+      sources: [
+        { title: 'What Is Amazon Neptune? – Amazon Neptune', url: 'https://docs.aws.amazon.com/neptune/latest/userguide/intro.html', checked: '2026-11-25' },
+        { title: 'Choosing an AWS database service – AWS Decision Guides', url: 'https://docs.aws.amazon.com/decision-guides/latest/decision-guides/databases-on-aws-how-to-choose.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf25',
@@ -307,7 +396,10 @@ export const highPerforming = {
         'AWS WAF rules attached to the distribution'
       ],
       correctAnswer: 0,
-      explanation: 'CloudFront Functions run lightweight JavaScript at edge locations on viewer request and response events, scale to millions of requests per second, and cost much less than Lambda@Edge, which fits simple header-based rewrites and redirects. Lambda@Edge suits heavier logic that needs network access or origin events, API Gateway adds a full round trip to a Region, and WAF filters requests rather than rewriting URLs.'
+      explanation: 'CloudFront Functions run lightweight JavaScript at edge locations on viewer request and response events, scale to millions of requests per second, and cost much less than Lambda@Edge, which fits simple header-based rewrites and redirects. Lambda@Edge suits heavier logic that calls external services or runs on origin events, API Gateway adds a full round trip to a Region, and WAF filters requests rather than rewriting URLs.',
+      sources: [
+        { title: 'Differences between CloudFront Functions and Lambda@Edge – Amazon CloudFront', url: 'https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/edge-functions-choosing.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf26',
@@ -319,7 +411,11 @@ export const highPerforming = {
         'AWS Global Accelerator with endpoint groups per Region'
       ],
       correctAnswer: 3,
-      explanation: 'Global Accelerator provides two static anycast IP addresses, onboards TCP and UDP traffic at the nearest edge location onto the AWS backbone, and shifts traffic between Regional endpoints quickly based on health checks. CloudFront is designed for HTTP and HTTPS content delivery, and Route 53 routing policies return different IP addresses through DNS, so clients that cache records fail over slowly and get no static IPs.'
+      explanation: 'Global Accelerator provides two static anycast IP addresses, onboards TCP and UDP traffic at the nearest edge location onto the AWS backbone, and shifts traffic between Regional endpoints quickly based on health checks. CloudFront is designed for HTTP and HTTPS content delivery, and Route 53 routing policies return different IP addresses through DNS, so clients that cache records fail over slowly and get no static IPs.',
+      sources: [
+        { title: 'How AWS Global Accelerator works – AWS Global Accelerator', url: 'https://docs.aws.amazon.com/global-accelerator/latest/dg/introduction-how-it-works.html', checked: '2026-11-25' },
+        { title: 'AWS Global Accelerator FAQs – Amazon Web Services', url: 'https://aws.amazon.com/global-accelerator/faqs/', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf27',
@@ -331,7 +427,11 @@ export const highPerforming = {
         'Route the traffic through AWS Global Accelerator endpoints'
       ],
       correctAnswer: 2,
-      explanation: 'Direct Connect provides a dedicated private connection with consistent bandwidth and latency, and running an IPsec VPN over it adds the required encryption. Extra internet VPN tunnels still share the unpredictable internet path, Direct Connect by itself is private but not encrypted by default, and Global Accelerator improves internet traffic to application endpoints rather than providing hybrid site-to-VPC connectivity.'
+      explanation: 'Direct Connect provides a dedicated private connection with consistent bandwidth and latency, and running an IPsec VPN over it adds the required encryption. Extra internet VPN tunnels still share the unpredictable internet path, Direct Connect by itself is private but not encrypted by default, and Global Accelerator improves internet traffic to application endpoints rather than providing hybrid site-to-VPC connectivity.',
+      sources: [
+        { title: 'AWS Direct Connect + AWS Site-to-Site VPN – Amazon Virtual Private Cloud Connectivity Options', url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/aws-direct-connect-site-to-site-vpn.html', checked: '2026-11-25' },
+        { title: 'Encryption in AWS Direct Connect – AWS Direct Connect', url: 'https://docs.aws.amazon.com/directconnect/latest/UserGuide/encryption-in-transit.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf28',
@@ -343,7 +443,11 @@ export const highPerforming = {
         'A virtual private gateway in each VPC using AWS VPN CloudHub'
       ],
       correctAnswer: 1,
-      explanation: 'Transit Gateway acts as a regional hub that supports transitive routing between attached VPCs, VPNs, and Direct Connect, with peering between Regions, replacing the mesh with a hub-and-spoke design. VPC peering is not transitive and grows quadratically, PrivateLink exposes individual services rather than routing whole networks, and VPN CloudHub links remote sites to each other through one virtual private gateway rather than interconnecting many VPCs.'
+      explanation: 'Transit Gateway acts as a regional hub that supports transitive routing between attached VPCs, VPNs, and Direct Connect, with peering between Regions, replacing the mesh with a hub-and-spoke design. VPC peering is not transitive and grows quadratically, PrivateLink exposes individual services rather than routing whole networks, and VPN CloudHub links remote sites to each other through one virtual private gateway rather than interconnecting many VPCs.',
+      sources: [
+        { title: 'What is AWS Transit Gateway for Amazon VPC? – Amazon VPC', url: 'https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html', checked: '2026-11-25' },
+        { title: 'How VPC peering connections work – Amazon Virtual Private Cloud', url: 'https://docs.aws.amazon.com/vpc/latest/peering/vpc-peering-basics.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf29',
@@ -355,7 +459,11 @@ export const highPerforming = {
         'A public Application Load Balancer restricted by security groups'
       ],
       correctAnswer: 0,
-      explanation: 'With PrivateLink, the provider publishes an endpoint service behind an NLB and each customer creates an interface endpoint in its own VPC, which works with overlapping CIDRs and exposes only that service. VPC peering and Transit Gateway both require non-overlapping CIDRs and open network-level routing, and a public ALB sends traffic over the internet.'
+      explanation: 'With PrivateLink, the provider publishes an endpoint service behind an NLB and each customer creates an interface endpoint in its own VPC, which works with overlapping CIDRs and exposes only that service. VPC peering and Transit Gateway both require non-overlapping CIDRs and open network-level routing, and a public ALB sends traffic over the internet.',
+      sources: [
+        { title: 'Share your services through AWS PrivateLink – Amazon Virtual Private Cloud', url: 'https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-share-your-services.html', checked: '2026-11-25' },
+        { title: 'AWS PrivateLink – Building a Scalable and Secure Multi-VPC AWS Network Infrastructure', url: 'https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/aws-privatelink.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf30',
@@ -367,7 +475,11 @@ export const highPerforming = {
         'Amazon Kinesis Data Streams with enhanced fan-out'
       ],
       correctAnswer: 3,
-      explanation: 'Kinesis Data Streams orders records within a shard by partition key, retains data for a configurable period (24 hours by default, extendable) for replay, and enhanced fan-out gives each consumer its own dedicated read throughput. Firehose is a delivery service with no consumer replay, SQS standard queues do not guarantee order and delete messages once processed, and SNS pushes messages without retaining them for replay.'
+      explanation: 'Kinesis Data Streams orders records within a shard by partition key, retains data for a configurable period (24 hours by default, extendable) for replay, and enhanced fan-out gives each consumer its own dedicated read throughput. Firehose is a delivery service with no consumer replay, SQS standard queues do not guarantee order and delete messages once processed, and SNS pushes messages without retaining them for replay.',
+      sources: [
+        { title: 'Develop enhanced fan-out consumers with dedicated throughput – Amazon Kinesis Data Streams', url: 'https://docs.aws.amazon.com/streams/latest/dev/enhanced-consumers.html', checked: '2026-11-25' },
+        { title: 'Change the data retention period – Amazon Kinesis Data Streams', url: 'https://docs.aws.amazon.com/streams/latest/dev/kinesis-extended-retention.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf31',
@@ -379,7 +491,11 @@ export const highPerforming = {
         'Amazon SQS with a scheduled Lambda function batching to S3'
       ],
       correctAnswer: 1,
-      explanation: 'Amazon Data Firehose is fully managed, buffers records by size or time, converts JSON records to Parquet or ORC using a schema from the Glue Data Catalog, and delivers them to S3 in near real time. Kinesis Data Streams with KCL, MSK with Kafka Connect, and SQS with Lambda all require building and operating custom consumer or conversion code.'
+      explanation: 'Amazon Data Firehose is fully managed, buffers records by size or time, converts JSON records to Parquet or ORC using a schema from the Glue Data Catalog, and delivers them to S3 in near real time. Kinesis Data Streams with KCL, MSK with Kafka Connect, and SQS with Lambda all require building and operating custom consumer or conversion code.',
+      sources: [
+        { title: 'Convert input data format in Amazon Data Firehose – Amazon Data Firehose', url: 'https://docs.aws.amazon.com/firehose/latest/dev/record-format-conversion.html', checked: '2026-11-25' },
+        { title: 'What is Amazon Data Firehose? – Amazon Data Firehose', url: 'https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf32',
@@ -391,7 +507,11 @@ export const highPerforming = {
         'Import the logs into Amazon RDS for MySQL and query them there'
       ],
       correctAnswer: 2,
-      explanation: 'A Glue crawler infers schemas and partitions and registers tables in the Glue Data Catalog, and Athena runs serverless SQL directly on S3 billed by data scanned. A provisioned Redshift cluster and a long-running EMR cluster cost money while idle and need loading or management, and RDS is not designed for terabyte-scale log analytics.'
+      explanation: 'A Glue crawler infers schemas and partitions and registers tables in the Glue Data Catalog, and Athena runs serverless SQL directly on S3 billed by data scanned. A provisioned Redshift cluster and a long-running EMR cluster cost money while idle and need loading or management, and RDS is not designed for terabyte-scale log analytics.',
+      sources: [
+        { title: 'What is Amazon Athena? – Amazon Athena', url: 'https://docs.aws.amazon.com/athena/latest/ug/what-is.html', checked: '2026-11-25' },
+        { title: 'Using crawlers to populate the Data Catalog – AWS Glue', url: 'https://docs.aws.amazon.com/glue/latest/dg/add-crawler.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf33',
@@ -403,7 +523,11 @@ export const highPerforming = {
         'Create external tables with Redshift Spectrum to query S3'
       ],
       correctAnswer: 3,
-      explanation: 'Redshift Spectrum queries data in S3 through external tables defined in the Glue Data Catalog, so a single Redshift query can join local tables with S3 data without loading it. COPY would load ten years of history into paid cluster storage, joining Athena results in application code is complex and slow, and Concurrency Scaling adds capacity for concurrent queries rather than access to S3 data.'
+      explanation: 'Redshift Spectrum queries data in S3 through external tables defined in the Glue Data Catalog, so a single Redshift query can join local tables with S3 data without loading it. COPY would load ten years of history into paid cluster storage, joining Athena results in application code is complex and slow, and Concurrency Scaling adds capacity for concurrent queries rather than access to S3 data.',
+      sources: [
+        { title: 'Amazon Redshift Spectrum – Amazon Redshift', url: 'https://docs.aws.amazon.com/redshift/latest/dg/c-using-spectrum.html', checked: '2026-11-25' },
+        { title: 'Concurrency scaling – Amazon Redshift', url: 'https://docs.aws.amazon.com/redshift/latest/dg/concurrency-scaling.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'perf34',
@@ -415,7 +539,10 @@ export const highPerforming = {
         'Amazon Athena queries scheduled every minute'
       ],
       correctAnswer: 0,
-      explanation: 'Managed Service for Apache Flink runs Flink applications in Java, Scala, Python, or SQL with managed state, windowing, and checkpointing for real-time stream analytics. A Firehose Lambda transformation processes buffered batches without durable windowed state, hourly Glue jobs are batch rather than real time, and Athena queries data at rest in S3 rather than an in-flight stream.'
+      explanation: 'Managed Service for Apache Flink runs Flink applications in Java, Scala, Python, or SQL with managed state, windowing, and checkpointing for real-time stream analytics. A Firehose Lambda transformation processes buffered batches without durable windowed state, hourly Glue jobs are batch rather than real time, and Athena queries data at rest in S3 rather than an in-flight stream.',
+      sources: [
+        { title: 'What is Amazon Managed Service for Apache Flink? – Managed Service for Apache Flink', url: 'https://docs.aws.amazon.com/managed-flink/latest/java/what-is.html', checked: '2026-11-25' }
+      ]
     }
   ]
 };
