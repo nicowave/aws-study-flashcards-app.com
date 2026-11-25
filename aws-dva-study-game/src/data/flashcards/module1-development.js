@@ -1,5 +1,6 @@
 // Module 1: Development with AWS Services
 // AWS Certified Developer – Associate (DVA-C02)
+// Sources: official AWS documentation, linked on each card
 
 export const module1 = {
   id: 'module1',
@@ -8,7 +9,7 @@ export const module1 = {
   icon: '💻',
   color: '#a78bfa',
   gradient: 'linear-gradient(135deg, #a78bfa 0%, #a78bfa 100%)',
-  source: 'DVA-C02 Exam Guide',
+  source: 'Official AWS documentation (linked on each card)',
   cards: [
     {
       id: 'dva-dev-c1',
@@ -16,7 +17,11 @@ export const module1 = {
       back: '• SQS: a queue. One consumer group pulls and processes each message; buffers load; consumers poll.\n• SNS: pub/sub push. Every subscriber gets a copy; filter policies per subscription.\n• EventBridge: event bus with content-based rules, many AWS and SaaS sources, schema registry, archive and replay.\nFan-out with durability: SNS topic to one SQS queue per consumer.',
       hint: 'Pull queue, push topic, routed bus',
       tags: ['sqs', 'sns', 'eventbridge'],
-      difficulty: 'beginner'
+      difficulty: 'beginner',
+      sources: [
+        { title: 'Fanout Amazon SNS notifications to Amazon SQS queues for asynchronous processing', url: 'https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html', checked: '2026-11-25' },
+        { title: 'What Is Amazon EventBridge?', url: 'https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c2',
@@ -24,7 +29,11 @@ export const module1 = {
       back: '• Choreography (EventBridge): services react to events independently. Loose coupling, no central owner of the flow.\n• Orchestration (Step Functions): a state machine drives the sequence, retries, compensations and keeps a visual execution history.\nRule: need ordered steps, rollback (saga) or a per-run audit trail? Step Functions. Need independent reactions to a fact? EventBridge.',
       hint: 'Who owns the sequence?',
       tags: ['eventbridge', 'step-functions', 'patterns'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      sources: [
+        { title: 'Saga orchestration pattern', url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga-orchestration.html', checked: '2026-11-25' },
+        { title: 'Choosing workflow type in Step Functions', url: 'https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c3',
@@ -32,7 +41,11 @@ export const module1 = {
       back: '• MessageGroupId: ordering scope. Strict order inside a group; different groups process in parallel. Use an entity ID (account, order) for parallelism.\n• MessageDeduplicationId: duplicate sends with the same ID within the 5-minute deduplication interval are accepted but not delivered again. Or enable content-based deduplication (SHA-256 of the body).\nA FIFO queue needs a FIFO DLQ.',
       hint: 'Order scope vs duplicate suppression',
       tags: ['sqs', 'fifo'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      sources: [
+        { title: 'Using the message group ID with Amazon SQS FIFO Queues', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/using-messagegroupid-property.html', checked: '2026-11-25' },
+        { title: 'Exactly-once processing in Amazon SQS', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-exactly-once-processing.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c4',
@@ -40,7 +53,11 @@ export const module1 = {
       back: '• Visibility timeout (default 30 s, max 12 h): hides a received message; set it longer than processing time, or extend with ChangeMessageVisibility.\n• With a Lambda trigger, AWS recommends a queue visibility timeout of at least 6x the function timeout.\n• Long polling: WaitTimeSeconds up to 20 s cuts empty receives and cost.\n• DLQ: redrive policy moves a message after maxReceiveCount receives.',
       hint: 'Hide, wait, park',
       tags: ['sqs', 'lambda'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      sources: [
+        { title: 'Amazon SQS visibility timeout', url: 'https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html', checked: '2026-11-25' },
+        { title: 'Creating and configuring an Amazon SQS event source mapping', url: 'https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-configure.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c5',
@@ -48,7 +65,11 @@ export const module1 = {
       back: '• Standard: up to 1 year, exactly-once, billed per state transition, full visual history. Long-running and human-approval flows.\n• Express: up to 5 minutes, billed by requests and duration, at-least-once (async) or at-most-once (sync), logs to CloudWatch Logs. High-volume event processing.\nError handling in both: Retry (ErrorEquals, IntervalSeconds, MaxAttempts, BackoffRate) and Catch (ErrorEquals, Next, ResultPath).',
       hint: 'Long and exact vs short and cheap',
       tags: ['step-functions'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      sources: [
+        { title: 'Choosing workflow type in Step Functions', url: 'https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html', checked: '2026-11-25' },
+        { title: 'Handling errors in Step Functions workflows', url: 'https://docs.aws.amazon.com/step-functions/latest/dg/concepts-error-handling.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c6',
@@ -56,23 +77,34 @@ export const module1 = {
       back: '• Proxy: the whole request is passed to the backend as-is; for Lambda proxy the function must return { statusCode, headers, body } or the client gets a 502.\n• Non-proxy (REST APIs): VTL mapping templates transform the integration request and response, so you can reshape payloads for a backend you cannot change.\nHTTP APIs offer parameter mapping but not VTL mapping templates.',
       hint: 'Pass-through vs transform',
       tags: ['api-gateway', 'lambda'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      sources: [
+        { title: 'Lambda proxy integrations in API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html', checked: '2026-11-25' },
+        { title: 'Mapping template transformations for REST APIs in API Gateway', url: 'https://docs.aws.amazon.com/apigateway/latest/developerguide/models-mappings.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c7',
       front: 'Lambda limits that show up on the exam',
-      back: '• Memory: 128 MB to 10,240 MB; CPU scales with memory.\n• Timeout: default 3 s, max 15 min.\n• /tmp ephemeral storage: 512 MB default, configurable up to 10,240 MB.\n• Package: 50 MB zipped direct upload, 250 MB unzipped including layers; container images up to 10 GB.\n• Up to 5 layers per function; environment variables up to 4 KB total.',
+      back: '• Memory: 128 MB to 10,240 MB; CPU scales with memory.\n• Timeout: default 3 s, max 30 min (raised from 15 min; older material may still say 15).\n• /tmp ephemeral storage: 512 MB default, configurable up to 10,240 MB.\n• Package: 50 MB zipped direct upload, 250 MB unzipped including layers; container images up to 10 GB.\n• Up to 5 layers per function; environment variables up to 4 KB total.',
       hint: 'Memory, time, disk, size',
       tags: ['lambda', 'limits'],
-      difficulty: 'beginner'
+      difficulty: 'beginner',
+      sources: [
+        { title: 'Lambda quotas', url: 'https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c8',
       front: 'Reserved vs provisioned concurrency vs SnapStart',
-      back: '• Reserved: guarantees and caps concurrency for one function. Protects downstream systems; no extra charge.\n• Provisioned: pre-initialized environments on a version or alias; removes cold starts for predictable load; billed while configured.\n• SnapStart: snapshot of the initialized environment on a published version (Java, Python, .NET); cuts cold starts with no idle cost. Re-create unique state (random seeds, connections) in after-restore hooks.',
+      back: '• Reserved: guarantees and caps concurrency for one function. Protects downstream systems; no extra charge.\n• Provisioned: pre-initialized environments on a version or alias; removes cold starts for predictable load; billed while configured.\n• SnapStart: snapshot of the initialized environment on a published version (Java, Python, .NET); cuts cold starts with no idle environments to pay for (free for Java; Python and .NET pay snapshot caching and restore charges). Re-create unique state (random seeds, connections) in after-restore hooks.',
       hint: 'Cap, pre-warm, snapshot',
       tags: ['lambda', 'concurrency', 'performance'],
-      difficulty: 'advanced'
+      difficulty: 'advanced',
+      sources: [
+        { title: 'Improving startup performance with Lambda SnapStart', url: 'https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html', checked: '2026-11-25' },
+        { title: 'Configuring provisioned concurrency for an Event Function', url: 'https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c9',
@@ -80,15 +112,23 @@ export const module1 = {
       back: '• Async (S3, SNS, EventBridge): Lambda retries failed events twice by default; configure retry attempts (0-2) and maximum event age.\n• Destinations: on-success and on-failure records that include the request, response and error details.\n• DLQ: SQS or SNS only, failures only, event payload with limited error attributes.\nPrefer destinations for new designs.',
       hint: 'Two retries, then where?',
       tags: ['lambda', 'error-handling'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      sources: [
+        { title: 'Configuring error handling settings for Lambda asynchronous invocations', url: 'https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-configuring.html', checked: '2026-11-25' },
+        { title: 'Capturing records of Lambda asynchronous invocations', url: 'https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-retain-records.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c10',
       front: 'Event source mappings (SQS, Kinesis, DynamoDB Streams): tuning and partial failures',
-      back: '• Lambda polls the source and invokes your function with batches.\n• BatchSize and MaximumBatchingWindowInSeconds trade latency for fewer invocations.\n• ReportBatchItemFailures: return batchItemFailures with the failed itemIdentifier values so only those records are retried.\n• Streams: BisectBatchOnFunctionError, MaximumRetryAttempts and an on-failure destination stop a bad record from blocking the shard.',
+      back: '• Lambda polls the source and invokes your function with batches.\n• BatchSize and MaximumBatchingWindowInSeconds trade latency for fewer invocations.\n• ReportBatchItemFailures: return batchItemFailures with the failed itemIdentifier values so only those SQS messages are retried (streams retry from the first failed record).\n• Streams: BisectBatchOnFunctionError, MaximumRetryAttempts and an on-failure destination stop a bad record from blocking the shard.',
       hint: 'Batch, window, report failures',
       tags: ['lambda', 'sqs', 'kinesis'],
-      difficulty: 'advanced'
+      difficulty: 'advanced',
+      sources: [
+        { title: 'How Lambda processes records from stream and queue-based event sources', url: 'https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html', checked: '2026-11-25' },
+        { title: 'Configuring partial batch response with Kinesis Data Streams and Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg/services-kinesis-batchfailurereporting.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c11',
@@ -96,7 +136,11 @@ export const module1 = {
       back: 'A VPC-attached function only has the network access of its subnets, and it never gets a public IP, even in a public subnet.\n• AWS services: add a gateway endpoint (S3, DynamoDB) or interface endpoints.\n• Internet: private subnet with a route to a NAT gateway.\nThe execution role also needs the ENI permissions (AWSLambdaVPCAccessExecutionRole).',
       hint: 'Endpoints or NAT, not a public IP',
       tags: ['lambda', 'vpc', 'exam-trap'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      sources: [
+        { title: 'Giving Lambda Event Functions access to resources in an Amazon VPC', url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html', checked: '2026-11-25' },
+        { title: 'Gateway endpoints', url: 'https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c12',
@@ -104,7 +148,10 @@ export const module1 = {
       back: '• 1 RCU = 1 strongly consistent read/s of up to 4 KB, or 2 eventually consistent reads; transactional reads cost 2x.\n• 1 WCU = 1 write/s of up to 1 KB; transactional writes cost 2x.\n• Always round item size UP to the next 4 KB (reads) or 1 KB (writes) first.\nExample: 10 strongly consistent reads/s of 6 KB = 10 x 2 = 20 RCU; 10 writes/s of 2.5 KB = 10 x 3 = 30 WCU.',
       hint: 'Round up first: 4 KB reads, 1 KB writes',
       tags: ['dynamodb', 'capacity'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      sources: [
+        { title: 'DynamoDB read and write operations', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/read-write-operations.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c13',
@@ -112,7 +159,10 @@ export const module1 = {
       back: '• GSI: any partition and sort key, add or delete at any time, own throughput, eventually consistent reads ONLY.\n• LSI: same partition key with a different sort key, must be created with the table, shares table throughput, supports strongly consistent reads, 10 GB limit per partition key value.\nTrap: "strongly consistent read on a GSI" is never a valid answer.',
       hint: 'Global = anytime, eventual only',
       tags: ['dynamodb', 'indexes', 'exam-trap'],
-      difficulty: 'advanced'
+      difficulty: 'advanced',
+      sources: [
+        { title: 'Improving data access with secondary indexes in DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SecondaryIndexes.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c14',
@@ -120,7 +170,11 @@ export const module1 = {
       back: '• BatchWriteItem: up to 25 puts or deletes, no updates, no conditions, NOT atomic. Throttled items come back in UnprocessedItems and must be retried with exponential backoff.\n• TransactWriteItems: all-or-nothing across items and tables, supports condition checks and updates, costs 2x capacity.\nIgnoring UnprocessedItems means silently lost writes.',
       hint: 'Partial success vs all-or-nothing',
       tags: ['dynamodb', 'exam-trap'],
-      difficulty: 'advanced'
+      difficulty: 'advanced',
+      sources: [
+        { title: 'BatchWriteItem', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html', checked: '2026-11-25' },
+        { title: 'Amazon DynamoDB Transactions: How it works', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c15',
@@ -128,7 +182,11 @@ export const module1 = {
       back: '• Query: needs the partition key; key conditions on the sort key read only matching items. Filter expressions apply AFTER the read and still consume capacity.\n• Scan: reads the whole table; use parallel scan only for bulk jobs.\n• Each call returns at most 1 MB: loop with ExclusiveStartKey = LastEvaluatedKey.\n• TTL: a Number attribute in epoch seconds; expired items are deleted in the background, not instantly, so filter them out on read.',
       hint: 'Key conditions, 1 MB pages, epoch seconds',
       tags: ['dynamodb'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      sources: [
+        { title: 'Paginating table query results in DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.Pagination.html', checked: '2026-11-25' },
+        { title: 'Using time to live (TTL) in DynamoDB', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html', checked: '2026-11-25' }
+      ]
     },
     {
       id: 'dva-dev-c16',
@@ -136,7 +194,11 @@ export const module1 = {
       back: '• Lazy loading (cache-aside): read the cache, on a miss read the DB and populate. Only requested data is cached; data can go stale; a miss costs three trips.\n• Write-through: update the cache on every DB write. Always fresh, but caches data nobody reads.\nCombine write-through with a TTL. DAX is a write-through, API-compatible cache for DynamoDB; ElastiCache needs your own logic.',
       hint: 'Fill on miss vs fill on write',
       tags: ['elasticache', 'dax', 'caching'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      sources: [
+        { title: 'Caching strategies for Memcached', url: 'https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html', checked: '2026-11-25' },
+        { title: 'DAX and DynamoDB consistency models', url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.consistency.html', checked: '2026-11-25' }
+      ]
     }
   ]
 };
