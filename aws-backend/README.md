@@ -34,7 +34,10 @@ npx cdk bootstrap        # once per account/region
 npm run deploy
 ```
 
-Run `npm install` again after every `git pull` that changes `package.json`.
+Run `npm install` again after every `git pull` that changes `package.json`,
+and `(cd lambda/callables && npm ci)` too: the payments Lambda is uploaded
+with its own `node_modules` (Stripe, aws-jwt-verify), and without them it
+crashes on every request. `cdk deploy` now refuses to run if any are missing.
 `cdk.json` runs the project's own `node_modules/.bin/ts-node` (TypeScript 5),
 so without it the deploy stops with "ts-node: No such file or directory".
 It used to say `npx ts-node`, which quietly downloaded the newest ts-node and
