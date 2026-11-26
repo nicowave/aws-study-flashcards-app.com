@@ -36,6 +36,8 @@ const SITES = [
     chips: ['Runs in your browser', 'Nothing to install', 'First tutorial free'], host: 'js.aws-study-flashcards-app.com', mono: 'await fetch("/api/status")' },
   { id: 'typescript', kicker: 'Coding course', title: 'TypeScript for AWS', accent: 'Catch the bug before it ships.', color: '#60a5fa',
     chips: ['Runs in your browser', 'Nothing to install', 'First tutorial free'], host: 'typescript.aws-study-flashcards-app.com', mono: 'app.ts(16,30): error TS2551' },
+  { id: 'tech-spanish', kicker: 'Course · Curso', title: 'Tech Spanish ↔<br>Tech English', accent: 'Talk tech in both languages.', color: '#f2a845',
+    chips: ['Spanish and English', 'Flashcards both ways', 'Two modules free'], host: 'spanish.aws-study-flashcards-app.com', mono: '¿Ya mergeaste la PR? · LGTM' },
 ];
 
 const page = (s) => `<!doctype html><html><head><meta charset="utf-8"><style>

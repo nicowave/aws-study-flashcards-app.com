@@ -4,7 +4,7 @@
 # =============================================================================
 # Deploys the Study Hub Homepage, the certification study games, and Tutorials
 # Run from: ~/dev/sites/aws-study-flashcards.com/
-# Usage: ./deploy.sh [all|hub|cloud|ai|saa|dva|bash|python|js|typescript|tutorials|newsletter]
+# Usage: ./deploy.sh [all|hub|cloud|ai|saa|dva|bash|python|js|typescript|spanish|tutorials|newsletter]
 # =============================================================================
 
 set -e  # Exit on any error
@@ -112,12 +112,12 @@ deploy_hub() {
     # the games' current wording; if it fails, run: node scripts/build-readiness.mjs)
     ensure_deps  # a pull may have added test libraries since the last install
     print_step "Running the hub's tests..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Tests passed"
     
     # Build
     print_step "Building ${site_name}..."
-    npm run build
+    npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
     
     # Sync to S3
@@ -196,12 +196,12 @@ deploy_cloud() {
     # Every question and flashcard must cite an official AWS page checked within a year.
     ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question and card cites an official AWS source..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Sources check passed"
     
     # Build
     print_step "Building ${site_name}..."
-    npm run build
+    npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
     
     # Sync to S3
@@ -265,12 +265,12 @@ deploy_ai() {
     # Every question, card and guide section must cite an official AWS page checked within a year.
     ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question, card and guide section cites an official AWS source..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Sources check passed"
     
     # Build
     print_step "Building ${site_name}..."
-    npm run build
+    npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
     
     # Sync to S3
@@ -334,12 +334,12 @@ deploy_saa() {
     # Every question, card and study guide section must cite an official AWS page checked within a year.
     ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question, card and guide section cites an official AWS source..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Sources check passed"
 
     # Build
     print_step "Building ${site_name}..."
-    npm run build
+    npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
 
     # Sync to S3
@@ -403,12 +403,12 @@ deploy_dva() {
     # Every question, card and study guide section must cite an official AWS page checked within a year.
     ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question, card and guide section cites an official AWS source..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Sources check passed"
 
     # Build
     print_step "Building ${site_name}..."
-    npm run build
+    npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
 
     # Sync to S3
@@ -453,11 +453,11 @@ deploy_course() {
     fi
 
     print_step "Testing the practice shell and every task's answer..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Tests passed"
 
     print_step "Building ${course}..."
-    COURSE="$course" npm run build
+    COURSE="$course" npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
 
     print_step "Uploading to S3: s3://${bucket}/"
@@ -494,6 +494,39 @@ deploy_js() {
 
 deploy_typescript() {
     deploy_course typescript "typescript.aws-study-flashcards-app.com" "E2HBJJFM265RJL"
+}
+
+# Tech Spanish ↔ Tech English (COURSE=tech-spanish). Its site is made by
+# scripts/create-course-site.mjs, which prints the CloudFront id: write it in
+# SPANISH_DIST_ID. Until then the id is looked up by the site's name.
+SPANISH_DIST_ID=""
+spanish_dist_id() {
+    if [ -n "$SPANISH_DIST_ID" ]; then
+        echo "$SPANISH_DIST_ID"
+        return
+    fi
+    local found
+    # "|| ..." so a failed AWS call can't end the script silently under set -e
+    found=$(aws cloudfront list-distributions \
+        --query "DistributionList.Items[?Aliases.Items && contains(Aliases.Items, 'spanish.aws-study-flashcards-app.com')].Id | [0]" \
+        --output text 2>/dev/null) || { echo "LOOKUP_FAILED"; return 0; }
+    if [ -n "$found" ] && [ "$found" != "None" ]; then echo "$found"; fi
+    return 0
+}
+
+deploy_spanish() {
+    local dist_id
+    dist_id=$(spanish_dist_id)
+    if [ "$dist_id" = "LOOKUP_FAILED" ]; then
+        print_error "Could not look up the spanish. CloudFront distribution (the AWS CLI call failed). Check your credentials, or set SPANISH_DIST_ID in deploy.sh."
+        return 1
+    fi
+    if [ -z "$dist_id" ]; then
+        print_error "spanish.aws-study-flashcards-app.com has no CloudFront distribution yet."
+        print_info "Create it first: node scripts/create-course-site.mjs --from typescript --to spanish --apply"
+        return 1
+    fi
+    deploy_course tech-spanish "spanish.aws-study-flashcards-app.com" "$dist_id"
 }
 
 deploy_tutorials() {
@@ -542,10 +575,10 @@ deploy_next() {
         local parts=(${=entry})
         folder=${parts[1]}; bucket=${parts[2]}; dist_id=${parts[3]}
         print_step "${folder} -> https://${parts[4]}/next/"
-        cd "${SCRIPT_DIR}/${folder}" || { ((failed++)); continue; }
+        cd "${SCRIPT_DIR}/${folder}" || { failed=$((failed + 1)); continue; }
         if [ ! -f .env ]; then
             print_error ".env missing in $folder — skipping"
-            ((failed++)); cd "$SCRIPT_DIR"; continue
+            failed=$((failed + 1)); cd "$SCRIPT_DIR"; continue
         fi
         [ -d node_modules ] || npm install
         if npx vite build --base=/next/ --outDir dist-next --emptyOutDir > /dev/null; then
@@ -562,7 +595,7 @@ deploy_next() {
             aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/next/*" > /dev/null
             print_success "${parts[4]}/next/"
         else
-            print_error "Build failed: $folder"; ((failed++))
+            print_error "Build failed: $folder"; failed=$((failed + 1))
         fi
         cd "$SCRIPT_DIR"
     done
@@ -598,25 +631,33 @@ deploy_all() {
     local start_time=$(date +%s)
     local failed=0
     
-    deploy_hub || ((failed++))
+    deploy_hub || failed=$((failed + 1))
     echo ""
-    deploy_cloud || ((failed++))
+    deploy_cloud || failed=$((failed + 1))
     echo ""
-    deploy_ai || ((failed++))
+    deploy_ai || failed=$((failed + 1))
     echo ""
-    deploy_saa || ((failed++))
+    deploy_saa || failed=$((failed + 1))
     echo ""
-    deploy_dva || ((failed++))
+    deploy_dva || failed=$((failed + 1))
     echo ""
-    deploy_bash || ((failed++))
+    deploy_bash || failed=$((failed + 1))
     echo ""
-    deploy_python || ((failed++))
+    deploy_python || failed=$((failed + 1))
     echo ""
-    deploy_js || ((failed++))
+    deploy_js || failed=$((failed + 1))
     echo ""
-    deploy_typescript || ((failed++))
+    deploy_typescript || failed=$((failed + 1))
     echo ""
-    deploy_tutorials || ((failed++))
+    local spanish_id
+    spanish_id=$(spanish_dist_id)
+    if [ -n "$spanish_id" ]; then
+        deploy_spanish || failed=$((failed + 1))
+    else
+        print_info "Skipping Tech Spanish: its site isn't created yet (scripts/create-course-site.mjs)"
+    fi
+    echo ""
+    deploy_tutorials || failed=$((failed + 1))
 
     local end_time=$(date +%s)
     local duration=$((end_time - start_time))
@@ -624,7 +665,7 @@ deploy_all() {
     print_header "Deployment Complete!"
     echo ""
     if [ $failed -eq 0 ]; then
-        print_success "All 10 sites deployed successfully in ${duration} seconds"
+        print_success "All sites deployed successfully in ${duration} seconds"
     else
         print_error "$failed deployment(s) failed"
     fi
@@ -638,6 +679,7 @@ deploy_all() {
     echo "  🐍 Python: https://python.aws-study-flashcards-app.com"
     echo "  🟨 JavaScript: https://js.aws-study-flashcards-app.com"
     echo "  🔷 TypeScript: https://typescript.aws-study-flashcards-app.com"
+    echo "  ñ  Tech Spanish: https://spanish.aws-study-flashcards-app.com"
     echo "  📚 Tuts:  https://tutorials.aws-study-flashcards-app.com"
     echo ""
     print_info "CloudFront invalidations may take 1-2 minutes to propagate"
@@ -686,6 +728,9 @@ case "${1:-}" in
     typescript|ts)
         deploy_typescript
         ;;
+    spanish|tech-spanish)
+        deploy_spanish
+        ;;
     tutorials|tuts)
         deploy_tutorials
         ;;
@@ -696,10 +741,10 @@ case "${1:-}" in
         deploy_newsletter
         ;;
     -h|--help)
-        echo "Usage: $0 [all|hub|cloud|ai|saa|dva|bash|python|js|typescript|tutorials|next|newsletter]"
+        echo "Usage: $0 [all|hub|cloud|ai|saa|dva|bash|python|js|typescript|spanish|tutorials|next|newsletter]"
         echo ""
         echo "Options:"
-        echo "  all    Deploy all ten sites"
+        echo "  all    Deploy every site (Tech Spanish once its site exists)"
         echo "  hub    Deploy Study Hub Homepage only"
         echo "  cloud  Deploy Cloud Practitioner Game only"
         echo "  ai     Deploy AI Study Game only"
@@ -709,6 +754,7 @@ case "${1:-}" in
         echo "  python Deploy the Python for AWS course site only"
         echo "  js     Deploy the JavaScript for AWS course site only"
         echo "  typescript  Deploy the TypeScript for AWS course site only"
+        echo "  spanish     Deploy the Tech Spanish ↔ Tech English course site only"
         echo "  tutorials  Deploy Tutorials site only (static, no build)"
         echo "  next   Deploy hidden test versions of the 5 apps at /next/"
         echo "  newsletter  Upload newsletter issues and email a preview of the next one"
@@ -730,8 +776,9 @@ case "${1:-}" in
         echo "  9) python - Python for AWS course"
         echo "  10) js    - JavaScript for AWS course"
         echo "  11) typescript - TypeScript for AWS course"
+        echo "  12) spanish - Tech Spanish ↔ Tech English course"
         echo ""
-        read "choice?Enter choice [all/hub/cloud/ai/saa/dva/tutorials/bash/python/js/typescript]: "
+        read "choice?Enter choice [all/hub/cloud/ai/saa/dva/tutorials/bash/python/js/typescript/spanish]: "
         
         case $choice in
             1|all) deploy_all ;;
@@ -745,6 +792,7 @@ case "${1:-}" in
             9|python) deploy_python ;;
             10|js|javascript) deploy_js ;;
             11|typescript|ts) deploy_typescript ;;
+            12|spanish|tech-spanish) deploy_spanish ;;
             *) print_error "Invalid choice" ;;
         esac
         ;;

@@ -41,6 +41,7 @@ const CERT_IDS = new Set([
   'python-for-aws',
   'javascript-for-aws',
   'typescript-for-aws',
+  'tech-spanish',
 ]);
 const MAX_PROGRESS_BYTES = 16 * 1024;
 const MAX_PROFILE_BYTES = 256 * 1024; // avatar images are small JPEG data URLs

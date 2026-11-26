@@ -30,6 +30,7 @@ const SITE_ORIGINS = [
   'https://python.aws-study-flashcards-app.com',
   'https://js.aws-study-flashcards-app.com',
   'https://typescript.aws-study-flashcards-app.com',
+  'https://spanish.aws-study-flashcards-app.com',
   // Moving to levelupstudyhub.com: the new names sign in and call the API
   // too, while the old names above keep working during the move.
   'https://levelupstudyhub.com',
@@ -41,6 +42,7 @@ const SITE_ORIGINS = [
   'https://python.levelupstudyhub.com',
   'https://js.levelupstudyhub.com',
   'https://typescript.levelupstudyhub.com',
+  'https://spanish.levelupstudyhub.com',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',
