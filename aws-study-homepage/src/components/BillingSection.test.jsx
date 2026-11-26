@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import BillingSection from './BillingSection';
 import { getEntitlements, openBillingPortal } from '../services/billing';
 import { certifications } from '../data/certifications';
-import { COURSES } from '../data/courses';
+import { COURSES, OTHER_COURSES } from '../data/courses';
 
 // The token claims and Stripe are the boundary: never reach Cognito or the API from a test
 vi.mock('../services/billing', () => ({ getEntitlements: vi.fn(), openBillingPortal: vi.fn() }));
@@ -53,9 +53,9 @@ describe('BillingSection (hub Settings)', () => {
   });
 
   it('one-time unlocks: lists each by its name, with the portal for receipts and the plans to upgrade', async () => {
-    await show({ plan: null, certs: [cert.id, `${course.id}-for-aws`, 'something-new'] });
+    await show({ plan: null, certs: [cert.id, `${course.id}-for-aws`, OTHER_COURSES[0].plan, 'something-new'] });
     const list = screen.getByRole('list', { name: /unlocked/i });
-    expect(within(list).getAllByRole('listitem').map((li) => li.textContent)).toEqual([certLabel, course.title, 'something-new']);
+    expect(within(list).getAllByRole('listitem').map((li) => li.textContent)).toEqual([certLabel, course.title, OTHER_COURSES[0].title, 'something-new']);
     expect(manage()).toBeInTheDocument();
     expect(seePlans()).toBeInTheDocument();
     // Only Pro is a subscription, so only Pro is told about cancelling

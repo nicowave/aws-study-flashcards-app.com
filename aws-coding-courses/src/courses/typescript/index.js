@@ -1,5 +1,6 @@
 // TypeScript for AWS: typescript.aws-study-flashcards-app.com
 import meta from './meta.json';
+import { siblingsOf } from '../../shared/courseSites';
 import startHere from '../../shared/startHere';
 import bugProofFlashcards from './tutorials/01-bug-proof-flashcards';
 import awsCliTool from './tutorials/02-aws-cli-tool';
@@ -43,11 +44,7 @@ $ npx cdk deploy
 - Put the CDK app on GitHub with its deploy workflow: it shows you can ship, not just code.
 - Practice for the exam with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com).
 - You've finished the Developer Path. Book the AWS Certified Developer – Associate when your practice scores are steady above 80%.`,
-  siblings: [
-    { title: 'Bash for AWS', url: 'https://bash.aws-study-flashcards-app.com', live: true },
-    { title: 'Python for AWS', url: 'https://python.aws-study-flashcards-app.com', live: true },
-    { title: 'JavaScript for AWS', url: 'https://js.aws-study-flashcards-app.com', live: true },
-  ],
+  siblings: siblingsOf(meta.id),
   tutorials: [startHere, bugProofFlashcards, awsCliTool, deployWithCode],
 };
 

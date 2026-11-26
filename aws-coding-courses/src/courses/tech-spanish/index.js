@@ -3,6 +3,7 @@
 // (course.languages), and every text written with both(en, es) follows it.
 // Terms come from glossary.json (content/tech-spanish), never retyped here.
 import meta from './meta.json';
+import { siblingsOf } from '../../shared/courseSites';
 import { both } from '../../engine/i18n';
 import startHere from './tutorials/00-start-here';
 import gitEveryday from './tutorials/01-git-everyday';
@@ -56,7 +57,6 @@ you   Got it: merged, deploying after
       'Each module starts from a real moment at work. Read a little, drill the words with flashcards, sort phrases by register, write a real message, then check yourself.',
       'Cada módulo parte de un momento real de trabajo. Lee un poco, repasa las palabras con tarjetas, clasifica frases por registro, escribe un mensaje real y luego compruébalo.',
     ),
-    'footer.moreCourses': both('More courses', 'Más cursos'),
     'tut.finished': both('🎉 Module finished', '🎉 Módulo terminado'),
     'app.unlocked': both(() => 'Unlocked. Every module is yours. Enjoy!', () => 'Desbloqueado. Todos los módulos son tuyos. ¡Disfrútalo!'),
     'unlock.soon': both('Purchases open very soon. The free modules are ready now.', 'Las compras abren muy pronto. Los módulos gratis ya están listos.'),
@@ -118,12 +118,7 @@ you   Got it: merged, deploying after
 - Prepárate para una certificación de AWS con el [juego de estudio de Cloud Practitioner](https://cloud.aws-study-flashcards-app.com): ya conoces el vocabulario en los dos idiomas.
 - Ten el glosario a mano: cada término está en las tarjetas de su módulo.`,
   ),
-  siblings: [
-    { title: 'Bash for AWS', url: 'https://bash.aws-study-flashcards-app.com', live: true },
-    { title: 'Python for AWS', url: 'https://python.aws-study-flashcards-app.com', live: true },
-    { title: 'JavaScript for AWS', url: 'https://js.aws-study-flashcards-app.com', live: true },
-    { title: 'TypeScript for AWS', url: 'https://typescript.aws-study-flashcards-app.com', live: true },
-  ],
+  siblings: siblingsOf(meta.id),
   tutorials: [startHere, gitEveryday, talkingCode, devopsCicd, cloudAws, data, security, teamwork, finalProject],
 };
 

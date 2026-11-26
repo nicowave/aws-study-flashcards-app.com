@@ -50,9 +50,13 @@ describe('onThisName', () => {
   it('moves a Study Hub link onto the new name when the page is on the new name', () => {
     expect(onThisName('https://aws-study-flashcards-app.com', NEW)).toBe('https://levelupstudyhub.com');
     expect(onThisName('https://architect.aws-study-flashcards-app.com', 'levelupstudyhub.com')).toBe('https://architect.levelupstudyhub.com');
-    for (const sub of ['cloud', 'ai', 'architect', 'developer', 'bash', 'python', 'js', 'typescript', 'spanish', 'tutorials']) {
+    for (const sub of ['cloud', 'ai', 'architect', 'developer', 'bash', 'python', 'js', 'typescript', 'tutorials']) {
       expect(onThisName(`https://${sub}.aws-study-flashcards-app.com`, NEW)).toBe(`https://${sub}.levelupstudyhub.com`);
     }
+  });
+
+  it('leaves spanish. on its old name until spanish.levelupstudyhub.com exists', () => {
+    expect(onThisName('https://spanish.aws-study-flashcards-app.com', NEW)).toBe('https://spanish.aws-study-flashcards-app.com');
   });
 
   it('keeps the path, the part after "?" and the part after "#"', () => {

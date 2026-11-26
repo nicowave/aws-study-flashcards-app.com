@@ -10,5 +10,16 @@ export const COURSES = [
   { id: 'typescript', title: 'TypeScript for AWS', url: 'https://typescript.aws-study-flashcards-app.com', mark: 'TS', color: '#93a8f4',
     blurb: 'Bug-proof code, your own AWS command-line tool, and infrastructure as code with the Cloud Development Kit.', tutorials: 3, hours: 14 },
 ];
+
+// Courses outside the Developer Path (not in its bundle). Bought by their own
+// plan id (`plan`), which is also the purchase id in the token's `certs`.
+// `live: false` shows the card as coming soon, with no link to a site that
+// doesn't answer yet; switch it to true on launch day (docs/launch-tech-spanish.md).
+export const OTHER_COURSES = [
+  { id: 'tech-spanish', plan: 'tech-spanish', title: 'Tech Spanish ↔ Tech English', url: 'https://spanish.aws-study-flashcards-app.com', mark: 'ñ', color: '#f2a845',
+    blurb: 'Talk and write about software, DevOps and AWS in Spanish and in English: what goes in a formal document, what the team really says, and what is slang.',
+    modules: 9, hours: 8, live: false },
+];
+
 export const COURSE_PRICE = '$19.99';
 export const BUNDLE_PRICE = '$59';

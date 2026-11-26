@@ -5,7 +5,7 @@ import App from './App';
 import { useAuth } from './context/AuthContext';
 import { getPlan, getProTrialStatus, getEntitlements, startCheckout, openBillingPortal, PRO_TRIAL_DAYS } from './services/billing';
 import { certifications, categories } from './data/certifications';
-import { COURSES } from './data/courses';
+import { COURSES, OTHER_COURSES } from './data/courses';
 import { GIS_PAGE } from './data/gis';
 import { HERO_SLIDES } from './data/heroSlides';
 import { PROMOTIONS } from './services/offers';
@@ -840,6 +840,15 @@ describe('App', () => {
       const column = within(within(footer()).getByRole('heading', { name: 'Coding courses' }).parentElement);
       for (const c of COURSES) expect(column.getByRole('link', { name: c.title })).toHaveAttribute('href', onNewName(c.url));
       expect(column.getByRole('link', { name: /gis courses/i })).toHaveAttribute('href', `${import.meta.env.BASE_URL}gis/`);
+    });
+
+    it('lists the other courses: a link to the site once live, to the #courses card until then', () => {
+      render(<App />);
+      const column = within(within(footer()).getByRole('heading', { name: 'Coding courses' }).parentElement);
+      for (const c of OTHER_COURSES) {
+        if (c.live) expect(column.getByRole('link', { name: c.title })).toHaveAttribute('href', onNewName(c.url));
+        else expect(column.getByRole('link', { name: `${c.title} (coming soon)` })).toHaveAttribute('href', `${import.meta.env.BASE_URL}#courses`);
+      }
     });
 
     it('links to the terms and privacy pages and says it is not affiliated with AWS', () => {
