@@ -21,7 +21,7 @@ On purpose. One build is served under both names during the move (see CLAUDE.md,
 
 | # | Step | Who | State |
 |---|---|---|---|
-| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] in progress (2 of 11 answered) |
+| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] in progress (3 of 11 answered) |
 | 2 | `deploy.sh` prints the new names | Code | [ ] |
 | 3 | Backend fallback, email links, UTM matching; `cdk deploy` | Code + Owner | [ ] |
 | 4 | Stripe, Google, Search Console, GA4 settings | Owner | [ ] |
@@ -61,13 +61,7 @@ These block step 8. Each has the read-only check that answers it; run them on th
   ```bash
   aws cloudfront list-functions --query "FunctionList.Items[].{name:Name,stage:FunctionMetadata.Stage}" --output table
   ```
-- [ ] **The deployed Cognito web client lists the new callbacks** (`https://*.levelupstudyhub.com/` and `/next/`). Code has them (`aws-backend/lib/study-hub-stack.ts:35-43`, `:230-234`); the deploy is unverified.
-  ```bash
-  aws cognito-idp list-user-pools --max-results 20 --query "UserPools[].[Id,Name]" --output table
-  ```
-  ```bash
-  aws cognito-idp describe-user-pool-client --user-pool-id POOL_ID --client-id 8att6q0026f6sb44qn4il7tu8 --query "UserPoolClient.CallbackURLs"
-  ```
+- [x] **The deployed Cognito web client lists the new callbacks.** Answered 2026-11-26 (`describe-user-pool-client` on client `8att6q0026f6sb44qn4il7tu8`): it lists `/` and `/next/` for `levelupstudyhub.com` and its `cloud.`, `ai.`, `architect.`, `developer.`, `bash.`, `python.`, `js.` and `typescript.` subdomains, next to every old-name entry (including `saa.` and `dva.`) and `localhost:5173-5175`. Google sign-in on the new names is ready. Tutorials uses a different client (`tutorials-nicotek`), checked separately below.
 - [ ] **The HTTP API CORS allows the new origins** (`study-hub-stack.ts:258`).
   ```bash
   aws apigatewayv2 get-api --api-id vaj7alg0f6 --query "CorsConfiguration.AllowOrigins"
