@@ -6,7 +6,7 @@ Run everything from the repo root on your Mac, with the **default** AWS profile.
 
 ## 1. Create the site (S3, CloudFront, DNS)
 
-`scripts/create-course-site.mjs` copies the live TypeScript site: the bucket settings, the CloudFront distribution (certificate, cache policy, error pages) and the Route 53 records, under both names. Without `--apply` it only prints the plan.
+`scripts/create-course-site.mjs` copies the live TypeScript site: the bucket settings, the CloudFront distribution (certificate, cache policy, error pages) and the Route 53 records, under every name the TypeScript site answers to. Without `--apply` it only prints the plan.
 
 ```bash
 node scripts/create-course-site.mjs --from typescript --to spanish
@@ -64,9 +64,11 @@ Switch the course from "coming soon" to a link, then deploy the hub and the cour
 
 - `aws-study-homepage/src/data/courses.js`: `OTHER_COURSES` → Tech Spanish → `live: true` (hub card, hub footer, search-engine and crawler copy).
 - `aws-coding-courses/src/shared/courseSites.js`: Tech Spanish → `live: true` (the "More courses" footer on every course site).
-- `aws-study-homepage/public/llms.txt`: add under "Coding courses":
+- `aws-study-homepage/public/llms.txt`: add a section of its own after the Developer Path list (that section is about the four coding courses and their bundle):
   ```
-  - [Tech Spanish ↔ Tech English](https://spanish.aws-study-flashcards-app.com/): software, DevOps and AWS vocabulary in Spanish and English, with the right register for documents, the team and slang. Not part of the Developer Path bundle.
+  ## Other courses
+
+  - [Tech Spanish ↔ Tech English](https://spanish.aws-study-flashcards-app.com/): software, DevOps and AWS vocabulary in Spanish and English, with the right register for documents, the team and slang. Start here and Module 1 are free; $19.99 once. Not part of the Developer Path bundle.
   ```
 
 ```bash
