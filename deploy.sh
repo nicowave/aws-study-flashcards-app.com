@@ -112,12 +112,12 @@ deploy_hub() {
     # the games' current wording; if it fails, run: node scripts/build-readiness.mjs)
     ensure_deps  # a pull may have added test libraries since the last install
     print_step "Running the hub's tests..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Tests passed"
     
     # Build
     print_step "Building ${site_name}..."
-    npm run build
+    npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
     
     # Sync to S3
@@ -196,12 +196,12 @@ deploy_cloud() {
     # Every question and flashcard must cite an official AWS page checked within a year.
     ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question and card cites an official AWS source..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Sources check passed"
     
     # Build
     print_step "Building ${site_name}..."
-    npm run build
+    npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
     
     # Sync to S3
@@ -265,12 +265,12 @@ deploy_ai() {
     # Every question, card and guide section must cite an official AWS page checked within a year.
     ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question, card and guide section cites an official AWS source..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Sources check passed"
     
     # Build
     print_step "Building ${site_name}..."
-    npm run build
+    npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
     
     # Sync to S3
@@ -334,12 +334,12 @@ deploy_saa() {
     # Every question, card and study guide section must cite an official AWS page checked within a year.
     ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question, card and guide section cites an official AWS source..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Sources check passed"
 
     # Build
     print_step "Building ${site_name}..."
-    npm run build
+    npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
 
     # Sync to S3
@@ -403,12 +403,12 @@ deploy_dva() {
     # Every question, card and study guide section must cite an official AWS page checked within a year.
     ensure_deps  # a pull may have added test libraries since the last install
     print_step "Checking every question, card and guide section cites an official AWS source..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Sources check passed"
 
     # Build
     print_step "Building ${site_name}..."
-    npm run build
+    npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
 
     # Sync to S3
@@ -453,11 +453,11 @@ deploy_course() {
     fi
 
     print_step "Testing the practice shell and every task's answer..."
-    npm test
+    npm test || { print_error "Tests failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Tests passed"
 
     print_step "Building ${course}..."
-    COURSE="$course" npm run build
+    COURSE="$course" npm run build || { print_error "Build failed: not deploying"; cd "$SCRIPT_DIR"; return 1; }
     print_success "Build complete"
 
     print_step "Uploading to S3: s3://${bucket}/"
@@ -506,10 +506,10 @@ spanish_dist_id() {
         return
     fi
     local found
+    # "|| ..." so a failed AWS call can't end the script silently under set -e
     found=$(aws cloudfront list-distributions \
         --query "DistributionList.Items[?Aliases.Items && contains(Aliases.Items, 'spanish.aws-study-flashcards-app.com')].Id | [0]" \
-        --output text 2>/dev/null)
-    # Always succeed: under set -e a failed lookup would end the script silently
+        --output text 2>/dev/null) || { echo "LOOKUP_FAILED"; return 0; }
     if [ -n "$found" ] && [ "$found" != "None" ]; then echo "$found"; fi
     return 0
 }
@@ -517,6 +517,10 @@ spanish_dist_id() {
 deploy_spanish() {
     local dist_id
     dist_id=$(spanish_dist_id)
+    if [ "$dist_id" = "LOOKUP_FAILED" ]; then
+        print_error "Could not look up the spanish. CloudFront distribution (the AWS CLI call failed). Check your credentials, or set SPANISH_DIST_ID in deploy.sh."
+        return 1
+    fi
     if [ -z "$dist_id" ]; then
         print_error "spanish.aws-study-flashcards-app.com has no CloudFront distribution yet."
         print_info "Create it first: node scripts/create-course-site.mjs --from typescript --to spanish --apply"
@@ -571,10 +575,10 @@ deploy_next() {
         local parts=(${=entry})
         folder=${parts[1]}; bucket=${parts[2]}; dist_id=${parts[3]}
         print_step "${folder} -> https://${parts[4]}/next/"
-        cd "${SCRIPT_DIR}/${folder}" || { ((failed++)); continue; }
+        cd "${SCRIPT_DIR}/${folder}" || { failed=$((failed + 1)); continue; }
         if [ ! -f .env ]; then
             print_error ".env missing in $folder — skipping"
-            ((failed++)); cd "$SCRIPT_DIR"; continue
+            failed=$((failed + 1)); cd "$SCRIPT_DIR"; continue
         fi
         [ -d node_modules ] || npm install
         if npx vite build --base=/next/ --outDir dist-next --emptyOutDir > /dev/null; then
@@ -591,7 +595,7 @@ deploy_next() {
             aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/next/*" > /dev/null
             print_success "${parts[4]}/next/"
         else
-            print_error "Build failed: $folder"; ((failed++))
+            print_error "Build failed: $folder"; failed=$((failed + 1))
         fi
         cd "$SCRIPT_DIR"
     done
@@ -627,31 +631,33 @@ deploy_all() {
     local start_time=$(date +%s)
     local failed=0
     
-    deploy_hub || ((failed++))
+    deploy_hub || failed=$((failed + 1))
     echo ""
-    deploy_cloud || ((failed++))
+    deploy_cloud || failed=$((failed + 1))
     echo ""
-    deploy_ai || ((failed++))
+    deploy_ai || failed=$((failed + 1))
     echo ""
-    deploy_saa || ((failed++))
+    deploy_saa || failed=$((failed + 1))
     echo ""
-    deploy_dva || ((failed++))
+    deploy_dva || failed=$((failed + 1))
     echo ""
-    deploy_bash || ((failed++))
+    deploy_bash || failed=$((failed + 1))
     echo ""
-    deploy_python || ((failed++))
+    deploy_python || failed=$((failed + 1))
     echo ""
-    deploy_js || ((failed++))
+    deploy_js || failed=$((failed + 1))
     echo ""
-    deploy_typescript || ((failed++))
+    deploy_typescript || failed=$((failed + 1))
     echo ""
-    if [ -n "$(spanish_dist_id)" ]; then
-        deploy_spanish || ((failed++))
+    local spanish_id
+    spanish_id=$(spanish_dist_id)
+    if [ -n "$spanish_id" ]; then
+        deploy_spanish || failed=$((failed + 1))
     else
         print_info "Skipping Tech Spanish: its site isn't created yet (scripts/create-course-site.mjs)"
     fi
     echo ""
-    deploy_tutorials || ((failed++))
+    deploy_tutorials || failed=$((failed + 1))
 
     local end_time=$(date +%s)
     local duration=$((end_time - start_time))

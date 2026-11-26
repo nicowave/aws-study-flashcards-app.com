@@ -31,7 +31,7 @@ If it reports **"No Route 53 record to copy"** for a name, that domain's DNS liv
    ```
 3. Deploy the backend. This also adds both spanish. names to sign-in (Cognito callback URLs), CORS and checkout's return addresses:
    ```bash
-   cd aws-backend && npx cdk deploy
+   (cd aws-backend && npx cdk deploy)
    ```
 
 Until this step, the site works and the free modules open, but the unlock button says purchases open soon.
@@ -41,7 +41,7 @@ Until this step, the site works and the free modules open, but the unlock button
 `index.html` uses `https://aws-study-flashcards-app.com/og/tech-spanish.png`, which the hub serves. Build it (needs Google Chrome), then deploy the hub:
 
 ```bash
-cd aws-study-homepage && node scripts/build-share-images.mjs && cd ..
+(cd aws-study-homepage && node scripts/build-share-images.mjs)
 ```
 
 ```bash
@@ -67,11 +67,15 @@ curl -sI https://spanish.levelupstudyhub.com | head -1
 ```
 
 ```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://spanish.aws-study-flashcards-app.com/git-everyday
+```
+
+```bash
 curl -s https://spanish.aws-study-flashcards-app.com/git-everyday | grep -o 'assets/index-[^"]*\.js'
 ```
 
 - ✓ Both names answer `200`.
-- ✓ A module's address (`/git-everyday`) returns the app, not a 404, and the bundle name matches the one in `aws-coding-courses/dist/tech-spanish/assets/`.
+- ✓ A module's address (`/git-everyday`) answers `200` (not `404`), and its page names the same bundle as `aws-coding-courses/dist/tech-spanish/assets/`.
 - ✓ In a browser: the ES | EN switch works, signing in keeps you signed in on the other study sites, and a test purchase unlocks the paid modules.
 
 ## Later (not needed to launch)

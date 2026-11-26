@@ -33,6 +33,7 @@ Stack: Vite + React for the apps, Cognito for sign-in, DynamoDB + API Gateway/La
 - Tutorials: no build. Uploads `site/index.html` plus every `site/<slug>/index.html`.
 - New course site: `node scripts/create-course-site.mjs --from typescript --to <sub>` copies a live site's bucket, CloudFront and Route 53 setup under both names (plan only; `--apply` creates). Tests: `node --test scripts/create-course-site.test.mjs` (a pretend AWS CLI).
 - Newsletter: `./deploy.sh newsletter` uploads `newsletter/issues/*.md` and emails Nico a preview of the next issue. Issues go out Tuesdays 9:00 Eastern to everyone on the email list (`LEAD#<email>` items). See `newsletter/README.md`.
+- `deploy.sh` runs under zsh `set -e`, but zsh switches that off inside `deploy_x || …` (as in `all`), so every test and build step ends with its own `|| { …; return 1; }`. Keep that on new steps, and count with `failed=$((failed + 1))` (`((failed++))` from 0 exits the script).
 - Verify a deploy: `curl` the page and check the bundle hash changed. Tutorials returns a 302 to Cognito for unauthenticated requests — that's expected, not a failure.
 
 ## AWS CLI
