@@ -50,7 +50,7 @@ describe('onThisName', () => {
   it('moves a Study Hub link onto the new name when the page is on the new name', () => {
     expect(onThisName('https://aws-study-flashcards-app.com', NEW)).toBe('https://levelupstudyhub.com');
     expect(onThisName('https://architect.aws-study-flashcards-app.com', 'levelupstudyhub.com')).toBe('https://architect.levelupstudyhub.com');
-    for (const sub of ['cloud', 'ai', 'architect', 'developer', 'bash', 'python', 'js', 'typescript', 'tutorials']) {
+    for (const sub of ['cloud', 'ai', 'architect', 'developer', 'bash', 'python', 'js', 'typescript', 'spanish', 'tutorials']) {
       expect(onThisName(`https://${sub}.aws-study-flashcards-app.com`, NEW)).toBe(`https://${sub}.levelupstudyhub.com`);
     }
   });

@@ -37,6 +37,7 @@ const ALLOWED_ORIGINS = [
   "https://python.aws-study-flashcards-app.com",
   "https://js.aws-study-flashcards-app.com",
   "https://typescript.aws-study-flashcards-app.com",
+  "https://spanish.aws-study-flashcards-app.com",
   // Moving to levelupstudyhub.com: checkout may return buyers to the new
   // names too, while the old names above keep working during the move.
   "https://levelupstudyhub.com",
@@ -48,6 +49,7 @@ const ALLOWED_ORIGINS = [
   "https://python.levelupstudyhub.com",
   "https://js.levelupstudyhub.com",
   "https://typescript.levelupstudyhub.com",
+  "https://spanish.levelupstudyhub.com",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
@@ -74,6 +76,8 @@ const PLAN_PRICES = {
   "python-for-aws": process.env.STRIPE_PRICE_PYTHON_COURSE || "",
   "javascript-for-aws": process.env.STRIPE_PRICE_JAVASCRIPT_COURSE || "",
   "typescript-for-aws": process.env.STRIPE_PRICE_TYPESCRIPT_COURSE || "",
+  // Tech Spanish ↔ Tech English: not part of the Developer Path bundle
+  "tech-spanish": process.env.STRIPE_PRICE_TECH_SPANISH_COURSE || "",
   // One-time bundle: unlocks everything in BUNDLES["developer-path"]
   "developer-path": process.env.STRIPE_PRICE_DEVELOPER_PATH || "",
 };

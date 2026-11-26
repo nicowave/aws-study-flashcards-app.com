@@ -40,7 +40,7 @@ export const cookieDomainFor = (hostname) => {
 // page's name. The sign-in address (auth.) and any site not listed keep the
 // name they were written with, so a link can never point at a door that does
 // not exist. A new site joins this list once it has a door under both names.
-export const SITE_SUBDOMAINS = ['', 'cloud', 'ai', 'architect', 'developer', 'bash', 'python', 'js', 'typescript', 'tutorials'];
+export const SITE_SUBDOMAINS = ['', 'cloud', 'ai', 'architect', 'developer', 'bash', 'python', 'js', 'typescript', 'spanish', 'tutorials'];
 
 const SITE_LINK = new RegExp(
   `^https://(?:([a-z0-9-]+)\\.)?(?:${ROOT_DOMAINS.map((d) => d.replace(/\./g, '\\.')).join('|')})(?=[/?#]|$)`,

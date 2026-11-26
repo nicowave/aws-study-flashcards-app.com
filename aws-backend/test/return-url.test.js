@@ -45,6 +45,9 @@ const CASES = [
   ["https://cloud.levelupstudyhub.com", "https://cloud.levelupstudyhub.com"],
   ["https://aws-study-flashcards-app.com", OLD_HUB],
   ["https://bash.aws-study-flashcards-app.com", "https://bash.aws-study-flashcards-app.com"],
+  // Tech Spanish, under both names
+  ["https://spanish.aws-study-flashcards-app.com", "https://spanish.aws-study-flashcards-app.com"],
+  ["https://spanish.levelupstudyhub.com", "https://spanish.levelupstudyhub.com"],
   [undefined, OLD_HUB], // clients that send nothing keep today's behaviour
   ["https://levelupstudyhub.com.evil.example", OLD_HUB],
   ["https://levelupstudyhub.com@evil.example", OLD_HUB],
