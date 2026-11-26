@@ -21,7 +21,7 @@ On purpose. One build is served under both names during the move (see CLAUDE.md,
 
 | # | Step | Who | State |
 |---|---|---|---|
-| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] |
+| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] in progress (2 of 11 answered) |
 | 2 | `deploy.sh` prints the new names | Code | [ ] |
 | 3 | Backend fallback, email links, UTM matching; `cdk deploy` | Code + Owner | [ ] |
 | 4 | Stripe, Google, Search Console, GA4 settings | Owner | [ ] |
@@ -39,11 +39,24 @@ On purpose. One build is served under both names during the move (see CLAUDE.md,
 
 These block step 8. Each has the read-only check that answers it; run them on the Mac with the DEFAULT profile.
 
-- [ ] **Which CloudFront distributions serve which names.** The two names present different certificates live, so the new names may sit on separate distributions that this repo doesn't record. The function must go only on old-name distributions, or it loops.
-  ```bash
-  aws cloudfront list-distributions --query "DistributionList.Items[].{id:Id,aliases:Aliases.Items,cert:ViewerCertificate.ACMCertificateArn}" --output json
-  ```
-  Write the host → distribution → certificate table here. If the new names have their own distributions, `deploy.sh` must invalidate them too.
+- [x] **Which CloudFront distributions serve which names.** Answered 2026-11-26 (`aws cloudfront list-distributions`). **Each name has its own distribution**, so the old-host function goes only on the old-name ones and cannot loop:
+
+  | Site | Old-name distribution (gets the redirect) | New-name distribution (keeps serving) |
+  |---|---|---|
+  | Hub | `E3D126UT3L72OL` (aws-study-flashcards-app.com; apex-only cert) | `EQQAL9UJ4QD8M` (levelupstudyhub.com + www.) |
+  | Cloud Practitioner | `E6NUXKK8FTCR1` | `EDFO69NOBW3ND` |
+  | AI Practitioner | `E23TPCWLVKFC65` | `E10Z4YFFKV0730` |
+  | Solutions Architect | `EBOXWN6EUZHKF` (saa. + architect.) | `E2QGETZVAOUTUY` |
+  | Developer | `E2UB744W5YUCTW` (dva. + developer.) | `E1AE85QV25KDPD` |
+  | Bash | `EYR8XH2CLI1DT` | `E1GVBB47Y9R725` |
+  | Python | `E205DY614C5Q4C` | `E3M8Y7JMGKWB6T` |
+  | JavaScript | `E1JMSZCG8CKTGT` (js.); `E27Y7QTYXZD1SM` (javascript. redirect) | `E8AUAQW0X05X2` (js.) |
+  | TypeScript | `E2HBJJFM265RJL` | `EYRAVLUIZ7XC4` |
+  | Tutorials | `E24YKUY1M23PV0` | `E3F0ZP2LBB09SZ` |
+
+  Old-name subdomains use the wildcard certificate `…/9c5abd7d…`, the old apex its own; every new-name distribution uses one certificate `…/57ec786c…` (covers `levelupstudyhub.com` and `*.levelupstudyhub.com`). Keep all of them.
+  - **`deploy.sh` only invalidates the old-name distributions.** Non-hashed files (`robots.txt`, `sitemap.xml`, `terms.html`, share images) are uploaded with a one-year `Cache-Control`. A live check on 2026-11-26 found the same files on both hub names (same ETag; the new distribution answered `RefreshHit`, so it revalidates today), but nothing guarantees it. Step 2 adds the new IDs to every invalidation.
+  - **`ED9BTUZG465V` has no alias** and uses the old apex certificate. It serves no name; find out what it was (probably an earlier hub) before deciding to disable it. Not part of this plan.
 - [ ] **Where the existing `www.levelupstudyhub.com` → apex function lives.** A cache behavior holds one viewer-request function, so the old-host logic may have to merge into it.
   ```bash
   aws cloudfront list-functions --query "FunctionList.Items[].{name:Name,stage:FunctionMetadata.Stage}" --output table
@@ -64,7 +77,7 @@ These block step 8. Each has the read-only check that answers it; run them on th
   for h in "" cloud. ai. architect. developer. bash. python. js. typescript. tutorials.; do printf '%-14s ' "${h:-apex}"; curl -s -o /dev/null -w '%{http_code}\n' "https://${h}levelupstudyhub.com/"; done
   ```
 - [ ] **Tutorials on the new name.** `tutorials.levelupstudyhub.com` exists and is a callback in the `tutorials-nicotek` Cognito client. Its viewer-request slot is the Lambda@Edge auth function, so its redirect goes inside `~/dev/aws/tutorials-site/edge/index.mjs`, not in the CloudFront Function.
-- [ ] **Leftover aliases.** Do `www.aws-study-flashcards-app.com` and `javascript.levelupstudyhub.com` exist? Are `saa.`/`dva.` still aliases on the Architect and Developer distributions? (`saa.` answered 200 live.)
+- [x] **Leftover aliases.** Answered 2026-11-26: `www.aws-study-flashcards-app.com` and `javascript.levelupstudyhub.com` don't exist (no distribution has them). `saa.` and `dva.` are still aliases on the Architect and Developer old-name distributions, so the function maps them to `architect.` and `developer.levelupstudyhub.com`.
 - [ ] **How the `javascript.` redirect is built.** Check whether its bucket uses `RedirectAllRequestsTo` and whether path and query survive.
   ```bash
   aws s3api get-bucket-website --bucket javascript.aws-study-flashcards-app.com
@@ -91,8 +104,8 @@ These block step 8. Each has the read-only check that answers it; run them on th
 ### 1. Pre-flight (Owner, no changes)
 Answer every item under "What is missing" above. **Done when** there is a host → distribution → certificate table here, every new host returns 200, and the Cognito client and API CORS list the new names.
 
-### 2. `deploy.sh` prints the new names (Code)
-Change only the echo lines: `:160`, `:229`, `:298`, `:367`, `:436`, `:527` (tutorials, after step 1 confirms it), and the summary `:632-641`. `deploy_course` (`:479`) gets a public-host argument instead of echoing `https://${bucket}`; `deploy_next` (`:537-541`) changes only its host field. Bucket names and distribution IDs stay. Add `curl -sI` checks once the redirect is live.
+### 2. `deploy.sh` prints the new names and invalidates both (Code)
+Every deploy also invalidates the new-name distribution of the same site (IDs in the table above). Change the echo lines: `:160`, `:229`, `:298`, `:367`, `:436`, `:527` (tutorials, after step 1 confirms it), and the summary `:632-641`. `deploy_course` (`:479`) gets a public-host argument instead of echoing `https://${bucket}`; `deploy_next` (`:537-541`) changes only its host field. Bucket names and distribution IDs stay. Add `curl -sI` checks once the redirect is live.
 
 ### 3. Backend (Code + Owner `cdk deploy`)
 - `SITE_URL` → `https://levelupstudyhub.com` (`aws-backend/lambda/callables/index.js:27`) and its tests (`return-url.test.js`, `checkout-guard.test.js`).
