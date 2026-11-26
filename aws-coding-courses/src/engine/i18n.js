@@ -52,7 +52,7 @@ export const STRINGS = {
     'nav.signIn': 'Sign in',
     'nav.signOut': 'Sign out',
     'nav.language': 'Language',
-    'footer.moreCourses': 'More coding courses',
+    'footer.moreCourses': 'More courses',
     'footer.games': 'Certification games',
     'footer.comingSoon': 'coming soon',
     'footer.allHub': 'All of Level Up Study Hub',

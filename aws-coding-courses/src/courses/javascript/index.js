@@ -1,5 +1,6 @@
 // JavaScript for AWS: js.aws-study-flashcards-app.com
 import meta from './meta.json';
+import { siblingsOf } from '../../shared/courseSites';
 import startHere from '../../shared/startHere';
 import flashcardPage from './tutorials/01-flashcard-page';
 import statusDashboard from './tutorials/02-status-dashboard';
@@ -44,11 +45,7 @@ Response:
 - Put the four projects on your résumé and GitHub: a live page, a dashboard, an API and an app with sign-in.
 - Practice for the exam with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com).
 - Continue with [TypeScript for AWS](https://typescript.aws-study-flashcards-app.com): the same code with safety rails, and the whole app deployed with the AWS Cloud Development Kit.`,
-  siblings: [
-    { title: 'Bash for AWS', url: 'https://bash.aws-study-flashcards-app.com', live: true },
-    { title: 'Python for AWS', url: 'https://python.aws-study-flashcards-app.com', live: true },
-    { title: 'TypeScript for AWS', url: 'https://typescript.aws-study-flashcards-app.com', live: true },
-  ],
+  siblings: siblingsOf(meta.id),
   tutorials: [startHere, flashcardPage, statusDashboard, contactForm, studyTracker],
 };
 

@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { PricingIcon } from './Icons';
 import { getEntitlements, openBillingPortal } from '../services/billing';
 import { certifications } from '../data/certifications';
-import { COURSES } from '../data/courses';
+import { COURSES, OTHER_COURSES } from '../data/courses';
 
 // Purchase ids (the token's `certs` claim) to the names the hub shows: certs keep their id,
-// a coding course is bought as `<course id>-for-aws`
+// a Developer Path course is bought as `<course id>-for-aws`, any other course by its `plan`
 const PURCHASE_NAMES = new Map([
   ...certifications.map((c) => [c.id, c.name.replace(/^AWS Certified /, '')]),
   ...COURSES.map((c) => [`${c.id}-for-aws`, c.title]),
+  ...OTHER_COURSES.map((c) => [c.plan, c.title]),
 ]);
 const purchaseName = (id) => PURCHASE_NAMES.get(id) || id;
 

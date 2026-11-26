@@ -1,5 +1,6 @@
 // Bash for AWS: bash.aws-study-flashcards-app.com
 import meta from './meta.json';
+import { siblingsOf } from '../../shared/courseSites';
 import startHere from '../../shared/startHere';
 import serverHealthCheck from './tutorials/01-server-health-check';
 import logDetective from './tutorials/02-log-detective';
@@ -49,11 +50,7 @@ Live at https://www.example.com`,
 - Put the four scripts on your résumé as a "Bash automation" project, linking to your GitHub.
 - Practice for the exam with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com).
 - Continue with [Python for AWS](https://python.aws-study-flashcards-app.com): the language AWS automation runs on, with boto3, Lambda and DynamoDB.`,
-  siblings: [
-    { title: 'Python for AWS', url: 'https://python.aws-study-flashcards-app.com', live: true },
-    { title: 'JavaScript for AWS', url: 'https://js.aws-study-flashcards-app.com', live: true },
-    { title: 'TypeScript for AWS', url: 'https://typescript.aws-study-flashcards-app.com', live: true },
-  ],
+  siblings: siblingsOf(meta.id),
   tutorials: [startHere, serverHealthCheck, logDetective, nightlyBackup, websiteDeploy],
 };
 

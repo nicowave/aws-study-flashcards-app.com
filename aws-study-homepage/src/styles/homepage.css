@@ -2291,6 +2291,11 @@
 .course-mark { font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; }
 .course-go { margin-top: auto; padding-top: 12px; font-weight: 600; color: var(--accent-secondary); }
 .price-was { opacity: 0.6; font-weight: 400; }
+.other-courses { margin-top: 36px; }
+.other-courses-title { margin: 0 0 14px; font-size: 1.15rem; }
+.course-note { margin: 4px 0 0; font-size: 0.85rem; opacity: 0.75; }
+.course-card.coming-soon { cursor: default; }
+.course-card.coming-soon .course-go { color: inherit; opacity: 0.7; }
 .bundle-card { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 22px 26px; border-radius: 14px; border: 1px solid rgba(236, 72, 153, 0.35); background: rgba(236, 72, 153, 0.07); }
 .bundle-card h3 { margin: 6px 0; }
 .bundle-card p { margin: 0; max-width: 60ch; }

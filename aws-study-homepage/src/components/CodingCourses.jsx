@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { startCheckout } from '../services/billing';
 import { currentPromotion, salePrice } from '../services/offers';
-import { COURSES, COURSE_PRICE, BUNDLE_PRICE } from '../data/courses';
+import { COURSES, OTHER_COURSES, COURSE_PRICE, BUNDLE_PRICE } from '../data/courses';
 import { onThisName } from '../config/auth.config';
 
-export { COURSES };
+export { COURSES, OTHER_COURSES };
 
 const Price = ({ price, percent }) => (percent ? (
   <><strong className="mono">{salePrice(price, percent)}</strong> <s className="mono price-was">{price}</s></>
@@ -67,6 +67,32 @@ const CodingCourses = ({ onShowLogin }) => {
         </button>
         {error && <p className="plan-error">{error}</p>}
       </div>
+      {OTHER_COURSES.length > 0 && (
+        <div className="other-courses">
+          <h3 className="other-courses-title">More courses</h3>
+          <div className="cert-grid">
+            {OTHER_COURSES.map((c) => {
+              const body = (
+                <>
+                  <div className="cert-card-header">
+                    <span className="cert-icon course-mark mono" style={{ background: `${c.color}22`, color: c.color }}>{c.mark}</span>
+                    <span className="cert-level" style={{ color: c.color }}>{c.modules} modules · about {c.hours} hours</span>
+                  </div>
+                  <h3 className="cert-name">{c.title}</h3>
+                  <p className="cert-description">{c.blurb}</p>
+                  <p className="cert-price">One-time unlock <Price price={COURSE_PRICE} percent={live?.single} /></p>
+                  <p className="course-note">Not part of the Developer Path bundle.</p>
+                  <span className="course-go">{c.live ? 'Start free →' : 'Coming soon'}</span>
+                </>
+              );
+              // Not live yet: a card, not a link, so nobody lands on a site that doesn't answer
+              return c.live
+                ? <a key={c.id} href={onThisName(c.url)} className="cert-card course-card">{body}</a>
+                : <div key={c.id} className="cert-card course-card coming-soon" aria-label={`${c.title}, coming soon`}>{body}</div>;
+            })}
+          </div>
+        </div>
+      )}
     </section>
   );
 };

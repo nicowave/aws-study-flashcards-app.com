@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { certifications } from './src/data/certifications.js'
-import { COURSES, COURSE_PRICE, BUNDLE_PRICE } from './src/data/courses.js'
+import { COURSES, OTHER_COURSES, COURSE_PRICE, BUNDLE_PRICE } from './src/data/courses.js'
 import { FAQ } from './src/data/faq.js'
 import { GIS_PAGE, GIS_WHY, GIS_COURSES, GIS_FOR, GIS_FAQ, GIS_DISCLAIMER } from './src/data/gis.js'
 import { fileURLToPath } from 'node:url'
@@ -43,6 +43,8 @@ function structuredData() {
       price: c.price,
     })),
     ...COURSES.map((c) => course({ name: c.title, description: c.blurb, url: c.url, price: COURSE_PRICE, hours: c.hours })),
+    // Only live sites: crawlers shouldn't be sent to an address that doesn't answer yet
+    ...OTHER_COURSES.filter((c) => c.live).map((c) => course({ name: c.title, description: c.blurb, url: c.url, price: COURSE_PRICE, hours: c.hours })),
   ]
   return {
     '@context': 'https://schema.org',
@@ -61,6 +63,16 @@ function structuredData() {
       },
     ],
   }
+}
+
+// Courses outside the Developer Path, once their site is live
+function otherCourses() {
+  const items = OTHER_COURSES.filter((c) => c.live).map((c) => `
+        <li><a href="${c.url}"><strong>${esc(c.title)}</strong></a>: ${esc(c.blurb)} ${c.modules} modules, about ${c.hours} hours. ${COURSE_PRICE} once.</li>`).join('')
+  return items ? `
+      <h2>More courses</h2>
+      <ul>${items}
+      </ul>` : ''
 }
 
 // What crawlers that don't run JavaScript (most AI search bots, link previews)
@@ -87,7 +99,7 @@ function staticPage() {
         certification. Practice in your browser, then build it on your own AWS account. The first tutorial of every course is free.
         The Developer Path bundle (all four courses plus the Developer – Associate study game) is ${BUNDLE_PRICE} once.</p>
       <ul>${courseItems}
-      </ul>
+      </ul>${otherCourses()}
       <h2>New: GIS courses</h2>
       <p><a href="/gis/">GIS courses (coming soon)</a>: understand GIS, build open-source web maps, and use GIS in real estate and international development.</p>
       <h2>Questions People Ask</h2>${faqItems}

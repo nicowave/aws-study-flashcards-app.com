@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import CodingCourses, { PromoBanner, COURSES as EXPORTED } from './CodingCourses';
-import { COURSES, COURSE_PRICE, BUNDLE_PRICE } from '../data/courses';
+import CodingCourses, { PromoBanner, COURSES as EXPORTED, OTHER_COURSES as OTHER_EXPORTED } from './CodingCourses';
+import { COURSES, OTHER_COURSES, COURSE_PRICE, BUNDLE_PRICE } from '../data/courses';
 import { certifications } from '../data/certifications';
 import { useAuth } from '../context/AuthContext';
 import { startCheckout } from '../services/billing';
@@ -93,6 +93,50 @@ describe('CodingCourses', () => {
     });
   });
 
+  describe('more courses (outside the Developer Path)', () => {
+    const other = OTHER_COURSES[0];
+    const card = () => screen.getByRole('heading', { name: other.title, level: 3 }).closest('.course-card');
+    const withLive = (live, fn) => { const was = other.live; other.live = live; try { fn(); } finally { other.live = was; } };
+
+    it('re-exports the list and keeps the Developer Path list at four courses', () => {
+      expect(OTHER_EXPORTED).toBe(OTHER_COURSES);
+      expect(OTHER_COURSES.length).toBeGreaterThan(0);
+      expect(COURSES.map((c) => c.id)).not.toContain(other.id);
+    });
+
+    it('shows modules, hours, blurb and price, and says it is not in the bundle', () => {
+      render(<CodingCourses onShowLogin={onShowLogin} />);
+      const c = within(card());
+      expect(c.getByText(`${other.modules} modules · about ${other.hours} hours`)).toBeInTheDocument();
+      expect(c.getByText(other.blurb)).toBeInTheDocument();
+      expect(c.getByText(COURSE_PRICE)).toBeInTheDocument();
+      expect(c.getByText(/not part of the developer path bundle/i)).toBeInTheDocument();
+    });
+
+    it('is a card without a link while its site is not live', () => {
+      withLive(false, () => {
+        render(<CodingCourses onShowLogin={onShowLogin} />);
+        expect(card().tagName).toBe('DIV');
+        expect(within(card()).getByText('Coming soon')).toBeInTheDocument();
+        expect(screen.queryByRole('link', { name: new RegExp(other.title) })).not.toBeInTheDocument();
+      });
+    });
+
+    it('links to its site through onThisName once live', () => {
+      withLive(true, () => {
+        render(<CodingCourses onShowLogin={onShowLogin} />);
+        expect(card()).toHaveAttribute('href', onNewName(other.url));
+        expect(within(card()).getByText(/start free/i)).toBeInTheDocument();
+      });
+    });
+
+    it('takes part in sales like the other courses', () => {
+      at(promo.start + MINUTE);
+      render(<CodingCourses onShowLogin={onShowLogin} />);
+      expect(within(card()).getByText(discounted(COURSE_PRICE, promo.single))).toBeInTheDocument();
+    });
+  });
+
   describe('Developer Path bundle', () => {
     it('offers all four courses plus the Developer Associate game for the bundle price', () => {
       render(<CodingCourses onShowLogin={onShowLogin} />);
@@ -178,7 +222,7 @@ describe('CodingCourses', () => {
       at(promo.teaseFrom + MINUTE);
       const { container } = render(<CodingCourses onShowLogin={onShowLogin} />);
       expect(container.querySelector('s')).toBeNull();
-      expect(screen.getAllByText(COURSE_PRICE)).toHaveLength(COURSES.length);
+      expect(screen.getAllByText(COURSE_PRICE)).toHaveLength(COURSES.length + OTHER_COURSES.length);
       expect(within(bundle()).getByText(BUNDLE_PRICE)).toBeInTheDocument();
     });
 

@@ -1,5 +1,6 @@
 // Python for AWS: python.aws-study-flashcards-app.com
 import meta from './meta.json';
+import { siblingsOf } from '../../shared/courseSites';
 import startHere from '../../shared/startHere';
 import spreadsheetReport from './tutorials/01-spreadsheet-report';
 import awsBill from './tutorials/02-aws-bill';
@@ -48,11 +49,7 @@ Response:
 - Put the four programs on your résumé as a "Python and AWS automation" project, linking to your GitHub.
 - Practice for the exam with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com).
 - Continue with [JavaScript for AWS](https://js.aws-study-flashcards-app.com): web pages, and Lambda functions behind a real sign-in.`,
-  siblings: [
-    { title: 'Bash for AWS', url: 'https://bash.aws-study-flashcards-app.com', live: true },
-    { title: 'JavaScript for AWS', url: 'https://js.aws-study-flashcards-app.com', live: true },
-    { title: 'TypeScript for AWS', url: 'https://typescript.aws-study-flashcards-app.com', live: true },
-  ],
+  siblings: siblingsOf(meta.id),
   tutorials: [startHere, spreadsheetReport, awsBill, uptimeAlerts, uploadPipeline],
 };
 

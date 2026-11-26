@@ -4,6 +4,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { localize } from '../engine/i18n';
 import { tutorialProblems, missingTranslations, parityProblems } from './validate';
+import { COURSE_SITES } from '../shared/courseSites';
 import { Shell } from '../engine/shell/shell';
 import { nodePython } from '../engine/python/nodePython';
 import { nodeRunner, prepareFiles, transpile } from '../engine/js/nodeJs';
@@ -168,6 +169,16 @@ for (const course of COURSES) {
     }
   });
 }
+
+describe('course footers', () => {
+  it('list every other course site, with the URL in its meta.json', () => {
+    expect(COURSE_SITES.map((s) => s.id).sort()).toEqual(COURSES.map((c) => c.id).sort());
+    for (const c of COURSES) {
+      expect(COURSE_SITES.find((s) => s.id === c.id).url).toBe(c.url);
+      expect(c.siblings.map((s) => s.id)).toEqual(COURSE_SITES.filter((s) => s.id !== c.id).map((s) => s.id));
+    }
+  });
+});
 
 describe('Tech Spanish glossary', () => {
   it('uses the current glossary (run node build.mjs in content/tech-spanish after editing it)', () => {

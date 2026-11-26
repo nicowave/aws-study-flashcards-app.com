@@ -5,7 +5,7 @@ import SettingsPage from './components/SettingsPage';
 import ForgotPassword from './components/ForgotPassword';
 import { applyAnalyticsPreference } from './services/analytics';
 import { BILLING_ENABLED, PRO_PRICE_LABEL, PRO_TRIAL_DAYS, getPlan, getProTrialStatus, startCheckout, openBillingPortal } from './services/billing';
-import CodingCourses, { COURSES, PromoBanner } from './components/CodingCourses';
+import CodingCourses, { COURSES, OTHER_COURSES, PromoBanner } from './components/CodingCourses';
 import Faq from './components/Faq';
 import { currentPromotion, salePrice } from './services/offers';
 import ReadinessCheck from './components/ReadinessCheck';
@@ -738,6 +738,9 @@ const Footer = () => (
         <div className="footer-column">
           <h4>Coding courses</h4>
           {COURSES.map((c) => <a key={c.id} href={onThisName(c.url)}>{c.title}</a>)}
+          {OTHER_COURSES.map((c) => (c.live
+            ? <a key={c.id} href={onThisName(c.url)}>{c.title}</a>
+            : <a key={c.id} href={`${BASE}#courses`}>{c.title} (coming soon)</a>))}
           <a href={`${BASE}gis/`}>GIS courses (coming soon)</a>
         </div>
         <div className="footer-column">
