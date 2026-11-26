@@ -21,7 +21,7 @@ Keep answers direct, no fluff.
 | Python for AWS (coding course) | `aws-coding-courses/` (`COURSE=python`) | python.aws-study-flashcards-app.com | `python.aws-study-flashcards-app.com` | `E205DY614C5Q4C` |
 | JavaScript for AWS (coding course) | `aws-coding-courses/` (`COURSE=javascript`) | js.aws-study-flashcards-app.com (javascript. redirects here) | `js.aws-study-flashcards-app.com` | `E1JMSZCG8CKTGT` (redirect: `E27Y7QTYXZD1SM`) |
 | TypeScript for AWS (coding course) | `aws-coding-courses/` (`COURSE=typescript`) | typescript.aws-study-flashcards-app.com | `typescript.aws-study-flashcards-app.com` | `E2HBJJFM265RJL` |
-| Tech Spanish ↔ Tech English (course) | `aws-coding-courses/` (`COURSE=tech-spanish`) | spanish.aws-study-flashcards-app.com (not live yet) | `spanish.aws-study-flashcards-app.com` | `SPANISH_DIST_ID` in `deploy.sh` once created |
+| Tech Spanish ↔ Tech English (course) | `aws-coding-courses/` (`COURSE=tech-spanish`) | spanish.aws-study-flashcards-app.com (not live yet) | `spanish.aws-study-flashcards-app.com` | `ED5TOS0C03S4Z` |
 | Tutorials (static, Cognito-gated) | `~/dev/aws/tutorials-site/site/` | tutorials.aws-study-flashcards-app.com | `tutorials-aws-study-flashcards-app-418272768335` | `E24YKUY1M23PV0` |
 
 Stack: Vite + React for the apps, Cognito for sign-in, DynamoDB + API Gateway/Lambda (`aws-backend/`, CDK) for profiles, progress and payments, S3 + CloudFront hosting. Firebase is fully retired (data archived in `s3://study-hub-archive-418272768335/firebase/`). AWS account `418272768335`, region `us-east-1`.

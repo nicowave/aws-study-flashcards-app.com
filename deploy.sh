@@ -499,7 +499,7 @@ deploy_typescript() {
 # Tech Spanish ↔ Tech English (COURSE=tech-spanish). Its site is made by
 # scripts/create-course-site.mjs, which prints the CloudFront id: write it in
 # SPANISH_DIST_ID. Until then the id is looked up by the site's name.
-SPANISH_DIST_ID=""
+SPANISH_DIST_ID="ED5TOS0C03S4Z"
 spanish_dist_id() {
     if [ -n "$SPANISH_DIST_ID" ]; then
         echo "$SPANISH_DIST_ID"
