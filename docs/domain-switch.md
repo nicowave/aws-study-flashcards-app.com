@@ -21,7 +21,7 @@ On purpose. One build is served under both names during the move (see CLAUDE.md,
 
 | # | Step | Who | State |
 |---|---|---|---|
-| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] in progress (6 of 11 answered) |
+| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] in progress (7 of 11 answered) |
 | 2 | `deploy.sh` prints the new names | Code | [ ] |
 | 3 | Backend fallback, email links, UTM matching; `cdk deploy` | Code + Owner | [ ] |
 | 4 | Stripe, Google, Search Console, GA4 settings | Owner | [ ] |
@@ -57,10 +57,7 @@ These block step 8. Each has the read-only check that answers it; run them on th
   Old-name subdomains use the wildcard certificate `…/9c5abd7d…`, the old apex its own; every new-name distribution uses one certificate `…/57ec786c…` (covers `levelupstudyhub.com` and `*.levelupstudyhub.com`). Keep all of them.
   - **`deploy.sh` only invalidates the old-name distributions.** Non-hashed files (`robots.txt`, `sitemap.xml`, `terms.html`, share images) are uploaded with a one-year `Cache-Control`. A live check on 2026-11-26 found the same files on both hub names (same ETag; the new distribution answered `RefreshHit`, so it revalidates today), but nothing guarantees it. Step 2 adds the new IDs to every invalidation.
   - **`ED9BTUZG465V` has no alias** and uses the old apex certificate. It serves no name; find out what it was (probably an earlier hub) before deciding to disable it. Not part of this plan.
-- [ ] **Where the existing `www.levelupstudyhub.com` → apex function lives.** A cache behavior holds one viewer-request function, so the old-host logic may have to merge into it.
-  ```bash
-  aws cloudfront list-functions --query "FunctionList.Items[].{name:Name,stage:FunctionMetadata.Stage}" --output table
-  ```
+- [x] **Where the existing `www.levelupstudyhub.com` → apex function lives.** Answered 2026-11-27 by inference: only the new hub distribution `EQQAL9UJ4QD8M` has the `www.levelupstudyhub.com` alias, and that host answers `301` with `x-cache: FunctionGeneratedResponse`, so the function sits on a **new-name** distribution. The old-host function goes on old-name distributions only, so the two never share a cache behavior and nothing has to merge. One thing left for step 8, when the owner is in AWS anyway: confirm no old-name distribution already has a viewer-request function (`aws cloudfront list-functions`, then each distribution's behaviors).
 - [x] **The deployed Cognito web client lists the new callbacks.** Answered 2026-11-26 (`describe-user-pool-client` on client `8att6q0026f6sb44qn4il7tu8`): it lists `/` and `/next/` for `levelupstudyhub.com` and its `cloud.`, `ai.`, `architect.`, `developer.`, `bash.`, `python.`, `js.` and `typescript.` subdomains, next to every old-name entry (including `saa.` and `dva.`) and `localhost:5173-5175`. Google sign-in on the new names is ready. Tutorials uses a different client (`tutorials-nicotek`), checked separately below.
 - [x] **The HTTP API CORS allows the new origins.** Answered 2026-11-27 from the cloud session with CORS preflights (`OPTIONS /v1/me` with an `Origin` header): the API answers `access-control-allow-origin` for `levelupstudyhub.com` and all eight new subdomains, still for the old hub, and not for a foreign origin. No AWS access needed.
 - [x] **Every new host answers 200.** Answered 2026-11-27 from the cloud session: the apex, `cloud.`, `ai.`, `architect.`, `developer.`, `bash.`, `python.`, `js.` and `typescript.levelupstudyhub.com` return 200 and serve the **same bundle** as their old-name twin (e.g. hub `index-Cr3BZU_t.js` on both). `tutorials.` returns 302 to its Cognito login, as expected.
