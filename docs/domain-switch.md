@@ -21,7 +21,7 @@ On purpose. One build is served under both names during the move (see CLAUDE.md,
 
 | # | Step | Who | State |
 |---|---|---|---|
-| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] in progress (3 of 11 answered) |
+| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] in progress (6 of 11 answered) |
 | 2 | `deploy.sh` prints the new names | Code | [ ] |
 | 3 | Backend fallback, email links, UTM matching; `cdk deploy` | Code + Owner | [ ] |
 | 4 | Stripe, Google, Search Console, GA4 settings | Owner | [ ] |
@@ -62,23 +62,14 @@ These block step 8. Each has the read-only check that answers it; run them on th
   aws cloudfront list-functions --query "FunctionList.Items[].{name:Name,stage:FunctionMetadata.Stage}" --output table
   ```
 - [x] **The deployed Cognito web client lists the new callbacks.** Answered 2026-11-26 (`describe-user-pool-client` on client `8att6q0026f6sb44qn4il7tu8`): it lists `/` and `/next/` for `levelupstudyhub.com` and its `cloud.`, `ai.`, `architect.`, `developer.`, `bash.`, `python.`, `js.` and `typescript.` subdomains, next to every old-name entry (including `saa.` and `dva.`) and `localhost:5173-5175`. Google sign-in on the new names is ready. Tutorials uses a different client (`tutorials-nicotek`), checked separately below.
-- [ ] **The HTTP API CORS allows the new origins** (`study-hub-stack.ts:258`).
-  ```bash
-  aws apigatewayv2 get-api --api-id vaj7alg0f6 --query "CorsConfiguration.AllowOrigins"
-  ```
-- [ ] **Every new host answers 200.** From this cloud session only the apex and `cloud.` could be reached.
-  ```bash
-  for h in "" cloud. ai. architect. developer. bash. python. js. typescript. tutorials.; do printf '%-14s ' "${h:-apex}"; curl -s -o /dev/null -w '%{http_code}\n' "https://${h}levelupstudyhub.com/"; done
-  ```
-- [ ] **Tutorials on the new name.** `tutorials.levelupstudyhub.com` exists and is a callback in the `tutorials-nicotek` Cognito client. Its viewer-request slot is the Lambda@Edge auth function, so its redirect goes inside `~/dev/aws/tutorials-site/edge/index.mjs`, not in the CloudFront Function.
+- [x] **The HTTP API CORS allows the new origins.** Answered 2026-11-27 from the cloud session with CORS preflights (`OPTIONS /v1/me` with an `Origin` header): the API answers `access-control-allow-origin` for `levelupstudyhub.com` and all eight new subdomains, still for the old hub, and not for a foreign origin. No AWS access needed.
+- [x] **Every new host answers 200.** Answered 2026-11-27 from the cloud session: the apex, `cloud.`, `ai.`, `architect.`, `developer.`, `bash.`, `python.`, `js.` and `typescript.levelupstudyhub.com` return 200 and serve the **same bundle** as their old-name twin (e.g. hub `index-Cr3BZU_t.js` on both). `tutorials.` returns 302 to its Cognito login, as expected.
+- [ ] **Tutorials on the new name.** Half answered 2026-11-27: `tutorials.levelupstudyhub.com` exists, and its Lambda@Edge already sends visitors to the `tutorials-nicotek` login with `redirect_uri=https://tutorials.levelupstudyhub.com/callback`. Still to check (the cloud session can't reach the Cognito login host): open https://tutorials.levelupstudyhub.com in a browser. A login page means the callback is registered; an error page mentioning `redirect_mismatch` means it must be added to the `tutorials-nicotek` client. Its redirect goes inside `~/dev/aws/tutorials-site/edge/index.mjs`, not in the CloudFront Function, because its viewer-request slot already holds that Lambda@Edge.
 - [x] **Leftover aliases.** Answered 2026-11-26: `www.aws-study-flashcards-app.com` and `javascript.levelupstudyhub.com` don't exist (no distribution has them). `saa.` and `dva.` are still aliases on the Architect and Developer old-name distributions, so the function maps them to `architect.` and `developer.levelupstudyhub.com`.
-- [ ] **How the `javascript.` redirect is built.** Check whether its bucket uses `RedirectAllRequestsTo` and whether path and query survive.
-  ```bash
-  aws s3api get-bucket-website --bucket javascript.aws-study-flashcards-app.com
-  ```
+- [x] **How the `javascript.` redirect is built.** Answered 2026-11-27 (live): `https://javascript.aws-study-flashcards-app.com/some/path?a=1&b=2` → `301` from `server: AmazonS3` (an S3 website redirect behind `E27Y7QTYXZD1SM`) to `https://js.aws-study-flashcards-app.com/some/path`. It **keeps the path but drops the query string**. Step 7 points it at `js.levelupstudyhub.com`; losing the query there is acceptable (nobody links to `javascript.` with tracking tags), or the old-host CloudFront Function can take over this host too and keep the query.
 - [ ] **Local overrides.** Do the Mac's `.env` files set `VITE_COGNITO_AUTH_URL` or other host overrides? Only `.env.example` is in the repo.
 - [ ] **Google OAuth app status.** If the app is verified, adding `levelupstudyhub.com` as an authorized domain needs the Search Console property verified first.
-- [ ] **http → https** on both names (expect a redirect to https).
+- [ ] **http → https** on both names (expect a redirect to https). The cloud session can't make plain-http requests; run `curl -sI http://levelupstudyhub.com/x?a=1` and the same for the old name on the Mac.
 
 ## Owner decisions
 
