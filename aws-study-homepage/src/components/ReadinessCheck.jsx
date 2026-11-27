@@ -87,14 +87,16 @@ const ReadinessCheck = () => {
   const [copied, setCopied] = useState(false);
   const sectionRef = useRef(null);
 
-  // Bring the check into view below the sticky header (tall on phones)
-  const scrollToCheck = () => {
+  // Bring the check into view below the sticky header (tall on phones). Wait for the web fonts first: when they
+  // arrive the header can wrap onto fewer rows, and a scroll measured before that ends with the card under it.
+  const scrollToCheck = () => Promise.resolve(document.fonts?.ready).then(() => {
     const el = sectionRef.current;
     if (!el) return;
     const header = document.querySelector('header');
     const offset = header && getComputedStyle(header).position === 'sticky' ? header.offsetHeight : 0;
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
-  };
+    // No behavior given: the page's scroll-behavior decides, smooth unless the visitor asked for reduced motion
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset });
+  });
 
   const start = async (c) => {
     setError('');

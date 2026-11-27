@@ -910,4 +910,61 @@ describe('App', () => {
       expect(screen.getByRole('heading', { name: 'Welcome Back' })).toBeInTheDocument();
     });
   });
+
+  // The header wraps onto one to three rows, so its height is measured, never assumed: html's scroll-padding-top
+  // (global.css) reads --hub-header-height, and every jump and keyboard-focus scroll stops below the header.
+  describe('room below the sticky header', () => {
+    let headerHeight;
+    const root = document.documentElement;
+    const published = () => root.style.getPropertyValue('--hub-header-height');
+    beforeEach(() => {
+      headerHeight = 71;
+      // jsdom has no layout: give the header a height and everything else none
+      vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function rect() {
+        const height = this.tagName === 'HEADER' ? headerHeight : 0;
+        return { top: 0, bottom: height, left: 0, right: 0, width: 0, height, x: 0, y: 0, toJSON() {} };
+      });
+    });
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      root.style.removeProperty('--hub-header-height');
+    });
+
+    it('publishes the header height, follows it when the header re-wraps, and stops watching when it goes away', () => {
+      const observers = [];
+      vi.stubGlobal('ResizeObserver', class {
+        constructor(callback) { this.callback = callback; this.watched = []; this.live = true; observers.push(this); }
+        observe(el) { this.watched.push(el); }
+        disconnect() { this.live = false; }
+      });
+      const { unmount } = render(<App />);
+      expect(published()).toBe('71px');
+      const watcher = observers.find((o) => o.live && o.watched.includes(header()));
+      expect(watcher).toBeDefined();
+
+      headerHeight = 151; // signed in on a laptop: two rows
+      act(() => watcher.callback([]));
+      expect(published()).toBe('151px');
+
+      unmount();
+      expect(observers.filter((o) => o.watched.length).every((o) => !o.live)).toBe(true);
+    });
+
+    it('still publishes the height once in a browser without ResizeObserver', () => {
+      vi.stubGlobal('ResizeObserver', undefined);
+      render(<App />);
+      expect(published()).toBe('71px');
+    });
+
+    it('Settings → "See plans" leaves the motion to the page, so reduced-motion visitors get no glide', async () => {
+      signIn();
+      const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(() => {});
+      render(<App />);
+      await userEvent.click(within(header()).getByRole('button', { name: 'Settings' }));
+      expect(await screen.findByText(/Your plan:/)).toHaveTextContent('Free');
+      await userEvent.click(screen.getByRole('button', { name: 'See plans' }));
+      await waitFor(() => expect(scrolled.mock.contexts.some((el) => el.id === 'plans')).toBe(true));
+      for (const [options] of scrolled.mock.calls) expect(options?.behavior).toBeUndefined();
+    });
+  });
 });
