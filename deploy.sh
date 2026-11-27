@@ -642,65 +642,89 @@ deploy_newsletter() {
     print_success "Issues uploaded. They go out Tuesdays at 9:00 Eastern."
 }
 
+# run_site <key> <function>: deploy one site and remember how it ended, for the summary of "all"
+run_site() {
+    if "$2"; then
+        site_status[$1]=ok
+    else
+        site_status[$1]=failed
+        failed=$((failed + 1))
+    fi
+}
+
+# summary_line <key> <label and address>: a failed site must not look deployed
+summary_line() {
+    case "${site_status[$1]}" in
+        ok) echo "  ${GREEN}✓${NC} $2" ;;
+        skipped) echo "  - $2  (skipped)" ;;
+        *) echo "  ${RED}✗ $2  NOT deployed: still the previous version${NC}" ;;
+    esac
+}
+
 deploy_all() {
     print_header "Deploying ALL Sites"
     
     local start_time=$(date +%s)
     local failed=0
+    typeset -A site_status
     
-    deploy_hub || failed=$((failed + 1))
+    run_site hub deploy_hub
     echo ""
-    deploy_cloud || failed=$((failed + 1))
+    run_site cloud deploy_cloud
     echo ""
-    deploy_ai || failed=$((failed + 1))
+    run_site ai deploy_ai
     echo ""
-    deploy_saa || failed=$((failed + 1))
+    run_site saa deploy_saa
     echo ""
-    deploy_dva || failed=$((failed + 1))
+    run_site dva deploy_dva
     echo ""
-    deploy_bash || failed=$((failed + 1))
+    run_site bash deploy_bash
     echo ""
-    deploy_python || failed=$((failed + 1))
+    run_site python deploy_python
     echo ""
-    deploy_js || failed=$((failed + 1))
+    run_site js deploy_js
     echo ""
-    deploy_typescript || failed=$((failed + 1))
+    run_site typescript deploy_typescript
     echo ""
     local spanish_id
     spanish_id=$(spanish_dist_id)
     if [ -n "$spanish_id" ]; then
-        deploy_spanish || failed=$((failed + 1))
+        run_site spanish deploy_spanish
     else
+        site_status[spanish]=skipped
         print_info "Skipping Tech Spanish: its site isn't created yet (scripts/create-course-site.mjs)"
     fi
     echo ""
-    deploy_tutorials || failed=$((failed + 1))
+    run_site tutorials deploy_tutorials
 
     local end_time=$(date +%s)
     local duration=$((end_time - start_time))
 
-    print_header "Deployment Complete!"
-    echo ""
     if [ $failed -eq 0 ]; then
+        print_header "Deployment Complete!"
+        echo ""
         print_success "All sites deployed successfully in ${duration} seconds"
     else
-        print_error "$failed deployment(s) failed"
+        print_header "Deployment finished with failures"
+        echo ""
+        print_error "$failed deployment(s) failed: scroll up to each site's first ✗ for the reason"
     fi
     echo ""
-    echo "  🌐 Hub:   https://levelupstudyhub.com"
-    echo "  ☁️  Cloud: https://cloud.levelupstudyhub.com"
-    echo "  🤖 AI:    https://ai.levelupstudyhub.com"
-    echo "  🏗️  Architect: https://architect.levelupstudyhub.com"
-    echo "  👨‍💻 Developer: https://developer.levelupstudyhub.com"
-    echo "  💲 Bash:  https://bash.levelupstudyhub.com"
-    echo "  🐍 Python: https://python.levelupstudyhub.com"
-    echo "  🟨 JavaScript: https://js.levelupstudyhub.com"
-    echo "  🔷 TypeScript: https://typescript.levelupstudyhub.com"
-    echo "  ñ  Tech Spanish: https://spanish.aws-study-flashcards-app.com"
-    echo "  📚 Tuts:  https://tutorials.levelupstudyhub.com"
+    summary_line hub "🌐 Hub:   https://levelupstudyhub.com"
+    summary_line cloud "☁️  Cloud: https://cloud.levelupstudyhub.com"
+    summary_line ai "🤖 AI:    https://ai.levelupstudyhub.com"
+    summary_line saa "🏗️  Architect: https://architect.levelupstudyhub.com"
+    summary_line dva "👨‍💻 Developer: https://developer.levelupstudyhub.com"
+    summary_line bash "💲 Bash:  https://bash.levelupstudyhub.com"
+    summary_line python "🐍 Python: https://python.levelupstudyhub.com"
+    summary_line js "🟨 JavaScript: https://js.levelupstudyhub.com"
+    summary_line typescript "🔷 TypeScript: https://typescript.levelupstudyhub.com"
+    summary_line spanish "ñ  Tech Spanish: https://spanish.aws-study-flashcards-app.com"
+    summary_line tutorials "📚 Tuts:  https://tutorials.levelupstudyhub.com"
     echo ""
     print_info "CloudFront invalidations may take 1-2 minutes to propagate"
     echo ""
+    [ $failed -eq 0 ] || return 1  # a failed site makes "all" exit non-zero
 }
 
 # =============================================================================
