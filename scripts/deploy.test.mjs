@@ -121,7 +121,9 @@ test('spanish: one distribution and the old-name address until its new-name site
 test('all: every site once, the javascript. redirect never, and a summary on the new name', { skip }, () => {
   const r = deploy('all');
   assert.equal(r.status, 0, r.output);
+  assert.match(r.output, /Deployment Complete!/);
   assert.match(r.output, /All sites deployed successfully/);
+  assert.doesNotMatch(r.output, /NOT deployed/);
   assert.deepEqual(r.buckets.sort(), [...SITES, SPANISH].map((s) => s.bucket).sort());
   const expected = [...SITES.flatMap((s) => [[s.oldDist, '/*'], [s.newDist, '/*']]), [SPANISH.oldDist, '/*']];
   const byId = (a, b) => a[0].localeCompare(b[0]);
@@ -155,6 +157,21 @@ test('all: a failed invalidation counts as one failed deployment and the other s
   assert.match(r.output, /1 deployment\(s\) failed/);
   assert.doesNotMatch(r.output, /All sites deployed successfully/);
   assert.equal(r.invalidations.length, SITES.length * 2 + 1);
+});
+
+// Regression: the summary listed every address under "Deployment Complete!" even when sites had failed
+test('all: the summary marks a failed site as not deployed, and the run exits non-zero', { skip }, () => {
+  const cloud = site('cloud');
+  const r = deploy('all', { fail: cloud.newDist });
+  assert.notEqual(r.status, 0);
+  assert.doesNotMatch(r.output, /Deployment Complete!/);
+  const summary = r.output.slice(r.output.indexOf('Deployment finished with failures')).split('\n').filter((l) => l.includes('https://'));
+  assert.equal(summary.length, SITES.length + 1);
+  for (const line of summary) {
+    const failed = line.includes(`${cloud.url} `);
+    assert.equal(/NOT deployed/.test(line), failed, line);
+    assert.equal(line.includes('✓'), !failed, line);
+  }
 });
 
 test('next: test builds go to the same buckets and clear /next/ on both distributions', { skip }, () => {
