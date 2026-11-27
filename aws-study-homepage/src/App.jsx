@@ -1087,6 +1087,26 @@ function HomepageContent() {
     }
   }, [isAuthenticated, currentPage]);
 
+  // A bookmark or a link can open the hub at a section (/#plans). The sections only exist once React has drawn
+  // them, after the browser looked for the #hash and found nothing, so jump there once ourselves: after the fonts
+  // have settled the header's height, and only if the visitor has not scrolled in the meantime.
+  // #readiness is left to ReadinessCheck, which already handles it. A reload or Back/Forward is left to the
+  // browser's own scroll restore: jumping to the section there would throw away the place the visitor had reached.
+  useEffect(() => {
+    const visit = performance.getEntriesByType?.('navigation')?.[0]?.type;
+    if (visit === 'reload' || visit === 'back_forward') return undefined;
+    let id = '';
+    try { id = decodeURIComponent(window.location.hash.slice(1)); } catch { return undefined; }
+    const section = id && id !== 'readiness' ? document.getElementById(id) : null;
+    if (!section || section.tagName !== 'SECTION') return undefined;
+    let cancelled = false;
+    const twoFrames = (fn) => requestAnimationFrame(() => requestAnimationFrame(fn));
+    twoFrames(() => Promise.resolve(document.fonts?.ready).then(() => twoFrames(() => {
+      if (!cancelled && window.scrollY === 0) section.scrollIntoView({ block: 'start' });
+    })));
+    return () => { cancelled = true; };
+  }, []);
+
   const handleNavigateSettings = () => {
     if (isAuthenticated) {
       setCurrentPage('settings');

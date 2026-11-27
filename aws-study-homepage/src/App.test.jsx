@@ -967,4 +967,82 @@ describe('App', () => {
       for (const [options] of scrolled.mock.calls) expect(options?.behavior).toBeUndefined();
     });
   });
+
+  // The sections are drawn after the browser has looked for the #hash, so the page jumps there itself, once.
+  describe('opening the page at a section (/#plans)', () => {
+    let scrolled;
+    beforeEach(() => {
+      scrolled = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(() => {});
+    });
+    const jumpedTo = () => scrolled.mock.contexts.map((el) => el.id);
+    // Longer than the two frames + fonts + two frames the page waits before jumping
+    const settle = () => act(() => new Promise((resolve) => { setTimeout(resolve, 150); }));
+    // jsdom has no navigation timing; stand one in for a reload or a Back/Forward visit
+    const visitType = (type) => {
+      const real = Object.getOwnPropertyDescriptor(performance, 'getEntriesByType');
+      Object.defineProperty(performance, 'getEntriesByType', {
+        configurable: true, writable: true, value: (kind) => (kind === 'navigation' ? [{ type }] : []),
+      });
+      return () => (real ? Object.defineProperty(performance, 'getEntriesByType', real) : delete performance.getEntriesByType);
+    };
+
+    it.each(['certifications', 'courses', 'about', 'plans', 'faq', 'resources', 'newsletter'])(
+      'lands on #%s, from its top, once',
+      async (id) => {
+        go(`/#${id}`);
+        render(<App />);
+        await waitFor(() => expect(jumpedTo()).toContain(id));
+        await settle();
+        expect(jumpedTo()).toEqual([id]);
+        expect(scrolled.mock.calls[0][0]).toEqual({ block: 'start' });
+      },
+    );
+
+    it.each([
+      ['a name that is not on the page', '/#nothing-here'],
+      ['#readiness, which the readiness check scrolls to itself', '/#readiness'],
+      ['a broken address', '/#%E0%A4%A'],
+      ['no hash at all', '/'],
+    ])('does nothing for %s', async (_, path) => {
+      go(path);
+      render(<App />);
+      await settle();
+      expect(jumpedTo()).toEqual([]);
+    });
+
+    it('does nothing when the visitor has already scrolled', async () => {
+      go('/#plans');
+      Object.defineProperty(window, 'scrollY', { configurable: true, writable: true, value: 400 });
+      try {
+        render(<App />);
+        await settle();
+        expect(jumpedTo()).toEqual([]);
+      } finally {
+        Object.defineProperty(window, 'scrollY', { configurable: true, writable: true, value: 0 });
+      }
+    });
+
+    it.each(['reload', 'back_forward'])("leaves a %s visit to the browser's own scroll restore", async (type) => {
+      go('/#plans');
+      const restore = visitType(type);
+      try {
+        render(<App />);
+        await settle();
+        expect(jumpedTo()).toEqual([]);
+      } finally {
+        restore();
+      }
+    });
+
+    it('still lands on the section after a link from another page (a plain visit)', async () => {
+      go('/#plans');
+      const restore = visitType('navigate');
+      try {
+        render(<App />);
+        await waitFor(() => expect(jumpedTo()).toEqual(['plans']));
+      } finally {
+        restore();
+      }
+    });
+  });
 });
