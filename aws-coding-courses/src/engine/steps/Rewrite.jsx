@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Markdown from '../Markdown';
 import { useT } from '../i18n';
-import { checkRewrite } from './rewrite';
+import { checkRewrite } from './rewriteCheck';
 
 const read = (key) => { try { return localStorage.getItem(key) || ''; } catch { return ''; } };
 const write = (key, v) => { try { localStorage.setItem(key, v); } catch { /* private mode */ } };
