@@ -21,7 +21,7 @@ On purpose. One build is served under both names during the move (see CLAUDE.md,
 
 | # | Step | Who | State |
 |---|---|---|---|
-| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] in progress (9 of 11 answered) |
+| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] in progress (10 of 11 answered; the last one, the Google OAuth app status, only matters for step 4) |
 | 2 | `deploy.sh` prints the new names | Code | [ ] |
 | 3 | Backend fallback, email links, UTM matching; `cdk deploy` | Code + Owner | [ ] |
 | 4 | Stripe, Google, Search Console, GA4 settings | Owner | [ ] |
@@ -64,7 +64,7 @@ These block step 8. Each has the read-only check that answers it; run them on th
 - [x] **Tutorials on the new name.** Answered 2026-11-27: `tutorials.levelupstudyhub.com` exists, its Lambda@Edge sends visitors to the `tutorials-nicotek` login with `redirect_uri=https://tutorials.levelupstudyhub.com/callback`, and the owner's browser shows the Cognito sign-in form for that address (Cognito shows an error page instead when a callback isn't registered), so the callback is registered. For step 8: the old tutorials host gets its redirect inside `~/dev/aws/tutorials-site/edge/index.mjs`, not in the CloudFront Function, because its viewer-request slot already holds that Lambda@Edge.
 - [x] **Leftover aliases.** Answered 2026-11-26: `www.aws-study-flashcards-app.com` and `javascript.levelupstudyhub.com` don't exist (no distribution has them). `saa.` and `dva.` are still aliases on the Architect and Developer old-name distributions, so the function maps them to `architect.` and `developer.levelupstudyhub.com`.
 - [x] **How the `javascript.` redirect is built.** Answered 2026-11-27 (live): `https://javascript.aws-study-flashcards-app.com/some/path?a=1&b=2` → `301` from `server: AmazonS3` (an S3 website redirect behind `E27Y7QTYXZD1SM`) to `https://js.aws-study-flashcards-app.com/some/path`. It **keeps the path but drops the query string**. Step 7 points it at `js.levelupstudyhub.com`; losing the query there is acceptable (nobody links to `javascript.` with tracking tags), or the old-host CloudFront Function can take over this host too and keep the query.
-- [ ] **Local overrides.** Do the Mac's `.env` files set `VITE_COGNITO_AUTH_URL` or other host overrides? Only `.env.example` is in the repo.
+- [x] **Local overrides.** Answered 2026-11-27 (owner's Mac, repo root): `grep -n "VITE_COGNITO_AUTH_URL\|VITE_API_BASE_URL" */.env*` (minus `.env.example`) prints nothing. Those are the only two build-time variables that carry a host (the others the apps read are `VITE_COGNITO_CLIENT_ID`, `VITE_BILLING_ENABLED` and the price labels), so every local build uses the defaults in `auth.config.js`.
 - [ ] **Google OAuth app status.** If the app is verified, adding `levelupstudyhub.com` as an authorized domain needs the Search Console property verified first.
 - [x] **http → https** on both names. Answered 2026-11-27 (owner's Mac, `curl -sI`): `http://levelupstudyhub.com/x?a=1` → `301`, `Location: https://levelupstudyhub.com/x?a=1`; `http://aws-study-flashcards-app.com/x?a=1` → `301`, `Location: https://aws-study-flashcards-app.com/x?a=1`. Same host, path and query kept (CloudFront's built-in redirect to HTTPS). So an `http://` visit to an old host will take two hops after switch day: to https on the old host, then to the new host.
 
