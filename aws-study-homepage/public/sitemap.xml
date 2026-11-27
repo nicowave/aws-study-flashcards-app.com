@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- This site's pages only. Each study game and course site has its own robots.txt and sitemap.xml. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://aws-study-flashcards-app.com/</loc><lastmod>2026-10-30</lastmod></url>
-  <url><loc>https://aws-study-flashcards-app.com/terms.html</loc><lastmod>2026-09-01</lastmod></url>
-  <url><loc>https://aws-study-flashcards-app.com/privacy.html</loc><lastmod>2026-09-01</lastmod></url>
+  <url><loc>https://levelupstudyhub.com/</loc><lastmod>2026-11-27</lastmod></url>
+  <url><loc>https://levelupstudyhub.com/gis/</loc><lastmod>2026-11-27</lastmod></url>
+  <url><loc>https://levelupstudyhub.com/terms.html</loc><lastmod>2026-11-20</lastmod></url>
+  <url><loc>https://levelupstudyhub.com/privacy.html</loc><lastmod>2026-11-20</lastmod></url>
 </urlset>

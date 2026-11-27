@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import { localize } from '../engine/i18n';
 import { tutorialProblems, missingTranslations, parityProblems } from './validate';
 import { COURSE_SITES } from '../shared/courseSites';
+import { onThisName } from '../config/auth.config';
 import { Shell } from '../engine/shell/shell';
 import { nodePython } from '../engine/python/nodePython';
 import { nodeRunner, prepareFiles, transpile } from '../engine/js/nodeJs';
@@ -177,6 +178,33 @@ describe('course footers', () => {
       expect(COURSE_SITES.find((s) => s.id === c.id).url).toBe(c.url);
       expect(c.siblings.map((s) => s.id)).toEqual(COURSE_SITES.filter((s) => s.id !== c.id).map((s) => s.id));
     }
+  });
+
+  const liveSites = COURSE_SITES.filter((s) => s.live);
+  const spanish = COURSE_SITES.find((s) => s.id === 'tech-spanish');
+
+  it('are written with the public name, except Tech Spanish, which only has the old one', () => {
+    expect(liveSites.map((s) => s.id)).toEqual(['bash-for-aws', 'python-for-aws', 'javascript-for-aws', 'typescript-for-aws']);
+    expect(liveSites.map((s) => s.url)).toEqual([
+      'https://bash.levelupstudyhub.com',
+      'https://python.levelupstudyhub.com',
+      'https://js.levelupstudyhub.com',
+      'https://typescript.levelupstudyhub.com',
+    ]);
+    expect(spanish.url).toBe('https://spanish.aws-study-flashcards-app.com');
+  });
+
+  it('keep a visitor on the name they opened', () => {
+    for (const s of liveSites) {
+      const sub = new URL(s.url).hostname.split('.')[0];
+      expect(onThisName(s.url, 'bash.aws-study-flashcards-app.com')).toBe(`https://${sub}.aws-study-flashcards-app.com`);
+      expect(onThisName(s.url, 'bash.levelupstudyhub.com')).toBe(s.url);
+    }
+  });
+
+  it('leave the Tech Spanish link as written on both names', () => {
+    expect(onThisName(spanish.url, 'bash.aws-study-flashcards-app.com')).toBe(spanish.url);
+    expect(onThisName(spanish.url, 'bash.levelupstudyhub.com')).toBe(spanish.url);
   });
 });
 

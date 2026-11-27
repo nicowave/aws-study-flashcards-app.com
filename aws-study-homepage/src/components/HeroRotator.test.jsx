@@ -4,10 +4,10 @@ import userEvent from '@testing-library/user-event';
 import HeroRotator from './HeroRotator';
 import { HERO_SLIDES } from '../data/heroSlides';
 
-// Pretend the page was opened on the new name, so we can see links go through onThisName.
+// Pretend the page was opened on a third name, so a link written with either name shows it went through onThisName.
 vi.mock('../config/auth.config', async (importOriginal) => ({
   ...(await importOriginal()),
-  onThisName: (url) => url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com'),
+  onThisName: (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example'),
 }));
 
 const BASE = import.meta.env.BASE_URL;
@@ -15,7 +15,7 @@ const ADVANCE_MS = 8000; // how long each headline shows (HeroRotator.jsx)
 const total = HERO_SLIDES.length;
 const titleOf = (s) => `${s.before}${s.highlight}${s.after}`;
 const hrefOf = (href) => {
-  if (href.startsWith('https://')) return href.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com');
+  if (href.startsWith('https://')) return href.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example');
   if (href.startsWith('/')) return `${BASE}${href.slice(1)}`;
   return href;
 };
@@ -91,7 +91,7 @@ describe('HeroRotator', () => {
       render(<HeroRotator />);
       const aws = HERO_SLIDES[0].actions.find((a) => a.href.startsWith('https://'));
       expect(screen.getByRole('link', { name: aws.label })).toHaveAttribute('href', hrefOf(aws.href));
-      expect(hrefOf(aws.href)).toContain('levelupstudyhub.com');
+      expect(hrefOf(aws.href)).toContain('page-name.example');
     });
   });
 

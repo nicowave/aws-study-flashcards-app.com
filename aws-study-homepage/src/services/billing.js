@@ -78,8 +78,8 @@ export const getProTrialStatus = async () => {
 /** Opens the Stripe customer portal (manage / cancel / invoices). */
 export const openBillingPortal = async () => {
   // Come back to the hub on the name the member opened (on the old name that is the old hub, as
-  // before). The server accepts only listed Study Hub addresses and otherwise uses the old hub.
-  const { data } = await callFunction('createPortalSession', { returnUrl: onThisName('https://aws-study-flashcards-app.com') });
+  // before). The server accepts only listed Study Hub addresses and otherwise uses its own default.
+  const { data } = await callFunction('createPortalSession', { returnUrl: onThisName('https://levelupstudyhub.com') });
   if (data?.url) {
     window.location.assign(data.url);
   } else {

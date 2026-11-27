@@ -7,14 +7,15 @@ import { certifications } from '../data/certifications';
 import { useAuth } from '../context/AuthContext';
 import { startCheckout } from '../services/billing';
 import { PROMOTIONS } from '../services/offers';
+import { SITE_SUBDOMAINS } from '../config/auth.config';
 
 vi.mock('../context/AuthContext', () => ({ useAuth: vi.fn() }));
 // Billing is the money boundary: never reach Stripe.
 vi.mock('../services/billing', () => ({ startCheckout: vi.fn() }));
-// Pretend the page was opened on the new name, so we can see links go through onThisName.
+// Pretend the page was opened on a third name, so a link written with either name shows it went through onThisName.
 vi.mock('../config/auth.config', async (importOriginal) => ({
   ...(await importOriginal()),
-  onThisName: (url) => url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com'),
+  onThisName: (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example'),
 }));
 
 const [promo] = PROMOTIONS;
@@ -29,7 +30,7 @@ const discounted = (price, percent) => {
   const c = cents(price);
   return `$${((c - Math.round((c * percent) / 100)) / 100).toFixed(2)}`;
 };
-const onNewName = (url) => url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com');
+const onPageName = (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example');
 
 const signedIn = (yes) => vi.mocked(useAuth).mockReturnValue({ isAuthenticated: yes, user: yes ? { email: 'a@example.com' } : null });
 const courseCard = (title) => screen.getByRole('heading', { name: title, level: 3 }).closest('a');
@@ -74,15 +75,24 @@ describe('CodingCourses', () => {
 
     it.each(COURSES.map((c) => [c.title, c]))('%s: the whole card links to its site through onThisName', (_, c) => {
       render(<CodingCourses onShowLogin={onShowLogin} />);
-      expect(courseCard(c.title)).toHaveAttribute('href', onNewName(c.url));
+      expect(courseCard(c.title)).toHaveAttribute('href', onPageName(c.url));
     });
 
     it('keeps each course on its own site with whole tutorial and hour counts', () => {
       expect(new Set(COURSES.map((c) => c.url)).size).toBe(COURSES.length);
       for (const c of COURSES) {
-        expect(c.url).toMatch(/^https:\/\/[a-z]+\.aws-study-flashcards-app\.com$/);
+        expect(c.url).toMatch(/^https:\/\/[a-z]+\.levelupstudyhub\.com$/);
         expect(Number.isInteger(c.tutorials) && c.tutorials > 0).toBe(true);
         expect(Number.isInteger(c.hours) && c.hours > 0).toBe(true);
+      }
+    });
+
+    // A site outside SITE_SUBDOMAINS has no door on the new name yet, and onThisName leaves its link as written.
+    it('writes a course on the new name only once its site answers there', () => {
+      for (const c of [...COURSES, ...OTHER_COURSES]) {
+        const [sub, ...root] = new URL(c.url).hostname.split('.');
+        if (SITE_SUBDOMAINS.includes(sub)) expect(root.join('.')).toBe('levelupstudyhub.com');
+        else expect(root.join('.')).toBe('aws-study-flashcards-app.com');
       }
     });
 
@@ -125,7 +135,7 @@ describe('CodingCourses', () => {
     it('links to its site through onThisName once live', () => {
       withLive(true, () => {
         render(<CodingCourses onShowLogin={onShowLogin} />);
-        expect(card()).toHaveAttribute('href', onNewName(other.url));
+        expect(card()).toHaveAttribute('href', onPageName(other.url));
         expect(within(card()).getByText(/start free/i)).toBeInTheDocument();
       });
     });

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://developer.aws-study-flashcards-app.com/sitemap.xml
+Sitemap: https://developer.levelupstudyhub.com/sitemap.xml

@@ -13,7 +13,7 @@ const CERTS = [
   { id: 'solutions-architect-associate', name: 'Solutions Architect', level: 'Associate', url: 'https://architect.aws-study-flashcards-app.com' },
   { id: 'developer-associate', name: 'Developer', level: 'Associate', url: 'https://developer.aws-study-flashcards-app.com' },
 ];
-const HUB = 'https://aws-study-flashcards-app.com';
+const HUB = 'https://levelupstudyhub.com';
 
 const shuffleOptions = (q) => {
   const order = q.options.map((_, i) => i);

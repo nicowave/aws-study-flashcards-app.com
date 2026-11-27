@@ -7,10 +7,11 @@ import { certifications } from '../data/certifications';
 import { PROMOTIONS } from '../services/offers';
 import { API_BASE_URL } from '../config/auth.config';
 
-// Pretend the page was opened on the new name, so we can see which links go through onThisName.
+// Pretend the page was opened on a third name, so we can see which links go through onThisName,
+// whichever name they were written with.
 vi.mock('../config/auth.config', async (importOriginal) => ({
   ...(await importOriginal()),
-  onThisName: (url) => url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com'),
+  onThisName: (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example'),
 }));
 
 const reply = (status, body) => ({
@@ -449,7 +450,7 @@ describe('ReadinessCheck', () => {
       render(<ReadinessCheck />);
       const { certId } = await finishCheck(user);
       await screen.findByText(/on its way to/i);
-      const site = certifications.find((c) => c.id === certId).url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com');
+      const site = certifications.find((c) => c.id === certId).url.replace('levelupstudyhub.com', 'page-name.example');
       const link = screen.getByRole('link', { name: /start studying/i });
       expect(link).toHaveAttribute('href', `${site}/?utm_source=readiness&utm_medium=web&utm_campaign=study-plan`);
     });
@@ -470,7 +471,7 @@ describe('ReadinessCheck', () => {
         expect(a.getAttribute('rel')).toMatch(/noopener/);
       }
       for (const shared of [new URL(linkedin.searchParams.get('url')), new URL(x.searchParams.get('url'))]) {
-        expect(shared.hostname).toBe('aws-study-flashcards-app.com'); // share links keep the public name
+        expect(shared.hostname).toBe('levelupstudyhub.com'); // share links keep the public name, whatever the page's
         expect(shared.searchParams.get('check')).toBe(certId);
         expect(shared.hash).toBe('#readiness');
       }
