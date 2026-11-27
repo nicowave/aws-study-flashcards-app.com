@@ -79,7 +79,8 @@ const sub = (status, price, plan) => ({
   items: { data: [{ price: { id: price } }] },
 });
 const user = { uid: "u1", email: "person@example.test" };
-const HUB = "https://aws-study-flashcards-app.com";
+const HUB = "https://levelupstudyhub.com";
+const OLD_HUB = "https://aws-study-flashcards-app.com"; // still a listed return address during the move
 
 function account({ customer = true, purchases = [] } = {}) {
   table = new Map();
@@ -90,9 +91,9 @@ function account({ customer = true, purchases = [] } = {}) {
 test("a free year in its trial is not sold Pro again: back to the site, Pro written", async () => {
   account();
   const stripe = fakeStripe({ subs: [sub("trialing", "price_old_pro", "all-access")] }); // known by metadata only
-  const res = await createCheckoutSession({ plan: "all-access", returnUrl: HUB }, user, stripe);
+  const res = await createCheckoutSession({ plan: "all-access", returnUrl: OLD_HUB }, user, stripe);
   assert.equal(res.alreadyOwned, true);
-  assert.equal(res.url, `${HUB}/?checkout=success&owned=1`);
+  assert.equal(res.url, `${OLD_HUB}/?checkout=success&owned=1`, "back to the name the page was opened on");
   assert.equal(stripe.calls.sessions.length, 0, "no checkout session may be created");
   assert.equal(table.get(key("USER#u1", "ENTITLEMENTS")).allAccess, true);
 });
@@ -114,7 +115,7 @@ test("the Developer Path bundle already covers the Developer Associate exam", as
   const stripe = fakeStripe();
   const res = await createCheckoutSession({ plan: "developer-associate" }, user, stripe);
   assert.equal(res.alreadyOwned, true);
-  assert.equal(res.url, `${HUB}/?checkout=success&owned=1`, "an unknown or missing return address falls back to the hub");
+  assert.equal(res.url, `${HUB}/?checkout=success&owned=1`, "an unknown or missing return address falls back to the hub on levelupstudyhub.com");
 });
 
 test("ended Pro can buy again, at full price with no second trial", async () => {

@@ -1,4 +1,4 @@
-// TypeScript for AWS: typescript.aws-study-flashcards-app.com
+// TypeScript for AWS: typescript.levelupstudyhub.com
 import meta from './meta.json';
 import { siblingsOf } from '../../shared/courseSites';
 import startHere from '../../shared/startHere';

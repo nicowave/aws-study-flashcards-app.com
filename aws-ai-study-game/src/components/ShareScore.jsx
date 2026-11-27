@@ -7,7 +7,7 @@ import { ShareIcon } from './Icons';
 const CERT = { id: 'ai-practitioner', name: 'AI Practitioner', hashtag: 'AIPractitioner' };
 
 const shareUrl = (campaign) =>
-  `https://aws-study-flashcards-app.com/?check=${CERT.id}&utm_source=share&utm_medium=social&utm_campaign=${campaign}#readiness`;
+  `https://levelupstudyhub.com/?check=${CERT.id}&utm_source=share&utm_medium=social&utm_campaign=${campaign}#readiness`;
 
 const track = (method, campaign) => {
   try {

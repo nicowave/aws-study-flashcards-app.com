@@ -40,7 +40,7 @@ describe('ShareScore', () => {
   it("links to the hub's readiness check for this cert, tagged with the campaign", () => {
     renderShare();
     const url = new URL(sharedUrl());
-    expect(url.protocol).toBe('https:');
+    expect(url.origin).toBe('https://levelupstudyhub.com'); // shared links carry the public name
     expect(url.searchParams.get('check')).toMatch(/\S/);
     expect(url.searchParams.get('utm_source')).toBe('share');
     expect(url.searchParams.get('utm_medium')).toBe('social');

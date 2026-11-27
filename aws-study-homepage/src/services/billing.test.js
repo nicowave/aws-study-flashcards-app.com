@@ -2,8 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // The server call is the boundary: never reach the API from a test
 vi.mock('./awsAuth', () => ({ callFunction: vi.fn(), getTokens: vi.fn(), decodeJwt: vi.fn() }));
+// Pretend the page was opened on a third name, so we can see the hub address go through onThisName.
+vi.mock('../config/auth.config', async (importOriginal) => ({
+  ...(await importOriginal()),
+  onThisName: (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example'),
+}));
 import { callFunction, getTokens, decodeJwt } from './awsAuth';
-import { getProTrialStatus, getEntitlements } from './billing';
+import { getProTrialStatus, getEntitlements, openBillingPortal } from './billing';
 
 describe('getProTrialStatus', () => {
   beforeEach(() => vi.mocked(callFunction).mockReset());
@@ -50,5 +55,16 @@ describe('getEntitlements', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.mocked(getTokens).mockRejectedValueOnce(new Error('expired'));
     await expect(getEntitlements()).resolves.toBeNull();
+  });
+});
+
+describe('openBillingPortal', () => {
+  beforeEach(() => vi.mocked(callFunction).mockReset());
+
+  it('asks Stripe to send the member back to the hub on the name the page was opened on', async () => {
+    vi.mocked(callFunction).mockResolvedValueOnce({ data: {} }); // no portal address, so nothing navigates
+    await expect(openBillingPortal()).rejects.toThrow('No portal URL returned');
+    expect(callFunction).toHaveBeenCalledTimes(1);
+    expect(callFunction).toHaveBeenCalledWith('createPortalSession', { returnUrl: 'https://page-name.example' });
   });
 });

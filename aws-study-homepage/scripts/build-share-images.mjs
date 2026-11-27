@@ -21,21 +21,22 @@ const lockup = (h) => LOCKUP.replace(/ width="[\d.]+" height="[\d.]+"/, ` width=
 
 const SITES = [
   { id: 'cloud-practitioner', kicker: 'Foundational certification', title: 'AWS Certified<br>Cloud Practitioner', accent: 'Are you ready for the exam?', color: '#22d3ee',
-    chips: ['65-question timed practice exam', 'Quizzes', 'Flashcards'], host: 'cloud.aws-study-flashcards-app.com' },
+    chips: ['65-question timed practice exam', 'Quizzes', 'Flashcards'], host: 'cloud.levelupstudyhub.com' },
   { id: 'ai-practitioner', kicker: 'Foundational certification', title: 'AWS Certified<br>AI Practitioner', accent: 'Are you ready for the exam?', color: '#a78bfa',
-    chips: ['65-question timed practice exam', 'Quizzes', 'Flashcards'], host: 'ai.aws-study-flashcards-app.com' },
+    chips: ['65-question timed practice exam', 'Quizzes', 'Flashcards'], host: 'ai.levelupstudyhub.com' },
   { id: 'solutions-architect-associate', kicker: 'Associate certification', title: 'AWS Certified<br>Solutions Architect', accent: 'Are you ready for the exam?', color: '#f472b6',
-    chips: ['65-question timed practice exam', 'Quizzes', 'Flashcards'], host: 'architect.aws-study-flashcards-app.com' },
+    chips: ['65-question timed practice exam', 'Quizzes', 'Flashcards'], host: 'architect.levelupstudyhub.com' },
   { id: 'developer-associate', kicker: 'Associate certification', title: 'AWS Certified<br>Developer', accent: 'Are you ready for the exam?', color: '#60a5fa',
-    chips: ['65-question timed practice exam', 'Quizzes', 'Flashcards'], host: 'developer.aws-study-flashcards-app.com' },
+    chips: ['65-question timed practice exam', 'Quizzes', 'Flashcards'], host: 'developer.levelupstudyhub.com' },
   { id: 'bash', kicker: 'Coding course', title: 'Bash for AWS', accent: 'Automate the work you do by hand.', color: '#22d3ee',
-    chips: ['Runs in your browser', 'Nothing to install', 'First tutorial free'], host: 'bash.aws-study-flashcards-app.com', mono: '$ aws s3 sync ./backups s3://team-backups' },
+    chips: ['Runs in your browser', 'Nothing to install', 'First tutorial free'], host: 'bash.levelupstudyhub.com', mono: '$ aws s3 sync ./backups s3://team-backups' },
   { id: 'python', kicker: 'Coding course', title: 'Python for AWS', accent: 'Real scripts for real AWS jobs.', color: '#a78bfa',
-    chips: ['Runs in your browser', 'Nothing to install', 'First tutorial free'], host: 'python.aws-study-flashcards-app.com', mono: '>>> boto3.client("s3").list_buckets()' },
+    chips: ['Runs in your browser', 'Nothing to install', 'First tutorial free'], host: 'python.levelupstudyhub.com', mono: '>>> boto3.client("s3").list_buckets()' },
   { id: 'javascript', kicker: 'Coding course', title: 'JavaScript for AWS', accent: 'From a web page to a serverless app.', color: '#f472b6',
-    chips: ['Runs in your browser', 'Nothing to install', 'First tutorial free'], host: 'js.aws-study-flashcards-app.com', mono: 'await fetch("/api/status")' },
+    chips: ['Runs in your browser', 'Nothing to install', 'First tutorial free'], host: 'js.levelupstudyhub.com', mono: 'await fetch("/api/status")' },
   { id: 'typescript', kicker: 'Coding course', title: 'TypeScript for AWS', accent: 'Catch the bug before it ships.', color: '#60a5fa',
-    chips: ['Runs in your browser', 'Nothing to install', 'First tutorial free'], host: 'typescript.aws-study-flashcards-app.com', mono: 'app.ts(16,30): error TS2551' },
+    chips: ['Runs in your browser', 'Nothing to install', 'First tutorial free'], host: 'typescript.levelupstudyhub.com', mono: 'app.ts(16,30): error TS2551' },
+  // Old name until spanish.levelupstudyhub.com exists (docs/launch-tech-spanish.md)
   { id: 'tech-spanish', kicker: 'Course · Curso', title: 'Tech Spanish ↔<br>Tech English', accent: 'Talk tech in both languages.', color: '#f2a845',
     chips: ['Spanish and English', 'Flashcards both ways', 'Two modules free'], host: 'spanish.aws-study-flashcards-app.com', mono: '¿Ya mergeaste la PR? · LGTM' },
 ];
@@ -84,7 +85,7 @@ const hubPage = () => `<!doctype html><html><head><meta charset="utf-8"><style>
   <div class="sub">Practice exams, study guides, real world and exam prep to level up your career.</div>
   <div class="chips">${CERTS.map(([c, col]) => `<span class="chip" style="color:${col};border-color:${col}">${c}</span>`).join('')}</div>
   <div class="more">+ Bash, Python, JavaScript and TypeScript courses for AWS</div>
-  <div class="foot">aws-study-flashcards-app.com &nbsp;·&nbsp; Start free, no account needed</div>
+  <div class="foot">levelupstudyhub.com &nbsp;·&nbsp; Start free, no account needed</div>
 </body></html>`;
 
 const tmp = mkdtempSync(join(tmpdir(), 'og-'));

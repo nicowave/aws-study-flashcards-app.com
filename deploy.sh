@@ -75,11 +75,24 @@ ensure_deps() {
     fi
 }
 
+# invalidate_cloudfront <paths> <id>...: each site has an old-name and a new-name distribution on one bucket; clear every one, even after a failure
+invalidate_cloudfront() {
+    local paths="$1" dist_id failed=0
+    shift
+    for dist_id in "$@"; do
+        [ -n "$dist_id" ] || continue
+        aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "$paths" > /dev/null \
+            || { print_error "CloudFront invalidation failed for ${dist_id}. The files are uploaded; run it again: aws cloudfront create-invalidation --distribution-id ${dist_id} --paths '${paths}'"; failed=$((failed + 1)); }
+    done
+    [ $failed -eq 0 ] || return 1
+}
+
 deploy_hub() {
     local site_name="Study Hub Homepage"
     local folder="aws-study-homepage"
     local bucket="aws-study-flashcards-app-home"
     local dist_id="E3D126UT3L72OL"
+    local new_dist_id="EQQAL9UJ4QD8M"  # the same site on levelupstudyhub.com
     local site_path="${SCRIPT_DIR}/${folder}"
     
     print_header "Deploying: ${site_name}"
@@ -150,14 +163,12 @@ deploy_hub() {
     
     # Invalidate CloudFront
     print_step "Invalidating CloudFront cache..."
-    aws cloudfront create-invalidation \
-        --distribution-id "$dist_id" \
-        --paths "/*" > /dev/null
-    print_success "CloudFront invalidation created"
+    invalidate_cloudfront "/*" "$dist_id" "$new_dist_id" || { cd "$SCRIPT_DIR"; return 1; }
+    print_success "CloudFront invalidations created (old and new name)"
     
     cd "$SCRIPT_DIR"
     print_success "${site_name} deployed!"
-    echo "  🌐 https://aws-study-flashcards-app.com"
+    echo "  🌐 https://levelupstudyhub.com"
 }
 
 deploy_cloud() {
@@ -165,6 +176,7 @@ deploy_cloud() {
     local folder="aws-cloud-practitioner-game"
     local bucket="cloud.aws-study-flashcards-app.com"
     local dist_id="E6NUXKK8FTCR1"
+    local new_dist_id="EDFO69NOBW3ND"  # the same site on levelupstudyhub.com
     local site_path="${SCRIPT_DIR}/${folder}"
     
     print_header "Deploying: ${site_name}"
@@ -219,14 +231,12 @@ deploy_cloud() {
     
     # Invalidate CloudFront
     print_step "Invalidating CloudFront cache..."
-    aws cloudfront create-invalidation \
-        --distribution-id "$dist_id" \
-        --paths "/*" > /dev/null
-    print_success "CloudFront invalidation created"
+    invalidate_cloudfront "/*" "$dist_id" "$new_dist_id" || { cd "$SCRIPT_DIR"; return 1; }
+    print_success "CloudFront invalidations created (old and new name)"
     
     cd "$SCRIPT_DIR"
     print_success "${site_name} deployed!"
-    echo "  ☁️  https://cloud.aws-study-flashcards-app.com"
+    echo "  ☁️  https://cloud.levelupstudyhub.com"
 }
 
 deploy_ai() {
@@ -234,6 +244,7 @@ deploy_ai() {
     local folder="aws-ai-study-game"
     local bucket="ai.aws-study-flashcards-app.com"
     local dist_id="E23TPCWLVKFC65"
+    local new_dist_id="E10Z4YFFKV0730"  # the same site on levelupstudyhub.com
     local site_path="${SCRIPT_DIR}/${folder}"
     
     print_header "Deploying: ${site_name}"
@@ -288,14 +299,12 @@ deploy_ai() {
     
     # Invalidate CloudFront
     print_step "Invalidating CloudFront cache..."
-    aws cloudfront create-invalidation \
-        --distribution-id "$dist_id" \
-        --paths "/*" > /dev/null
-    print_success "CloudFront invalidation created"
+    invalidate_cloudfront "/*" "$dist_id" "$new_dist_id" || { cd "$SCRIPT_DIR"; return 1; }
+    print_success "CloudFront invalidations created (old and new name)"
     
     cd "$SCRIPT_DIR"
     print_success "${site_name} deployed!"
-    echo "  🤖 https://ai.aws-study-flashcards-app.com"
+    echo "  🤖 https://ai.levelupstudyhub.com"
 }
 
 deploy_saa() {
@@ -303,6 +312,7 @@ deploy_saa() {
     local folder="aws-saa-study-game"
     local bucket="saa.aws-study-flashcards-app.com"
     local dist_id="EBOXWN6EUZHKF"
+    local new_dist_id="E2QGETZVAOUTUY"  # the same site on levelupstudyhub.com
     local site_path="${SCRIPT_DIR}/${folder}"
 
     print_header "Deploying: ${site_name}"
@@ -357,14 +367,12 @@ deploy_saa() {
 
     # Invalidate CloudFront
     print_step "Invalidating CloudFront cache..."
-    aws cloudfront create-invalidation \
-        --distribution-id "$dist_id" \
-        --paths "/*" > /dev/null
-    print_success "CloudFront invalidation created"
+    invalidate_cloudfront "/*" "$dist_id" "$new_dist_id" || { cd "$SCRIPT_DIR"; return 1; }
+    print_success "CloudFront invalidations created (old and new name)"
 
     cd "$SCRIPT_DIR"
     print_success "${site_name} deployed!"
-    echo "  🏗️  https://architect.aws-study-flashcards-app.com"
+    echo "  🏗️  https://architect.levelupstudyhub.com"
 }
 
 deploy_dva() {
@@ -372,6 +380,7 @@ deploy_dva() {
     local folder="aws-dva-study-game"
     local bucket="dva.aws-study-flashcards-app.com"
     local dist_id="E2UB744W5YUCTW"
+    local new_dist_id="E1AE85QV25KDPD"  # the same site on levelupstudyhub.com
     local site_path="${SCRIPT_DIR}/${folder}"
 
     print_header "Deploying: ${site_name}"
@@ -426,22 +435,23 @@ deploy_dva() {
 
     # Invalidate CloudFront
     print_step "Invalidating CloudFront cache..."
-    aws cloudfront create-invalidation \
-        --distribution-id "$dist_id" \
-        --paths "/*" > /dev/null
-    print_success "CloudFront invalidation created"
+    invalidate_cloudfront "/*" "$dist_id" "$new_dist_id" || { cd "$SCRIPT_DIR"; return 1; }
+    print_success "CloudFront invalidations created (old and new name)"
 
     cd "$SCRIPT_DIR"
     print_success "${site_name} deployed!"
-    echo "  👨‍💻 https://developer.aws-study-flashcards-app.com"
+    echo "  👨‍💻 https://developer.levelupstudyhub.com"
 }
 
 # Coding course sites: one app (aws-coding-courses), built once per course
 # with COURSE=<id> into dist/<id>/. Add python/js/typescript the same way.
+# Usage: deploy_course <course> <bucket> <distribution id> <public host> [new-name distribution id]
 deploy_course() {
     local course="$1"
     local bucket="$2"
     local dist_id="$3"
+    local public_host="$4"
+    local new_dist_id="${5:-}"  # empty while the site has no levelupstudyhub.com twin
     local site_path="${SCRIPT_DIR}/aws-coding-courses"
 
     print_header "Deploying: ${course} course"
@@ -471,29 +481,30 @@ deploy_course() {
     print_success "Files uploaded to S3"
 
     print_step "Invalidating CloudFront cache..."
-    aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/*" > /dev/null
+    invalidate_cloudfront "/*" "$dist_id" "$new_dist_id" || { cd "$SCRIPT_DIR"; return 1; }
     print_success "CloudFront invalidation created"
 
     cd "$SCRIPT_DIR"
     print_success "${course} course deployed!"
-    echo "  💲 https://${bucket}"
+    echo "  💲 https://${public_host}"
 }
 
 deploy_bash() {
-    deploy_course bash "bash.aws-study-flashcards-app.com" "EYR8XH2CLI1DT"
+    deploy_course bash "bash.aws-study-flashcards-app.com" "EYR8XH2CLI1DT" "bash.levelupstudyhub.com" "E1GVBB47Y9R725"
 }
 
 deploy_python() {
-    deploy_course python "python.aws-study-flashcards-app.com" "E205DY614C5Q4C"
+    deploy_course python "python.aws-study-flashcards-app.com" "E205DY614C5Q4C" "python.levelupstudyhub.com" "E3M8Y7JMGKWB6T"
 }
 
-# javascript.aws-study-flashcards-app.com is a bucket that redirects here (E27Y7QTYXZD1SM)
+# javascript.aws-study-flashcards-app.com is a bucket that redirects here (E27Y7QTYXZD1SM);
+# it serves no files of ours, so it is never invalidated
 deploy_js() {
-    deploy_course javascript "js.aws-study-flashcards-app.com" "E1JMSZCG8CKTGT"
+    deploy_course javascript "js.aws-study-flashcards-app.com" "E1JMSZCG8CKTGT" "js.levelupstudyhub.com" "E8AUAQW0X05X2"
 }
 
 deploy_typescript() {
-    deploy_course typescript "typescript.aws-study-flashcards-app.com" "E2HBJJFM265RJL"
+    deploy_course typescript "typescript.aws-study-flashcards-app.com" "E2HBJJFM265RJL" "typescript.levelupstudyhub.com" "EYRAVLUIZ7XC4"
 }
 
 # Tech Spanish ↔ Tech English (COURSE=tech-spanish). Its site is made by
@@ -526,7 +537,8 @@ deploy_spanish() {
         print_info "Create it first: node scripts/create-course-site.mjs --from typescript --to spanish --apply"
         return 1
     fi
-    deploy_course tech-spanish "spanish.aws-study-flashcards-app.com" "$dist_id"
+    # Old name only: spanish.levelupstudyhub.com does not exist yet (docs/launch-tech-spanish.md)
+    deploy_course tech-spanish "spanish.aws-study-flashcards-app.com" "$dist_id" "spanish.aws-study-flashcards-app.com"
 }
 
 deploy_tutorials() {
@@ -534,6 +546,7 @@ deploy_tutorials() {
     local site_path="${HOME}/dev/aws/tutorials-site/site"
     local bucket="tutorials-aws-study-flashcards-app-418272768335"
     local dist_id="E24YKUY1M23PV0"
+    local new_dist_id="E3F0ZP2LBB09SZ"  # the same site on levelupstudyhub.com
     local html=(--content-type "text/html; charset=utf-8" --cache-control "public, max-age=300")
 
     print_header "Deploying: ${site_name}"
@@ -554,10 +567,10 @@ deploy_tutorials() {
     print_success "Files uploaded to S3"
 
     print_step "Invalidating CloudFront cache..."
-    aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/*" > /dev/null
-    print_success "CloudFront invalidation created"
+    invalidate_cloudfront "/*" "$dist_id" "$new_dist_id" || return 1
+    print_success "CloudFront invalidations created (old and new name)"
     print_success "${site_name} deployed!"
-    echo "  📚 https://tutorials.aws-study-flashcards-app.com"
+    echo "  📚 https://tutorials.levelupstudyhub.com"
 }
 
 # Hidden test builds at <site>/next/ (sign-in switch, migration step 2).
@@ -567,11 +580,11 @@ deploy_next() {
     local failed=0
     local entry folder bucket dist_id
     for entry in \
-        "aws-study-homepage aws-study-flashcards-app-home E3D126UT3L72OL aws-study-flashcards-app.com" \
-        "aws-cloud-practitioner-game cloud.aws-study-flashcards-app.com E6NUXKK8FTCR1 cloud.aws-study-flashcards-app.com" \
-        "aws-ai-study-game ai.aws-study-flashcards-app.com E23TPCWLVKFC65 ai.aws-study-flashcards-app.com" \
-        "aws-saa-study-game saa.aws-study-flashcards-app.com EBOXWN6EUZHKF architect.aws-study-flashcards-app.com" \
-        "aws-dva-study-game dva.aws-study-flashcards-app.com E2UB744W5YUCTW developer.aws-study-flashcards-app.com"; do
+        "aws-study-homepage aws-study-flashcards-app-home E3D126UT3L72OL levelupstudyhub.com EQQAL9UJ4QD8M" \
+        "aws-cloud-practitioner-game cloud.aws-study-flashcards-app.com E6NUXKK8FTCR1 cloud.levelupstudyhub.com EDFO69NOBW3ND" \
+        "aws-ai-study-game ai.aws-study-flashcards-app.com E23TPCWLVKFC65 ai.levelupstudyhub.com E10Z4YFFKV0730" \
+        "aws-saa-study-game saa.aws-study-flashcards-app.com EBOXWN6EUZHKF architect.levelupstudyhub.com E2QGETZVAOUTUY" \
+        "aws-dva-study-game dva.aws-study-flashcards-app.com E2UB744W5YUCTW developer.levelupstudyhub.com E1AE85QV25KDPD"; do
         local parts=(${=entry})
         folder=${parts[1]}; bucket=${parts[2]}; dist_id=${parts[3]}
         print_step "${folder} -> https://${parts[4]}/next/"
@@ -592,14 +605,18 @@ deploy_next() {
                 aws s3 cp "$next_page" "s3://${bucket}/next/${next_page#dist-next/}" \
                     --cache-control "no-cache,no-store,must-revalidate" --content-type "text/html; charset=utf-8" > /dev/null
             done
-            aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/next/*" > /dev/null
-            print_success "${parts[4]}/next/"
+            # parts[5] is the new-name distribution: the printed address is on it
+            if invalidate_cloudfront "/next/*" "$dist_id" "${parts[5]}"; then
+                print_success "${parts[4]}/next/"
+            else
+                failed=$((failed + 1))
+            fi
         else
             print_error "Build failed: $folder"; failed=$((failed + 1))
         fi
         cd "$SCRIPT_DIR"
     done
-    [ $failed -eq 0 ] && print_success "All 5 test versions deployed" || print_error "$failed failed"
+    [ $failed -eq 0 ] && print_success "All 5 test versions deployed" || { print_error "$failed failed"; return 1; }
 }
 
 # Weekly newsletter: upload newsletter/issues/*.md to the newsletter bucket
@@ -670,17 +687,17 @@ deploy_all() {
         print_error "$failed deployment(s) failed"
     fi
     echo ""
-    echo "  🌐 Hub:   https://aws-study-flashcards-app.com"
-    echo "  ☁️  Cloud: https://cloud.aws-study-flashcards-app.com"
-    echo "  🤖 AI:    https://ai.aws-study-flashcards-app.com"
-    echo "  🏗️  Architect: https://architect.aws-study-flashcards-app.com"
-    echo "  👨‍💻 Developer: https://developer.aws-study-flashcards-app.com"
-    echo "  💲 Bash:  https://bash.aws-study-flashcards-app.com"
-    echo "  🐍 Python: https://python.aws-study-flashcards-app.com"
-    echo "  🟨 JavaScript: https://js.aws-study-flashcards-app.com"
-    echo "  🔷 TypeScript: https://typescript.aws-study-flashcards-app.com"
+    echo "  🌐 Hub:   https://levelupstudyhub.com"
+    echo "  ☁️  Cloud: https://cloud.levelupstudyhub.com"
+    echo "  🤖 AI:    https://ai.levelupstudyhub.com"
+    echo "  🏗️  Architect: https://architect.levelupstudyhub.com"
+    echo "  👨‍💻 Developer: https://developer.levelupstudyhub.com"
+    echo "  💲 Bash:  https://bash.levelupstudyhub.com"
+    echo "  🐍 Python: https://python.levelupstudyhub.com"
+    echo "  🟨 JavaScript: https://js.levelupstudyhub.com"
+    echo "  🔷 TypeScript: https://typescript.levelupstudyhub.com"
     echo "  ñ  Tech Spanish: https://spanish.aws-study-flashcards-app.com"
-    echo "  📚 Tuts:  https://tutorials.aws-study-flashcards-app.com"
+    echo "  📚 Tuts:  https://tutorials.levelupstudyhub.com"
     echo ""
     print_info "CloudFront invalidations may take 1-2 minutes to propagate"
     echo ""

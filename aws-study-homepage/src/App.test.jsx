@@ -44,10 +44,10 @@ vi.mock('./services/leads', () => ({
 }));
 vi.mock('./services/sharedAuth', () => ({ sendPasswordReset: vi.fn(), resetPassword: vi.fn() }));
 
-// Pretend the page was opened on the new name, so we can see links go through onThisName.
+// Pretend the page was opened on a third name, so a link written with either name shows it went through onThisName.
 vi.mock('./config/auth.config', async (importOriginal) => ({
   ...(await importOriginal()),
-  onThisName: (url) => url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com'),
+  onThisName: (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example'),
 }));
 
 // One coming-soon cert next to the real data, so that path is covered even while
@@ -58,7 +58,7 @@ vi.mock('./data/certifications', async (importOriginal) => {
     ...actual,
     certifications: [...actual.certifications, {
       id: 'test-coming-soon', name: 'Test Coming Soon Certification', code: 'TST-C01', level: 'Professional',
-      category: 'professional', description: 'A fixture.', url: 'https://test.aws-study-flashcards-app.com',
+      category: 'professional', description: 'A fixture.', url: 'https://test.levelupstudyhub.com',
       price: '$99.99', status: 'coming-soon', color: '#888888', examLength: '1 minute', questions: '1 question',
       officialUrl: 'https://aws.amazon.com/certification/', features: ['Fixture Feature'],
     }],
@@ -78,7 +78,7 @@ const discounted = (price, percent) => {
   const c = cents(price);
   return `$${((c - Math.round((c * percent) / 100)) / 100).toFixed(2)}`;
 };
-const onNewName = (url) => url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com');
+const onPageName = (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example');
 
 const live = certifications.filter((c) => c.status === 'available');
 const hidden = certifications.filter((c) => c.status === 'hidden');
@@ -207,7 +207,7 @@ describe('App', () => {
     it.each(live.map((c) => [c.name, c]))('%s: "Start Free" goes to its site through onThisName; "AWS Docs" opens the official page', (_, cert) => {
       render(<App />);
       const card = within(certCard(cert.name));
-      expect(card.getByRole('link', { name: /start free/i })).toHaveAttribute('href', onNewName(cert.url));
+      expect(card.getByRole('link', { name: /start free/i })).toHaveAttribute('href', onPageName(cert.url));
       const docs = card.getByRole('link', { name: /aws docs/i });
       expect(docs).toHaveAttribute('href', cert.officialUrl);
       expect(docs).toHaveAttribute('target', '_blank');
@@ -217,7 +217,7 @@ describe('App', () => {
     it('gives every live cert its own site and a dollar price', () => {
       expect(new Set(live.map((c) => c.url)).size).toBe(live.length);
       for (const c of live) {
-        expect(c.url).toMatch(/^https:\/\/[a-z-]+\.aws-study-flashcards-app\.com$/);
+        expect(c.url).toMatch(/^https:\/\/[a-z-]+\.levelupstudyhub\.com$/);
         expect(c.price).toMatch(/^\$\d+\.\d{2}$/);
       }
     });
@@ -274,9 +274,9 @@ describe('App', () => {
       render(<App />);
       const cloud = certifications.find((c) => c.id === 'cloud-practitioner');
       expect(within(planCard('Guest Preview')).getByRole('link', { name: /try it now/i }))
-        .toHaveAttribute('href', onNewName(cloud.url));
+        .toHaveAttribute('href', onPageName(cloud.url));
       expect(within(planCard('Free Account')).getByRole('link', { name: /create free account/i }))
-        .toHaveAttribute('href', onNewName(cloud.url));
+        .toHaveAttribute('href', onPageName(cloud.url));
       expect(within(planCard('Guest Preview')).getByText('Free')).toBeInTheDocument();
       expect(within(planCard('Free Account')).getByText('Free')).toBeInTheDocument();
     });
@@ -581,10 +581,10 @@ describe('App', () => {
 
       const ai = within(welcome).getByRole('link', { name: /ai practitioner/i });
       expect(ai).toHaveTextContent('Lvl 3 · 70%');
-      expect(ai).toHaveAttribute('href', onNewName(certifications.find((c) => c.id === 'ai-practitioner').url));
+      expect(ai).toHaveAttribute('href', onPageName(certifications.find((c) => c.id === 'ai-practitioner').url));
       const cloud = within(welcome).getByRole('link', { name: /cloud practitioner/i });
       expect(cloud).toHaveTextContent('Lvl 2 · 90%');
-      expect(cloud).toHaveAttribute('href', onNewName(certifications.find((c) => c.id === 'cloud-practitioner').url));
+      expect(cloud).toHaveAttribute('href', onPageName(certifications.find((c) => c.id === 'cloud-practitioner').url));
     });
 
     // Regression: the panel once had cards for AI and Cloud Practitioner only, so Solutions
@@ -599,7 +599,7 @@ describe('App', () => {
         const short = c.name.replace(/^AWS Certified /, '');
         const card = within(welcome).getByRole('link', { name: new RegExp(short.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) });
         expect(card).toHaveTextContent('Lvl 2 · 75%');
-        expect(card).toHaveAttribute('href', onNewName(c.url));
+        expect(card).toHaveAttribute('href', onPageName(c.url));
       }
     });
 
@@ -832,13 +832,13 @@ describe('App', () => {
       render(<App />);
       const column = within(footer()).getByRole('heading', { name: 'Certifications' }).parentElement;
       const hrefs = within(column).getAllByRole('link').map((a) => a.getAttribute('href'));
-      expect(hrefs.sort()).toEqual(live.map((c) => onNewName(c.url)).sort());
+      expect(hrefs.sort()).toEqual(live.map((c) => onPageName(c.url)).sort());
     });
 
     it('links to every coding course through onThisName, and to the GIS page', () => {
       render(<App />);
       const column = within(within(footer()).getByRole('heading', { name: 'Coding courses' }).parentElement);
-      for (const c of COURSES) expect(column.getByRole('link', { name: c.title })).toHaveAttribute('href', onNewName(c.url));
+      for (const c of COURSES) expect(column.getByRole('link', { name: c.title })).toHaveAttribute('href', onPageName(c.url));
       expect(column.getByRole('link', { name: /gis courses/i })).toHaveAttribute('href', `${import.meta.env.BASE_URL}gis/`);
     });
 
@@ -846,7 +846,7 @@ describe('App', () => {
       render(<App />);
       const column = within(within(footer()).getByRole('heading', { name: 'Coding courses' }).parentElement);
       for (const c of OTHER_COURSES) {
-        if (c.live) expect(column.getByRole('link', { name: c.title })).toHaveAttribute('href', onNewName(c.url));
+        if (c.live) expect(column.getByRole('link', { name: c.title })).toHaveAttribute('href', onPageName(c.url));
         else expect(column.getByRole('link', { name: `${c.title} (coming soon)` })).toHaveAttribute('href', `${import.meta.env.BASE_URL}#courses`);
       }
     });

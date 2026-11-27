@@ -24,7 +24,7 @@ const cognitoVerifier = CognitoJwtVerifier.create({
   tokenUse: "id",
 });
 
-const SITE_URL = "https://aws-study-flashcards-app.com";
+const SITE_URL = "https://levelupstudyhub.com";
 const ALLOWED_ORIGINS = [
   "https://aws-study-flashcards-app.com",
   "https://cloud.aws-study-flashcards-app.com",
@@ -56,8 +56,8 @@ const ALLOWED_ORIGINS = [
 ];
 
 // Where Stripe sends a buyer or member back: the address the page asked for when
-// it is one of ours, else the old hub. Each name has its own sign-in, so coming
-// back on the name the visitor opened keeps them signed in.
+// it is one of ours, else the hub on levelupstudyhub.com. Each name has its own
+// sign-in, so coming back on the name the visitor opened keeps them signed in.
 const returnBaseFor = (requested) => {
   const r = typeof requested === "string" ? requested : "";
   return ALLOWED_ORIGINS.find((o) => r === o || r.startsWith(`${o}/`)) ? r.replace(/\/$/, "") : SITE_URL;

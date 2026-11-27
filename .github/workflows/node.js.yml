@@ -32,3 +32,18 @@ jobs:
     # Component tests, plus (in the four games) the official-sources check on every question and card
     - if: contains(fromJSON('["aws-cloud-practitioner-game","aws-saa-study-game","aws-dva-study-game","aws-ai-study-game","aws-study-homepage","aws-dev-track"]'), matrix.app)
       run: npm test
+    # The payments Lambda ships its own node_modules, and the backend tests load it
+    - if: matrix.app == 'aws-backend'
+      run: npm ci --prefix lambda/callables && npm test
+
+  # deploy.sh and the new-site script, run against a pretend AWS CLI (deploy.sh is a zsh script)
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - run: sudo apt-get update && sudo apt-get install -y zsh
+    - run: node --test scripts/deploy.test.mjs scripts/create-course-site.test.mjs

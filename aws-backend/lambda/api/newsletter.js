@@ -54,11 +54,14 @@ function parseIssue(id, source) {
   return { id, date: id.slice(0, 10), subject, preview: meta.preview || '', body: body.trim() };
 }
 
+// Either name and its subdomains: issues written before the move link to the old one
+const OUR_HOST = /(^|\.)(levelupstudyhub\.com|aws-study-flashcards-app\.com)$/;
+
 // Our own links get the newsletter's tracking tags
 function trackLink(url, issueId) {
   try {
     const u = new URL(url);
-    if (!/(^|\.)aws-study-flashcards-app\.com$/.test(u.hostname) || u.searchParams.has('utm_source')) return url;
+    if (!OUR_HOST.test(u.hostname) || u.searchParams.has('utm_source')) return url;
     u.searchParams.set('utm_source', 'newsletter');
     u.searchParams.set('utm_medium', 'email');
     u.searchParams.set('utm_campaign', issueId);
@@ -354,4 +357,4 @@ exports.handler = async (event) => {
   ddbClient ||= DynamoDBDocumentClient.from(new DynamoDBClient({}));
   return run(ddbClient, event || {});
 };
-Object.assign(exports, { run, parseIssue, renderIssue, renderMarkdown, easternDate });
+Object.assign(exports, { run, parseIssue, renderIssue, renderMarkdown, trackLink, easternDate });
