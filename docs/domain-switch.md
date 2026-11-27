@@ -21,7 +21,7 @@ On purpose. One build is served under both names during the move (see CLAUDE.md,
 
 | # | Step | Who | State |
 |---|---|---|---|
-| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] in progress (8 of 11 answered) |
+| 1 | Read-only pre-flight of the live AWS setup | Owner | [ ] in progress (9 of 11 answered) |
 | 2 | `deploy.sh` prints the new names | Code | [ ] |
 | 3 | Backend fallback, email links, UTM matching; `cdk deploy` | Code + Owner | [ ] |
 | 4 | Stripe, Google, Search Console, GA4 settings | Owner | [ ] |
@@ -66,7 +66,7 @@ These block step 8. Each has the read-only check that answers it; run them on th
 - [x] **How the `javascript.` redirect is built.** Answered 2026-11-27 (live): `https://javascript.aws-study-flashcards-app.com/some/path?a=1&b=2` → `301` from `server: AmazonS3` (an S3 website redirect behind `E27Y7QTYXZD1SM`) to `https://js.aws-study-flashcards-app.com/some/path`. It **keeps the path but drops the query string**. Step 7 points it at `js.levelupstudyhub.com`; losing the query there is acceptable (nobody links to `javascript.` with tracking tags), or the old-host CloudFront Function can take over this host too and keep the query.
 - [ ] **Local overrides.** Do the Mac's `.env` files set `VITE_COGNITO_AUTH_URL` or other host overrides? Only `.env.example` is in the repo.
 - [ ] **Google OAuth app status.** If the app is verified, adding `levelupstudyhub.com` as an authorized domain needs the Search Console property verified first.
-- [ ] **http → https** on both names (expect a redirect to https). The cloud session can't make plain-http requests; run `curl -sI http://levelupstudyhub.com/x?a=1` and the same for the old name on the Mac.
+- [x] **http → https** on both names. Answered 2026-11-27 (owner's Mac): `curl -sI 'http://levelupstudyhub.com/x?a=1'` and the same on `aws-study-flashcards-app.com` both return `301 Moved Permanently` with `Server: CloudFront`, `Content-Type: text/html` and `Content-Length: 167`, which is CloudFront's built-in "redirect HTTP to HTTPS" response (same host, path and query, on https). The `Location` line itself was cut off by `head -5`; it gets read during the step 8 tests. So an `http://` visit to an old host will take two hops after switch day: to https on the old host, then to the new host.
 
 ## Owner decisions
 
