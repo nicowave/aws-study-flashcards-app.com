@@ -46,4 +46,4 @@ jobs:
       with:
         node-version: 20
     - run: sudo apt-get update && sudo apt-get install -y zsh
-    - run: node --test scripts/deploy.test.mjs scripts/create-course-site.test.mjs
+    - run: node --test scripts/deploy.test.mjs scripts/create-course-site.test.mjs scripts/file-names.test.mjs

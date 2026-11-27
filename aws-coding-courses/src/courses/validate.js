@@ -2,7 +2,7 @@
 // module tests. Each returns a list of problems ([] = fine), so a failing test
 // names every broken step at once.
 import { isBoth } from '../engine/i18n';
-import { checkRewrite } from '../engine/steps/rewrite';
+import { checkRewrite } from '../engine/steps/rewriteCheck';
 import { REGISTERS } from '../engine/steps/register';
 
 export const KINDS = ['read', 'try', 'quiz', 'cards', 'build', 'register', 'rewrite'];
