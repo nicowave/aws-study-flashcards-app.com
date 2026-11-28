@@ -7,6 +7,7 @@ import spreadsheetReport from './tutorials/01-spreadsheet-report';
 import awsBill from './tutorials/02-aws-bill';
 import uptimeAlerts from './tutorials/03-uptime-alerts';
 import uploadPipeline from './tutorials/04-upload-pipeline';
+import testsAndLogs from './tutorials/06-tests-and-logs';
 
 const course = {
   ...meta,
@@ -14,7 +15,7 @@ const course = {
   accent: '#7db6e4',
   eyebrow: 'Coding course · Python',
   headline: 'Turn the jobs you do by hand into Python that runs itself.',
-  lede: 'Python for AWS teaches the language AWS automation runs on, through jobs IT teams really get asked to do: a weekly spreadsheet report, a hunt for what\'s on the AWS bill, certificate alerts and an upload pipeline built on Lambda and DynamoDB. No programming background needed.',
+  lede: 'Python for AWS teaches the language AWS automation runs on, through jobs IT teams really get asked to do: a weekly spreadsheet report, a hunt for what\'s on the AWS bill, certificate alerts, an upload pipeline built on Lambda and DynamoDB, and tests that catch bugs before they ship. No programming background needed.',
   heroNote: 'Start here and Tutorial 1 are free. Nothing to install to begin: real Python runs in your browser, with a pretend AWS account to practice on.',
   heroTerminal: `$ python weekly_report.py
 Tickets: 48 (3 duplicates removed)
@@ -35,8 +36,9 @@ Response:
     'Build **Lambda** functions that run on a schedule with **EventBridge** and send email alerts through **SNS**',
     'Process uploads automatically with **S3 events**, **Lambda** and **DynamoDB**, safely retried',
     'Handle the errors real code meets: timeouts, missing keys, AWS error codes, duplicates and bad input',
+    'Write automated tests with `unittest`, test code that calls AWS without AWS by using mocks, and write logs you can search in **CloudWatch Logs**',
   ],
-  pricingLede: 'All four tutorials with every practice task, quiz, flashcard deck and real-AWS project. Pay monthly or yearly and cancel anytime. Also included in Pro, with every other course and certification game.',
+  pricingLede: 'All five tutorials with every practice task, quiz, flashcard deck and real-AWS project. Pay monthly or yearly and cancel anytime. Also included in Pro, with every other course and certification game.',
   faq: [
     { q: 'Do I need to know how to code?', a: 'No. If you\'re comfortable with computers (IT support, sysadmin, help desk, a technical hobby), you\'re ready. Tutorial 1 starts from your very first line of Python. The [Bash course](https://bash.aws-study-flashcards-app.com) helps but isn\'t required.' },
     { q: 'Is it real Python?', a: 'Yes: Python 3.13, running in your browser through Pyodide. The only pretend parts are the AWS account and the internet it talks to, so you can practice without a bill or a real website going down.' },
@@ -48,11 +50,11 @@ Response:
     { q: 'Is this an official AWS course?', a: 'No. Level Up Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
   ],
   afterCourse: `**Next steps:**
-- Put the four programs on your résumé as a "Python and AWS automation" project, linking to your GitHub.
+- Put the four programs on your résumé as a "Python and AWS automation" project, linking to your GitHub, where the tests run on every push.
 - Practice for the exam with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com).
 - Continue with [JavaScript for AWS](https://js.aws-study-flashcards-app.com): web pages, and Lambda functions behind a real sign-in.`,
   siblings: siblingsOf(meta.id),
-  tutorials: [startHere, spreadsheetReport, awsBill, uptimeAlerts, uploadPipeline],
+  tutorials: [startHere, spreadsheetReport, awsBill, uptimeAlerts, uploadPipeline, testsAndLogs],
 };
 
 export default course;

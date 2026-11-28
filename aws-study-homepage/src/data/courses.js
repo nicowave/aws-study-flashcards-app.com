@@ -5,7 +5,7 @@ export const COURSES = [
   { id: 'bash', title: 'Bash for AWS', url: 'https://bash.levelupstudyhub.com', mark: '$_', color: '#89d185',
     blurb: 'Health checks, log digging, backups to Amazon S3 and one-command website deploys.', tutorials: 4, hours: 10 },
   { id: 'python', title: 'Python for AWS', url: 'https://python.levelupstudyhub.com', mark: '>>>', color: '#7db6e4',
-    blurb: 'Spreadsheet reports, the AWS bill, certificate alerts and an upload pipeline with Lambda and DynamoDB.', tutorials: 4, hours: 16 },
+    blurb: 'Spreadsheet reports, the AWS bill, certificate alerts, an upload pipeline with Lambda and DynamoDB, and tests that catch bugs before they ship.', tutorials: 5, hours: 20 },
   { id: 'javascript', title: 'JavaScript for AWS', url: 'https://js.levelupstudyhub.com', mark: 'JS', color: '#eed65a',
     blurb: 'Web pages, live dashboards, a serverless contact form and a study tracker with sign-in.', tutorials: 4, hours: 18 },
   { id: 'typescript', title: 'TypeScript for AWS', url: 'https://typescript.levelupstudyhub.com', mark: 'TS', color: '#93a8f4',

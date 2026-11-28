@@ -14,7 +14,7 @@
 Practice in the browser (a practice terminal, real Python, a JavaScript and TypeScript editor with a pretend AWS account), then build the same thing on your own AWS account. The first tutorial of each course is free; each course is $11 a month or $69 a year, and Pro includes every course.
 
 - [Bash for AWS](https://bash.levelupstudyhub.com/): health checks, log digging, backups to Amazon S3, one-command website deploys.
-- [Python for AWS](https://python.levelupstudyhub.com/): spreadsheet reports, the AWS bill, certificate alerts, an upload pipeline with Lambda and DynamoDB.
+- [Python for AWS](https://python.levelupstudyhub.com/): spreadsheet reports, the AWS bill, certificate alerts, an upload pipeline with Lambda and DynamoDB, automated tests and logging.
 - [JavaScript for AWS](https://js.levelupstudyhub.com/): web pages, live dashboards, a serverless contact form, a study tracker with sign-in.
 - [TypeScript for AWS](https://typescript.levelupstudyhub.com/): type-safe code, a command-line tool for AWS, infrastructure as code with the Cloud Development Kit.
 
