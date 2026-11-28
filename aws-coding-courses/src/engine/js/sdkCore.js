@@ -637,6 +637,77 @@ const paginator = (Client, Cmd, tokenIn, tokenOut, limitKey) => async function* 
 
 export const paginateListObjectsV2 = paginator(S3Client, ListObjectsV2Command, 'ContinuationToken', 'NextContinuationToken', 'MaxKeys');
 
+// Presigned URLs (@aws-sdk/s3-request-presigner). Signing is local arithmetic,
+// as in the real SDK: no call to AWS, so nothing is added to STATE.calls. The
+// runner hands in the presigner (presign.js) that the pretend fetch also uses
+// to check a request against its URL.
+let presigner = null;
+export const usePresigner = (p) => { presigner = p; };
+
+const PRESIGN_METHODS = { PutObjectCommand: 'PUT', GetObjectCommand: 'GET', HeadObjectCommand: 'HEAD', DeleteObjectCommand: 'DELETE' };
+
+export const getSignedUrl = async (client, command, options = {}) => {
+  if (!(client instanceof BaseClient) || client.constructor.service !== 's3') {
+    throw new TypeError('getSignedUrl(client, command, options) needs an S3Client first: getSignedUrl(new S3Client({}), new PutObjectCommand({ ... }), { expiresIn: 300 })');
+  }
+  if (!(command instanceof Command) || command.constructor.service !== 's3') {
+    throw new TypeError('getSignedUrl(client, command, options) needs an S3 command second, like new PutObjectCommand({ Bucket, Key })');
+  }
+  const name = command.constructor.name;
+  const method = PRESIGN_METHODS[name];
+  if (!method) throw new Error(`The practice account can presign PutObjectCommand, GetObjectCommand, HeadObjectCommand and DeleteObjectCommand, not ${name}`);
+  const input = command.input;
+  for (const n of ['Bucket', 'Key']) {
+    if (input[n] === undefined || input[n] === null || input[n] === '') throw new Error(`No value provided for input HTTP label: ${n}.`);
+  }
+  const { expiresIn = 900, signableHeaders } = options || {};
+  if (signableHeaders !== undefined && typeof signableHeaders?.has !== 'function') throw new TypeError('signableHeaders.has is not a function');
+  if (Number(expiresIn) > presigner.WEEK) throw new Error('Signature version 4 presigned URLs must have an expiration date less than one week in the future');
+
+  // The headers the request would carry. Content-Length is signed whenever it
+  // is set; Content-Type only when signableHeaders asks for it (the real
+  // presigner leaves it out of the signature otherwise).
+  const headers = {};
+  const signed = [];
+  if (method === 'PUT' && input.ContentLength !== undefined) { headers['content-length'] = String(input.ContentLength); signed.push('content-length'); }
+  if (method === 'PUT' && input.ContentType !== undefined) {
+    headers['content-type'] = String(input.ContentType);
+    if (signableHeaders?.has('content-type')) signed.push('content-type');
+  }
+  // What the SDK moves from headers into the address: metadata, and (since
+  // 3.729.0) its default checksum settings unless the client says WHEN_REQUIRED
+  const query = {};
+  if (method === 'PUT') {
+    for (const [k, v] of Object.entries(input.Metadata || {})) query[`x-amz-meta-${k.toLowerCase()}`] = String(v);
+    if (client.config.requestChecksumCalculation !== 'WHEN_REQUIRED') Object.assign(query, { 'x-amz-checksum-crc32': 'AAAAAA==', 'x-amz-sdk-checksum-algorithm': 'CRC32' });
+  }
+  if (method === 'GET' && client.config.responseChecksumValidation !== 'WHEN_REQUIRED') query['x-amz-checksum-mode'] = 'ENABLED';
+
+  const url = presigner.sign({ method, bucket: input.Bucket, key: input.Key, region: client.config.region, headers, signed, query, expiresIn, operation: method === 'HEAD' ? undefined : name.replace(/Command$/, '') }); // the SDK adds no x-id for HeadObject
+  (STATE.presigned = STATE.presigned || []).push({ command: name, bucket: input.Bucket, key: input.Key, expiresIn: Number(expiresIn), signedHeaders: ['host', ...signed].sort(), url });
+  return url;
+};
+
+// The buckets, as the pretend fetch sees them when a request arrives at a presigned URL
+export const presignedStore = {
+  has: (name) => !(STATE.s3Denied || []).includes(name) && !!buckets()[name],
+  denied: (name) => (STATE.s3Denied || []).includes(name), // exists, in someone else's account
+  put: (name, key, { size = 0, type, text, bytes, meta } = {}) => {
+    const data = bytes instanceof Uint8Array ? bytes : typeof text === 'string' ? encoder.encode(text) : new Uint8Array(size);
+    const o = object(data, type || 'binary/octet-stream', meta);
+    if (!(bytes instanceof Uint8Array) && typeof text !== 'string') o.sized = true; // a file's bytes aren't kept, only how many
+    buckets()[name][key] = o;
+    return { etag: o.etag };
+  },
+  get: (name, key) => {
+    const o = buckets()[name]?.[key];
+    return o ? { size: o.data.length, type: o.type, text: o.sized ? '' : new TextDecoder().decode(o.data), modified: o.modified.toISOString(), etag: o.etag, meta: { ...o.meta } } : null;
+  },
+  remove: (name, key) => { delete buckets()[name]?.[key]; },
+  list: (name, prefix = '') => Object.keys(buckets()[name] || {}).filter((k) => k.startsWith(prefix)).sort()
+    .map((k) => { const o = buckets()[name][k]; return { key: k, size: o.data.length, type: o.type, modified: o.modified.toISOString() }; }),
+};
+
 // ---------------------------------------------------------------------------
 // SES (v2)
 // ---------------------------------------------------------------------------
@@ -789,6 +860,7 @@ export const snapshot = () => ({
   }]))])),
   ses: { sent: plain(STATE.ses?.sent || []) },
   cloudfront: Object.fromEntries((STATE.cloudfront?.distributions || []).map((d) => [d.id, { invalidations: plain(d.invalidations || []) }])),
+  presigned: plain(STATE.presigned || []),
   calls: plain(STATE.calls.slice(-400)),
   callCount: STATE.calls.length,
 });

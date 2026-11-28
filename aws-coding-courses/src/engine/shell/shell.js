@@ -1,10 +1,10 @@
 // The practice shell: runs the Bash subset from parser.js against the
 // in-memory file system, a pretend web (for curl) and a pretend AWS account.
 // Everything is synchronous; pipes pass each command's full output along.
-import { parse, ParseError } from './parser';
+import { parse, tokenize, ParseError } from './parser';
 import { evaluate, ArithError } from './arith';
 import { VirtualFs, FsError, HOME, globToRegex, hasGlob } from './fs';
-import { COMMANDS, setParser } from './commands';
+import { COMMANDS, BUILTINS, setParser } from './commands';
 import { FakeAws } from './fakeAws';
 
 class ExitSignal { constructor(code) { this.code = code; } }
@@ -17,6 +17,17 @@ export class ShellError extends Error {
 setParser(parse);
 
 const MAX_STEPS = 20000; // stops runaway loops (while true; do ...; done)
+// The folders where the practice shell's own programs (ls, grep, aws ...) "live"
+const SYSTEM_DIRS = ['/usr/local/bin', '/usr/bin', '/bin'];
+
+// Commands that never end a script under set -e by themselves
+const NO_ERREXIT = new Set(['list', 'andor', 'if', 'case', 'for', 'while', 'group']);
+
+// Builtins that take name=value, and so name=(a b c) too
+const DECLARING = new Set(['local', 'declare', 'typeset', 'export', 'readonly']);
+
+// $'...': backslash escapes become the characters they stand for
+const ANSI_C = { n: '\n', t: '\t', r: '\r', a: '\u0007', b: '\b', e: '\u001b', f: '\f', v: '\v', '\\': '\\', "'": "'", '"': '"' };
 
 export class Shell {
   /**
@@ -44,7 +55,11 @@ export class Shell {
       this.fs.cwd = this.fs.resolve(scenario.cwd);
       this.vars.PWD = this.fs.cwd;
     }
+    // The variables handed on to programs this shell starts (scripts, bash -c).
+    // A plain NAME=value stays in this shell until `export NAME`.
+    this.exported = new Set(Object.keys(this.vars));
     this.functions = {};
+    this.arrays = {}; // name=(a b c): indexed arrays, kept apart from the text variables
     this.positional = [];
     this.scriptName = 'bash';
     this.status = 0;
@@ -130,6 +145,7 @@ export class Shell {
       case 'pipeline': status = this.execPipeline(node, io); break;
       case 'simple': status = this.execSimple(node, io); break;
       case 'if': status = this.withRedirects(node, io, (rio) => this.execIf(node, rio)); break;
+      case 'case': status = this.withRedirects(node, io, (rio) => this.execCase(node, rio)); break;
       case 'for': status = this.withRedirects(node, io, (rio) => this.execFor(node, rio)); break;
       case 'while': status = this.withRedirects(node, io, (rio) => this.execWhile(node, rio)); break;
       case 'group': status = this.withRedirects(node, io, (rio) => this.execList(node.body, rio)); break;
@@ -143,7 +159,10 @@ export class Shell {
       default: throw new ShellError(`unsupported: ${node.type}`);
     }
     this.status = status;
-    if (status !== 0 && this.options.errexit && this.conditionDepth === 0 && !['list', 'andor'].includes(node.type) && !node.negate) {
+    // set -e. A failure inside if / for / while / case / { } already stopped the
+    // script there, unless it was one Bash ignores (the left side of && or ||).
+    // Then the compound command ends non-zero too, and Bash carries on.
+    if (status !== 0 && this.options.errexit && this.conditionDepth === 0 && !NO_ERREXIT.has(node.type) && !node.negate) {
       throw new ExitSignal(status);
     }
     return status;
@@ -154,6 +173,17 @@ export class Shell {
       if (this.inCondition(() => this.execList(cond, io)) === 0) return this.execList(body, io);
     }
     return node.elseBody ? this.execList(node.elseBody, io) : 0;
+  }
+
+  // Runs the commands of the first pattern that matches (* ? [abc] are wildcards)
+  execCase(node, io) {
+    const text = (raw) => this.expandWord(raw, { split: false, glob: false }).join('');
+    const value = text(node.word);
+    const anything = (glob) => new RegExp(globToRegex(glob).source.replace(/\[\^\/\]/g, '[^]'));
+    for (const { patterns, body } of node.clauses) {
+      if (patterns.some((p) => anything(text(p)).test(value))) return this.execList(body, io);
+    }
+    return 0;
   }
 
   execFor(node, io) {
@@ -217,15 +247,35 @@ export class Shell {
 
   // Runs fn with a copy of the shell's variables and directory, then restores them
   subshell(fn) {
-    const saved = { vars: { ...this.vars }, cwd: this.fs.cwd, functions: { ...this.functions }, options: { ...this.options }, positional: [...this.positional] };
+    const arrays = Object.fromEntries(Object.entries(this.arrays).map(([k, v]) => [k, [...v]]));
+    const saved = { vars: { ...this.vars }, exported: new Set(this.exported), arrays, cwd: this.fs.cwd, functions: { ...this.functions }, options: { ...this.options }, positional: [...this.positional] };
     try {
       return fn();
     } catch (e) {
       if (e instanceof ExitSignal) return e.code;
       throw e;
     } finally {
-      Object.assign(this, { vars: saved.vars, functions: saved.functions, options: saved.options, positional: saved.positional });
+      Object.assign(this, { vars: saved.vars, exported: saved.exported, arrays: saved.arrays, functions: saved.functions, options: saved.options, positional: saved.positional });
       this.fs.cwd = saved.cwd;
+    }
+  }
+
+  // Runs fn as a new program would run (./script.sh, bash -c '...'): it starts
+  // with the exported variables only, and without this shell's functions,
+  // arrays and `set` options. Nothing it changes comes back.
+  childProcess(fn) {
+    const locals = this.localStack;
+    try {
+      return this.subshell(() => {
+        this.vars = Object.fromEntries(Object.entries(this.vars).filter(([name]) => this.exported.has(name)));
+        this.arrays = {};
+        this.functions = {};
+        this.options = { errexit: false, nounset: false, pipefail: false, xtrace: false };
+        this.localStack = [];
+        return fn();
+      });
+    } finally {
+      this.localStack = locals;
     }
   }
 
@@ -245,6 +295,12 @@ export class Shell {
       const target = this.expandWord(r.target, { split: false })[0] ?? '';
       if (r.op === '<') {
         stdin = this.fs.read(target);
+        input = undefined;
+        continue;
+      }
+      // cmd <<< "text": the text, plus a line break, is the command's input
+      if (r.op === '<<<') {
+        stdin = `${target}\n`;
         input = undefined;
         continue;
       }
@@ -280,25 +336,50 @@ export class Shell {
     this.lastSubstStatus = undefined;
     // [[ ... ]] doesn't split words or expand wildcards
     const literal = node.words[0] === '[[' ? { split: false, glob: false } : undefined;
-    const words = node.words.flatMap((w) => this.expandWord(w, literal));
-    const assigns = node.assigns.map((a) => ({ ...a, value: this.expandWord(a.raw, { split: false, glob: false }).join('') }));
+    // local list=(a "b c"): the items are read here, from the word as written, for assign()
+    const arrayLiterals = {};
+    const declaring = DECLARING.has(node.words[0]);
+    const words = node.words.flatMap((w) => {
+      const m = declaring && w.match(/^([A-Za-z_][A-Za-z0-9_]*)=(\(.*\))$/s);
+      if (!m) return this.expandWord(w, literal);
+      arrayLiterals[m[1]] = this.arrayItems(m[2]);
+      return [`${m[1]}=()`];
+    });
+    const assigns = node.assigns.map((a) => (/^\(.*\)$/s.test(a.raw)
+      ? { ...a, items: this.arrayItems(a.raw) }
+      : { ...a, value: this.expandWord(a.raw, { split: false, glob: false }).join('') }));
 
     if (!words.length) {
-      for (const a of assigns) this.setVar(a.name, a.append ? (this.vars[a.name] ?? '') + a.value : a.value);
+      for (const a of assigns) {
+        if (a.items) this.setArray(a.name, a.items, a.append);
+        else if (a.index !== undefined) this.setElement(a.name, a.index, a.value, a.append);
+        else this.setVar(a.name, a.append ? (this.getVar(a.name) ?? '') + a.value : a.value);
+      }
       if (node.redirs.length) this.applyRedirects(node.redirs, io).flush();
       return this.lastSubstStatus ?? 0;
     }
 
     if (this.options.xtrace) io.err(`+ ${words.join(' ')}\n`);
     const { io: rio, flush } = this.applyRedirects(node.redirs, io);
-    // VAR=value cmd: the assignment only lasts for that command
-    const savedVars = assigns.length ? { ...this.vars } : null;
-    for (const a of assigns) this.vars[a.name] = a.value;
+    // VAR=value cmd: the assignment only lasts for that command. Only the
+    // names set in front are put back, so what a function or `read` assigns stays.
+    // For that command the variable is exported too: the program started sees it.
+    const saved = assigns.map((a) => ({ name: a.name, had: a.name in this.vars, value: this.vars[a.name], exported: this.exported.has(a.name) }));
+    for (const a of assigns) {
+      this.vars[a.name] = a.value ?? a.items.join(' ');
+      this.exported.add(a.name);
+    }
+    this.arrayLiterals = arrayLiterals;
     try {
       return this.invoke(words, rio);
     } finally {
+      this.arrayLiterals = {};
       flush();
-      if (savedVars) this.vars = savedVars;
+      for (const v of saved) {
+        if (v.had) this.vars[v.name] = v.value;
+        else delete this.vars[v.name];
+        if (!v.exported) this.exported.delete(v.name);
+      }
     }
   }
 
@@ -306,7 +387,9 @@ export class Shell {
     const [name, ...args] = words;
     if (this.functions[name]) return this.callFunction(name, args, io);
     if (name.includes('/')) return this.runScriptFile(name, args, io, { needsExec: true });
-    const cmd = COMMANDS[name];
+    const found = this.locate(name);
+    if (found?.kind === 'file') return this.runScriptFile(found.path, args, io, { needsExec: true });
+    const cmd = found && COMMANDS[name];
     if (!cmd) {
       io.err(`bash: ${name}: command not found\n`);
       return 127;
@@ -321,6 +404,22 @@ export class Shell {
     }
   }
 
+  // Where a command name leads, the way Bash decides: a function, a shell
+  // builtin, or the first match in the folders of $PATH, left to right. A
+  // runnable file in one of those folders wins over a program of the same
+  // name further along, which is how a test puts a pretend `aws` in front.
+  locate(name) {
+    if (this.functions[name]) return { kind: 'function' };
+    if (BUILTINS.has(name)) return { kind: 'builtin' };
+    for (const dir of (this.vars.PATH ?? '').split(':')) {
+      const path = `${dir || '.'}/${name}`.replace(/\/{2,}/g, '/');
+      const node = this.fs.node(path);
+      if (node && node.type !== 'dir' && node.mode & 0o111) return { kind: 'file', path };
+      if (SYSTEM_DIRS.includes(dir.replace(/\/+$/, '')) && COMMANDS[name]) return { kind: 'program', path: `/usr/bin/${name}` };
+    }
+    return null;
+  }
+
   callFunction(name, args, io) {
     const savedPositional = this.positional;
     this.positional = args;
@@ -332,9 +431,11 @@ export class Shell {
       throw e;
     } finally {
       const locals = this.localStack.pop();
-      for (const [k, v] of Object.entries(locals)) {
-        if (v === undefined) delete this.vars[k];
-        else this.vars[k] = v;
+      for (const [k, was] of Object.entries(locals)) {
+        if (was.value === undefined) delete this.vars[k];
+        else this.vars[k] = was.value;
+        if (was.items === undefined) delete this.arrays[k];
+        else this.arrays[k] = was.items;
       }
       this.positional = savedPositional;
     }
@@ -369,12 +470,9 @@ export class Shell {
       }
     };
     if (source) return run();
-    // A script runs in a child process: its variables and cd don't leak out
-    return this.subshell(() => {
-      this.options = { errexit: false, nounset: false, pipefail: false, xtrace: false };
-      this.functions = {};
-      return run();
-    });
+    // A script runs in a child process: its variables and cd don't leak out,
+    // and it only receives the variables that were exported
+    return this.childProcess(run);
   }
 
   // ------------------------------------------------------------------
@@ -392,12 +490,94 @@ export class Shell {
   declareLocal(name, value) {
     const frame = this.localStack[this.localStack.length - 1];
     if (!frame) throw new ShellError('local: can only be used in a function');
-    if (!(name in frame)) frame[name] = this.vars[name];
-    if (value !== undefined) this.vars[name] = value;
+    if (!(name in frame)) {
+      frame[name] = { value: this.vars[name], items: this.arrays[name] };
+      delete this.arrays[name];
+    }
+    if (value !== undefined) this.assign(name, value);
     else if (!(name in this.vars)) this.vars[name] = '';
   }
 
-  setVar(name, value) { this.vars[name] = String(value); }
+  setVar(name, value) {
+    if (this.arrays[name]) this.arrays[name][0] = String(value);
+    else this.vars[name] = String(value);
+  }
+
+  // name=value as `local`, `declare` and `export` receive it. Written as
+  // name=(a b), it makes an array (execSimple kept the items).
+  assign(name, value) {
+    if (this.arrayLiterals?.[name]) this.setArray(name, this.arrayLiterals[name]);
+    else this.setVar(name, value);
+  }
+
+  // ------------------------------------------------------------------
+  // Indexed arrays: name=(a b c), name+=(d), name[2]=x
+  // ------------------------------------------------------------------
+
+  // The words between the parentheses of name=( ... ), expanded like arguments
+  arrayItems(raw) {
+    return tokenize(raw.slice(1, -1)).filter((t) => t.t === 'word').flatMap((t) => this.expandWord(t.v));
+  }
+
+  // The items of an array. A plain variable counts as an array of one.
+  itemsOf(name) {
+    if (this.arrays[name]) return this.arrays[name];
+    return this.vars[name] ? [this.vars[name]] : [];
+  }
+
+  setArray(name, items, append = false) {
+    this.arrays[name] = append ? [...this.itemsOf(name), ...items] : [...items];
+    delete this.vars[name];
+  }
+
+  setElement(name, index, value, append = false) {
+    const items = [...this.itemsOf(name)];
+    const i = evaluate(this.expandString(index, { arith: true }), this.varAccess());
+    if (i < 0) throw new ShellError(`${name}[${index}]: bad array subscript`);
+    items[i] = append ? (items[i] ?? '') + value : value;
+    this.arrays[name] = Array.from(items, (x) => x ?? '');
+    delete this.vars[name];
+  }
+
+  // What "$*" and "${name[*]}" put between the items: the first character of IFS
+  joiner() {
+    return this.vars.IFS === undefined ? ' ' : this.vars.IFS.slice(0, 1);
+  }
+
+  // ${name[@]}, ${name[*]}, ${#name[@]}, ${!name[@]}, ${name[2]}, ${#name[2]},
+  // and after the brackets: :-default, :+other, :start and :start:count
+  arrayParam([, prefix, name, index, rest = ''], quoted) {
+    const bad = () => new ShellError(`\${${prefix ?? ''}${name}[${index}]${rest}}: bad substitution`);
+    if (rest && prefix) throw bad();
+    const word = rest.match(/^:?([-+])(.*)$/s);
+    const slice = !word && rest.match(/^:(-?\d+)(?::(\d+))?$/);
+    if (rest && !word && !slice) throw bad();
+    let items = this.itemsOf(name);
+    if (index === '@' || index === '*') {
+      if (prefix === '#') return { text: String(items.length) };
+      if (word) {
+        if ((word[1] === '-') === (items.length === 0)) return { text: this.expandString(word[2]) };
+        if (word[1] === '+') return { text: '' };
+      }
+      if (slice) {
+        const start = Number(slice[1]) < 0 ? Math.max(0, items.length + Number(slice[1])) : Number(slice[1]);
+        items = items.slice(start, slice[2] === undefined ? undefined : start + Number(slice[2]));
+      }
+      const list = prefix === '!' ? items.map((_, i) => String(i)) : items;
+      if (index === '@' && quoted) return { fields: [...list] };
+      return { text: list.join(index === '*' && quoted ? this.joiner() : ' ') };
+    }
+    if (slice) throw bad();
+    const i = evaluate(this.expandString(index, { arith: true }), this.varAccess());
+    const value = items[i < 0 ? items.length + i : i];
+    if (word) {
+      const missing = rest[0] === ':' ? !value : value === undefined;
+      if ((word[1] === '-') === missing) return { text: this.expandString(word[2]) };
+      return { text: word[1] === '+' ? '' : value };
+    }
+    if (value === undefined && this.options.nounset) throw new ShellError(`${name}[${index}]: unbound variable`);
+    return { text: prefix === '#' ? String((value ?? '').length) : value ?? '' };
+  }
 
   getVar(name) {
     if (/^[0-9]+$/.test(name)) {
@@ -407,13 +587,14 @@ export class Shell {
     switch (name) {
       case '?': return String(this.status);
       case '#': return String(this.positional.length);
-      case '@': case '*': return this.positional.join(' ');
+      case '@': return this.positional.join(' ');
+      case '*': return this.positional.join(this.joiner());
       case '$': return '4242';
       case '!': return '4243';
       case 'RANDOM': return String(Math.floor(Math.random() * 32768));
       case 'PWD': return this.fs.cwd;
       case 'SECONDS': return String(Math.floor((Date.now() - (this.startedAt ??= Date.now())) / 1000));
-      default: return this.vars[name];
+      default: return this.arrays[name] ? this.arrays[name][0] : this.vars[name];
     }
   }
 
@@ -430,6 +611,7 @@ export class Shell {
     // Each field is a list of chars tagged quoted/unquoted
     const fields = [[]];
     let sawQuotes = false;
+    let vanished = false; // "$@" or "${list[@]}" with nothing in it: no word at all
     const add = (text, quoted) => {
       const f = fields[fields.length - 1];
       for (const ch of text) f.push({ ch, quoted });
@@ -446,10 +628,29 @@ export class Shell {
         i = end + 1;
       } else if (c === '"') {
         sawQuotes = true;
-        i = this.expandDouble(raw, i + 1, add, newField);
+        i = this.expandDouble(raw, i + 1, add, newField, () => { vanished = true; });
       } else if (c === '\\') {
         add(raw[i + 1] ?? '', true);
         i += 2;
+      } else if (c === '$' && raw[i + 1] === "'") {
+        // $'...': a quoted string where \n is a line break, \t a tab
+        let text = '';
+        let j = i + 2;
+        for (; j < raw.length && raw[j] !== "'"; j++) {
+          if (raw[j] !== '\\' || j + 1 >= raw.length) { text += raw[j]; continue; }
+          // \033 and \x1b (the start of a colour code), \u00e9
+          const code = raw.slice(j + 1).match(/^(?:([0-7]{1,3})|x([0-9A-Fa-f]{1,2})|u([0-9A-Fa-f]{1,4}))/);
+          if (code) {
+            text += String.fromCodePoint(code[1] ? parseInt(code[1], 8) : parseInt(code[2] ?? code[3], 16));
+            j += code[0].length;
+          } else {
+            j++;
+            text += ANSI_C[raw[j]] ?? `\\${raw[j]}`;
+          }
+        }
+        add(text, true);
+        sawQuotes = true;
+        i = j + 1;
       } else if (c === '$' || c === '`') {
         const { text, end, fields: multi } = this.expandDollar(raw, i, false);
         if (multi) {
@@ -478,7 +679,7 @@ export class Shell {
         }
       }
       if (cur) words.push(cur);
-      else if (sawQuotes && field.length === 0 && fields.length === 1) words.push([]);
+      else if (sawQuotes && !vanished && field.length === 0 && fields.length === 1) words.push([]);
     }
 
     return words.flatMap((w) => {
@@ -492,7 +693,7 @@ export class Shell {
 
   // Inside "...": expands $ and `, keeps everything else literal.
   // Returns the index after the closing quote.
-  expandDouble(raw, i, add, newField) {
+  expandDouble(raw, i, add, newField, onNoFields) {
     while (i < raw.length && raw[i] !== '"') {
       const c = raw[i];
       if (c === '\\' && '$`"\\\n'.includes(raw[i + 1])) {
@@ -500,8 +701,10 @@ export class Shell {
         i += 2;
       } else if (c === '$' || c === '`') {
         const { text, end, fields: multi } = this.expandDollar(raw, i, true);
-        if (multi) multi.forEach((f, idx) => { if (idx) newField(); add(f, true); });
-        else add(text, true);
+        if (multi) {
+          if (!multi.length) onNoFields?.();
+          multi.forEach((f, idx) => { if (idx) newField(); add(f, true); });
+        } else add(text, true);
         i = end;
       } else {
         add(c, true);
@@ -530,6 +733,8 @@ export class Shell {
     }
     if (n === '{') {
       const end = raw.indexOf('}', i);
+      const element = raw.slice(i + 2, end).match(/^([#!])?([A-Za-z_][A-Za-z0-9_]*)\[([^\]]+)\](.*)$/s);
+      if (element) return { ...this.arrayParam(element, quoted), end: end + 1 };
       return { text: this.braceParam(raw.slice(i + 2, end), quoted), end: end + 1, ...(raw.slice(i + 2, end) === '@' && quoted ? { fields: [...this.positional] } : {}) };
     }
     if (n === '@' && quoted) return { fields: [...this.positional], end: i + 2 };

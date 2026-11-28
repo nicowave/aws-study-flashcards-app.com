@@ -13,17 +13,17 @@ Checked against `main` on 2026-11-28 (commit `69c1172`).
 
 | Course | Tutorials on `main` | Hours shown | Live | In flight (other session) |
 |---|---|---|---|---|
-| Bash for AWS | 4 (+ Start here) | 10 | yes | Bash 5 |
-| Python for AWS | 4 (+ Start here) | 16 | yes | Python 5 |
-| JavaScript for AWS | 4 (+ Start here) | 18 | yes | JavaScript 5 |
+| Bash for AWS | 5 (+ Start here) | 14 | yes | none |
+| Python for AWS | 5 (+ Start here) | 21 | yes | none |
+| JavaScript for AWS | 5 (+ Start here) | 24 | yes | none |
 | TypeScript for AWS | 3 (+ Start here) | 14 | yes | TypeScript 4 |
 | Tech Spanish ↔ Tech English | 8 modules + Start here | 8 | **no** (written; launch waits on the owner) | none |
 
-**In flight, not to be written twice.** One tutorial per course is being written in another session, on branch `claude/confident-franklin-osujab`. On 2026-11-28 none of them is on `main` and no pull request for them is open.
+**In flight, not to be written twice.** Bash 5, Python 5 and JavaScript 5 are written, tested and reviewed, and arrive with the pull request that made this edit (branch `claude/confident-franklin-osujab`, 2026-11-28); the three rows above show the course as it is once that merges. TypeScript 4 is still being written in that other session: its first author run was cut off before the tutorial file existed, so it is not in that pull request. Do not write it twice.
 
-- [ ] Bash 5: "Deploy many sites, and tell the truth" (multi-site deploy, honest summary, testing with a pretend `aws`)
-- [ ] Python 5: summarising support tickets with Amazon Bedrock (adds a pretend `bedrock-runtime` client to the practice engine)
-- [ ] JavaScript 5: photo uploads straight to S3 with presigned URLs (may add a pretend presigner)
+- [x] Bash 5: "Deploy many sites, and tell the truth" (multi-site deploy, honest summary, testing with a pretend `aws`)
+- [x] Python 5: "Summarize support tickets with Amazon Bedrock" (adds a pretend `bedrock-runtime` client to the practice engine)
+- [x] JavaScript 5: "Photo uploads without a server" (presigned URLs; adds a pretend `@aws-sdk/s3-request-presigner`, S3 over the pretend `fetch`, and file inputs in page probes)
 - [ ] TypeScript 4: a typed API, end to end
 
 Tutorials below are numbered after these. If one of them changes scope, the tutorial after it is re-checked for overlap before it is written.
@@ -42,7 +42,7 @@ Comparable courses also cover, and this one does not yet: arrays, `case` and opt
 
 | # | Tutorial | Why | Practice-engine needs |
 |---|---|---|---|
-| 5 | Deploy many sites, and tell the truth | In flight | (other session) |
+| 5 | Deploy many sites, and tell the truth | Done 2026-11-28 | Added: commands found through `PATH`, indexed arrays, `case`, exported variables, Bash 5.2's `set -e` rules |
 | 6 | **The server fleet report**: list EC2 instances, find the untagged and the forgotten, stop the dev ones at night | EC2 is the service every AWS job touches and the course has none; teaches arrays, `case`, `getopts` and `--query` | Pretend `aws ec2 describe-instances / stop-instances / create-tags`; the tiny `--query` reader may need filters (`[?…]`). Must run on Bash 3.2 (the Mac): no associative arrays |
 | 7 | **First day on a new server**: a setup script that is safe to run twice (users, permissions, a config file edited in place, a service started) | Permissions, `sed`, `find`/`xargs` and here-documents are the biggest gap against any general Bash course; "safe to run twice" is what makes a script a tool | `chmod`/`chown` with visible modes in `ls -l`, `sed -i`, `find`, `xargs`, a pretend `systemctl`; likely the largest engine job on this list |
 | 8 | **Watch the logs from your desk**: search CloudWatch Logs, send your own metric, clean up after yourself with `trap` | Closes the loop from tutorial 2 (logs on a disk) to where logs live on AWS; `trap` and temp files finish the "safe scripts" thread | Pretend `aws logs filter-log-events / tail`, `aws cloudwatch put-metric-data`; `trap`, `mktemp` |
@@ -55,7 +55,7 @@ Comparable courses also cover, and this one does not yet: automated tests; class
 
 | # | Tutorial | Why | Practice-engine needs |
 |---|---|---|---|
-| 5 | Summarise support tickets with Amazon Bedrock | In flight | (other session) |
+| 5 | Summarize support tickets with Amazon Bedrock | Done 2026-11-28 | Added: pretend `bedrock-runtime` (Converse), `practice.aws.checkpoint()` / `restore()` |
 | 6 | **Test it before it ships**: tests for the upload pipeline's checks, a pretend AWS in the tests, logs you can read at 3 a.m. | Testing is the largest single gap against comparable courses, and employers ask for it first | `unittest` and `unittest.mock` ship with Python, so possibly none; to confirm: test output shown clearly, and a check that can tell passing tests from no tests |
 | 7 | **A queue between two jobs**: SQS between the upload and the slow work, retries, a dead-letter queue, partial batch failures; messages as dataclasses | Queues are how AWS systems survive failure and a staple of the Developer Associate exam; dataclasses and type hints arrive with a real use | Pretend `sqs` client in `practice_aws.py` (send, receive, delete, visibility timeout, redrive) and SQS events for `invoke` |
 | 8 | **Your own tool, packaged**: turn the scripts into one command with `argparse`, modules, a virtual environment and `pip install` | The step from "scripts" to "a tool a colleague can install"; covers modules and packaging, which every general course has | Several files importing each other (to confirm), command-line arguments for a run; `pip` and virtual environments are taught in "Build it" only |
@@ -68,7 +68,7 @@ Comparable courses also cover, and this one does not yet: automated tests; array
 
 | # | Tutorial | Why | Practice-engine needs |
 |---|---|---|---|
-| 5 | Photo uploads straight to S3 with presigned URLs | In flight | (other session) |
+| 5 | Photo uploads without a server (presigned URLs) | Done 2026-11-28 | Added: pretend presigner, S3 over `fetch`, `practice.chooseFile` |
 | 6 | **Test the API before your users do**: tests for the contact-form and study-tracker handlers, every status code, a pretend DynamoDB | Same gap as Python: no testing anywhere in the course | `node:test` and `node:assert` in the node runtime (neither is importable today); test results in the check |
 | 7 | **Design the data: one table, many questions**: keys, `Query`, an index, pages with `LastEvaluatedKey`, shaping results with `map`/`filter`/`reduce` | Tutorials 3–4 use DynamoDB one item at a time; real apps need modelling, and array methods get a full workout | `QueryCommand` with a global secondary index and paging in the pretend DynamoDB (to confirm what exists) |
 | 8 | **The weekly digest**: a scheduled Lambda that reads the week's activity and emails each person a summary | Scheduled, no-user-waiting code is the other half of serverless; uses modules, dates and SES together | A scheduled (EventBridge Scheduler) event for `invoke`; SES exists. Probably small |
@@ -83,7 +83,7 @@ Comparable courses also cover, and this one does not yet: `unknown` and validati
 
 | # | Tutorial | Why | Practice-engine needs |
 |---|---|---|---|
-| 4 | A typed API, end to end | In flight | (other session) |
+| 4 | A typed API, end to end | In flight, not in a pull request yet | (other session) |
 | 5 | **Never trust input**: `unknown`, a small validator whose types come from the schema, utility types, `satisfies` | Types vanish at run time: the lesson every TypeScript learner meets in production. **Overlap risk with TypeScript 4**; scope is fixed only after that one is readable | None expected |
 | 6 | **Test the stack**: assertions on the CDK template (no public bucket, the right table keys) and handler tests | The CDK tutorial deploys untested infrastructure; this is what a team reviews before `cdk deploy` | Pretend `aws-cdk-lib/assertions` (`Template.fromStack`, `hasResourceProperties`, `resourceCountIs`); `node:test` from JavaScript 6, so it comes after it |
 | 7 | **Events and queues, typed**: one event shape shared by sender and receiver, SQS between two Lambdas, defined in the CDK | Discriminated unions earn their keep across a service boundary; adds the queue pattern to this course | Pretend `@aws-sdk/client-sqs`, CDK `sqs.Queue` and `SqsEventSource`, SQS events for `invoke` |
@@ -125,7 +125,7 @@ Rules behind the order: the biggest gap against comparable courses first (testin
 
 | # | Item | Course | Engine work | State |
 |---|---|---|---|---|
-| 0 | Tutorials in flight (Bash 5, Python 5, JavaScript 5, TypeScript 4) | all | other session | [ ] not on `main` yet |
+| 0 | Tutorials in flight (Bash 5, Python 5, JavaScript 5, TypeScript 4) | all | other session | [x] Bash 5, Python 5, JavaScript 5 (pull request from `claude/confident-franklin-osujab`) · [ ] TypeScript 4 still being written |
 | 1 | Python 6: Test it before it ships | Python | little or none | [ ] |
 | 2 | TypeScript 5: Never trust input | TypeScript | none | [ ] waits for TypeScript 4 to be readable |
 | 3 | JavaScript 6: Test the API before your users do | JavaScript | `node:test`, `node:assert` | [ ] |

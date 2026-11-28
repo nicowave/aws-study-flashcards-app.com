@@ -1025,9 +1025,26 @@ const assignArgs = (ctx, fn) => {
   }
   return 0;
 };
-C.export = (ctx) => assignArgs(ctx, (n, v) => { if (v !== undefined) ctx.shell.setVar(n, v); });
-C.readonly = C.export;
-C.declare = C.export;
+// export NAME, export NAME=value: the variable is handed on to every program
+// started from here. export -n NAME takes that back (the variable stays).
+C.export = (ctx) => {
+  const off = ctx.args.includes('-n');
+  return assignArgs(ctx, (n, v) => {
+    if (v !== undefined) ctx.shell.assign(n, v);
+    if (off) ctx.shell.exported.delete(n);
+    else ctx.shell.exported.add(n);
+  });
+};
+C.readonly = (ctx) => assignArgs(ctx, (n, v) => { if (v !== undefined) ctx.shell.assign(n, v); });
+// declare -x NAME=value is another way to write export
+C.declare = (ctx) => {
+  const exporting = ctx.args.some((a) => /^-[A-Za-z]*x/.test(a));
+  return assignArgs(ctx, (n, v) => {
+    if (v !== undefined) ctx.shell.assign(n, v);
+    if (exporting) ctx.shell.exported.add(n);
+  });
+};
+C.typeset = C.declare;
 C.local = (ctx) => {
   try {
     return assignArgs(ctx, (n, v) => ctx.shell.declareLocal(n, v));
@@ -1036,7 +1053,24 @@ C.local = (ctx) => {
     return 1;
   }
 };
-C.unset = (ctx) => { for (const a of ctx.args) if (!a.startsWith('-')) { delete ctx.shell.vars[a]; delete ctx.shell.functions[a]; } return 0; };
+C.unset = (ctx) => {
+  for (const a of ctx.args) {
+    if (a.startsWith('-')) continue;
+    delete ctx.shell.vars[a];
+    delete ctx.shell.arrays[a];
+    delete ctx.shell.functions[a];
+    ctx.shell.exported.delete(a);
+  }
+  return 0;
+};
+
+// let "n += 1": arithmetic as a command. Like (( )), it fails when the last result is 0.
+C.let = (ctx) => {
+  if (!ctx.args.length) { ctx.err('bash: let: expression expected\n'); return 1; }
+  let value = 0;
+  for (const expr of ctx.args) value = evaluate(expr, ctx.shell.varAccess());
+  return value === 0 ? 1 : 0;
+};
 
 C.set = (ctx) => {
   const { shell } = ctx;
@@ -1142,10 +1176,19 @@ C.bash = (ctx) => {
   if (args[0] === '-c') {
     const src = args[1] ?? '';
     const { shell } = ctx;
-    return shell.subshell(() => {
+    // A new program: it gets the exported variables, not this shell's options or functions
+    return shell.childProcess(() => {
+      if (flags.some((f) => /^-[a-z]*x/.test(f))) shell.options.xtrace = true;
+      if (flags.some((f) => /^-[a-z]*e/.test(f))) shell.options.errexit = true;
+      if (flags.some((f) => /^-[a-z]*u/.test(f))) shell.options.nounset = true;
+      const savedName = shell.scriptName;
+      if (args[2] !== undefined) shell.scriptName = args[2];
       shell.positional = args.slice(3);
-      const res = shell.execList(parseOrThrow(src), ctx.io);
-      return res;
+      try {
+        return shell.execList(parseOrThrow(src), ctx.io);
+      } finally {
+        shell.scriptName = savedName;
+      }
     });
   }
   if (!args.length) { ctx.err('bash: (practice shell) you are already in bash. Run a script with: bash script.sh\n'); return 0; }
@@ -1160,7 +1203,7 @@ C.bash = (ctx) => {
   }
   const { shell } = ctx;
   if (flags.includes('-x')) {
-    return shell.subshell(() => {
+    return shell.childProcess(() => {
       shell.options.xtrace = true;
       return shell.runScriptFile(args[0], args.slice(1), ctx.io, { source: true });
     });
@@ -1175,10 +1218,18 @@ export const setParser = (fn) => { parseOrThrow = fn; };
 
 C.type = (ctx) => {
   let status = 0;
-  for (const n of ctx.args) {
-    if (ctx.shell.functions[n]) ctx.out(`${n} is a function\n`);
-    else if (BUILTINS.has(n)) ctx.out(`${n} is a shell builtin\n`);
-    else if (COMMANDS[n]) ctx.out(`${n} is /usr/bin/${n}\n`);
+  // type -t name: one word (function, builtin, file), nothing when not found
+  const brief = ctx.args[0] === '-t';
+  for (const n of brief ? ctx.args.slice(1) : ctx.args) {
+    const found = ctx.shell.locate(n);
+    if (brief) {
+      if (found) ctx.out(`${found.kind === 'program' ? 'file' : found.kind}\n`);
+      else status = 1;
+      continue;
+    }
+    if (found?.kind === 'function') ctx.out(`${n} is a function\n`);
+    else if (found?.kind === 'builtin') ctx.out(`${n} is a shell builtin\n`);
+    else if (found) ctx.out(`${n} is ${found.path}\n`);
     else { ctx.err(`bash: type: ${n}: not found\n`); status = 1; }
   }
   return status;
@@ -1186,7 +1237,8 @@ C.type = (ctx) => {
 C.which = (ctx) => {
   let status = 0;
   for (const n of ctx.args) {
-    if (COMMANDS[n] && !BUILTINS.has(n)) ctx.out(`/usr/bin/${n}\n`);
+    const found = ctx.shell.locate(n);
+    if (found?.path) ctx.out(`${found.path}\n`);
     else status = 1;
   }
   return status;
@@ -1194,9 +1246,10 @@ C.which = (ctx) => {
 C.command = (ctx) => {
   if (ctx.args[0] === '-v') {
     const n = ctx.args[1];
-    if (ctx.shell.functions[n] || BUILTINS.has(n)) { ctx.out(`${n}\n`); return 0; }
-    if (COMMANDS[n]) { ctx.out(`/usr/bin/${n}\n`); return 0; }
-    return 1;
+    const found = ctx.shell.locate(n ?? '');
+    if (!found) return 1;
+    ctx.out(`${found.path ?? n}\n`);
+    return 0;
   }
   return ctx.shell.invoke(ctx.args, ctx.io);
 };
@@ -1393,10 +1446,11 @@ C.hostname = (ctx) => { ctx.out(`${ctx.shell.vars.HOSTNAME}\n`); return 0; };
 C.uname = (ctx) => { ctx.out(ctx.args.includes('-a') ? `Linux ${ctx.shell.vars.HOSTNAME} 6.1.0-amzn #1 SMP x86_64 GNU/Linux\n` : 'Linux\n'); return 0; };
 C.id = (ctx) => { ctx.out('uid=1000(learner) gid=1000(learner) groups=1000(learner)\n'); return 0; };
 C.nproc = (ctx) => { ctx.out('2\n'); return 0; };
-C.env = (ctx) => { ctx.out(joinLines(Object.entries(ctx.shell.vars).filter(([k]) => /^[A-Z_]+$/.test(k)).map(([k, v]) => `${k}=${v}`))); return 0; };
+// env and printenv show what a program started from here would receive: the exported variables
+C.env = (ctx) => { ctx.out(joinLines(Object.entries(ctx.shell.vars).filter(([k]) => ctx.shell.exported.has(k)).map(([k, v]) => `${k}=${v}`))); return 0; };
 C.printenv = (ctx) => {
   if (!ctx.args.length) return C.env(ctx);
-  const v = ctx.shell.vars[ctx.args[0]];
+  const v = ctx.shell.exported.has(ctx.args[0]) ? ctx.shell.vars[ctx.args[0]] : undefined;
   if (v === undefined) return 1;
   ctx.out(`${v}\n`);
   return 0;
@@ -1477,13 +1531,13 @@ C.help = (ctx) => {
     '  system     date df free uptime whoami hostname env sleep crontab logger\n' +
     '  web        curl\n' +
     '  aws        aws s3, aws cloudfront, aws secretsmanager, aws sts (a pretend account)\n' +
-    '  scripts    bash file.sh, ./file.sh, source, if, for, while, functions, $(( ))\n\n' +
+    '  scripts    bash file.sh, ./file.sh, source, if, case, for, while, functions, arrays, $(( ))\n\n' +
     'Nothing here touches your real computer or a real AWS account.\n'
   );
   return 0;
 };
 
-const BUILTINS = new Set(['echo', 'printf', 'cd', 'pwd', 'exit', 'return', 'break', 'continue', 'export', 'readonly', 'declare', 'local', 'unset', 'set', 'shift', 'read', 'test', '[', '[[', 'source', '.', 'type', 'command', 'true', 'false', ':', 'help', 'history']);
+export const BUILTINS = new Set(['echo', 'printf', 'cd', 'pwd', 'exit', 'return', 'break', 'continue', 'export', 'readonly', 'declare', 'typeset', 'let', 'local', 'unset', 'set', 'shift', 'read', 'test', '[', '[[', 'source', '.', 'type', 'command', 'true', 'false', ':', 'help', 'history']);
 
 export const COMMANDS = C;
 export const COMMAND_NAMES = Object.keys(C).sort();
