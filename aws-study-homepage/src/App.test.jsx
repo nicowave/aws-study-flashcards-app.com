@@ -9,6 +9,7 @@ import { COURSES, OTHER_COURSES } from './data/courses';
 import { GIS_PAGE } from './data/gis';
 import { HERO_SLIDES } from './data/heroSlides';
 import { PROMOTIONS } from './services/offers';
+import { holdBrowserRestore } from './services/scrollRestore';
 
 // --- Boundaries -------------------------------------------------------------
 // Sign-in state comes from a fake AuthContext; each test sets what it needs.
@@ -1085,12 +1086,39 @@ describe('App', () => {
       jumps = vi.spyOn(window, 'scrollTo').mockImplementation(function scrollTo(a, b) {
         setScrollY(typeof a === 'object' ? a.top : b);
       });
+      // jsdom has no history.scrollRestoration either; browsers start every page on 'auto'
+      Object.defineProperty(window.history, 'scrollRestoration', { configurable: true, writable: true, value: 'auto' });
     });
     afterEach(() => {
       undoVisit();
       undoVisit = () => {};
       setScrollY(0);
       html.style.scrollBehavior = '';
+      delete window.history.scrollRestoration;
+    });
+
+    // When its own restore comes up short, Chrome falls back to the #section in the address and glides off there
+    it("keeps the browser's own restore out of the way meanwhile, then hands it back", async () => {
+      leaveAt(2000);
+      visitType('reload');
+      holdBrowserRestore(); // what the app does as it loads, before the page has finished parsing
+      expect(window.history.scrollRestoration).toBe('manual');
+      jumps.mockClear();
+      render(<App />);
+      expect(window.scrollY).toBe(2000);
+      await settle();
+      // Back on 'auto': the browser's restore is what makes Back between in-page #section jumps work
+      expect(window.history.scrollRestoration).toBe('auto');
+    });
+
+    it.each([
+      ['a plain visit', 'navigate', 2000],
+      ['a reload with no place saved', 'reload', null],
+    ])("leaves the browser's own restore alone on %s", (_, type, y) => {
+      if (y != null) leaveAt(y);
+      visitType(type);
+      holdBrowserRestore();
+      expect(window.history.scrollRestoration).toBe('auto');
     });
 
     it.each(['reload', 'back_forward'])('saves the place as the page is left and puts it back on a %s', async (type) => {

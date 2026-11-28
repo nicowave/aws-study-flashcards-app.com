@@ -13,7 +13,9 @@ import NewsletterSignup from './components/NewsletterSignup';
 import HeroRotator from './components/HeroRotator';
 import GisPage from './components/GisPage';
 import { captureSource } from './services/leads';
-import { isReturnVisit, tagEntry, saveScroll, savedScroll, jumpTo, watchVisitor } from './services/scrollRestore';
+import {
+  isReturnVisit, tagEntry, saveScroll, savedScroll, jumpTo, watchVisitor, holdBrowserRestore, releaseBrowserRestore,
+} from './services/scrollRestore';
 import {
   CloudIcon,
   RobotIcon,
@@ -50,6 +52,8 @@ import './styles/homepage.css';
 applyAnalyticsPreference();
 // Remember which tracked link brought this visit (sent with readiness emails)
 captureSource();
+// On a reload or Back/Forward the hub puts the place back itself; keep the browser from trying first (see below)
+holdBrowserRestore();
 
 // /gis/ is its own page (gis/index.html) but the same app: header, footer and sign-in are shared.
 // Read from the address bar each time, minus the site root ('/' or '/next/' for the test build),
@@ -1109,7 +1113,8 @@ function HomepageContent() {
 
   // A reload or Back/Forward puts the visitor back where they were. The browser tries this itself, but while the
   // loading screen shows the page is too short, so it lands at the top (see services/scrollRestore.js). We save the
-  // place as the page is left and put it back once the sections are drawn, unless the visitor has moved meanwhile.
+  // place as the page is left and put it back once the sections are drawn, unless the visitor has moved meanwhile;
+  // the browser is kept out of the way until then (holdBrowserRestore at the top of this file).
   const viewRef = useRef(currentPage);
   viewRef.current = currentPage;
   useLayoutEffect(() => {
@@ -1135,11 +1140,15 @@ function HomepageContent() {
       twoFrames(() => Promise.resolve(document.fonts?.ready).then(() => twoFrames(() => {
         putBack();
         visitor.stop();
+        releaseBrowserRestore(); // the browser's own restore is needed again for Back between #section jumps
       })));
+    } else {
+      releaseBrowserRestore();
     }
     return () => {
       cancelled = true;
       visitor?.stop();
+      releaseBrowserRestore();
       window.removeEventListener('hashchange', tagEntry);
       window.removeEventListener('hub:locationchange', tagEntry);
       window.removeEventListener('pagehide', onLeave);

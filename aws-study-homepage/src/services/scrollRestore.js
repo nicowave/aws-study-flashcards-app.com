@@ -6,8 +6,10 @@
 // signed in, every Back visit and most reloads ended at the top.) So the hub keeps the position itself: it is saved
 // for each history entry when the page is left, and put back once the sections are drawn.
 //
-// history.scrollRestoration stays 'auto' on purpose: 'manual' would also switch off the browser's restore for
-// Back/Forward between in-page #section jumps, which works today. Ours only steps in when the browser came up short.
+// While the hub puts the place back, the browser is asked to stand aside (history.scrollRestoration = 'manual'):
+// when its own attempt comes up short, Chrome falls back to the #section in the address and glides off there.
+// It is handed back ('auto') as soon as the place is back, because the setting passes on to new history entries,
+// and the browser's restore is what makes Back/Forward between in-page #section jumps work.
 
 const STORE_KEY = 'hub:scrollY'; // sessionStorage (this tab only): { [history entry id]: scrollY }
 const MAX_SAVED = 30; // a long visit must not grow the store forever
@@ -75,6 +77,23 @@ export const savedScroll = () => {
   const id = entryId();
   const y = id ? readStore()[id] : undefined;
   return Number.isFinite(y) ? y : null;
+};
+
+// Called once as the app loads, before the page has finished parsing: that is when the browser decides whether to
+// restore or to jump to the #section. Only on a return visit that has a place saved; otherwise the browser's own
+// restore is all there is, so it is left alone.
+let held = false;
+export const holdBrowserRestore = () => {
+  try {
+    if (!isReturnVisit() || !(savedScroll() > 0) || !('scrollRestoration' in window.history)) return;
+    window.history.scrollRestoration = 'manual';
+    held = true;
+  } catch { /* an old browser without the setting: nothing to hold */ }
+};
+export const releaseBrowserRestore = () => {
+  if (!held) return;
+  held = false;
+  try { window.history.scrollRestoration = 'auto'; } catch { /* as above */ }
 };
 
 // Straight there, never gliding: the page scrolls smoothly when motion is allowed, but a restore is not a jump
