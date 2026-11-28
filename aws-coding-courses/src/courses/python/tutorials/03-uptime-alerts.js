@@ -261,16 +261,32 @@ def lambda_handler(event, context):
 
 // Runs after the test event: makes every site healthy, calls the handler again,
 // and counts the emails, so the check can tell "one email" and "no email when fine".
-const QUIET_PROBE = `import practice
+// Then it puts the outages back, and remembers how many emails the account
+// held, so a second and third run are judged like the first.
+const QUIET_PROBE = `import copy, practice
 msgs = practice.aws.STATE["sns"]["${TOPIC_ARN}"]["messages"]
 before = len(msgs)
-for site in practice.net.WEB.values():
-    site.clear()
-    site.update({"status": 200, "ms": 150})
-for host in list(practice.net.CERTS):
-    practice.net.CERTS[host] = {"notAfter": practice.net.cert_time(practice.net._real["time"]() + 90 * 86400)}
-quiet = lambda_handler({}, practice.context())
-RESULT = {"before": before, "after": len(msgs), "quiet": quiet}`;
+start = getattr(practice, "_site_check_seen", 0)
+if start > before:  # the practice account was reset in between
+    start = 0
+web = copy.deepcopy(practice.net.WEB)
+certs = copy.deepcopy(practice.net.CERTS)
+try:
+    for site in practice.net.WEB.values():
+        site.clear()
+        site.update({"status": 200, "ms": 150})
+    for host in list(practice.net.CERTS):
+        practice.net.CERTS[host] = {"notAfter": practice.net.cert_time(practice.net._real["time"]() + 90 * 86400)}
+    quiet = lambda_handler({}, practice.context())
+finally:
+    after = len(msgs)
+    for url, site in web.items():
+        practice.net.WEB[url].clear()
+        practice.net.WEB[url].update(site)
+    practice.net.CERTS.clear()
+    practice.net.CERTS.update(certs)
+    practice._site_check_seen = after
+RESULT = {"start": start, "before": before, "after": after, "quiet": quiet}`;
 
 const tutorial = {
   slug: 'uptime-and-certificate-alerts',
@@ -597,7 +613,7 @@ Press **Test with the sample event** to run it the way Lambda would. The console
           return `The function failed with ${err.type}: ${err.message}`;
         }
         const messages = aws?.sns?.[TOPIC_ARN]?.messages || [];
-        const sent = probe ? messages.slice(0, probe.before) : messages;
+        const sent = probe ? messages.slice(probe.start || 0, probe.before) : messages;
         if (!sent.length) return 'No email went out, but four sites have problems. Publish to TOPIC_ARN when `problems` isn\'t empty.';
         if (sent.length > 1) return `That run sent ${sent.length} emails. Send one: collect the lines in a list and publish them together with "\\n".join(...).`;
         const text = `${sent[0].subject || ''}\n${sent[0].message}`;
