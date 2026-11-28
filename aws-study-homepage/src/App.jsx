@@ -4,7 +4,7 @@ import { certifications, categories } from './data/certifications';
 import SettingsPage from './components/SettingsPage';
 import ForgotPassword from './components/ForgotPassword';
 import { applyAnalyticsPreference } from './services/analytics';
-import { BILLING_ENABLED, PRO_PRICE_LABEL, PRO_TRIAL_DAYS, getPlan, getProTrialStatus, startCheckout, openBillingPortal } from './services/billing';
+import { BILLING_ENABLED, PRO_PRICE_LABEL, PRO_TRIAL_DAYS, getPlan, getProTrialStatus, getBillingAccountStatus, startCheckout, openBillingPortal, portalErrorMessage } from './services/billing';
 import CodingCourses, { COURSES, OTHER_COURSES, PromoBanner } from './components/CodingCourses';
 import Faq from './components/Faq';
 import { currentPromotion, salePrice } from './services/offers';
@@ -532,6 +532,8 @@ const ProPlanCard = ({ onShowLogin }) => {
   const [plan, setPlan] = useState(null);
   // Signed in: does checkout give this person the free week? (true / false / null = unknown yet)
   const [trial, setTrial] = useState(null);
+  // Pro member: can the billing portal open? (false = Pro given by hand, nothing to manage; null = unknown)
+  const [billingAccount, setBillingAccount] = useState(null);
   const [busy, setBusy] = useState(false);
   const [billingError, setBillingError] = useState('');
 
@@ -545,10 +547,13 @@ const ProPlanCard = ({ onShowLogin }) => {
         setPlan(p);
         // Only people without Pro are offered it; ask the server whether they'd get the trial
         if (p !== 'pro') getProTrialStatus().then((t) => live && setTrial(t));
+        // Only Pro members get a Manage button; ask whether there is any billing behind it
+        else getBillingAccountStatus().then((b) => live && setBillingAccount(b));
       });
     } else {
       setPlan(null);
       setTrial(null);
+      setBillingAccount(null);
     }
     return () => { live = false; };
   }, [isAuthenticated]);
@@ -572,7 +577,7 @@ const ProPlanCard = ({ onShowLogin }) => {
       await openBillingPortal();
     } catch (err) {
       console.error('[Plans] Portal failed:', err);
-      setBillingError('Could not open billing portal. Please try again.');
+      setBillingError(portalErrorMessage(err, 'Could not open billing portal. Please try again.'));
       setBusy(false);
     }
   };
@@ -609,6 +614,9 @@ const ProPlanCard = ({ onShowLogin }) => {
         <button className="btn btn-card-disabled plan-cta" disabled>
           Coming Soon
         </button>
+      ) : plan === 'pro' && billingAccount === false ? (
+        // No Stripe customer: the portal could only fail, so say why there is nothing to manage
+        <p className="plan-trial-note">Pro was given to this account, not bought, so there is no billing to manage.</p>
       ) : plan === 'pro' ? (
         <button className="btn btn-card-primary plan-cta" onClick={handleManage} disabled={busy}>
           {busy ? 'Opening…' : 'Manage Subscription'}

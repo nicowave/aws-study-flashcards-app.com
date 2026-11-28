@@ -12,6 +12,7 @@ const billing = vi.hoisted(() => ({ enabled: false }));
 vi.mock('../services/billing', () => ({
   get BILLING_ENABLED() { return billing.enabled; },
   getEntitlements: vi.fn(),
+  getBillingAccountStatus: vi.fn(async () => true),
   openBillingPortal: vi.fn(),
 }));
 vi.mock('../context/AuthContext', () => ({ useAuth: vi.fn() }));
