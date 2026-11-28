@@ -120,3 +120,112 @@
   font-size: 0.75rem;
   margin: 0;
 }
+
+/* Monthly / yearly choice, Pro offer (the same block in all four games) */
+
+.paywall-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.paywall-interval {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 4px;
+  border: 1px solid var(--md-border);
+  border-radius: var(--md-radius-md);
+}
+
+.paywall-interval-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--md-radius-md);
+  color: var(--md-on-surface-variant);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.paywall-interval-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.paywall-interval-option.selected {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  font-weight: 600;
+}
+
+.paywall-interval-option:focus-within {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 2px;
+}
+
+.paywall-interval-save {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--md-success);
+}
+
+.paywall-interval-option.selected .paywall-interval-save {
+  color: inherit;
+}
+
+.paywall-pro {
+  width: 100%;
+  max-width: 360px;
+  padding: 16px;
+  border: 1px solid var(--md-border);
+  border-radius: var(--md-radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.paywall-pro p {
+  margin: 0;
+}
+
+.paywall-pro-title {
+  color: var(--md-on-surface);
+  font-size: 0.92rem;
+}
+
+.paywall-pro .paywall-price-value {
+  font-size: 1.4rem;
+}
+
+.paywall-pro-note {
+  color: var(--md-on-surface-variant);
+  font-size: 0.8rem;
+}
+
+.paywall-pro-btn {
+  background: transparent;
+  color: var(--md-primary);
+  border: 1px solid var(--md-primary);
+  border-radius: var(--md-radius-md);
+  padding: 10px 24px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+
+.paywall-pro-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}

@@ -88,6 +88,19 @@ describe('AuthScreen', () => {
     });
   });
 
+  describe('signed out by the device limit', () => {
+    it('explains why when the context has a sign-out message', () => {
+      setAuth({ signOutMessage: 'You were signed out on this browser because your account signed in on another device.' });
+      render(<AuthScreen />);
+      expect(screen.getByRole('status')).toHaveTextContent('signed in on another device');
+    });
+
+    it('shows nothing extra after an ordinary sign-out', () => {
+      render(<AuthScreen />);
+      expect(screen.queryByText(/another device/)).not.toBeInTheDocument();
+    });
+  });
+
   describe('validation', () => {
     // "Sign In" is both the submit (sign-in mode) and the mode toggle (sign-up mode)
     const submit = (user) => user.click(screen.getAllByRole('button').find((b) => b.type === 'submit'));

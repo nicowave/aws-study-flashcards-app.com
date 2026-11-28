@@ -66,6 +66,26 @@ function assertLambdaDepsInstalled(dir: string): void {
   }
 }
 
+// Every product sells monthly ($11) and yearly ($69); Pro sells yearly only.
+// Old names (STRIPE_PRICE_ALL_ACCESS, STRIPE_PRICE_DEVELOPER_PATH, the one-time
+// STRIPE_PRICE_<X>) are still passed through when present, so the webhook can
+// recognise legacy purchases, but nothing sells them.
+const PRICE_PRODUCTS = [
+  'CLOUD_PRACTITIONER',
+  'AI_PRACTITIONER',
+  'SOLUTIONS_ARCHITECT',
+  'DEVELOPER_ASSOCIATE',
+  'BASH_COURSE',
+  'PYTHON_COURSE',
+  'JAVASCRIPT_COURSE',
+  'TYPESCRIPT_COURSE',
+  'TECH_SPANISH_COURSE',
+];
+const EXPECTED_PRICE_NAMES = [
+  ...PRICE_PRODUCTS.flatMap((p) => [`STRIPE_PRICE_${p}_MONTHLY`, `STRIPE_PRICE_${p}_YEARLY`]),
+  'STRIPE_PRICE_ALL_ACCESS_YEARLY',
+];
+
 // Stripe price IDs aren't secret, but they live in the untracked
 // aws-backend/.env (STRIPE_PRICE_*=price_...). Refuse to deploy without them:
 // empty prices would switch checkout off. CI only builds (never deploys), so
@@ -80,6 +100,15 @@ function loadPriceEnv(): Record<string, string> {
   for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
     const m = line.match(/^(STRIPE_PRICE_[A-Z_]+)=(.*)$/);
     if (m) out[m[1]] = m[2].trim();
+  }
+  // Warn, don't throw: a missing price only shows that plan as "not available",
+  // and prices can be added one at a time (e.g. a course that isn't live yet).
+  const missing = EXPECTED_PRICE_NAMES.filter((name) => !out[name]);
+  if (missing.length) {
+    console.warn(
+      `Warning: ${envPath} has no price for ${missing.join(', ')}. ` +
+        'Checkout shows those plans as not available until you add them and deploy again.',
+    );
   }
   return out;
 }
@@ -162,8 +191,32 @@ export class StudyHubBackendStack extends cdk.Stack {
       },
       accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
       lambdaTriggers: { preTokenGeneration: preTokenFn, userMigration: migrateUserFn, preSignUp: migrateUserFn },
+      // The device limit below (session tracking) needs Essentials or Plus.
+      // Before deploying, check the live tier:
+      //   aws cognito-idp describe-user-pool --user-pool-id <id> --query UserPool.UserPoolTier
+      // If it says LITE, this deploy moves the pool to Essentials, which is
+      // billed differently above the free monthly active users (see
+      // https://aws.amazon.com/cognito/pricing/). If it says PLUS, change this
+      // to PLUS first, or the deploy downgrades the pool.
+      featurePlan: cognito.FeaturePlan.ESSENTIALS,
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       deletionProtection: true, // every account lives here: AWS refuses to delete the pool until this is turned off
+    });
+
+    // Device limit: an account stays signed in on at most 3 devices. At the
+    // cap the next sign-in still succeeds, and Cognito revokes the least
+    // recently used token session (its refresh token stops working). Covers
+    // every app, since they all share the one WebClient below.
+    // https://docs.aws.amazon.com/cognito/latest/developerguide/managing-user-sessions.html
+    const sessionLimit = new cognito.CfnUserPoolSessionConfigurationAttachment(this, 'SessionLimit', {
+      userPoolId: userPool.userPoolId,
+      userSessionTracking: 'ENABLED',
+      tokenSession: { maxPerUser: 3 },
+    });
+    // The synth-time validator's resource list predates this type (Nov 2026)
+    cdk.Validations.of(sessionLimit).acknowledge({
+      id: 'CloudFormation-Validate::F3006',
+      reason: 'AWS::Cognito::UserPoolSessionConfigurationAttachment is newer than the validator',
     });
 
     // Hosted UI domain (Cognito-managed). A custom domain such as
@@ -238,6 +291,9 @@ export class StudyHubBackendStack extends cdk.Stack {
       accessTokenValidity: cdk.Duration.hours(1),
       idTokenValidity: cdk.Duration.hours(1),
       refreshTokenValidity: cdk.Duration.days(30),
+      // The default, set explicitly: the device limit revokes evicted sessions'
+      // refresh tokens, and the apps revoke their own old tokens with RevokeToken.
+      enableTokenRevocation: true,
     });
     webClient.node.addDependency(googleProvider);
 

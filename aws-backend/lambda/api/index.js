@@ -4,7 +4,7 @@
 //   GET    /v1/health
 //   GET    /v1/me                    profile + all progress + entitlements
 //   PATCH  /v1/me                    { displayName?, avatar? }
-//   DELETE /v1/me                    delete data + the Cognito user
+//   DELETE /v1/me                    delete data + the Cognito user (409 while a subscription bills)
 //   GET    /v1/progress/{certId}
 //   PUT    /v1/progress/{certId}     body = the game's stats object
 //   POST   /v1/leads, /v1/newsletter, /v1/leads/unsubscribe   public, see leads.js
@@ -189,8 +189,22 @@ async function patchMe(uid, claims, body) {
   return json(200, { ok: true });
 }
 
+// Subscription statuses that keep billing (same as ACTIVE_STATUSES in callables/index.js)
+const BILLING_STATUSES = new Set(['active', 'trialing', 'past_due']);
+// Deleting the account would leave Stripe charging someone we can no longer give access to.
+// One already set to end (cancel at period end) never bills again, so it doesn't block.
+const billingSubscription = (items) =>
+  (items.find((i) => i.SK === 'ENTITLEMENTS')?.active || []).find(
+    (s) => BILLING_STATUSES.has(s.status) && !s.cancelAtPeriodEnd
+  );
+
 async function deleteMe(uid, claims) {
   const items = await allItems(uid);
+  const billing = billingSubscription(items);
+  if (billing) {
+    console.log('[api] Delete refused: subscription still billing', billing.plan, billing.status);
+    return json(409, { error: 'Cancel your subscription in Manage billing first', code: 'SUBSCRIPTION_ACTIVE' });
+  }
   for (let i = 0; i < items.length; i += 25) {
     await ddb.send(
       new BatchWriteCommand({

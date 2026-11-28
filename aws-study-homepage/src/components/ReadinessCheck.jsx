@@ -296,7 +296,7 @@ const ReadinessCheck = () => {
 
               <div className="readiness-next">
                 <a href={studyUrl} className="btn btn-primary">Start studying {cert.name} <ArrowRightIcon size={16} /></a>
-                {sale?.live && <span className="readiness-sale">{sale.promo.label}: {sale.promo.single}% off the full game until {sale.promo.ends}</span>}
+                {sale?.live && <span className="readiness-sale">{sale.promo.label}: {sale.promo.single}% off the first payment for the full game until {sale.promo.ends}</span>}
               </div>
 
               <div className="readiness-share">

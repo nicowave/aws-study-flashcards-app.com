@@ -1,8 +1,9 @@
-// Sales and bundles shown on the hub. Checkout applies a sale's discount on
-// its own (PROMOTIONS in aws-backend/lambda/callables/index.js, with Stripe
-// coupons that expire by themselves); this file only shows it. Keep the
-// copies in step: this one, aws-coding-courses/src/services/offers.js, and
-// the backend.
+// Sales shown on the hub. Checkout applies a sale's discount on its own
+// (PROMOTIONS in aws-backend/lambda/callables/index.js, with Stripe coupons
+// that expire by themselves); this file only shows it. Keep the windows in
+// step: this copy, each game's and aws-coding-courses' src/services/offers.js,
+// and the backend. A subscription coupon covers the first payment (month or
+// year), which is what the pills say.
 
 export const PROMOTIONS = [
   {
@@ -12,7 +13,7 @@ export const PROMOTIONS = [
     start: Date.parse('2026-10-31T04:00:00Z'),
     end: Date.parse('2026-11-07T05:00:00Z'),
     single: 31, // % off each course or certification
-    bundle: 10, // % off the Developer Path and Pro
+    pro: 10, // % off Pro
     starts: 'Saturday, October 31',
     ends: 'November 6',
     teaseFrom: Date.parse('2026-10-28T04:00:00Z'),
@@ -42,7 +43,7 @@ export const currentPromotion = (now = Date.now()) => {
   return null;
 };
 
-/** '$19.99' less 31%, rounded the way Stripe rounds the discount: '$13.79'. */
+/** '$11' less 31%, rounded the way Stripe rounds the discount: '$7.59'. */
 export const salePrice = (price, percent) => {
   const cents = Math.round(parseFloat(price.replace(/[^0-9.]/g, '')) * 100);
   const off = Math.round((cents * percent) / 100);

@@ -3,6 +3,7 @@ import React from 'react';
 import { linkProps } from './router';
 import { tutorialStats } from './progress';
 import UnlockCard from './UnlockCard';
+import ManageBilling from './ManageBilling';
 import Markdown from './Markdown';
 import { useT } from './i18n';
 
@@ -58,6 +59,13 @@ const CourseHome = ({ course, progress, access, user, onSignIn }) => {
           })}
         </ol>
       </section>
+
+      {access && user && (
+        <section className="have-access">
+          <p><strong>{t('home.haveAccess')}</strong> {t('home.manageHint')}</p>
+          <ManageBilling course={course} returnPath="/" className="btn ghost" />
+        </section>
+      )}
 
       {!access && (
         <section className="pricing" id="pricing">

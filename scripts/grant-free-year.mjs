@@ -9,16 +9,18 @@
 // --uid picks the account when one email leads to more than one (old accounts copied from Firebase).
 //
 // Why a subscription and not a coupon: Pro is the yearly Stripe price, and checkout always asks
-// for a card. A 100%-off coupon would still take a card and renew at $39. Instead this makes a
+// for a card. A 100%-off coupon would still take a card and renew at $199. Instead this makes a
 // 365-day trial with no card, set to cancel at the end of that trial. Two locks keep it from ever
 // charging: cancel_at_period_end ends it on its last day even if a card turns up later, and
 // missing_payment_method=cancel ends it if no card is on file. The tool also refuses a customer
 // who already has a saved card.
 //
-// Why the extra edit after creating it: the Study Hub webhook listens for
-// customer.subscription.updated / .deleted, not .created. Touching the metadata sends an
-// "updated" event, and the webhook then writes ENTITLEMENTS allAccess=true, which the
-// sign-in trigger turns into the plan=pro claim the apps read.
+// How Pro switches on: the Study Hub webhook writes ENTITLEMENTS allAccess=true when Stripe tells
+// it about the subscription; the sign-in trigger turns that into the plan=pro claim the apps read.
+// Creating it sends customer.subscription.created (handled since Nov 2026, once
+// scripts/stripe-subscription-setup.mjs has added it to the endpoint). The tool also stamps the
+// metadata right after, which sends customer.subscription.updated, an event every endpoint already
+// sends: so the grant works whatever order the setup steps ran in. A second sync changes nothing.
 import { execFileSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 
@@ -47,8 +49,12 @@ const TABLE = aws('cloudformation', 'describe-stacks', '--stack-name', 'StudyHub
 const POOL = aws('cloudformation', 'describe-stacks', '--stack-name', 'StudyHubBackend',
   '--query', "Stacks[0].Outputs[?OutputKey=='UserPoolId'].OutputValue|[0]")
 const CALLABLES = aws('lambda', 'list-functions', '--query', "Functions[?starts_with(FunctionName,'StudyHubBackend-CallablesFn')].FunctionName|[0]")
-const PRO_PRICE = aws('lambda', 'get-function-configuration', '--function-name', CALLABLES,
-  '--query', 'Environment.Variables.STRIPE_PRICE_ALL_ACCESS') // all-access, $39 a year
+// Pro is $199 a year (STRIPE_PRICE_ALL_ACCESS_YEARLY). Before that deploy only the old $39 price
+// (STRIPE_PRICE_ALL_ACCESS) exists, so fall back to it; both count as Pro when reading subscriptions.
+const LAMBDA_ENV = aws('lambda', 'get-function-configuration', '--function-name', CALLABLES, '--query', 'Environment.Variables') || {}
+const PRO_PRICE = LAMBDA_ENV.STRIPE_PRICE_ALL_ACCESS_YEARLY || LAMBDA_ENV.STRIPE_PRICE_ALL_ACCESS
+const PRO_PRICES = new Set([LAMBDA_ENV.STRIPE_PRICE_ALL_ACCESS_YEARLY, LAMBDA_ENV.STRIPE_PRICE_ALL_ACCESS].filter(Boolean))
+if (!PRO_PRICE) { console.error('No Pro price on the callables Lambda (STRIPE_PRICE_ALL_ACCESS_YEARLY). Deploy the backend with aws-backend/.env first.'); process.exit(1) }
 const getItem = (PK, SK) => aws('dynamodb', 'get-item', '--consistent-read', '--table-name', TABLE, '--key', JSON.stringify({ PK: S(PK), SK: S(SK) }))?.Item || null
 const putItem = (item) => aws('dynamodb', 'put-item', '--table-name', TABLE, '--item', JSON.stringify(item))
 
@@ -85,8 +91,17 @@ async function stripe(method, path, body, idempotencyKey) {
 // Dates in New York time: an evening grant in UTC would otherwise print tomorrow's date.
 const day = (unix) => (unix ? new Date(unix * 1000).toLocaleDateString('en-US', { timeZone: 'America/New_York', year: 'numeric', month: 'long', day: 'numeric' }) : '—')
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
-const endOf = (s) => s.cancel_at || s.trial_end || s.current_period_end
-const isPro = (s) => (s.metadata?.plan || (s.items.data[0]?.price.id === PRO_PRICE && 'all-access')) === 'all-access'
+// Newer Stripe API versions keep the period end on the item, not the subscription.
+const endOf = (s) => s.cancel_at || s.trial_end || s.current_period_end || s.items?.data?.[0]?.current_period_end
+// Same order as the backend: the price decides, metadata only for a price we don't know
+// (the billing portal can change a subscription's price, never its metadata).
+const KNOWN_PRICES = new Set(Object.entries(LAMBDA_ENV).filter(([k, v]) => k.startsWith('STRIPE_PRICE_') && v).map(([, v]) => v))
+const isPro = (s) => {
+  const ids = s.items.data.map((i) => i.price.id)
+  if (ids.some((id) => PRO_PRICES.has(id))) return true
+  if (ids.some((id) => KNOWN_PRICES.has(id))) return false
+  return s.metadata?.plan === 'all-access'
+}
 
 /** A saved card on the customer, the one thing that could make Stripe charge. */
 async function cardOnFile(customer) {
@@ -155,7 +170,7 @@ async function lookup(uid) {
 
 function show(who, how) {
   console.log(`account     ${email}  (uid ${who.uid.slice(0, 6)}…, ${how})`)
-  console.log(`Pro now     ${who.allAccess ? 'yes' : 'no'}${who.certs.length ? `   one-time unlocks: ${who.certs.join(', ')}` : ''}`)
+  console.log(`Pro now     ${who.allAccess ? 'yes' : 'no'}${who.certs.length ? `   products: ${who.certs.join(', ')}` : ''}`)
   console.log(`Stripe      ${who.customer?.id || 'no customer yet'}${who.card ? '   CARD ON FILE' : ''}`)
   for (const s of who.pro) {
     const ends = s.status === 'canceled' ? `ended ${day(s.ended_at)}` : `ends ${day(endOf(s))}${s.cancel_at_period_end || s.cancel_at ? '' : ' (not set to end)'}`
@@ -228,12 +243,12 @@ if (cmd === 'grant') {
   console.log(`created subscription ${sub.id}  ${sub.status}  free until ${day(endOf(sub))}  set to end: ${sub.cancel_at_period_end ? 'yes' : 'NO'}`)
   if (!sub.cancel_at_period_end) console.log('WARNING: Stripe did not set the subscription to end. Check it in the Dashboard before telling anyone.')
 
-  // The edit that sends customer.subscription.updated to the Study Hub webhook.
+  // .updated reaches the webhook even on an endpoint that doesn't send .created yet (see the header)
   await stripe('POST', `subscriptions/${sub.id}`, { metadata: { granted_at: new Date().toISOString() } })
   const ok = await waitForPro(uid, true, sub.id)
   console.log(ok
     ? `Pro is ON in Study Hub until ${day(endOf(sub))}. They see it after signing out and back in once, or within an hour.`
-    : 'WARNING: Study Hub has not switched Pro on after 90 s. Check the webhook.')
+    : 'WARNING: Study Hub has not switched Pro on after 90 s. Check the webhook endpoint (it must send customer.subscription.updated or .created) and the webhook logs.')
   process.exit(ok ? 0 : 1)
 }
 

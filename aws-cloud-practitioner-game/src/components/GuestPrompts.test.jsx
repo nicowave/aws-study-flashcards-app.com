@@ -3,13 +3,13 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { GuestBanner, GuestUpsell } from './GuestPrompts';
 import { PROMOTIONS } from '../services/offers';
+import { PRODUCT_PRICES } from '../services/prices';
 
-// The build variables behind billing, switched per test. The label is a fixture price.
-const billing = vi.hoisted(() => ({ enabled: true, label: '$19.99 one-time' }));
+// The build variable behind billing, switched per test. Prices come from the shared prices module.
+const billing = vi.hoisted(() => ({ enabled: true }));
 vi.mock('../services/billing', () => ({
   startCheckout: vi.fn(),
   get BILLING_ENABLED() { return billing.enabled; },
-  get CERT_PRICE_LABEL() { return billing.label; },
 }));
 
 const [promo] = PROMOTIONS;
@@ -23,6 +23,9 @@ const discounted = (price, percent) => {
   return `$${((cents - Math.round((cents * percent) / 100)) / 100).toFixed(2)}`;
 };
 
+const { month, year } = PRODUCT_PRICES;
+const normal = `${month}/month or ${year}/year`;
+
 const bullets = ['Timed mock exam', 'Readiness breakdown', 'Every quiz domain'];
 const renderUpsell = (overrides = {}) => {
   const props = { feature: 'The Practice Feature', bullets, onSignUp: vi.fn(), onBack: vi.fn(), ...overrides };
@@ -32,7 +35,6 @@ const renderUpsell = (overrides = {}) => {
 
 beforeEach(() => {
   billing.enabled = true;
-  billing.label = '$19.99 one-time';
   at(promo.end + MINUTE); // no sale unless a test sets one
 });
 
@@ -69,17 +71,20 @@ describe('GuestUpsell', () => {
   });
 
   describe('with billing on', () => {
-    it('offers to unlock the feature and names the one-time price', () => {
+    it('offers to unlock the feature and names the monthly and yearly price', () => {
       const { feature } = renderUpsell();
       expect(screen.getByRole('heading', { name: `Unlock ${feature}` })).toBeInTheDocument();
-      expect(screen.getByText(/no card needed/i)).toHaveTextContent(`one-time unlock (${billing.label})`);
+      const note = screen.getByText(/no card needed/i);
+      expect(note).toHaveTextContent(`subscription to this certification (${normal}, cancel anytime) or with Pro`);
+      expect(note).not.toHaveTextContent(/one-time|lifetime/i);
     });
 
-    it('quotes the sale price and the normal price while a sale runs', () => {
+    it('quotes the first payment at the sale price, and the normal price, while a sale runs', () => {
       at(promo.start + MINUTE);
       renderUpsell();
+      const sale = `${discounted(month, promo.single)}/month or ${discounted(year, promo.single)}/year`;
       expect(screen.getByText(/no card needed/i)).toHaveTextContent(
-        `(${discounted('$19.99', promo.single)} during the ${promo.label}, normally $19.99)`,
+        `(${sale} for the first payment during the ${promo.label}, normally ${normal}, cancel anytime)`,
       );
     });
 
@@ -87,7 +92,7 @@ describe('GuestUpsell', () => {
       at(promo.teaseFrom + MINUTE);
       renderUpsell();
       const note = screen.getByText(/no card needed/i);
-      expect(note).toHaveTextContent(`(${billing.label})`);
+      expect(note).toHaveTextContent(`(${normal}, cancel anytime)`);
       expect(note).not.toHaveTextContent(promo.label);
     });
   });

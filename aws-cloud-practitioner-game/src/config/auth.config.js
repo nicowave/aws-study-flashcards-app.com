@@ -15,6 +15,11 @@ export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'https://vaj7alg0f6.execute-api.us-east-1.amazonaws.com';
 export const CALLABLE_BASE_URL = `${API_BASE_URL}/callable`;
 
+// Devices one account can stay signed in on at once. Cognito enforces it
+// (TokenSession.MaxPerUser in aws-backend/lib/study-hub-stack.ts); this copy is
+// only for the message a signed-out browser shows. Change both together.
+export const MAX_SIGNED_IN_DEVICES = 3;
+
 // One sign-in for every subdomain: the session cookie lives on the root domain.
 // The same build is served under both names while Study Hub moves to
 // levelupstudyhub.com, so the root domain is read from the address the page

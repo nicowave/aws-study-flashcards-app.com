@@ -12,7 +12,7 @@ const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 const { CognitoJwtVerifier } = require("aws-jwt-verify");
-const { PRO_COVERS, alreadyCovered } = require("./coverage");
+const { PRODUCTS, coverageFor } = require("./coverage");
 
 const TABLE_NAME = process.env.TABLE_NAME;
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}), {
@@ -63,54 +63,87 @@ const returnBaseFor = (requested) => {
   return ALLOWED_ORIGINS.find((o) => r === o || r.startsWith(`${o}/`)) ? r.replace(/\/$/, "") : SITE_URL;
 };
 
-// Per-cert plans are ONE-TIME prices; all-access is a yearly subscription.
-const PLAN_PRICES = {
-  "all-access": process.env.STRIPE_PRICE_ALL_ACCESS || "",
-  "cloud-practitioner": process.env.STRIPE_PRICE_CLOUD_PRACTITIONER || "",
-  "ai-practitioner": process.env.STRIPE_PRICE_AI_PRACTITIONER || "",
-  "solutions-architect-associate": process.env.STRIPE_PRICE_SOLUTIONS_ARCHITECT || "",
-  "developer-associate": process.env.STRIPE_PRICE_DEVELOPER_ASSOCIATE || "",
-  // Coding courses: one-time, NOT included in all-access (the course sites
-  // check `certs` only)
-  "bash-for-aws": process.env.STRIPE_PRICE_BASH_COURSE || "",
-  "python-for-aws": process.env.STRIPE_PRICE_PYTHON_COURSE || "",
-  "javascript-for-aws": process.env.STRIPE_PRICE_JAVASCRIPT_COURSE || "",
-  "typescript-for-aws": process.env.STRIPE_PRICE_TYPESCRIPT_COURSE || "",
-  // Tech Spanish ↔ Tech English: not part of the Developer Path bundle
-  "tech-spanish": process.env.STRIPE_PRICE_TECH_SPANISH_COURSE || "",
-  // One-time bundle: unlocks everything in BUNDLES["developer-path"]
-  "developer-path": process.env.STRIPE_PRICE_DEVELOPER_PATH || "",
+// Every product is a subscription, monthly or yearly; Pro (all-access) is yearly only.
+// Env names: STRIPE_PRICE_<X>_MONTHLY / _YEARLY per product, STRIPE_PRICE_ALL_ACCESS_YEARLY for Pro.
+const PRODUCT_ENV = {
+  "cloud-practitioner": "CLOUD_PRACTITIONER",
+  "ai-practitioner": "AI_PRACTITIONER",
+  "solutions-architect-associate": "SOLUTIONS_ARCHITECT",
+  "developer-associate": "DEVELOPER_ASSOCIATE",
+  "bash-for-aws": "BASH_COURSE",
+  "python-for-aws": "PYTHON_COURSE",
+  "javascript-for-aws": "JAVASCRIPT_COURSE",
+  "typescript-for-aws": "TYPESCRIPT_COURSE",
+  "tech-spanish": "TECH_SPANISH_COURSE",
 };
+const envPrice = (name) => process.env[name] || "";
+const INTERVALS = ["month", "year"];
+// What checkout sells: plan -> { month?, year? } price IDs. An empty price switches that choice off.
+const PRICES = {
+  ...Object.fromEntries(
+    PRODUCTS.map((plan) => [
+      plan,
+      { month: envPrice(`STRIPE_PRICE_${PRODUCT_ENV[plan]}_MONTHLY`), year: envPrice(`STRIPE_PRICE_${PRODUCT_ENV[plan]}_YEARLY`) },
+    ])
+  ),
+  "all-access": { year: envPrice("STRIPE_PRICE_ALL_ACCESS_YEARLY") },
+};
+// Recognised, never sold: the old $39/yr Pro, the old one-time product prices and the Developer
+// Path bundle. Subscriptions and sessions that still use them must keep counting.
+const LEGACY_PRICES = {
+  "all-access": envPrice("STRIPE_PRICE_ALL_ACCESS"),
+  "developer-path": envPrice("STRIPE_PRICE_DEVELOPER_PATH"),
+  ...Object.fromEntries(PRODUCTS.map((plan) => [plan, envPrice(`STRIPE_PRICE_${PRODUCT_ENV[plan]}`)])),
+};
+// One-time bundles, no longer sold. Their owners keep everything listed here for good.
 const BUNDLES = {
   "developer-path": ["bash-for-aws", "python-for-aws", "javascript-for-aws", "typescript-for-aws", "developer-associate"],
 };
 
 // Sales: during the window, checkout applies the coupon automatically (no
 // code to type). The coupons also stop working on their own at redeem_by,
-// and each one only applies to its own Stripe products.
+// and each one only applies to its own Stripe products. On a subscription a
+// coupon lasts as its `duration` says (once / repeating / forever).
 const PROMOTIONS = [
   {
     name: "halloween-2026", // Oct 31 00:00 to Nov 6 23:59, US Eastern
     start: Date.parse("2026-10-31T04:00:00Z"),
     end: Date.parse("2026-11-07T05:00:00Z"),
-    coupons: { "all-access": "HALLOWEEN10", "developer-path": "HALLOWEEN10", default: "HALLOWEEN31" },
+    coupons: { "all-access": "HALLOWEEN10", default: "HALLOWEEN31" },
   },
 ];
 const promotionFor = (plan, now = Date.now()) => {
   const promo = PROMOTIONS.find((p) => now >= p.start && now < p.end);
   return promo ? { name: promo.name, coupon: promo.coupons[plan] || promo.coupons.default } : null;
 };
+/** The plan a Stripe price belongs to (current or legacy), or null. */
 const planForPrice = (priceId) => {
-  const hit = Object.entries(PLAN_PRICES).find(([, p]) => p && p === priceId);
-  return hit ? hit[0] : null;
+  if (!priceId) return null;
+  for (const [plan, byInterval] of Object.entries(PRICES)) {
+    if (Object.values(byInterval).includes(priceId)) return plan;
+  }
+  const legacy = Object.entries(LEGACY_PRICES).find(([, p]) => p && p === priceId);
+  return legacy ? legacy[0] : null;
+};
+/** "month" | "year" | null for a subscription: from Stripe's price, else our metadata, else our table. */
+const intervalOf = (sub) => {
+  const price = sub.items?.data?.[0]?.price;
+  const fromTable = Object.values(PRICES)
+    .flatMap((byInterval) => Object.entries(byInterval))
+    .find(([, p]) => p && p === price?.id)?.[0];
+  return price?.recurring?.interval || sub.metadata?.interval || fromTable || null;
 };
 const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 
-// Pro starts with a free week for anyone who hasn't had Pro before. Checkout
+// Pro starts with a free trial for anyone who hasn't had Pro before. Checkout
 // still takes a card; the first yearly charge runs when the trial ends unless
-// they cancel first. One-time plans have no trial (the free tier is the trial).
-// Keep in step with PRO_TRIAL_DAYS in aws-study-homepage/src/services/billing.js.
-const PRO_TRIAL_DAYS = 7;
+// they cancel first. Products get no trial: their free modules are the trial.
+// Keep in step with PRO_TRIAL_DAYS in every app's prices file.
+const PRO_TRIAL_DAYS = 14;
+
+// Shown in Checkout when someone buys Pro while paying for single products
+const OVERLAP_NOTICE =
+  "Pro includes every certification and course. Your other subscriptions keep billing until you cancel them in Manage billing.";
 
 // ---------------------------------------------------------------------------
 // Secrets: one Secrets Manager entry holding the Stripe key and the Stripe
@@ -226,12 +259,20 @@ async function purchasedPlans(uid) {
 }
 
 // ---------------------------------------------------------------------------
-// Entitlements: Stripe subscriptions (all-access) + recorded one-time cert
-// purchases -> DynamoDB ENTITLEMENTS (read by the pre-token Lambda).
+// Entitlements: Stripe subscriptions (any plan, monthly or yearly) + recorded
+// one-time purchases (kept for good) -> DynamoDB ENTITLEMENTS (read by the
+// pre-token Lambda). certs means "owned one by one"; Pro sets allAccess and
+// the pre-token Lambda expands it to every product.
 // ---------------------------------------------------------------------------
+const subscriptionPeriodEnd = (sub) => {
+  // From API version 2025-08-27.basil the period lives on the items, not the subscription
+  const end = sub.items?.data?.[0]?.current_period_end ?? sub.current_period_end;
+  return end ? new Date(end * 1000).toISOString() : null;
+};
+
 async function syncCustomerEntitlements(stripe, uid, customerId) {
   const subs = customerId
-    ? await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 20 })
+    ? await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 100 })
     : { data: [] };
 
   let allAccess = false;
@@ -247,17 +288,20 @@ async function syncCustomerEntitlements(stripe, uid, customerId) {
   for (const sub of subs.data) {
     if (!ACTIVE_STATUSES.includes(sub.status)) continue;
     const priceId = sub.items?.data?.[0]?.price?.id || null;
-    const plan = sub.metadata?.plan || planForPrice(priceId);
+    // The price decides: the billing portal can change a subscription's price, never its metadata
+    const plan = planForPrice(priceId) || sub.metadata?.plan;
     if (!plan) continue;
     if (plan === "all-access") allAccess = true;
+    else if (BUNDLES[plan]) BUNDLES[plan].forEach((c) => certs.add(c));
     else certs.add(plan);
     active.push({
       plan,
       status: sub.status,
+      interval: intervalOf(sub),
       priceId,
       stripeSubscriptionId: sub.id,
       cancelAtPeriodEnd: sub.cancel_at_period_end || false,
-      currentPeriodEnd: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
+      currentPeriodEnd: subscriptionPeriodEnd(sub),
     });
   }
 
@@ -297,12 +341,14 @@ async function customerExists(stripe, customerId) {
 /**
  * One read of what checkout needs to know about the buyer, so every decision below rests on the
  * same answer (two separate reads could disagree when one of them fails):
- *   purchased       one-time plans recorded for this account
- *   own             this account's own subscriptions as { status, plan } (entitlements come from these)
- *   hadPro          anyone behind this email has had Pro before, trial or paid: no second free week,
+ *   purchased       one-time plans recorded for this account (kept for good)
+ *   own             this account's own subscriptions as { id, itemId, priceId, status, plan, interval }
+ *                   (entitlements come from these; id/itemId let checkout offer a monthly -> yearly switch)
+ *   hadPro          anyone behind this email has had Pro before, trial or paid: no second free trial,
  *                   even after deleting the account and signing up again
- *   activeElsewhere Pro is running on another customer with the same email, which happens when one
- *                   person has two sign-ins (say Google, and email with a password)
+ *   elsewhere       plans with an active subscription on another customer with the same email, which
+ *                   happens when one person has two sign-ins (say Google, and email with a password)
+ *   activeElsewhere Pro is among them
  */
 async function buyerHistory(stripe, uid, customerId, email) {
   const purchased = await purchasedPlans(uid);
@@ -313,29 +359,82 @@ async function buyerHistory(stripe, uid, customerId, email) {
     sameEmail.data.forEach((c) => customerIds.add(c.id));
   }
   const own = [];
+  const elsewhere = new Set();
   let hadPro = purchased.has("all-access");
-  let activeElsewhere = false;
   for (const customer of customerIds) {
     const subs = await stripe.subscriptions.list({ customer, status: "all", limit: 100 });
     for (const sub of subs.data) {
-      const plan = sub.metadata?.plan || planForPrice(sub.items?.data?.[0]?.price?.id);
-      if (customer === customerId) own.push({ status: sub.status, plan });
-      if (plan !== "all-access") continue;
-      hadPro = true;
-      if (customer !== customerId && ACTIVE_STATUSES.includes(sub.status)) activeElsewhere = true;
+      const item = sub.items?.data?.[0];
+      const plan = planForPrice(item?.price?.id) || sub.metadata?.plan;
+      if (customer === customerId) {
+        own.push({ id: sub.id, itemId: item?.id || null, priceId: item?.price?.id || null, status: sub.status, plan, interval: intervalOf(sub) });
+      } else if (plan && ACTIVE_STATUSES.includes(sub.status)) {
+        elsewhere.add(plan);
+      }
+      if (plan === "all-access") hadPro = true;
     }
   }
-  return { purchased, own, hadPro, activeElsewhere };
+  return { purchased, own, hadPro, elsewhere, activeElsewhere: elsewhere.has("all-access") };
+}
+
+// The default portal ("Manage billing") has plan switching off: its product list would let a
+// subscriber move to any other product. scripts/stripe-subscription-setup.mjs makes a second
+// configuration, tagged with this purpose, that the monthly -> yearly confirm link uses.
+const SWITCH_PORTAL_PURPOSE = "interval-switch";
+let switchConfigPromise = null;
+/** The interval-switch portal configuration's ID, or null (then the flow uses the default portal). */
+function switchConfigurationId(stripe) {
+  if (!switchConfigPromise) {
+    switchConfigPromise = (async () => {
+      const { data } = await stripe.billingPortal.configurations.list({ active: true, limit: 100 });
+      return data.find((c) => !c.is_default && c.metadata?.purpose === SWITCH_PORTAL_PURPOSE)?.id || null;
+    })().catch((err) => {
+      console.error("[billing] Could not look up the interval-switch portal configuration:", err.message);
+      switchConfigPromise = null; // try again on the next call
+      return null;
+    });
+  }
+  return switchConfigPromise;
+}
+
+/** Portal page that confirms moving an active monthly subscription to the plan's yearly price. */
+async function intervalSwitchUrl(stripe, customerId, subscription, yearlyPrice, returnBase) {
+  const params = { customer: customerId, return_url: returnBase };
+  try {
+    const configuration = await switchConfigurationId(stripe);
+    const session = await stripe.billingPortal.sessions.create({
+      ...params,
+      ...(configuration && { configuration }),
+      flow_data: {
+        type: "subscription_update_confirm",
+        subscription_update_confirm: {
+          subscription: subscription.id,
+          items: [{ id: subscription.itemId, price: yearlyPrice, quantity: 1 }],
+        },
+        // Every site refreshes its token on ?checkout=success
+        after_completion: { type: "redirect", redirect: { return_url: `${returnBase}/?checkout=success` } },
+      },
+    });
+    return session.url;
+  } catch (err) {
+    // Say the switch configuration is missing: the plain portal still lets them manage or cancel it
+    console.error(`[billing] Interval switch link failed for ${subscription.id}:`, err.message);
+    return (await stripe.billingPortal.sessions.create(params)).url;
+  }
 }
 
 // ---------------------------------------------------------------------------
-// createCheckoutSession — { plan, returnUrl } -> { url }
+// createCheckoutSession — { plan, interval: "month" | "year", returnUrl } ->
+//   { url }                         Stripe Checkout
+//   { url, alreadyOwned: true }     back to the site (?checkout=success&owned=1)
+//   { url, switchInterval: true }   billing portal: confirm moving monthly to yearly
 // ---------------------------------------------------------------------------
 async function createCheckoutSession(data, user, stripe) {
   if (!user) throw new CallableError("UNAUTHENTICATED", "Sign in to upgrade");
   const plan = data?.plan || "all-access";
-  const priceId = PLAN_PRICES[plan];
-  if (!priceId) throw new CallableError("FAILED_PRECONDITION", `Plan not available: ${plan}`);
+  if (!PRICES[plan] && !BUNDLES[plan]) throw new CallableError("FAILED_PRECONDITION", `Plan not available: ${plan}`);
+  // Pro is yearly only, so pages that send no interval for Pro still work
+  const interval = plan === "all-access" ? data?.interval ?? "year" : data?.interval;
 
   // "firebaseUID" is the app user ID; the name predates the move to AWS.
   const uid = user.uid;
@@ -346,6 +445,75 @@ async function createCheckoutSession(data, user, stripe) {
     console.warn(`[billing] Replacing missing Stripe customer ${customerId} for uid=${uid}`);
     customerId = null;
   }
+
+  const returnBase = returnBaseFor(data?.returnUrl);
+
+  let history = null;
+  try {
+    history = await buyerHistory(stripe, uid, customerId, user.email);
+  } catch (err) {
+    // A failed lookup must never block a sale: check out, without the trial. It could sell a
+    // subscription the buyer already has; they can cancel the extra one in Manage billing.
+    console.error(`[billing] Buyer history lookup failed for uid=${uid}:`, err.message);
+  }
+
+  // Never sell what the account already has. A page's sign-in token can be an hour old, so it can
+  // still offer "Start Free Trial" or a paywall to someone who just got access. This runs before the
+  // interval and "still sold?" checks, so owners on old pages (no interval, or a bundle) get owned=1.
+  if (history) {
+    const covered = coverageFor({
+      plan,
+      purchased: history.purchased,
+      subscriptions: history.own,
+      bundles: BUNDLES,
+      activeStatuses: ACTIVE_STATUSES,
+    });
+    const current = covered?.subscription;
+    if (current && current.interval === "month" && interval === "year" && current.itemId) {
+      // Monthly, asking for yearly: a second checkout would bill them twice. The portal confirms the
+      // change (with proration) on the subscription they have; customer.subscription.updated re-syncs.
+      const yearly = PRICES[plan]?.year;
+      if (!yearly) throw new CallableError("FAILED_PRECONDITION", `Plan not available: ${plan} (yearly)`);
+      console.log(`[billing] uid=${uid} switching ${plan} from monthly to yearly in the portal`);
+      return { url: await intervalSwitchUrl(stripe, customerId, current, yearly, returnBase), switchInterval: true };
+    }
+    if (covered) {
+      try {
+        // Write ENTITLEMENTS now, so the token the site asks for next carries access even if the
+        // webhook hasn't run yet
+        await syncCustomerEntitlements(stripe, uid, customerId);
+      } catch (err) {
+        console.error(`[billing] Entitlement sync failed for uid=${uid}:`, err.message);
+      }
+      console.log(`[billing] uid=${uid} already has ${plan} (${covered.by}); no checkout`);
+      // Back to the site as if checkout had finished: every site refreshes its token on
+      // ?checkout=success, so access shows up. owned=1 tells it apart from a real sale.
+      return { url: `${returnBase}/?checkout=success&owned=1`, alreadyOwned: true };
+    }
+    const proElsewhere = history.elsewhere.has("all-access");
+    if (proElsewhere || history.elsewhere.has(plan)) {
+      // It runs on this person's other sign-in. Selling here would charge them a second time.
+      console.log(`[billing] uid=${uid} has ${proElsewhere ? "Pro" : plan} on another sign-in with the same email; no checkout`);
+      throw new CallableError(
+        "FAILED_PRECONDITION",
+        `${proElsewhere ? "Pro is" : "This subscription is"} already on for this email under your other sign-in. Sign out, then sign in the other way, for example with Google.`
+      );
+    }
+  }
+
+  if (BUNDLES[plan]) throw new CallableError("FAILED_PRECONDITION", "The Developer Path bundle is no longer sold");
+  if (plan === "all-access" && interval !== "year") throw new CallableError("INVALID_ARGUMENT", "Pro is yearly only");
+  if (!INTERVALS.includes(interval)) throw new CallableError("INVALID_ARGUMENT", "Choose monthly or yearly");
+  const priceId = PRICES[plan][interval];
+  if (!priceId) throw new CallableError("FAILED_PRECONDITION", `Plan not available: ${plan} (${interval})`);
+
+  // Pro includes every product, but their own subscriptions keep billing until cancelled in Manage
+  // billing. Nothing cancels them for the buyer (a cancelled Pro trial would take the products with
+  // it), so Checkout and the page they return to both tell them.
+  const overlap =
+    plan === "all-access" && Boolean(history?.own.some((s) => s.plan !== "all-access" && ACTIVE_STATUSES.includes(s.status)));
+  if (overlap) console.log(`[billing] uid=${uid} is buying Pro while subscribed to single products`);
+
   if (!customerId) {
     const customer = await stripe.customers.create({
       email: user.email || undefined,
@@ -355,78 +523,28 @@ async function createCheckoutSession(data, user, stripe) {
     await saveCustomerId(uid, customerId);
   }
 
-  const returnBase = returnBaseFor(data?.returnUrl);
-
-  // One-time cert prices check out in payment mode; the all-access yearly
-  // plan in subscription mode. Derived from the plan (not a Stripe price
-  // lookup) so the restricted API key needs no Prices read permission.
-  const mode = plan === "all-access" ? "subscription" : "payment";
-
-  let history = null;
-  if (mode === "subscription" || PRO_COVERS.has(plan)) {
-    try {
-      history = await buyerHistory(stripe, uid, customerId, user.email);
-    } catch (err) {
-      // A failed lookup must never block a sale: check out, without the trial
-      console.error(`[billing] Buyer history lookup failed for uid=${uid}:`, err.message);
-    }
-  }
-
-  // Never sell Pro, or a certificate Pro includes, to someone who already has it. A page's
-  // sign-in token can be an hour old, so it can still offer "Start Free Trial" to a person just
-  // given Pro. They no longer qualify for the trial, so checkout would charge them at once.
-  if (history && PRO_COVERS.has(plan)) {
-    const covered = alreadyCovered({
-      plan,
-      purchased: history.purchased,
-      subscriptions: history.own,
-      bundles: BUNDLES,
-      activeStatuses: ACTIVE_STATUSES,
-    });
-    if (covered) {
-      try {
-        // Write ENTITLEMENTS now, so the token the site asks for next carries Pro even if the
-        // webhook hasn't run yet
-        await syncCustomerEntitlements(stripe, uid, customerId);
-      } catch (err) {
-        console.error(`[billing] Entitlement sync failed for uid=${uid}:`, err.message);
-      }
-      console.log(`[billing] uid=${uid} already has ${plan}; no checkout`);
-      // Back to the site as if checkout had finished: every site refreshes its token on
-      // ?checkout=success, so access shows up. owned=1 tells it apart from a real sale.
-      return { url: `${returnBase}/?checkout=success&owned=1`, alreadyOwned: true };
-    }
-    if (history.activeElsewhere) {
-      // Pro runs on this person's other sign-in. Selling here would charge them a second time.
-      console.log(`[billing] uid=${uid} has Pro on another sign-in with the same email; no checkout`);
-      throw new CallableError(
-        "FAILED_PRECONDITION",
-        "Pro is already on for this email under your other sign-in. Sign out, then sign in the other way, for example with Google."
-      );
-    }
-  }
-  const trial = mode === "subscription" && history !== null && !history.hadPro;
+  // Always a subscription (derived from the plan, not a Stripe price lookup, so the restricted
+  // API key needs no Prices read permission). Only Pro gets the free trial.
+  const trial = plan === "all-access" && history !== null && !history.hadPro;
+  const metadata = { firebaseUID: uid, plan, interval };
   const params = {
-    mode,
+    mode: "subscription",
     customer: customerId,
     line_items: [{ price: priceId, quantity: 1 }],
-    ...(mode === "subscription"
-      ? {
-          // Card up front, even when a coupon or the trial makes today $0
-          payment_method_collection: "always",
-          subscription_data: {
-            metadata: { firebaseUID: uid, plan },
-            ...(trial && {
-              trial_period_days: PRO_TRIAL_DAYS,
-              trial_settings: { end_behavior: { missing_payment_method: "cancel" } },
-            }),
-          },
-        }
-      : { invoice_creation: { enabled: true } }),
-    metadata: { firebaseUID: uid, plan },
+    // Card up front, even when a coupon or the trial makes today $0
+    payment_method_collection: "always",
+    subscription_data: {
+      metadata,
+      ...(trial && {
+        trial_period_days: PRO_TRIAL_DAYS,
+        trial_settings: { end_behavior: { missing_payment_method: "cancel" } },
+      }),
+    },
+    metadata,
     allow_promotion_codes: true,
-    success_url: `${returnBase}/?checkout=success`,
+    success_url: `${returnBase}/?checkout=success${overlap ? "&overlap=1" : ""}`,
     cancel_url: `${returnBase}/?checkout=cancelled`,
+    ...(overlap && { custom_text: { submit: { message: OVERLAP_NOTICE } } }),
   };
   // Stripe allows a discount or promotion codes, not both
   const promo = promotionFor(plan);
@@ -450,7 +568,7 @@ async function createCheckoutSession(data, user, stripe) {
 
 // ---------------------------------------------------------------------------
 // proTrialStatus — () -> { trialAvailable: true | false | null }
-// What the Pro card may promise a signed-in person: the free week only if checkout would give it,
+// What the Pro card may promise a signed-in person: the free trial only if checkout would give it,
 // by the same rule (buyerHistory: nobody behind this account or email has had Pro). null when the
 // lookup fails; checkout gives no trial then either, so the card shouldn't promise one.
 // ---------------------------------------------------------------------------
@@ -479,8 +597,51 @@ async function createPortalSession(data, user, stripe) {
 
 // ---------------------------------------------------------------------------
 // stripeWebhook — signature-verified Stripe events -> entitlement sync.
-// Events: checkout.session.completed, customer.subscription.updated/.deleted
+// Events: checkout.session.completed, customer.subscription.created/.updated/.deleted
+// (created covers subscriptions made outside Checkout: grant scripts, the Dashboard)
 // ---------------------------------------------------------------------------
+async function handleStripeEvent(stripe, stripeEvent) {
+  switch (stripeEvent.type) {
+    case "checkout.session.completed": {
+      const session = stripeEvent.data.object;
+      if (session.mode === "subscription" && session.customer) {
+        const uid =
+          session.metadata?.firebaseUID || (await uidForSubscription({ metadata: {}, customer: session.customer }));
+        if (uid) await syncCustomerEntitlements(stripe, uid, session.customer);
+        else console.error("[billing] No UID for checkout session", session.id);
+      } else if (
+        session.mode === "payment" &&
+        // A 100%-off promotion code completes with "no_payment_required"
+        ["paid", "no_payment_required"].includes(session.payment_status)
+      ) {
+        // Legacy one-time purchase (nothing new is sold this way, but a session opened before
+        // the switch to subscriptions can still complete): record it for good, keyed by plan so
+        // webhook retries stay idempotent, then resync claims.
+        const uid = session.metadata?.firebaseUID;
+        const plan = session.metadata?.plan;
+        if (uid && plan) {
+          await recordPurchase(uid, plan, session);
+          await syncCustomerEntitlements(stripe, uid, session.customer);
+        } else {
+          console.error("[billing] Paid session missing uid/plan metadata", session.id);
+        }
+      }
+      break;
+    }
+    case "customer.subscription.created":
+    case "customer.subscription.updated":
+    case "customer.subscription.deleted": {
+      const subscription = stripeEvent.data.object;
+      const uid = await uidForSubscription(subscription);
+      if (uid) await syncCustomerEntitlements(stripe, uid, subscription.customer);
+      else console.error("[billing] No UID for subscription", subscription.id);
+      break;
+    }
+    default:
+      break;
+  }
+}
+
 async function stripeWebhook(event) {
   const { stripe, webhookSecret } = await init();
   let stripeEvent;
@@ -496,43 +657,7 @@ async function stripeWebhook(event) {
   }
 
   try {
-    switch (stripeEvent.type) {
-      case "checkout.session.completed": {
-        const session = stripeEvent.data.object;
-        if (session.mode === "subscription" && session.customer) {
-          const uid =
-            session.metadata?.firebaseUID || (await uidForSubscription({ metadata: {}, customer: session.customer }));
-          if (uid) await syncCustomerEntitlements(stripe, uid, session.customer);
-          else console.error("[billing] No UID for checkout session", session.id);
-        } else if (
-          session.mode === "payment" &&
-          // A 100%-off promotion code completes with "no_payment_required"
-          ["paid", "no_payment_required"].includes(session.payment_status)
-        ) {
-          // One-time cert purchase: record it permanently, keyed by plan so
-          // webhook retries stay idempotent, then resync claims.
-          const uid = session.metadata?.firebaseUID;
-          const plan = session.metadata?.plan;
-          if (uid && plan) {
-            await recordPurchase(uid, plan, session);
-            await syncCustomerEntitlements(stripe, uid, session.customer);
-          } else {
-            console.error("[billing] Paid session missing uid/plan metadata", session.id);
-          }
-        }
-        break;
-      }
-      case "customer.subscription.updated":
-      case "customer.subscription.deleted": {
-        const subscription = stripeEvent.data.object;
-        const uid = await uidForSubscription(subscription);
-        if (uid) await syncCustomerEntitlements(stripe, uid, subscription.customer);
-        else console.error("[billing] No UID for subscription", subscription.id);
-        break;
-      }
-      default:
-        break;
-    }
+    await handleStripeEvent(stripe, stripeEvent);
     return { statusCode: 200, body: "ok" };
   } catch (err) {
     console.error("[billing] Webhook handler error:", err);
@@ -545,8 +670,19 @@ async function stripeWebhook(event) {
 // ---------------------------------------------------------------------------
 const CALLABLES = { createCheckoutSession, createPortalSession, proTrialStatus };
 
-// For aws-backend/test only: lets the tests run checkout against a fake Stripe and table.
-exports._test = { createCheckoutSession, createPortalSession, proTrialStatus };
+// For aws-backend/test only: lets the tests run checkout and the webhook against a fake Stripe and table.
+exports._test = {
+  createCheckoutSession,
+  createPortalSession,
+  proTrialStatus,
+  handleStripeEvent,
+  syncCustomerEntitlements,
+  planForPrice,
+  PRICES,
+  resetSwitchConfiguration: () => {
+    switchConfigPromise = null;
+  },
+};
 
 exports.handler = async (event) => {
   const path = event.rawPath || "";

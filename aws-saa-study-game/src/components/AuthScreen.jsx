@@ -20,7 +20,7 @@ const EyeOffIcon = ({ size = 24 }) => (
 );
 
 const AuthScreen = ({ onGuestContinue, hubUrl }) => {
-  const { login, register, googleSignIn, loading, error, clearError } = useAuth();
+  const { login, register, googleSignIn, loading, error, clearError, signOutMessage } = useAuth();
   
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -150,6 +150,13 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
               : 'Sign up to save your progress and achievements'}
           </p>
         </div>
+
+        {/* Cognito signed this browser out because the account signed in on another device */}
+        {signOutMessage && (
+          <div className="auth-notice auth-signed-out" role="status">
+            <span>{signOutMessage}</span>
+          </div>
+        )}
 
         {/* Google Sign-In */}
         <button

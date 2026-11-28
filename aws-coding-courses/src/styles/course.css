@@ -138,9 +138,8 @@ section h2 { font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.01em; }
 
 .pricing { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 32px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
 .unlock { background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; gap: 14px; }
-.unlock-price { display: flex; align-items: baseline; gap: 10px; }
+.unlock-price { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .unlock-price .price { font-size: 2.2rem; font-weight: 700; }
-.unlock-price .once { color: var(--muted); }
 .unlock-list { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; color: var(--muted); }
 .unlock-error { color: var(--danger); margin: 0; }
 .unlock-fine { color: var(--faint); font-size: 0.8rem; margin: 0; }
@@ -322,16 +321,32 @@ section h2 { font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.01em; }
   .code-block pre, .terminal, .editor textarea { font-size: 0.8rem; }
 }
 
-/* ---------- sales and the bundle ---------- */
+/* ---------- sales, billing period and Pro ---------- */
 .promo-banner { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; padding: 8px 16px; background: color-mix(in srgb, var(--brand-pop) 18%, var(--bg)); color: var(--text); font-size: 0.9rem; text-align: center; }
 .promo-banner a { color: #f472b6; font-weight: 600; }
 .sale-tag { margin: 0; align-self: flex-start; background: var(--brand-pop); color: var(--brand-ink); font-weight: 700; font-size: 0.8rem; padding: 3px 10px; border-radius: 999px; }
-.unlock-price .was, .bundle-price .was { color: var(--faint); font-size: 1rem; }
-.bundle { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 8px; }
-.bundle-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.bundle-price { display: flex; align-items: baseline; gap: 8px; }
-.bundle-price .price { font-size: 1.3rem; font-weight: 700; }
-.bundle p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.unlock-price .was, .unlock-pro-price .was { color: var(--faint); font-size: 1rem; }
+.unlock-price .per, .unlock-pro-price .per { color: var(--muted); }
+.interval-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.interval-option { position: relative; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 8px; padding: 8px 10px; cursor: pointer; color: var(--muted); font-weight: 600; font-size: 0.9rem; text-align: center; }
+.interval-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.interval-option.selected { background: var(--accent); color: var(--accent-ink); }
+/* Inset (the toggle clips overflow) and in the text color, so it shows on the accent-filled selected option too */
+.interval-option:focus-within { outline: 2px solid var(--text); outline-offset: -4px; }
+.interval-save { font-size: 0.75rem; font-weight: 700; }
+.unlock-pro { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 8px; }
+.unlock-pro p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.unlock-pro .unlock-pro-title { color: var(--text); }
+.unlock-pro-price { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.unlock-pro-price .price { font-size: 1.3rem; font-weight: 700; }
+.unlock-fine a { color: var(--link); }
+.have-access { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 22px; }
+.have-access p { margin: 0; color: var(--muted); }
+.have-access p strong { color: var(--text); }
+.manage-billing { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.manage-billing-error { color: var(--danger); font-size: 0.85rem; }
+.site-footer .manage-billing .link-btn { color: var(--muted); font-size: inherit; }
+.site-footer .manage-billing .link-btn:hover { color: var(--text); }
 
 /* Language switch (bilingual courses only) */
 .lang-switch { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }

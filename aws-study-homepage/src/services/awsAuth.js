@@ -10,6 +10,11 @@
 // Email/password calls Cognito's public API directly (USER_PASSWORD_AUTH, so
 // old Firebase passwords can be checked once on first sign-in). Google uses
 // the hosted sign-in page with the authorization-code flow + PKCE.
+//
+// Device limit: Cognito keeps at most 3 token sessions per account and, at a
+// 4th sign-in, revokes the least recently used one. A browser whose refresh
+// token was revoked leaves a short-lived studyHubSignedOut cookie, so whichever
+// site shows the sign-in next can explain why (takeSignOutReason()).
 import { AWS_REGION, COGNITO_CLIENT_ID, COGNITO_AUTH_URL, API_BASE_URL, cookieDomainFor } from '../config/auth.config';
 
 const IDP_URL = `https://cognito-idp.${AWS_REGION}.amazonaws.com/`;
@@ -17,6 +22,8 @@ const SESSION_COOKIE = 'studyHubSession';
 const TOKENS_KEY = 'studyHubTokens';
 const OAUTH_KEY = 'studyHubOAuth';
 const SESSION_DAYS = 30; // matches the refresh token lifetime
+const SIGNED_OUT_COOKIE = 'studyHubSignedOut';
+const STALE_AFTER_MS = 10 * 60_000; // refresh on focus after this, so an evicted device notices soon
 
 const isLocalhost = () => ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
@@ -35,14 +42,41 @@ const setSessionCookie = (refreshToken) => {
   document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(refreshToken)}; max-age=${SESSION_DAYS * 86400}; ${cookieScope()}`;
 };
 
-const getSessionCookie = () => {
-  const match = document.cookie.match(new RegExp(`(?:^|; )${SESSION_COOKIE}=([^;]*)`));
+const readCookie = (name) => {
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
   return match ? decodeURIComponent(match[1]) : null;
 };
+
+const getSessionCookie = () => readCookie(SESSION_COOKIE);
 
 const clearSessionCookie = () => {
   document.cookie = `${SESSION_COOKIE}=; max-age=0; ${cookieScope()}`;
 };
+
+// Why this browser was signed out, for the next site that shows a sign-in.
+// On the same root domain as the session, because the first subdomain that
+// notices clears the session for all of them.
+const setSignedOutCookie = (reason) => {
+  document.cookie = `${SIGNED_OUT_COOKIE}=${encodeURIComponent(reason)}; max-age=86400; ${cookieScope()}`;
+};
+
+const clearSignedOutCookie = () => {
+  document.cookie = `${SIGNED_OUT_COOKIE}=; max-age=0; ${cookieScope()}`;
+};
+
+/**
+ * Why this browser was signed out without asking ('device-limit'), or null.
+ * Reading it clears it, so the message shows once.
+ */
+export const takeSignOutReason = () => {
+  const reason = readCookie(SIGNED_OUT_COOKIE);
+  if (reason !== null) clearSignedOutCookie();
+  return reason || null;
+};
+
+/** Cognito's answer for a refresh token that was revoked (not merely expired). */
+export const isRevokedRefreshError = (err) =>
+  err?.code === 'NotAuthorizedException' && /revoked/i.test(String(err?.message || ''));
 
 // ============================================
 // TOKENS
@@ -56,17 +90,29 @@ export const decodeJwt = (jwt) => {
 // Which refresh token a cached ID token came from (to notice a different sign-in elsewhere)
 const tagOf = (refreshToken) => refreshToken.slice(-24);
 
-let tokens = null; // { idToken, accessToken, expiresAt, tag }
+let tokens = null; // { idToken, accessToken, expiresAt, tag, refreshedAt }
 let refreshing = null;
 
+// Ends a refresh token's session at Cognito; the result doesn't matter here.
+const revokeRefreshToken = (token) =>
+  idp('RevokeToken', { ClientId: COGNITO_CLIENT_ID, Token: token }).catch(() => {});
+
 const saveTokens = ({ IdToken, AccessToken, RefreshToken }) => {
-  if (RefreshToken) setSessionCookie(RefreshToken);
+  if (RefreshToken) {
+    const previous = getSessionCookie();
+    setSessionCookie(RefreshToken);
+    clearSignedOutCookie(); // signed in again: an old sign-out notice no longer applies
+    // A new sign-in in this browser replaces the old session; end it so one
+    // browser never holds two of the account's device slots.
+    if (previous && previous !== RefreshToken) revokeRefreshToken(previous);
+  }
   const refreshToken = RefreshToken || getSessionCookie();
   tokens = {
     idToken: IdToken,
     accessToken: AccessToken,
     expiresAt: decodeJwt(IdToken).exp * 1000,
     tag: tagOf(refreshToken),
+    refreshedAt: Date.now(),
   };
   try {
     localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens));
@@ -107,11 +153,19 @@ export const onSessionChange = (cb) => {
   return () => listeners.delete(cb);
 };
 
-// Pick up a sign-in or sign-out that happened on another subdomain or tab
+// Pick up a sign-in or sign-out that happened on another subdomain or tab,
+// and refresh a session that hasn't been checked for a while: a device the
+// limit signed out only finds out when Cognito refuses its refresh token.
 const checkForOutsideChange = () => {
   if (document.visibilityState !== 'visible' || lastTag === undefined) return;
   const cookie = getSessionCookie();
-  if ((cookie ? tagOf(cookie) : null) !== lastTag) notify();
+  if ((cookie ? tagOf(cookie) : null) !== lastTag) {
+    notify();
+    return;
+  }
+  if (cookie && !refreshing && Date.now() - (tokens?.refreshedAt || 0) > STALE_AFTER_MS) {
+    getTokens({ forceRefresh: true }).catch(() => {}); // a refused token signs out (and notifies) in getTokens
+  }
 };
 if (typeof document !== 'undefined') {
   document.addEventListener('visibilitychange', checkForOutsideChange);
@@ -140,6 +194,8 @@ const idp = async (action, body) => {
 };
 
 const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
+
+const RETRY = Symbol('retry with the current session cookie');
 
 /**
  * The current tokens, refreshed when close to expiry; null when signed out.
@@ -170,19 +226,24 @@ export const getTokens = async ({ forceRefresh = false } = {}) => {
     })
       .then((res) => saveTokens(res.AuthenticationResult))
       .catch((err) => {
-        if (err.code === 'NotAuthorizedException') {
-          // Expired or revoked (signed out, password changed, account deleted)
-          clearSessionCookie();
-          dropLocalTokens();
-          return null;
-        }
-        throw err;
+        if (err.code !== 'NotAuthorizedException') throw err;
+        // This browser signed in again (or out) meanwhile, which revoked the
+        // token we sent: carry on with whatever the cookie holds now.
+        if (getSessionCookie() !== refreshToken) return RETRY;
+        // Expired or revoked. Revoked here means another device's sign-in took
+        // this browser's slot (or the account was signed out everywhere).
+        if (isRevokedRefreshError(err)) setSignedOutCookie('device-limit');
+        clearSessionCookie();
+        dropLocalTokens();
+        notify();
+        return null;
       })
       .finally(() => {
         refreshing = null;
       });
   }
-  return refreshing;
+  const result = await refreshing;
+  return result === RETRY ? getTokens({ forceRefresh }) : result;
 };
 
 /** The signed-in user in the shape the apps already use, or null. */
@@ -220,6 +281,27 @@ export const signInWithPassword = async (email, password) => {
   const t = saveTokens(res.AuthenticationResult);
   notify();
   return userFromTokens(t);
+};
+
+/**
+ * Checks the password and keeps the session the check creates as this
+ * browser's session (saveTokens revokes the one it replaces), so the account's
+ * session count never changes. At the 3-device cap the check counts as a sign-in
+ * and Cognito may evict the least recently used session, which can be this
+ * browser's own: keeping the new one means this browser always stays signed in.
+ */
+export const verifyPassword = async (email, password) => {
+  const res = await idp('InitiateAuth', {
+    AuthFlow: 'USER_PASSWORD_AUTH',
+    ClientId: COGNITO_CLIENT_ID,
+    AuthParameters: { USERNAME: normalizeEmail(email), PASSWORD: password },
+  });
+  if (!res.AuthenticationResult) {
+    const err = new Error('This account needs an extra sign-in step that the app does not support');
+    err.code = res.ChallengeName || 'ChallengeRequired';
+    throw err;
+  }
+  saveTokens(res.AuthenticationResult);
 };
 
 /** Creates the account; Cognito emails a verification link. Not signed in yet. */
@@ -343,11 +425,12 @@ export const completeGoogleSignIn = async () => {
 export const signOutEverywhere = async () => {
   const refreshToken = getSessionCookie();
   clearSessionCookie();
+  clearSignedOutCookie(); // signing out yourself never shows the device-limit notice
   dropLocalTokens();
   notify();
   if (refreshToken) {
     // Also invalidate the token server-side; signing out locally already worked
-    await idp('RevokeToken', { ClientId: COGNITO_CLIENT_ID, Token: refreshToken }).catch(() => {});
+    await revokeRefreshToken(refreshToken);
   }
 };
 

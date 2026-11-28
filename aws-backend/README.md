@@ -58,6 +58,36 @@ curl <ApiUrl>/v1/health          # → {"ok":true,...}
 curl <ApiUrl>/v1/me              # → 401 (authorizer works)
 ```
 
+## Billing (Stripe, `lambda/callables/`)
+
+- **Every product is a subscription**, monthly or yearly: the four exam games
+  and the five courses. Pro (`all-access`) is yearly only, unlocks all nine,
+  and is the only plan with the 14-day free trial (people who never had Pro).
+- **Prices** come from `aws-backend/.env` (untracked):
+  `STRIPE_PRICE_<X>_MONTHLY` and `STRIPE_PRICE_<X>_YEARLY` for X in
+  `CLOUD_PRACTITIONER`, `AI_PRACTITIONER`, `SOLUTIONS_ARCHITECT`,
+  `DEVELOPER_ASSOCIATE`, `BASH_COURSE`, `PYTHON_COURSE`, `JAVASCRIPT_COURSE`,
+  `TYPESCRIPT_COURSE`, `TECH_SPANISH_COURSE`, plus
+  `STRIPE_PRICE_ALL_ACCESS_YEARLY`. An empty value switches that choice off.
+  The old names (`STRIPE_PRICE_ALL_ACCESS`, the $39/yr Pro;
+  `STRIPE_PRICE_DEVELOPER_PATH`; the one-time `STRIPE_PRICE_<X>`) are only
+  read so old subscriptions and purchases keep counting. They are never sold.
+- **`createCheckoutSession`** takes `{ plan, interval: 'month' | 'year', returnUrl }`.
+  It answers `{ url }` (Checkout), `{ url, alreadyOwned: true }` (the account
+  already has it: one-time purchase, Developer Path bundle, Pro, or the same
+  subscription) or `{ url, switchInterval: true }` (an active monthly
+  subscription asking for yearly: a billing-portal page that confirms the
+  switch, so nobody pays twice). The Developer Path bundle is no longer sold;
+  its owners keep everything in it.
+- **One-time buyers keep access for good**: `PURCHASE#<plan>` rows are never
+  removed. ENTITLEMENTS `certs` means "owned one by one"; the pre-token Lambda
+  lists all nine products in the `certs` claim for Pro members.
+- **Webhook events**: `checkout.session.completed`,
+  `customer.subscription.created`, `.updated`, `.deleted`.
+- **Deleting an account** (`DELETE /v1/me`) answers 409 while a subscription
+  still bills: cancel it in Manage billing first.
+- Tests: `npm test` (fake Stripe and table; needs `(cd lambda/callables && npm ci)`).
+
 ## Phase plan
 
 1. **This stack** — Cognito + DynamoDB + API skeleton. ✅
@@ -67,7 +97,7 @@ curl <ApiUrl>/v1/me              # → 401 (authorizer works)
    secret must not go in this repo); JIT user migration from Firebase.
 3. **Data + billing** — Firestore→DynamoDB progress migration; port the
    three Stripe functions to Lambda (webhook writes ENTITLEMENTS items).
-   Per-cert $10.99/mo products map to `certs: ['cloud-practitioner', ...]`.
+   Product subscriptions map to `certs: ['cloud-practitioner', ...]` (see Billing).
 4. **Content API + paywall** — question banks into DynamoDB, served per
    entitlement; first quiz free for any signed-in user.
 5. **Cutover** — decommission Firebase.

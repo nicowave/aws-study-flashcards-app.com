@@ -4,7 +4,9 @@ import { certifications, categories } from './data/certifications';
 import SettingsPage from './components/SettingsPage';
 import ForgotPassword from './components/ForgotPassword';
 import { applyAnalyticsPreference } from './services/analytics';
-import { BILLING_ENABLED, PRO_PRICE_LABEL, PRO_TRIAL_DAYS, getPlan, getProTrialStatus, startCheckout, openBillingPortal } from './services/billing';
+import { BILLING_ENABLED, PRO_TRIAL_DAYS, getPlan, getProTrialStatus, startCheckout, openBillingPortal } from './services/billing';
+import { PRODUCT_PRICES, PRO_YEARLY, YEARLY_SAVINGS_PERCENT } from './data/prices';
+import { ProductPrice, IntervalToggle } from './components/Pricing';
 import CodingCourses, { COURSES, OTHER_COURSES, PromoBanner } from './components/CodingCourses';
 import Faq from './components/Faq';
 import { currentPromotion, salePrice } from './services/offers';
@@ -347,12 +349,9 @@ const CertCard = ({ cert }) => {
       <p className="cert-code mono">{cert.code}</p>
       <p className="cert-description">{cert.description}</p>
 
-      {isAvailable && cert.price && (
+      {isAvailable && (
         <p className="cert-price">
-          One-time unlock{' '}
-          {liveSale()
-            ? <><strong className="mono">{salePrice(cert.price, liveSale().single)}</strong> <s className="mono price-was">{cert.price}</s></>
-            : <strong className="mono">{cert.price}</strong>}
+          <ProductPrice percent={liveSale()?.single} />
         </p>
       )}
 
@@ -398,6 +397,9 @@ const CertCard = ({ cert }) => {
 
 // The sale running right now, if any (checkout applies its discount itself)
 const liveSale = () => { const s = currentPromotion(); return s?.live ? s.promo : null; };
+
+// Every coding course, live or coming soon: Pro includes them all
+const courseCount = COURSES.length + OTHER_COURSES.length;
 
 // Certifications Section
 const Certifications = () => (
@@ -469,14 +471,14 @@ const About = () => (
             <SaveIcon size={32} />
           </div>
           <h3>Cloud Sync</h3>
-          <p>Sign in to sync your progress across all devices. Your stats, achievements, and study streaks are saved securely in the cloud.</p>
+          <p>Sign in to sync your progress across your devices (up to 3 signed in at once). Your stats, achievements, and study streaks are saved securely in the cloud.</p>
         </div>
         <div className="feature-card">
           <div className="feature-icon">
             <GiftIcon size={32} />
           </div>
           <h3>Free to Start</h3>
-          <p>Study guides are free for everyone. Try the first quiz domain and flashcard deck with no account, then unlock a certification once, with no subscription, for every quiz domain and the full-length exam simulator.</p>
+          <p>Study guides are free for everyone. Try the first quiz domain and flashcard deck with no account, then subscribe to a certification, monthly or yearly, for every quiz domain and the full-length exam simulator.</p>
         </div>
       </div>
     </div>
@@ -488,7 +490,7 @@ const About = () => (
 const ProPlanCard = ({ onShowLogin }) => {
   const { isAuthenticated } = useAuth();
   const [plan, setPlan] = useState(null);
-  // Signed in: does checkout give this person the free week? (true / false / null = unknown yet)
+  // Signed in: does checkout give this person the free trial? (true / false / null = unknown yet)
   const [trial, setTrial] = useState(null);
   const [busy, setBusy] = useState(false);
   const [billingError, setBillingError] = useState('');
@@ -515,10 +517,15 @@ const ProPlanCard = ({ onShowLogin }) => {
     setBillingError('');
     setBusy(true);
     try {
-      await startCheckout('all-access');
+      await startCheckout('all-access', 'year'); // Pro is yearly only
     } catch (err) {
       console.error('[Plans] Checkout failed:', err);
-      setBillingError('Could not start checkout. Please try again.');
+      // Pro on the person's other sign-in: say so, or they would retry forever
+      setBillingError(/other sign-in/i.test(err?.message || '')
+        ? 'Pro is already on for your email under your other sign-in. Sign out, then sign in the other way (for example with Google).'
+        : /not available/i.test(err?.message || '')
+          ? 'Pro opens very soon. Please check back shortly.'
+          : 'Could not start checkout. Please try again.');
       setBusy(false);
     }
   };
@@ -537,31 +544,37 @@ const ProPlanCard = ({ onShowLogin }) => {
 
   const sale = liveSale();
   // Signed out, the card shows the trial ("One free trial per person"); signed in, only when the
-  // server says checkout would give it, so a former Pro member is never promised a free week
+  // server says checkout would give it, so a former Pro member is never promised a free trial
   const offerTrial = BILLING_ENABLED && plan !== 'pro' && (!isAuthenticated || trial === true);
   const hadProBefore = BILLING_ENABLED && isAuthenticated && plan !== 'pro' && trial === false;
+  // Back from buying Pro while paying for single products (checkout adds overlap=1): those keep
+  // billing until cancelled, and nothing cancels them for the buyer
+  const overlap = BILLING_ENABLED && plan === 'pro' && new URLSearchParams(window.location.search).get('overlap') === '1';
   return (
     <div className={`plan-card ${BILLING_ENABLED ? 'plan-featured' : 'plan-dimmed'}`}>
       {BILLING_ENABLED && plan === 'pro' && <div className="plan-badge">Your Plan</div>}
       <div className="plan-name">Pro</div>
       <div className="plan-price mono">
-        {BILLING_ENABLED ? (PRO_PRICE_LABEL || 'Pro') : 'Coming Soon'}
+        {BILLING_ENABLED ? <>{PRO_YEARLY}<span className="plan-per">/year</span></> : 'Coming Soon'}
       </div>
       {offerTrial && <div className="plan-trial">First {PRO_TRIAL_DAYS} days free</div>}
-      {BILLING_ENABLED && sale && <div className="sale-pill">{sale.label}: {sale.bundle}% off your first year until {sale.ends}</div>}
-      <div className="plan-tagline">For serious exam prep</div>
+      {BILLING_ENABLED && sale && <div className="sale-pill">{sale.label}: {sale.pro}% off your first year until {sale.ends}</div>}
+      <div className="plan-tagline">Everything, billed yearly</div>
       <ul className="plan-features">
         <li>Every live certification unlocked</li>
+        <li>All {courseCount} coding courses included</li>
         <li>All quiz domains &amp; flashcard decks</li>
         <li>Full-length timed exam simulators with readiness scores</li>
-        <li>New certifications as they ship</li>
+        <li>New certifications and courses as they ship</li>
       </ul>
       {/* Above the button so it lines up with the other cards' buttons */}
-      {offerTrial && (
+      {offerTrial ? (
         <p className="plan-trial-note">
           Card required. Cancel before day {PRO_TRIAL_DAYS} and you pay nothing; otherwise Pro
           renews yearly. One free trial per person.
         </p>
+      ) : BILLING_ENABLED && plan !== 'pro' && (
+        <p className="plan-trial-note">Renews yearly until you cancel in Manage billing.</p>
       )}
       {!BILLING_ENABLED ? (
         <button className="btn btn-card-disabled plan-cta" disabled>
@@ -580,21 +593,64 @@ const ProPlanCard = ({ onShowLogin }) => {
           Sign In to Start Free Trial
         </button>
       )}
+      {overlap && (
+        <p className="plan-trial-note plan-overlap-note" role="status">
+          Pro now includes every certification and course. Your other subscriptions keep billing until you
+          cancel them: use Manage Subscription above.
+        </p>
+      )}
       {hadProBefore && (
-        <p className="plan-trial-note">You've had Pro before, so there's no free week this time: Pro starts today.</p>
+        <p className="plan-trial-note">You've had Pro before, so there's no trial this time: Pro starts today.</p>
       )}
       {billingError && <p className="plan-error">{billingError}</p>}
     </div>
   );
 };
 
-// Plans Section — guest preview, free account, one-certification unlock (bought inside each app), Pro (all-access yearly)
+// One certification or course: a subscription bought on that product's own site. The buyer
+// picks monthly or yearly there; here the toggle shows what each costs.
+const ProductPlanCard = () => {
+  const [interval, setBillingInterval] = useState('year');
+  const sale = liveSale();
+  const price = PRODUCT_PRICES[interval];
+  return (
+    <div className="plan-card">
+      <div className="plan-name">One Certification or Course</div>
+      <IntervalToggle value={interval} onChange={setBillingInterval} />
+      <div className="plan-price mono" aria-live="polite">
+        {price}<span className="plan-per">/{interval}</span>
+      </div>
+      {sale && (
+        <div className="sale-pill">
+          {sale.label}: {sale.single}% off your first {interval}, so {salePrice(price, sale.single)}
+        </div>
+      )}
+      <div className="plan-tagline">
+        {interval === 'year'
+          ? `Save ${YEARLY_SAVINGS_PERCENT}% against ${PRODUCT_PRICES.month} a month`
+          : `Or ${PRODUCT_PRICES.year} a year, ${YEARLY_SAVINGS_PERCENT}% less`}
+      </div>
+      <ul className="plan-features">
+        <li>Every quiz domain &amp; flashcard deck for one certification</li>
+        <li>Its full-length timed exam simulator</li>
+        <li>Or every tutorial of one coding course</li>
+        <li>Renews automatically; cancel anytime</li>
+      </ul>
+      <a href="#certifications" className="btn btn-card-primary plan-cta">
+        Choose a Certification <ArrowRightIcon size={16} />
+      </a>
+    </div>
+  );
+};
+
+// Plans Section — guest preview, free account, one certification or course (a monthly or yearly
+// subscription, bought on its own site), Pro (all-access, yearly)
 const Plans = ({ onShowLogin }) => (
   <section id="plans" className="plans-section">
     <div className="section-header">
       <h2 className="section-title">Simple Plans</h2>
       <p className="section-subtitle">
-        Start free in seconds. Unlock one certification for a one-time price, or every certification with Pro.
+        Start free in seconds. Subscribe to one certification or course, monthly or yearly, or get everything with Pro.
       </p>
     </div>
     <div className="plans-grid">
@@ -620,32 +676,19 @@ const Plans = ({ onShowLogin }) => (
           <li>Every flashcard deck</li>
           <li>Your first full quiz, any domain</li>
           <li>Full study guides</li>
-          <li>Cloud sync across devices</li>
+          <li>Cloud sync on up to 3 devices</li>
         </ul>
         <a href={onThisName('https://cloud.aws-study-flashcards-app.com')} className="btn btn-card-primary plan-cta">
           Create Free Account <ArrowRightIcon size={16} />
         </a>
       </div>
-      <div className="plan-card">
-        <div className="plan-name">One Certification</div>
-        <div className="plan-price plan-price-range mono">$9.99–$14.99</div>
-        {liveSale() && <div className="sale-pill">{liveSale().label}: {liveSale().single}% off, so {salePrice('$9.99', liveSale().single)}–{salePrice('$14.99', liveSale().single)}</div>}
-        <div className="plan-tagline">One-time payment, no subscription</div>
-        <ul className="plan-features">
-          <li>Every quiz domain &amp; flashcard deck for that certification</li>
-          <li>Its full-length timed exam simulator</li>
-          <li>Foundational $9.99 &middot; Associate $14.99</li>
-          <li>Pay once and keep it</li>
-        </ul>
-        <a href="#certifications" className="btn btn-card-primary plan-cta">
-          Choose a Certification <ArrowRightIcon size={16} />
-        </a>
-      </div>
+      <ProductPlanCard />
       <ProPlanCard onShowLogin={onShowLogin} />
     </div>
     <p className="plans-fine-print">
-      Prices are in US dollars. Applicable sales tax and any card processing fee are shown at checkout
-      before you pay. Payments are processed securely by Stripe for Nico Tek Solutions.{' '}
+      Prices are in US dollars. Subscriptions renew automatically; cancel anytime in Manage billing (Settings, Plan &amp; Billing).
+      Applicable sales tax and any card processing fee are shown at checkout before you pay. Payments are processed
+      securely by Stripe for Nico Tek Solutions. Unlocks bought before subscriptions keep their lifetime access.{' '}
       <a href="/terms.html">Terms of Service</a>
     </p>
   </section>
@@ -803,7 +846,7 @@ const LoginModal = ({ onClose }) => {
   const [localError, setLocalError] = useState(null);
   const [showReset, setShowReset] = useState(false);
 
-  const { login, register, googleSignIn, error, clearError } = useAuth();
+  const { login, register, googleSignIn, error, clearError, signOutMessage } = useAuth();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -903,6 +946,10 @@ const LoginModal = ({ onClose }) => {
           <h2>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
           <p>{mode === 'login' ? 'Sign in to sync your progress' : 'Start your AWS journey today'}</p>
         </div>
+
+        {signOutMessage && (
+          <div className="auth-info-box" role="status">{signOutMessage}</div>
+        )}
 
         {displayError && (
           <div className="auth-error-box">{displayError}</div>
@@ -1040,7 +1087,7 @@ const LoginModal = ({ onClose }) => {
 function HomepageContent() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [currentPage, setCurrentPage] = useState('home');
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, signOutMessage, dismissSignOutReason } = useAuth();
   const onGis = useIsGisPage();
 
   // Auto-redirect to home if user logs out while on settings
@@ -1077,6 +1124,15 @@ function HomepageContent() {
         onGis={onGis}
       />
 
+      {/* Cognito signed this browser out because the account signed in on another device */}
+      {signOutMessage && !isAuthenticated && !showLoginModal && (
+        <div className="signed-out-banner" role="status">
+          <span>{signOutMessage}</span>
+          <button type="button" className="signed-out-banner-signin" onClick={() => setShowLoginModal(true)}>Sign in</button>
+          <button type="button" className="signed-out-banner-close" onClick={dismissSignOutReason} aria-label="Dismiss">×</button>
+        </div>
+      )}
+
       {currentPage === 'settings' && isAuthenticated ? (
         <main>
           <SettingsPage onBack={handleBackToHome} onSeePlans={handleSeePlans} />
@@ -1092,7 +1148,7 @@ function HomepageContent() {
               <Hero />
               <ReadinessCheck />
               <Certifications />
-              <CodingCourses onShowLogin={() => setShowLoginModal(true)} />
+              <CodingCourses />
               <About />
               <Plans onShowLogin={() => setShowLoginModal(true)} />
               <Faq />

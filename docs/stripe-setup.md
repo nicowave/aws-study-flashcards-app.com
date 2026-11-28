@@ -1,169 +1,81 @@
-# Stripe Setup Runbook — Level Up Study Hub
+# Stripe setup: Level Up Study Hub
 
-The code (Cloud Functions + homepage wiring) is already in the repo. This
-runbook covers the parts only the account owner can do: creating keys,
-products, and the webhook in the Stripe Dashboard, and storing secrets in
-Firebase. **Never paste keys into source files, chat, or anything that gets
-committed** — keys go only into Firebase Secrets / `functions/.env`.
+How payments are wired, and what only the account owner can do in Stripe and AWS. **Never paste keys into source files, chat, or anything that gets committed.** The backend's key lives in AWS Secrets Manager; scripts read a key from the shell environment only.
 
-Do everything in a **sandbox** first (`rk_test_...` keys, test cards), then
-repeat with live keys when ready.
+To switch the live site to subscriptions, follow [subscriptions-launch.md](subscriptions-launch.md). This page is the reference.
 
-## 1. Create a restricted API key (sandbox)
+## The model
 
-Dashboard → Developers → [API keys](https://dashboard.stripe.com/test/apikeys)
-→ Create restricted key. Per Stripe's current guidance, use a **restricted
-key (RAK)**, not the unrestricted secret key. Grant only:
+| What | Price | Plan id | Stripe price env names (`aws-backend/.env`) |
+|---|---|---|---|
+| Each certification game (4) | $11/month or $69/year | `cloud-practitioner`, `ai-practitioner`, `solutions-architect-associate`, `developer-associate` | `STRIPE_PRICE_<X>_MONTHLY`, `STRIPE_PRICE_<X>_YEARLY` |
+| Each course (5) | $11/month or $69/year | `bash-for-aws`, `python-for-aws`, `javascript-for-aws`, `typescript-for-aws`, `tech-spanish` | same |
+| Pro (everything above) | $199/year, 14-day free trial for first-time Pro | `all-access` | `STRIPE_PRICE_ALL_ACCESS_YEARLY` |
 
-| Resource            | Permission |
-|---------------------|------------|
-| Checkout Sessions   | Write      |
-| Customers           | Write      |
-| Subscriptions       | Read       |
-| Billing Portal      | Write      |
+`<X>` is `CLOUD_PRACTITIONER`, `AI_PRACTITIONER`, `SOLUTIONS_ARCHITECT`, `DEVELOPER_ASSOCIATE`, `BASH_COURSE`, `PYTHON_COURSE`, `JAVASCRIPT_COURSE`, `TYPESCRIPT_COURSE`, `TECH_SPANISH_COURSE`. An empty or missing price shows that choice as not available (`cdk deploy` warns).
 
-Name it e.g. `aws-study-hub-functions`. Copy the `rk_test_...` value once —
-you can't reveal it again after saving.
+- **Everything is a subscription.** The buyer picks monthly or yearly on our page; checkout is always `mode: 'subscription'`. Products get no trial (their free modules are the trial). Pro's trial needs a card and is only for people who never had Pro (`buyerHistory` checks their purchases and every Stripe customer with their email; the hub asks the same through `proTrialStatus`).
+- **Legacy, recognised but never sold:** `STRIPE_PRICE_ALL_ACCESS` (the old $39/year Pro), `STRIPE_PRICE_DEVELOPER_PATH` (the old bundle) and the one-time `STRIPE_PRICE_<X>`. Keep them in `.env`: the webhook uses them to recognise old subscriptions and sessions. Buyers of one-time unlocks and the Developer Path keep access for good (`PURCHASE#<plan>` rows; `BUNDLES` expands the bundle).
+- **Display prices** are one constant file per app, never literals in components: hub `src/data/prices.js`, each game's and the courses' `src/services/prices.js` (`PRODUCT_MONTHLY`, `PRODUCT_YEARLY`, `PRO_YEARLY`, `PRO_TRIAL_DAYS`; the yearly saving is computed). The setup script's cents (`scripts/stripe-subscription-setup.mjs`) are the Stripe side. Change a price in all of them, plus `public/terms.html` and `public/llms.txt` in the hub (`prices.test.js` checks those two).
 
-## 2. Store the key as a Firebase secret
+## Where things live
 
-```bash
-firebase functions:secrets:set STRIPE_API_KEY
-```
+| Piece | Where |
+|---|---|
+| Checkout, portal, trial status, webhook | `aws-backend/lambda/callables/index.js` (the `CallablesFn` Lambda) |
+| Who already has what | `aws-backend/lambda/callables/coverage.js` |
+| Token claims (`plan: 'pro'`, `certs`) | `aws-backend/lambda/pre-token/index.js` |
+| Keys | Secrets Manager `study-hub/billing` = `{ stripeApiKey, stripeWebhookSecret }` |
+| Webhook URL | stack output `StripeWebhookUrl` (`<ApiUrl>/stripe/webhook`) |
+| Price IDs | untracked `aws-backend/.env` (not secret; `cdk deploy` refuses to run without the file) |
 
-Paste the `rk_test_...` value when prompted. (Firebase Secret Manager is the
-"secrets vault" here; the functions declare the secret and never see it in
-code or env files.)
+## The backend's API key
 
-## 3. Create the products and prices
+The Lambda uses a **restricted key** (`rk_live_…`) with only:
 
-Dashboard → Product catalog → Add product. The chosen model is **one-time
-purchase per certification** (first quiz free) plus a **yearly all-access
-bundle**. Checkout mode is derived from the price type, so the per-cert
-prices MUST be one-time and all-access MUST be recurring/yearly:
+| Resource | Permission |
+|---|---|
+| Checkout Sessions | Write |
+| Customers | Write |
+| Subscriptions | Read |
+| Customer portal | Write |
 
-| Product | Price | Plan id in code |
-|---|---|---|
-| AWS Cloud Practitioner Prep | $9.99 one-time | `cloud-practitioner` |
-| AWS AI Practitioner Prep | $9.99 one-time | `ai-practitioner` |
-| AWS Solutions Architect Prep | $14.99 one-time | `solutions-architect-associate` |
-| AWS Developer Associate Prep | $14.99 one-time | `developer-associate` |
-| All-Access Bundle | $39/year recurring | `all-access` |
+Swap it with `./scripts/update-stripe-key.sh` (asks for the key without echoing it, saves it into the secret, restarts the Lambda). The setup and migration scripts need more (Products, Prices, Billing Portal configuration, Webhook Endpoints): give them the account's standard secret key (`sk_live_…`) in the shell environment for that run only.
 
-Copy each price ID (`price_...`) into `functions/.env` (price IDs are not
-secrets):
+## Webhook
 
-```bash
-cat >> functions/.env <<'ENV'
-STRIPE_PRICE_CLOUD_PRACTITIONER=price_XXXXXXXX
-STRIPE_PRICE_AI_PRACTITIONER=price_XXXXXXXX
-STRIPE_PRICE_SOLUTIONS_ARCHITECT=price_XXXXXXXX
-STRIPE_PRICE_DEVELOPER_ASSOCIATE=price_XXXXXXXX
-STRIPE_PRICE_ALL_ACCESS=price_XXXXXXXX
-ENV
-```
+Endpoint: the `StripeWebhookUrl` output. Events:
 
-(Leave any plan you don't sell as an empty value — checkout for it is
-rejected server-side.)
+- `checkout.session.completed` (subscriptions, and legacy one-time sessions)
+- `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`
 
-## 4. Deploy functions, then create the webhook
+The signing secret (`whsec_…`) is `stripeWebhookSecret` in `study-hub/billing`. `stripe-subscription-setup.mjs --apply` adds `customer.subscription.created` to the existing endpoint; it never creates an endpoint. For a new endpoint: Dashboard → Developers → Webhooks → Add endpoint, the URL and events above, then put its signing secret into the secret (Secrets Manager console, or `aws secretsmanager put-secret-value` with the full JSON).
 
-```bash
-firebase deploy --only functions
-```
+## Customer portal
 
-The deploy output prints the `stripeWebhook` URL
-(`https://<region>-aws-study-hub.cloudfunctions.net/stripeWebhook` or a
-`run.app` URL). Then Dashboard → Developers →
-[Webhooks](https://dashboard.stripe.com/webhooks) → Add endpoint:
+`stripe-subscription-setup.mjs --apply` configures two portal configurations. The default one ("Manage billing", `createPortalSession`, linked from every app that sells): cancel at period end, invoice history, and no plan switching, because its product list would let a subscriber move to any other product while access followed the old one. A second configuration tagged `metadata.purpose=interval-switch` lists each product's monthly and yearly price (prorated; yearly to monthly waits for the end of the paid year); checkout uses it only for the monthly -> yearly confirm link, which shows just that change. Entitlements read the plan from the subscription's price first, so a changed price always wins over stale metadata.
 
-- **URL**: the `stripeWebhook` function URL
-- **Events**: `checkout.session.completed`,
-  `customer.subscription.updated`, `customer.subscription.deleted`
+## How checkout behaves
 
-Copy the endpoint's **signing secret** (`whsec_...` — separate from API
-keys) and store it:
+`createCheckoutSession` takes `{ plan, interval: 'month' | 'year', returnUrl }`:
 
-```bash
-firebase functions:secrets:set STRIPE_WEBHOOK_SECRET
-firebase deploy --only functions
-```
+- Products need `interval` ("Choose monthly or yearly" otherwise). Pro defaults to `year`; `month` is refused. `developer-path` answers "The Developer Path bundle is no longer sold".
+- Answers `{ url }` (Stripe Checkout), `{ url, alreadyOwned: true }` (the account already has it: one-time purchase, bundle, Pro, or the same subscription; back to `?checkout=success&owned=1`) or `{ url, switchInterval: true }` (an active monthly subscription asking for yearly: the portal confirms the switch, so nobody pays twice). Clients just go to `url`.
+- Refuses when the same email has it under another sign-in (Google vs password).
+- `returnUrl` is honoured only if it is in `ALLOWED_ORIGINS`, else the old hub.
+- Sales: `PROMOTIONS` applies a Stripe coupon automatically during its window (display copies in each app's `src/services/offers.js`).
+- Metadata `{ firebaseUID, plan, interval }` goes on the session and the subscription (`firebaseUID` is our user id; the name predates AWS).
 
-(The second deploy binds the new secret version.)
+Entitlements: the webhook writes `USER#<uid>` / `ENTITLEMENTS` (`allAccess`, `certs` = products held one by one, bought or subscribed, `active` = the running subscriptions). The pre-token Lambda turns that into `plan: 'pro'` and, for Pro, `certs` listing all nine products. `past_due` still counts; `canceled` and `unpaid` don't. Deleting an account (`DELETE /v1/me`) answers 409 while a subscription is active, trialing or past due: cancel it in Manage billing first.
 
-## 5. Enable the customer portal
+## Testing in a sandbox
 
-Dashboard → Settings → Billing → [Customer portal](https://dashboard.stripe.com/settings/billing/portal):
-enable it, allow subscription cancel, and save. `createPortalSession` fails
-until this is configured once.
+1. Make a sandbox restricted key (same permissions) and a sandbox secret key.
+2. Rehearse the setup: `STRIPE_SECRET_KEY=sk_test_… node scripts/stripe-subscription-setup.mjs --test-mode --apply --write-env --env-file /tmp/sandbox.env`.
+3. Script tests (fake Stripe, no network): `node --test scripts/stripe-subscription-setup.test.mjs scripts/migrate-pro-price.test.mjs`.
+4. Backend tests (fake Stripe and table): `(cd aws-backend && npm test)`.
+5. End to end, with a sandbox stack or after the live launch: card `4242 4242 4242 4242`, then cancel in Manage billing.
 
-## 6. Lock down Firestore
+## Superseded
 
-The webhook writes `subscription` and `stripeCustomerId` onto
-`/users/{uid}`. Clients must NOT be able to write those fields (claims are
-the real enforcement surface, but don't let the display state lie). In
-Firebase Console → Firestore → Rules, users' self-writes should exclude
-them:
-
-```
-match /users/{userId} {
-  allow read: if request.auth != null && request.auth.uid == userId;
-  allow write: if request.auth != null && request.auth.uid == userId
-    && !request.resource.data.diff(resource.data).affectedKeys()
-        .hasAny(['subscription', 'stripeCustomerId']);
-}
-match /users/{userId}/progress/{certId} {
-  allow read, write: if request.auth != null && request.auth.uid == userId;
-}
-```
-
-## 7. Turn the UI on and test end-to-end (sandbox)
-
-In `aws-study-homepage/.env` AND each game's `.env`
-(`aws-cloud-practitioner-game/.env`, `aws-ai-study-game/.env`):
-
-```
-VITE_BILLING_ENABLED=true
-VITE_CERT_PRICE_LABEL=$10.99/mo
-VITE_PRO_PRICE_LABEL=$16.99/mo
-```
-
-Then test the first-quiz-free funnel in a game (local or deployed):
-
-1. Sign in with a fresh account, play one full 5-question quiz — free.
-2. Start a second quiz → the **paywall screen** appears ($10.99/mo for
-   this cert). The Exam Simulator paywalls immediately.
-3. Subscribe with test card `4242 4242 4242 4242` → redirected back to the
-   game with `?checkout=success` → quizzes and exam unlock.
-4. Check Firestore `/users/{uid}.subscription` shows the cert under
-   `certs`, and the other game is still paywalled (per-cert isolation) —
-   unless the sub is all-access, which unlocks both.
-5. Cancel via the homepage Pro card → Manage Subscription (Stripe portal);
-   the webhook clears the claim at period end.
-
-## 8. Go live (later, when ready)
-
-1. Repeat steps 1–5 in **live mode** (`rk_live_...` key, live product/price,
-   live webhook + its own `whsec_...`).
-2. Update the two secrets and `functions/.env` with live values; redeploy
-   functions.
-3. Set `VITE_BILLING_ENABLED=true` in the homepage's production build env
-   and deploy the homepage.
-4. Stripe also requires public **Terms of Service** and **Privacy Policy**
-   pages — add them before flipping live.
-5. Recommended hardening from Stripe's key docs: add an access policy to
-   the live RAK, and rotate keys if anyone with access leaves.
-
-## Design notes (for whoever touches this next)
-
-- **Entitlement source of truth**: Firebase custom claims (`plan: 'pro'`),
-  set only by the webhook. `exchangeToken` forwards claims into the custom
-  token so entitlements survive cross-subdomain SSO. The Firestore
-  `subscription` map is display-only.
-- `past_due` still counts as entitled (grace period); `canceled`/`unpaid`
-  drop the claim.
-- Clients read the plan via `getIdTokenResult()` (`billing.js#getPlan`),
-  with a forced refresh after checkout returns.
-- The games don't gate anything on `plan` yet — premium gating lands with
-  the expanded question banks (which must be served from
-  Firestore/functions, not bundled JS, to be enforceable).
+`scripts/stripe-go-live.mjs` is the Firebase-era setup (one-time prices, `functions/.env`). It exits without touching Stripe; use `scripts/stripe-subscription-setup.mjs`.

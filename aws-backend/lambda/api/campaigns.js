@@ -17,7 +17,7 @@ const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, GetCommand, QueryCommand, ScanCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 const leads = require('./leads');
 
-const { CERTS, SALE, dollars, salePrice, studyPlan, esc, emailShell, footerText, button } = leads;
+const { CERTS, SALE, PRICES, PRICE_TEXT, TERMS_URL, RENEWAL_NOTE, dollars, salePrice, studyPlan, esc, emailShell, footerText, button } = leads;
 const TABLE_NAME = process.env.TABLE_NAME;
 const API_URL = process.env.API_URL;
 const DAY = 24 * 60 * 60 * 1000;
@@ -25,8 +25,12 @@ const FEATURES = [
   'Every quiz domain, weighted like the exam',
   'Full-length timed exam simulator with a readiness score',
   'All flashcard decks with a review queue',
-  'One-time payment, yours for good',
+  `${PRICE_TEXT}, cancel anytime`,
 ];
+// Sales take the coupon off the yearly price
+const YEARLY = PRICES.productYearly;
+const fine = `${RENEWAL_NOTE} Terms: ${TERMS_URL}`;
+const fineHtml = `${esc(RENEWAL_NOTE)} <a href="${esc(TERMS_URL)}" style="color:#5d6070">Terms</a>`;
 
 const tracked = (cert, campaign) =>
   `${cert.url}/?utm_source=readiness&utm_medium=email&utm_campaign=${campaign}&utm_content=${cert.id}`;
@@ -38,8 +42,8 @@ const para = (html) => `<p style="margin:0 0 14px;font-size:15px;line-height:1.5
 const callout = (html) =>
   `<p style="margin:16px 0 0;padding:12px 14px;background:#fbe7d6;border-radius:8px;font-size:14px;line-height:1.5;color:#8a3d06">${html}</p>`;
 const signoff = `<p style="margin:20px 0 0;font-size:15px;line-height:1.5">Stuck on something? Reply and ask. I read every one.<br><br>Nico<br><span style="color:#5d6070">Level Up Study Hub</span></p>`;
-const priceLine = (cert) =>
-  `<strong>${salePrice(cert)}</strong> <s style="color:#7d808e">${dollars(cert.cents)}</s>`;
+const priceLine = () =>
+  `<strong>${salePrice(YEARLY)}</strong> <s style="color:#7d808e">${dollars(YEARLY)}</s> a year`;
 
 // ---------------------------------------------------------------------------
 // The three emails. Each gets { cert, check, now } and returns { subject, text, inner }.
@@ -56,7 +60,7 @@ const CAMPAIGNS = {
       const subject = done ? `Ready for the ${cert.short} practice exam?` : `Day ${day} of your ${cert.short} plan`;
       const url = tracked(cert, 'day3');
       const sale = SALE.end > now
-        ? `Halloween deal: the full ${cert.short} game is ${salePrice(cert)} instead of ${dollars(cert.cents)} until Friday at midnight Eastern.`
+        ? `Halloween deal: a year of the full ${cert.short} game is ${salePrice(YEARLY)} instead of ${dollars(YEARLY)} until Friday at midnight Eastern. ${fine}`
         : '';
 
       const text = `${label}
@@ -82,7 +86,7 @@ ${para(`A quick check-in on the study plan from your readiness check. You scored
 <p style="margin:0;font-size:17px;line-height:1.45;font-weight:600">${esc(step)}</p>
 ${button(url, done ? 'Take the practice exam' : `Continue day ${day}`)}
 ${para('<strong>One tip that works:</strong> answer each flashcard out loud before you flip it. Pulling the answer from memory sticks far better than rereading.')}
-${sale ? callout(`<strong>Halloween deal:</strong> the full ${esc(cert.short)} game is ${priceLine(cert)} until Friday at midnight Eastern.`) : ''}
+${sale ? callout(`<strong>Halloween deal:</strong> a year of the full ${esc(cert.short)} game is ${priceLine()} until Friday at midnight Eastern. ${fineHtml}`) : ''}
 ${signoff}`;
       return { subject, text, inner };
     },
@@ -92,16 +96,17 @@ ${signoff}`;
     sale: true,
     build({ cert, check }) {
       const url = tracked(cert, 'sale-48-hours');
-      const subject = `Under 48 hours left: ${cert.short} for ${salePrice(cert)}`;
+      const subject = `Under 48 hours left: ${cert.short} for ${salePrice(YEARLY)} a year`;
       const text = `The Halloween deal ends tomorrow (Friday) at midnight Eastern.
 
-Until then the full ${cert.name} game is ${salePrice(cert)} instead of ${dollars(cert.cents)}:
+Until then a year of the full ${cert.name} game is ${salePrice(YEARLY)} instead of ${dollars(YEARLY)}:
 ${FEATURES.map((f) => `- ${f}`).join('\n')}
 
 Your readiness check said ${check.score}/${check.total}. The timed exam simulator is the quickest way to find out if you're ready for the real thing.
 
 Unlock it: ${url}
 The discount is applied at checkout, no code needed. Already unlocked it? Thank you, and ignore this one.
+${fine}
 
 Nico
 Level Up Study Hub
@@ -109,12 +114,12 @@ Level Up Study Hub
 ${footerText('UNSUBSCRIBE_URL')}`;
 
       const inner = `${eyebrow('Halloween deal · ends Friday at midnight Eastern')}${h1(`${cert.short}, 31% off for under 48 hours`)}
-<p style="margin:0 0 16px;font-size:30px;line-height:1">${priceLine(cert)}</p>
+<p style="margin:0 0 16px;font-size:30px;line-height:1">${priceLine()}</p>
 ${para(`The full ${esc(cert.name)} game:`)}
 <ul style="margin:0 0 16px;padding-left:20px;font-size:15px;line-height:1.6">${FEATURES.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>
 ${para(`Your readiness check said <strong>${check.score}/${check.total}</strong>. The timed exam simulator is the quickest way to find out if you're ready for the real thing.`)}
-${button(url, `Unlock for ${salePrice(cert)}`)}
-<p style="margin:0;font-size:13px;line-height:1.5;color:#5d6070">The discount is applied at checkout, no code needed. Already unlocked it? Thank you, and ignore this one.</p>
+${button(url, `Unlock for ${salePrice(YEARLY)} a year`)}
+<p style="margin:0;font-size:13px;line-height:1.5;color:#5d6070">The discount is applied at checkout, no code needed. Already unlocked it? Thank you, and ignore this one. ${fineHtml}</p>
 ${signoff}`;
       return { subject, text, inner };
     },
@@ -127,9 +132,10 @@ ${signoff}`;
       const subject = `Last day: 31% off ${cert.short} ends at midnight`;
       const text = `Today is the last day of the Halloween deal.
 
-The full ${cert.name} game is ${salePrice(cert)} until midnight Eastern tonight. Then it goes back to ${dollars(cert.cents)}.
+A year of the full ${cert.name} game is ${salePrice(YEARLY)} until midnight Eastern tonight. Then it goes back to ${dollars(YEARLY)} a year.
 
 Unlock it: ${url}
+${fine}
 
 This is the last sale email. After today it's study tips only.
 
@@ -139,8 +145,9 @@ Level Up Study Hub
 ${footerText('UNSUBSCRIBE_URL')}`;
 
       const inner = `${eyebrow('Halloween deal · last day')}${h1('31% off ends at midnight tonight')}
-${para(`The full ${esc(cert.name)} game is ${priceLine(cert)} until midnight Eastern. Then it goes back to ${dollars(cert.cents)}.`)}
-${button(url, `Unlock for ${salePrice(cert)}`)}
+${para(`A year of the full ${esc(cert.name)} game is ${priceLine()} until midnight Eastern. Then it goes back to ${dollars(YEARLY)} a year.`)}
+${button(url, `Unlock for ${salePrice(YEARLY)} a year`)}
+<p style="margin:0 0 14px;font-size:13px;line-height:1.5;color:#5d6070">${fineHtml}</p>
 ${para('<span style="color:#5d6070">This is the last sale email. After today it\'s study tips only.</span>')}
 ${signoff}`;
       return { subject, text, inner };

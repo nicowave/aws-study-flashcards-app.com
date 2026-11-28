@@ -4,15 +4,13 @@
 // client-writable state.
 import { getTokens, decodeJwt, callFunction } from './awsAuth';
 import { onThisName } from '../config/auth.config';
+import { INTERVALS } from './prices';
 
 export const BILLING_ENABLED = import.meta.env.VITE_BILLING_ENABLED === 'true';
 
-// Display label for this cert's one-time price (set per app at build time)
-export const CERT_PRICE_LABEL = import.meta.env.VITE_CERT_PRICE_LABEL || 'one-time purchase';
-
 /**
  * True when the signed-in user may access this cert's premium content:
- * an all-access plan ('pro') or a purchase of this cert.
+ * an all-access plan ('pro'), a subscription to this cert, or an earlier one-time purchase of it.
  * Pass { forceRefresh: true } right after checkout to pick up a new purchase.
  */
 export const hasCertEntitlement = async (certId, { forceRefresh = false } = {}) => {
@@ -28,9 +26,32 @@ export const hasCertEntitlement = async (certId, { forceRefresh = false } = {}) 
   }
 };
 
-/** Starts Stripe Checkout for this plan (one-time or subscription) and redirects. */
-export const startCheckout = async (plan) => {
-  const { data } = await callFunction('createCheckoutSession', { plan, returnUrl: window.location.origin });
+/**
+ * True when the signed-in user has paid for anything (Pro, a subscription or an earlier purchase),
+ * so Settings can offer "Manage billing". Reads the same token claims as hasCertEntitlement.
+ */
+export const hasPaidPlan = async () => {
+  try {
+    const tokens = await getTokens();
+    if (!tokens) return false;
+    const claims = decodeJwt(tokens.idToken);
+    return claims.plan === 'pro' || (claims.certs || '').split(',').some(Boolean);
+  } catch (err) {
+    console.warn('[billing] Failed to read plan claims:', err.message);
+    return false;
+  }
+};
+
+/**
+ * Starts Stripe Checkout for a plan billed monthly or yearly ('month' | 'year') and redirects.
+ * Pro ('all-access') is yearly only. The server may answer instead with the billing page that
+ * switches an active monthly subscription to yearly, or with "already owned"; either way it is
+ * a URL to open.
+ */
+export const startCheckout = async (plan, interval = 'year') => {
+  if (!INTERVALS.includes(interval)) throw new Error(`Unknown billing interval: ${interval}`);
+  if (plan === 'all-access' && interval !== 'year') throw new Error('Pro is billed yearly');
+  const { data } = await callFunction('createCheckoutSession', { plan, interval, returnUrl: window.location.origin });
   if (data?.url) {
     window.location.assign(data.url);
   } else {

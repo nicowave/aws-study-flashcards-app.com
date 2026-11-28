@@ -32,7 +32,7 @@
   <div class="page">
     <a class="home-link" href="/">&larr; Level Up Study Hub</a>
     <h1>Privacy Policy</h1>
-    <p class="meta">Effective date: September 1, 2026 · Updated November 20, 2026</p>
+    <p class="meta">Effective date: September 1, 2026 · Updated November 28, 2026</p>
 
     <p><strong>New name.</strong> AWS Study Hub is now called Level Up Study Hub, at levelupstudyhub.com. Your account,
     purchases, Pro plan and study progress carry over unchanged.</p>
@@ -60,9 +60,17 @@
       </tr>
       <tr>
         <td>Payment status</td>
-        <td>Subscription plan, status, and billing period; a Stripe customer reference</td>
+        <td>Subscriptions (plan, monthly or yearly, status, renewal date), past one-time purchases; a
+        Stripe customer reference</td>
         <td>Knowing what you've purchased. <strong>Card numbers go directly to Stripe — we never
         see or store them.</strong></td>
+      </tr>
+      <tr>
+        <td>Signed-in devices</td>
+        <td>For each signed-in session: the last IP address it used, an approximate location worked
+        out from that address, and the device type (Amazon Cognito session tracking)</td>
+        <td>Keeping an account signed in on at most 3 devices at a time. Signing in on a fourth
+        signs out the one used least recently.</td>
       </tr>
       <tr>
         <td>Readiness check</td>
@@ -91,6 +99,9 @@
       <li><strong>Authentication cookie</strong> on the address you signed in on
       (<code>.aws-study-flashcards-app.com</code> or <code>.levelupstudyhub.com</code>) so that
       signing in once works across the hub, game and course sites (essential).</li>
+      <li><strong>Signed-out notice cookie</strong> (<code>studyHubSignedOut</code>) on the same
+      address, set for up to one day when a browser is signed out because the account signed in on
+      another device, so the next page can tell you why (essential).</li>
       <li><strong>Local storage</strong> for study stats, preferences, and guest progress
       (essential).</li>
       <li><strong>Google Analytics cookies</strong> for usage analytics (optional — see
@@ -123,7 +134,8 @@
       <li><strong>Correction:</strong> update your display name, avatar, and password in
       Settings.</li>
       <li><strong>Deletion:</strong> delete your account in Settings → Danger Zone; this removes
-      your account and study data from our systems. Payment records held by Stripe are retained as
+      your account and study data from our systems. If a subscription is still running, cancel it in
+      Manage billing first; the account can't be deleted while it bills. Payment records held by Stripe are retained as
       required for tax and accounting law.</li>
       <li>Depending on where you live (e.g. the EU/EEA, UK, or California), you may have additional
       statutory rights — contact us and we will honour them.</li>
@@ -131,7 +143,9 @@
 
     <h2>5. Data retention</h2>
     <p>Account and progress data are kept while your account exists and deleted when you delete
-    your account. Analytics data is retained per Google Analytics' standard retention settings.
+    your account. Signed-in device details (IP address, approximate location, device type) are
+    kept only while that session is valid: until you sign out, it is signed out because the account
+    signed in on another device, or the sign-in expires (30 days after you signed in). Analytics data is retained per Google Analytics' standard retention settings.
     Backup copies may persist for up to 35 days before rotating out.</p>
 
     <h2>6. Security</h2>

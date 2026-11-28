@@ -16,7 +16,7 @@ npx vitest run src/courses/tech-spanish/modules.test.js -t git-everyday   # one 
 | File | What it is |
 |---|---|
 | `index.js` | The course: home page text, FAQ, labels, the module list |
-| `meta.json` | id, title, price, URL (also read by `vite.config.js`) |
+| `meta.json` | id, title, URL (also read by `vite.config.js`). Prices are not here: every course shows the ones in `src/services/prices.js` |
 | `glossary.json` | **Generated** copy of `content/tech-spanish/glossary.json`. Edit the glossary there and run `node build.mjs` |
 | `glossary.js` | Helpers: `term(id)`, `termTable(ids)`, `examples(ids)`, `traps(ids)`, `cardsFor(ids)` |
 | `tutorials/0N-<slug>.js` | One module each (the engine calls them tutorials) |

@@ -1,6 +1,9 @@
 // Questions people search for, answered on the page (Faq.jsx) and in the
 // FAQPage structured data the build adds (vite.config.js). Plain text only:
 // both places print the same words, and search engines want them to match.
+// Prices come from prices.js (this file is also read by vite.config.js in Node).
+import { PRODUCT_MONTHLY, PRODUCT_YEARLY, PRO_YEARLY, PRO_TRIAL_DAYS, YEARLY_SAVINGS_PERCENT } from './prices.js';
+
 export const FAQ = [
   {
     q: 'What is Level Up Study Hub?',
@@ -20,15 +23,23 @@ export const FAQ = [
   },
   {
     q: 'Is Level Up Study Hub free?',
-    a: 'You can start free with no account: the study guides, the first quiz domain and the first flashcard deck of every certification. A free account adds every flashcard deck and cloud sync. Unlocking everything for one certification is a one-time payment, with no subscription.',
+    a: 'You can start free with no account: the study guides, the first quiz domain and the first flashcard deck of every certification. A free account adds every flashcard deck and cloud sync. Unlocking everything for one certification or course is a subscription you can cancel anytime.',
   },
   {
     q: 'How much does it cost?',
-    a: 'A Foundational certification (Cloud Practitioner or AI Practitioner) is $9.99 once. An Associate certification is $14.99 once. Each coding course is $19.99 once, and the Developer Path bundle (all four courses plus the Developer – Associate study game) is $59 once. Prices are in US dollars.',
+    a: `Each certification and each coding course is ${PRODUCT_MONTHLY} a month or ${PRODUCT_YEARLY} a year (yearly saves ${YEARLY_SAVINGS_PERCENT}%). Pro unlocks every certification and every coding course for ${PRO_YEARLY} a year. Subscriptions renew automatically until you cancel, which you can do anytime in Manage billing. Unlocks bought before subscriptions keep their lifetime access. Prices are in US dollars.`,
   },
   {
     q: 'Is there a free trial?',
-    a: 'Yes, for Pro, which unlocks every certification for $39 a year. Your first 7 days are free. Checkout asks for a card, and the first yearly charge happens when the 7 days end unless you cancel before then. One free trial per person. The one-time unlocks have no trial, because the free preview and the free account already let you try every certification first.',
+    a: `Yes, for Pro, which unlocks every certification and every coding course for ${PRO_YEARLY} a year. Your first ${PRO_TRIAL_DAYS} days are free. Checkout asks for a card, and the first yearly charge happens when the ${PRO_TRIAL_DAYS} days end unless you cancel before then. One free trial per person. A single certification or course has no trial, because the free preview, the free account and the free first tutorial already let you try it first.`,
+  },
+  {
+    q: 'How do I cancel or switch to yearly?',
+    a: 'Sign in, open Settings, then Plan & Billing, and choose Manage billing. There you can cancel, see invoices and change your card. After you cancel, you keep access until the end of the month or year you paid for. To move a monthly subscription to yearly, choose Yearly where you bought it while signed in; Stripe credits the unused part of the month.',
+  },
+  {
+    q: 'On how many devices can I use my account?',
+    a: 'An account can stay signed in on up to 3 devices at once. Signing in on a fourth signs out the one used least recently, and that browser says why. Your progress syncs across all of them.',
   },
   {
     q: 'Do I need to install anything for the coding courses?',

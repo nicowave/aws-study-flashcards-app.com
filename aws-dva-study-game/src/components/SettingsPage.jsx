@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeftIcon, UserIcon, CameraIcon, PaletteIcon, KeyIcon, BarChartIcon, TrashIcon, ImageIcon, RefreshIcon, CheckIcon } from './Icons';
 import { isAnalyticsOptedOut, setAnalyticsOptOut } from '../services/analytics';
+import BillingSettings from './BillingSettings';
 import './SettingsPage.css';
 
 // Constants
@@ -613,6 +614,9 @@ const SettingsPage = ({ onBack }) => {
           </form>
         </div>
       )}
+
+      {/* Plan & billing: only for accounts that have paid (and only with billing on) */}
+      <BillingSettings />
 
       {/* Section 4: Analytics */}
       <div className="settings-section">

@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// SUPERSEDED: use scripts/stripe-subscription-setup.mjs (subscriptions, Customer Portal, webhook event).
+// This is the Firebase-era setup (one-time prices, functions/.env, Firebase secrets) and no longer runs:
+// functions/ is gone. Kept only for history; it exits before touching Stripe.
 /**
  * One-shot Stripe LIVE-mode setup for Level Up Study Hub.
  *
@@ -27,6 +30,9 @@
 import { execFileSync, execSync } from "node:child_process";
 import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { createRequire } from "node:module";
+
+console.error("Superseded: run scripts/stripe-subscription-setup.mjs instead (see its header).");
+process.exit(1);
 
 const require = createRequire(import.meta.url);
 // Reuse the Stripe SDK already installed for the Cloud Functions

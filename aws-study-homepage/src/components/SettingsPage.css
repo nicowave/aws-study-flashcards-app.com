@@ -513,6 +513,11 @@
   padding-left: 20px;
 }
 
+.billing-detail {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 .billing-actions {
   display: flex;
   flex-wrap: wrap;

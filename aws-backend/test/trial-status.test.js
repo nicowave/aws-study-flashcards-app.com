@@ -1,4 +1,4 @@
-// The Pro card may only promise the free week when checkout would give it.
+// The Pro card may only promise the free trial when checkout would give it.
 // Runs the real proTrialStatus and createCheckoutSession against a fake Stripe and table.
 //
 //   cd aws-backend/lambda/callables && npm ci     (once, for the AWS SDK)
@@ -15,7 +15,7 @@ const req = createRequire(callables);
 process.env.TABLE_NAME = "test-table";
 process.env.USER_POOL_ID = "us-east-1_TestPool1";
 process.env.USER_POOL_CLIENT_ID = "test-client";
-process.env.STRIPE_PRICE_ALL_ACCESS = "price_pro";
+process.env.STRIPE_PRICE_ALL_ACCESS_YEARLY = "price_pro";
 
 const lib = req("@aws-sdk/lib-dynamodb");
 let table = new Map();

@@ -1,19 +1,38 @@
-// "Unlock the course" card: sign in first, then Stripe Checkout. Shows a
-// running sale's price, and the Developer Path bundle as the other option.
-import React, { useState } from 'react';
+// "Unlock the course" card: sign in first, then Stripe Checkout. The course is a subscription,
+// monthly or yearly (the buyer picks here); Pro (yearly) is the other option. Shows a running
+// sale's price. Every amount comes from services/prices.js.
+import React, { useId, useState } from 'react';
 import { startCheckout } from '../services/billing';
-import { DEVELOPER_PATH, currentPromotion, salePrice } from '../services/offers';
+import { currentPromotion, salePrice } from '../services/offers';
+import { PRODUCT_PRICES, PRO_PLAN, PRO_TRIAL_DAYS, PRO_YEARLY, YEARLY_SAVINGS_PERCENT } from '../services/prices';
+import { onThisName } from '../config/auth.config';
 import { useT } from './i18n';
 
-const Price = ({ price, percent }) => (percent ? (
+// Written with the old name; onThisName keeps a visitor on the name they opened.
+const TERMS_URL = 'https://aws-study-flashcards-app.com/terms.html';
+const PRIVACY_URL = 'https://aws-study-flashcards-app.com/privacy.html';
+
+/** An amount with its period; while a sale runs, the sale price, the full one struck, "first month". */
+const Price = ({ price, percent, interval, t }) => (
   <>
-    <span className="price">{salePrice(price, percent)}</span>
-    <s className="was">{price}</s>
+    {percent ? (
+      <>
+        <span className="price">{salePrice(price, percent)}</span>
+        <s className="was">{price}</s>
+      </>
+    ) : <span className="price">{price}</span>}
+    <span className="per">
+      {percent
+        ? t(interval === 'month' ? 'unlock.firstMonth' : 'unlock.firstYear')
+        : t(interval === 'month' ? 'unlock.perMonth' : 'unlock.perYear')}
+    </span>
   </>
-) : <span className="price">{price}</span>);
+);
 
 const UnlockCard = ({ course, user, onSignIn, returnPath, compact = false }) => {
   const t = useT(course);
+  const name = useId();
+  const [interval, setBillingInterval] = useState('year');
   const [busy, setBusy] = useState(null); // the plan being checked out
   const [error, setError] = useState('');
   const paid = course.tutorials.filter((t) => !t.free);
@@ -21,26 +40,45 @@ const UnlockCard = ({ course, user, onSignIn, returnPath, compact = false }) => 
   const sale = currentPromotion();
   const live = sale?.live ? sale.promo : null;
 
-  const buy = async (plan) => {
+  const buy = async (plan, billing) => {
     if (!user) { onSignIn(t('unlock.signInNote')); return; }
     setBusy(plan);
     setError('');
     try {
-      await startCheckout(plan, returnPath);
+      await startCheckout(plan, billing, returnPath);
     } catch (e) {
       setBusy(null);
       setError(/not available/i.test(e.message)
         ? t('unlock.soon')
-        : t('unlock.failed'));
+        : /other sign-in/i.test(e.message) ? t('unlock.otherSignIn') : t('unlock.failed'));
     }
   };
 
   return (
     <div className={`unlock ${compact ? 'compact' : ''}`}>
       {live && <p className="sale-tag">{t('unlock.sale', live.label, live.single, live.ends)}</p>}
+      <fieldset className="interval-toggle">
+        <legend className="sr-only">{t('unlock.billing')}</legend>
+        {[
+          ['month', t('unlock.monthly'), null],
+          ['year', t('unlock.yearly'), t('unlock.save', YEARLY_SAVINGS_PERCENT)],
+        ].map(([value, label, save]) => (
+          <label key={value} className={`interval-option${interval === value ? ' selected' : ''}`}>
+            <input
+              type="radio"
+              name={name}
+              value={value}
+              checked={interval === value}
+              onChange={() => setBillingInterval(value)}
+              disabled={!!busy}
+            />
+            <span>{label}</span>
+            {save && <span className="interval-save">{save}</span>}
+          </label>
+        ))}
+      </fieldset>
       <div className="unlock-price">
-        <Price price={course.price} percent={live?.single} />
-        <span className="once">{t('unlock.once')}</span>
+        <Price price={PRODUCT_PRICES[interval]} percent={live?.single} interval={interval} t={t} />
       </div>
       {!compact && (
         <ul className="unlock-list">
@@ -48,25 +86,31 @@ const UnlockCard = ({ course, user, onSignIn, returnPath, compact = false }) => 
           <li>{t('unlock.everyTask')}</li>
           <li>{t('unlock.project')}</li>
           <li>{t('unlock.progress')}</li>
+          <li>{t('unlock.renews')}</li>
         </ul>
       )}
-      <button type="button" className="btn big" onClick={() => buy(course.id)} disabled={!!busy}>
+      <button type="button" className="btn big" onClick={() => buy(course.id, interval)} disabled={!!busy}>
         {busy === course.id ? t('unlock.opening') : user ? t('unlock.unlock', course.title) : t('unlock.signInToUnlock')}
       </button>
-      {!compact && course.bundle !== false && (
-        <div className="bundle">
-          <div className="bundle-head">
-            <strong>{t('unlock.orBundle', DEVELOPER_PATH.title)}</strong>
-            <span className="bundle-price"><Price price={DEVELOPER_PATH.price} percent={live?.bundle} /></span>
+      {!compact && (
+        <div className="unlock-pro">
+          <p className="unlock-pro-title"><strong>{t('unlock.orPro')}</strong></p>
+          <div className="unlock-pro-price">
+            <Price price={PRO_YEARLY} percent={live?.pro} interval="year" t={t} />
           </div>
-          <p>{t('unlock.bundleSeparately', DEVELOPER_PATH.includes, DEVELOPER_PATH.separately)}</p>
-          <button type="button" className="btn ghost" onClick={() => buy(DEVELOPER_PATH.plan)} disabled={!!busy}>
-            {busy === DEVELOPER_PATH.plan ? t('unlock.opening') : t('unlock.getBundle', DEVELOPER_PATH.title)}
+          <p className="unlock-pro-note">{t('unlock.proTrial', PRO_TRIAL_DAYS)}</p>
+          <button type="button" className="btn ghost" onClick={() => buy(PRO_PLAN, 'year')} disabled={!!busy}>
+            {busy === PRO_PLAN ? t('unlock.opening') : t('unlock.getPro')}
           </button>
         </div>
       )}
-      {error && <p className="unlock-error">{error}</p>}
-      <p className="unlock-fine">{t('unlock.fine')}{live ? t('unlock.fineSale') : ''}</p>
+      {error && <p className="unlock-error" role="alert">{error}</p>}
+      <p className="unlock-fine">
+        {t('unlock.fine')}{live ? t('unlock.fineSale') : ''}{' '}
+        <a href={onThisName(TERMS_URL)} target="_blank" rel="noopener noreferrer">{t('unlock.terms')}</a>
+        {' · '}
+        <a href={onThisName(PRIVACY_URL)} target="_blank" rel="noopener noreferrer">{t('unlock.privacy')}</a>
+      </p>
     </div>
   );
 };
