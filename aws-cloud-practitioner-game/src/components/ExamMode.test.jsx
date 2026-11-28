@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within, act } from '@testing-library/react';
+import { render, screen, within, act, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ExamMode from './ExamMode';
 import { correctIndex, answerField } from '../test/examConfig';
@@ -468,5 +468,60 @@ describe('ExamMode: history', () => {
     setup();
     expect(screen.getByRole('button', { name: 'Start Exam' })).toBeInTheDocument();
     expect(screen.queryByText(/Attempts:/)).not.toBeInTheDocument();
+  });
+});
+
+describe('ExamMode: readiness', () => {
+  // One saved attempt, built from [domain name, correct, total] rows the way the exam saves it.
+  const attempt = (rows) => {
+    const correct = rows.reduce((n, [, c]) => n + c, 0);
+    const total = rows.reduce((n, [, , t]) => n + t, 0);
+    return {
+      date: new Date(2026, 10, 28).toISOString(), scaled: scaledFor(correct, total),
+      pct: Math.round((correct / total) * 100), passed: true, correct, total, durationSec: 60,
+      domains: rows.map(([name, c, t]) => ({ name, correct: c, total: t })),
+    };
+  };
+  // Run one exam to learn this app's history key, then return a function that
+  // replaces the saved history and opens a fresh intro screen on it.
+  const historyOpener = async () => {
+    const first = setup();
+    await start(first.user);
+    await submit(first.user);
+    const key = historyKey();
+    first.unmount();
+    return (attempts) => {
+      cleanup();
+      localStorage.setItem(key, JSON.stringify(attempts));
+      setup();
+      return screen.getByText(/^Readiness:/).parentElement;
+    };
+  };
+
+  it('does not call a strong score with a domain at 4 of 8 "Ready" (60/65, scaled 931)', async () => {
+    // The attempt seen live on 2026-11-28: the overall score carried the blend past
+    // the Ready line while the card said "no weak domain" next to a 50% domain.
+    const open = await historyOpener();
+    const card = open([attempt([
+      ['Fixture Domain One', 30, 31],
+      ['Fixture Domain Two', 26, 26],
+      ['Fixture Domain Three', 4, 8],
+    ])]);
+    expect(card).toHaveTextContent('Readiness: Almost ready');
+    expect(card).not.toHaveTextContent(/no weak domain/);
+    expect(card).toHaveTextContent(/Fixture Domain Three is at 50%/);
+    expect(card).toHaveTextContent(/weakest domain 50%/);
+  });
+
+  it('is Ready only when every domain of the last attempt is at 70% or more', async () => {
+    const open = await historyOpener();
+    const atFloor = open([attempt([['Fixture Domain One', 50, 50], ['Fixture Domain Two', 7, 10]])]);
+    expect(atFloor).toHaveTextContent('Readiness: Ready');
+    expect(atFloor).toHaveTextContent(/no weak domain/);
+
+    const belowFloor = open([attempt([['Fixture Domain One', 50, 50], ['Fixture Domain Two', 6, 10]])]);
+    expect(belowFloor).toHaveTextContent('Readiness: Almost ready');
+    expect(belowFloor).not.toHaveTextContent(/no weak domain/);
+    expect(belowFloor).toHaveTextContent(/Fixture Domain Two is at 60%/);
   });
 });
