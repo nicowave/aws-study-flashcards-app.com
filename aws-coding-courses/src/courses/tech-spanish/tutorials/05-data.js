@@ -177,8 +177,8 @@ export default {
         { any: ['GSI', 'indice*'], label: 'GSI / índice secundario global' },
         { any: ['atributo*', 'campo*', 'email', 'correo'], label: 'el atributo email' },
         { any: ['consult*', 'query', 'querys', 'queries'], label: 'consulta / query' },
-        { any: ['cost*', 'capacidad*', 'RCU*', 'unidades de lectura', 'factura*', 'gast*', 'caro', 'cara'], label: 'coste / costo' },
-        { any: ['revis*', 'review*', 'mirar*', 'vistazo', 'echar un ojo', 'echas un ojo', 'echarle un ojo', 'visto bueno', 'aprob*'], label: 'revisar la PR' },
+        { any: ['cost*', 'cuest*', 'capacidad*', 'RCU*', 'unidades de lectura', 'factura*', 'gast*', 'caro', 'cara', 'carisim*'], label: 'coste / costo' },
+        { any: ['revis*', 'review*', 'mirar*', 'mirada', 'miras', 'ojeada', 'vistazo', 'echar un ojo', 'echas un ojo', 'echarle un ojo', 'visto bueno', 'aprob*'], label: 'revisar la PR' },
       ],
       avoid: [
         {

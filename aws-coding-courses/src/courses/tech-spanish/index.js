@@ -89,8 +89,8 @@ you   Got it: merged, deploying after
     {
       q: both('Are these the "official" translations?', '¿Son las traducciones "oficiales"?'),
       a: both(
-        'Often there is no single official translation: GitHub, VS Code and Git itself translate `git push` three different ways. Where AWS\'s Spanish documentation uses a term, we say so and link it (note that it is machine-translated). Where usage is debated, we show the options and say which fits a formal document.',
-        'Muchas veces no hay una única traducción oficial: GitHub, VS Code y el propio Git traducen `git push` de tres maneras distintas. Cuando la documentación de AWS en español usa un término, lo decimos y lo enlazamos (ojo: está traducida automáticamente). Cuando el uso está en debate, mostramos las opciones y cuál encaja en un documento formal.',
+        'Often there is no single official translation: GitHub, VS Code and Git itself translate `git push` three different ways. Where AWS\'s Spanish documentation uses a term, we say so (note that it is machine-translated). Where usage is debated, we show the options and say which fits a formal document.',
+        'Muchas veces no hay una única traducción oficial: GitHub, VS Code y el propio Git traducen `git push` de tres maneras distintas. Cuando la documentación de AWS en español usa un término, lo decimos (ojo: está traducida automáticamente). Cuando el uso está en debate, mostramos las opciones y cuál encaja en un documento formal.',
       ),
     },
     {
