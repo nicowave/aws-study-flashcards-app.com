@@ -99,22 +99,33 @@ const formatTime = (seconds) => {
 // Blends the average of the last three scaled scores (70%) with the weakest
 // domain from the latest attempt (30%), so one lucky pass carried by strong
 // domains doesn't read as exam-ready while another domain is failing.
+// The blend alone isn't enough: 60/65 with one domain at 4/8 still blends to 80.
+// So "Ready" also needs every domain of the latest attempt at READY_DOMAIN_FLOOR
+// or above, because the Ready sentence promises there is no weak domain.
+const READY_DOMAIN_FLOOR = 70;
+
 const computeReadiness = (history) => {
   if (history.length === 0) return null;
   const recent = history.slice(-3);
   const avgScaled = recent.reduce((sum, h) => sum + h.scaled, 0) / recent.length;
   const scorePct = Math.max(0, Math.min(100, ((avgScaled - 100) / 900) * 100));
   const latest = history[history.length - 1];
-  const domainPcts = (latest.domains || [])
+  const weakestDomain = (latest.domains || [])
     .filter((d) => d.total > 0)
-    .map((d) => (d.correct / d.total) * 100);
-  const weakest = domainPcts.length > 0 ? Math.min(...domainPcts) : scorePct;
+    .map((d) => ({ name: d.name, pct: (d.correct / d.total) * 100 }))
+    .reduce((low, d) => (low === null || d.pct < low.pct ? d : low), null);
+  const weakest = weakestDomain ? weakestDomain.pct : scorePct;
   const score = Math.round(0.7 * scorePct + 0.3 * weakest);
   let tone; let label; let note;
-  if (score >= 80) {
+  if (score >= 80 && weakest >= READY_DOMAIN_FLOOR) {
     tone = 'ready';
     label = 'Ready';
     note = 'Consistent passing scores with no weak domain — you\'re in shape to book the real exam.';
+  } else if (score >= 80) {
+    // Strong overall, held back by one domain: name it instead of the generic advice.
+    tone = 'almost';
+    label = 'Almost ready';
+    note = `Strong overall, but ${weakestDomain.name} is at ${Math.round(weakest)}%. Bring it to ${READY_DOMAIN_FLOOR}% or more, then retake to confirm.`;
   } else if (score >= 65) {
     tone = 'almost';
     label = 'Almost ready';
