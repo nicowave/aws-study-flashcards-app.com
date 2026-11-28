@@ -359,7 +359,7 @@ export default {
         { any: ['bucket*'], label: 'bucket de S3' },
         { any: ['red de entrega*', 'red de distribucion*', 'cdn'], label: 'red de entrega de contenido (CDN)' },
         { any: ['sin servidor*'], label: 'sin servidor' },
-        { any: ['funcion de lambda', 'funciones de lambda', 'funcion lambda', 'funciones lambda', 'funcion de aws lambda', 'funciones de aws lambda', 'aws lambda'], label: 'funciones de Lambda' },
+        { any: ['funcion de lambda', 'funciones de lambda', 'funcion lambda', 'funciones lambda', 'funcion en lambda', 'funciones en lambda', 'funcion de aws lambda', 'funciones de aws lambda', 'aws lambda'], label: 'funciones de Lambda' },
         { any: ['zona de disponibilidad', 'zonas de disponibilidad'], label: 'zonas de disponibilidad' },
         { any: ['administrad*', 'gestionad*'], label: 'servicio administrado' },
         { any: ['rol', 'roles'], label: 'rol de IAM' },

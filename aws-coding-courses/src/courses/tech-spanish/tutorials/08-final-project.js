@@ -260,6 +260,7 @@ throwing an exception.`,
 - getOrdersByCustomer: Query on the index instead of a full-table Scan.
 - Fixes the Lambda's IAM policy (adds table/Orders/index/*).
 - Customers with no orders get an empty array instead of an exception.
+
 Why: the Scan caused the INC-482 timeouts. In staging, p99 went from 2.4 s to 180 ms.
 How to test: pull this branch, run npx cdk diff, run npm test, then open the history of a customer with orders and one without.
 Heads-up: GSI reads are eventually consistent only. When we deploy, DynamoDB backfills the index; the table stays available.`,
@@ -370,6 +371,7 @@ El Scan causó los timeouts del incidente INC-482. En staging, la latencia p99 b
 - The table currently holds 1.2M records, and the index has finished backfilling.
 - Note: reads from the index are eventually consistent. If a brand-new order doesn't show up right away, it will within a second or two. Not a bug.
 - We didn't need to scale or add capacity.
+
 Please pull main before you touch the stack.`,
     },
     {
@@ -537,7 +539,7 @@ Para *explícame tu arquitectura*, ve del frontend a los datos: quién llama a q
         { any: ['scal*'], label: 'scales' },
         { any: ['pay*', 'bill*', 'charg*', 'cost*', 'pricing', 'price*'], label: 'pay per use' },
         { any: ['Lambda', 'API Gateway', 'DynamoDB', 'Fargate', 'Step Functions', 'S3'], label: 'an AWS example' },
-        { any: ['cold start*', 'cold-start*', 'latenc*', 'trade-off*', 'tradeoff*', 'downside*', 'drawback*', 'limit*', 'timeout*', '15 minutes', 'lock-in', 'edge case*'], label: 'a trade-off (cold starts, latency)' },
+        { any: ['cold start*', 'cold-start*', 'latenc*', 'trade-off*', 'tradeoff*', 'downside*', 'drawback*', 'limit*', 'timeout*', '30 minutes', 'lock-in', 'edge case*'], label: 'a trade-off (cold starts, latency)' },
       ],
       avoid: [
         {
@@ -635,6 +637,10 @@ Al final, hacemos un análisis posterior al incidente sin buscar culpables, con 
         { any: ['administrad*', 'gestionad*', 'serverless', 'sin servidor'], label: 'servicios administrados / serverless' },
       ],
       avoid: [
+        {
+          any: ['the', 'and', 'with', 'we', 'our'],
+          why: both('Write the answer in Spanish: this interview is in Spanish.', 'Escribe la respuesta en español: esta entrevista es en español.'),
+        },
         {
           any: ['cubo*'],
           why: both(
