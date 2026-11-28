@@ -73,6 +73,10 @@ const HUB_URL = 'https://aws-study-flashcards-app.com'
 // The backend finds the switch configuration by this tag (callables/index.js, SWITCH_PORTAL_PURPOSE)
 export const SWITCH_PORTAL_PURPOSE = 'interval-switch'
 // What members may change in Manage billing. The address matters for sales tax: renewals use it.
+// Stripe's tax category for every Study Hub product: "Training Services - Self-study Web-based"
+// (web training, no instructor, no downloads). Chosen 2026-11-28; a test calculation gave 6% in Maryland and DC.
+export const PRODUCT_TAX_CODE = 'txcd_20060058'
+
 export const PORTAL_CUSTOMER_UPDATES = ['email', 'address', 'tax_id']
 export const ACTIVE = ['active', 'trialing', 'past_due'] // same list as the callables Lambda
 
@@ -244,7 +248,7 @@ export async function setup({ stripe, apply = false, archiveLegacy = false, know
     if (!found) {
       if (problems.some((p) => p.startsWith(`${spec.plan}:`))) return null
       const created = await change(`create product "${spec.name}" (metadata.plan=${spec.plan})`, () =>
-        stripe.products.create({ name: spec.name, metadata: { plan: spec.plan } }))
+        stripe.products.create({ name: spec.name, tax_code: PRODUCT_TAX_CODE, metadata: { plan: spec.plan } }))
       if (created) { products.push(created); productById.set(created.id, created); used.set(created.id, spec.plan) }
       return created
     }
@@ -253,6 +257,13 @@ export async function setup({ stripe, apply = false, archiveLegacy = false, know
     if (product.metadata?.plan !== spec.plan) {
       await change(`tag product ${product.id} with metadata.plan=${spec.plan}`, () =>
         stripe.products.update(product.id, { metadata: { plan: spec.plan } }))
+    }
+    // Stripe Tax reads the product's tax code to decide whether and how a state taxes the sale. A product
+    // without one falls back to the account default, the generic code Stripe says not to use in the US.
+    const taxCode = typeof product.tax_code === 'object' ? product.tax_code?.id : product.tax_code
+    if (taxCode !== PRODUCT_TAX_CODE) {
+      await change(`set product ${product.id} tax code to ${PRODUCT_TAX_CODE} (was ${taxCode || 'none'})`, () =>
+        stripe.products.update(product.id, { tax_code: PRODUCT_TAX_CODE }))
     }
     if (product.active === false) {
       await change(`reactivate archived product ${product.id}`, () => stripe.products.update(product.id, { active: true }))
