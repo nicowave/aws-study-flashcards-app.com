@@ -1323,6 +1323,84 @@ describe('App', () => {
         slide(2600);
         expect(jumps).not.toHaveBeenCalled();
       });
+
+      // Safari's scroll anchoring moves the page as the sections above finish drawing. A scroll event reports that a
+      // frame late, after it is painted, so the hold also puts the place back from a ResizeObserver, before the paint.
+      describe('as the page grows', () => {
+        let observers;
+        beforeEach(() => {
+          observers = [];
+          vi.stubGlobal('ResizeObserver', class {
+            constructor(callback) { this.callback = callback; this.watched = []; this.live = true; observers.push(this); }
+            observe(el) { this.watched.push(el); }
+            disconnect() { this.live = false; }
+          });
+        });
+        afterEach(() => { vi.unstubAllGlobals(); });
+        const bodyWatchers = () => observers.filter((o) => o.watched.includes(document.body));
+        // the page grew and the browser moved it (no scroll event yet)
+        const grow = (y) => act(() => {
+          setScrollY(y);
+          for (const o of bodyWatchers()) if (o.live) o.callback([]);
+        });
+
+        it('puts the place back as soon as the page grows, without waiting for a scroll event', async () => {
+          leaveAt(2000);
+          comeBack('reload');
+          await settle();
+          jumps.mockClear();
+          grow(2052);
+          expect(jumps).toHaveBeenCalledWith({ top: 2000, left: 0, behavior: 'instant' });
+          expect(window.scrollY).toBe(2000);
+        });
+
+        it('stops watching the moment it lets go', async () => {
+          leaveAt(2000);
+          comeBack('reload');
+          await settle();
+          expect(bodyWatchers().filter((o) => o.live)).toHaveLength(1);
+          act(() => { window.dispatchEvent(new WheelEvent('wheel', { deltaY: 120 })); });
+          expect(bodyWatchers().filter((o) => o.live)).toHaveLength(0);
+          jumps.mockClear();
+          grow(2600);
+          expect(jumps).not.toHaveBeenCalled();
+        });
+
+        it('stops watching when the page goes away', () => {
+          leaveAt(2000);
+          const page = comeBack('reload');
+          page.unmount();
+          expect(bodyWatchers().filter((o) => o.live)).toHaveLength(0);
+        });
+
+        it('watches nothing on a plain visit', async () => {
+          leaveAt(2000);
+          comeBack('navigate');
+          await settle();
+          expect(bodyWatchers()).toHaveLength(0);
+        });
+
+        // With a #section in the address, holding anchoring's move off this early sets Safari gliding to the section,
+        // so there the scroll events alone hold the place.
+        it('leaves a reload of a #section address to the scroll events', async () => {
+          go('/#plans');
+          leaveAt(2000);
+          comeBack('reload');
+          await settle();
+          expect(bodyWatchers()).toHaveLength(0);
+          slide(2052);
+          expect(window.scrollY).toBe(2000);
+        });
+
+        it('still holds the place by scroll events in a browser without ResizeObserver', async () => {
+          vi.stubGlobal('ResizeObserver', undefined);
+          leaveAt(2000);
+          comeBack('reload');
+          await settle();
+          slide(2052);
+          expect(window.scrollY).toBe(2000);
+        });
+      });
     });
 
     it('does nothing when the browser already put the visitor back', async () => {
