@@ -59,11 +59,35 @@ export const startCheckout = async (plan, interval = 'year') => {
   }
 };
 
+/**
+ * Whether the billing portal can open for this account: true, false, or null when unknown. False
+ * means no Stripe customer (Pro or an unlock given by hand, never bought), so there is nothing to
+ * manage and Settings shows a plain line instead of a button that can only fail. Unknown keeps the
+ * button. Same rule as the hub.
+ */
+export const getBillingAccountStatus = async () => {
+  try {
+    const { data } = await callFunction('billingStatus', {});
+    return typeof data?.hasBillingAccount === 'boolean' ? data.hasBillingAccount : null;
+  } catch (err) {
+    // Includes a backend that predates billingStatus (NOT_FOUND): keep the button, as before
+    console.warn('[billing] Billing status lookup failed:', err.message);
+    return null;
+  }
+};
+
+/**
+ * What to show when the portal will not open: the server's own reason when it refused on purpose
+ * (no billing to manage, an expired sign-in), else the fallback (offline, or a crash on our side).
+ */
+export const portalErrorMessage = (err, fallback) =>
+  err?.code && err.code !== 'INTERNAL' && err.message ? err.message : fallback;
+
 /** Opens the Stripe customer portal (manage / cancel / invoices). */
 export const openBillingPortal = async () => {
-  // Come back to the hub on the name the member opened (on the old name that is the old hub, as
-  // before). The server accepts only listed Study Hub addresses and otherwise uses the old hub.
-  const { data } = await callFunction('createPortalSession', { returnUrl: onThisName('https://aws-study-flashcards-app.com') });
+  // Come back to the hub on the name the member opened (on the old name that is still the old
+  // hub). The server accepts only listed Study Hub addresses and otherwise uses its default hub.
+  const { data } = await callFunction('createPortalSession', { returnUrl: onThisName('https://levelupstudyhub.com') });
   if (data?.url) {
     window.location.assign(data.url);
   } else {

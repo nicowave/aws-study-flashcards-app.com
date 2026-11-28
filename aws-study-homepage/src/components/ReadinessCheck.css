@@ -3,7 +3,9 @@
   padding: 24px 24px 72px;
   max-width: 820px;
   margin: 0 auto;
-  scroll-margin-top: 80px;
+  /* Jumps stop below the sticky header (global.css); -16 px puts the section top right at the header's edge, the
+     same place ReadinessCheck.jsx scrolls it to, so the card sits 24 px below the header (16 on phones) either way. */
+  scroll-margin-top: -16px;
   display: flex;
   flex-direction: column;
   gap: 16px;

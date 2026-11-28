@@ -1,5 +1,5 @@
 // Stripe sends a buyer (checkout) or member (billing portal) back to the name they opened,
-// when that name is listed in ALLOWED_ORIGINS; anything else goes back to the old hub.
+// when that name is listed in ALLOWED_ORIGINS; anything else goes back to the hub on levelupstudyhub.com.
 // Each name has its own sign-in, so coming back on the other name would look signed out.
 //
 //   cd aws-backend/lambda/callables && npm ci     (once, for the AWS SDK)
@@ -25,6 +25,7 @@ lib.DynamoDBDocumentClient.prototype.send = async (cmd) =>
   cmd instanceof lib.GetCommand ? { Item: { stripeCustomerId: "cus_me" } } : cmd instanceof lib.QueryCommand ? { Items: [] } : {};
 
 const { createCheckoutSession, createPortalSession } = require(callables)._test;
+const HUB = "https://levelupstudyhub.com"; // where anything not on the list goes
 const OLD_HUB = "https://aws-study-flashcards-app.com";
 const user = { uid: "user-1", email: "person@example.invalid" };
 
@@ -39,19 +40,24 @@ function fakeStripe() {
   };
 }
 
+// Every site under both names (Tech Spanish included). The old names stay listed during
+// the move: a visitor there goes back there, not to the new hub.
+const SITES = ["cloud", "ai", "architect", "developer", "bash", "python", "js", "typescript", "spanish"];
+const OURS = [
+  HUB,
+  ...SITES.map((s) => `https://${s}.levelupstudyhub.com`),
+  OLD_HUB,
+  ...[...SITES, "saa", "dva"].map((s) => `https://${s}.aws-study-flashcards-app.com`),
+];
+
 const CASES = [
   // [page sent, where Stripe returns]
-  ["https://levelupstudyhub.com", "https://levelupstudyhub.com"],
-  ["https://cloud.levelupstudyhub.com", "https://cloud.levelupstudyhub.com"],
-  ["https://aws-study-flashcards-app.com", OLD_HUB],
-  ["https://bash.aws-study-flashcards-app.com", "https://bash.aws-study-flashcards-app.com"],
-  // Tech Spanish, under both names
-  ["https://spanish.aws-study-flashcards-app.com", "https://spanish.aws-study-flashcards-app.com"],
-  ["https://spanish.levelupstudyhub.com", "https://spanish.levelupstudyhub.com"],
-  [undefined, OLD_HUB], // clients that send nothing keep today's behaviour
-  ["https://levelupstudyhub.com.evil.example", OLD_HUB],
-  ["https://levelupstudyhub.com@evil.example", OLD_HUB],
-  ["https://evil.example", OLD_HUB],
+  ...OURS.map((origin) => [origin, origin]),
+  [undefined, HUB], // a page that sends nothing
+  ["https://levelupstudyhub.com.evil.example", HUB],
+  ["https://levelupstudyhub.com@evil.example", HUB],
+  ["https://aws-study-flashcards-app.com.evil.example", HUB],
+  ["https://evil.example", HUB],
 ];
 
 for (const [sent, expected] of CASES) {

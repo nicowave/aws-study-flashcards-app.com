@@ -16,7 +16,7 @@ export const HERO_SLIDES = [
       'Exam-style practice questions, flashcards, and full-length timed exam simulators for AWS Cloud Practitioner, AI Practitioner, Solutions Architect – Associate, and Developer – Associate. Know you’re ready before you book the real exam.',
     actions: [
       { label: 'Am I Ready? Free 10-Question Check', href: '#readiness', primary: true, icon: 'target' },
-      { label: 'Try It Free, No Account Needed', href: 'https://cloud.aws-study-flashcards-app.com', icon: 'cloud' },
+      { label: 'Try It Free, No Account Needed', href: 'https://cloud.levelupstudyhub.com', icon: 'cloud' },
     ],
   },
   {
@@ -58,7 +58,7 @@ export const HERO_SLIDES = [
     subtitle:
       'Script the repetitive work away with Bash and Python, then run it on AWS. Real projects, and the first tutorial of each course is free.',
     actions: [
-      { label: 'Start Bash Free', href: 'https://bash.aws-study-flashcards-app.com', primary: true, icon: 'code' },
+      { label: 'Start Bash Free', href: 'https://bash.levelupstudyhub.com', primary: true, icon: 'code' },
       { label: 'See All Four Courses', href: '#courses' },
     ],
   },
@@ -73,7 +73,7 @@ export const HERO_SLIDES = [
     subtitle:
       'Clean, chart and model financial data with Python and SQL, then check what AI tells you before you trust it. New course in the works.',
     actions: [
-      { label: 'Start Python Free Today', href: 'https://python.aws-study-flashcards-app.com', primary: true, icon: 'code' },
+      { label: 'Start Python Free Today', href: 'https://python.levelupstudyhub.com', primary: true, icon: 'code' },
     ],
   },
 ];

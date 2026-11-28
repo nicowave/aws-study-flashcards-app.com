@@ -1,4 +1,4 @@
-// JavaScript for AWS: js.aws-study-flashcards-app.com
+// JavaScript for AWS: js.levelupstudyhub.com
 import meta from './meta.json';
 import { siblingsOf } from '../../shared/courseSites';
 import startHere from '../../shared/startHere';

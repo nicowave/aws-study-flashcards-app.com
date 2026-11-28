@@ -5,10 +5,10 @@ import GisPage from './GisPage';
 import { GIS_PAGE, GIS_WHY, GIS_COURSES, GIS_FOR, GIS_FAQ, GIS_DISCLAIMER } from '../data/gis';
 import { COURSES } from '../data/courses';
 
-// Pretend the page was opened on the new name, so we can see links go through onThisName.
+// Pretend the page was opened on a third name, so a link written with either name shows it went through onThisName.
 vi.mock('../config/auth.config', async (importOriginal) => ({
   ...(await importOriginal()),
-  onThisName: (url) => url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com'),
+  onThisName: (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example'),
 }));
 
 const BASE = import.meta.env.BASE_URL;
@@ -41,7 +41,7 @@ describe('GisPage', () => {
     render(<GisPage />);
     const js = COURSES.find((c) => c.id === 'javascript');
     const link = screen.getByRole('link', { name: /start javascript free/i });
-    expect(link).toHaveAttribute('href', js.url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com'));
+    expect(link).toHaveAttribute('href', js.url.replace('levelupstudyhub.com', 'page-name.example'));
   });
 
   it('points to the live coding courses on the home page, under the site root', () => {

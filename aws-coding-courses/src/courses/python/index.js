@@ -1,4 +1,4 @@
-// Python for AWS: python.aws-study-flashcards-app.com
+// Python for AWS: python.levelupstudyhub.com
 import meta from './meta.json';
 import { siblingsOf } from '../../shared/courseSites';
 import startHere from '../../shared/startHere';

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalize, hasTerm, countWords, checkRewrite } from './rewrite';
+import { normalize, hasTerm, countWords, checkRewrite } from './rewriteCheck';
 import { registerQuestions } from './register';
 
 describe('rewrite checks', () => {

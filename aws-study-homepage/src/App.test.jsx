@@ -3,13 +3,14 @@ import { render, screen, within, act, fireEvent, waitFor } from '@testing-librar
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import { useAuth } from './context/AuthContext';
-import { getPlan, getProTrialStatus, getBillingSummary, startCheckout, openBillingPortal, PRO_TRIAL_DAYS } from './services/billing';
+import { getPlan, getProTrialStatus, getBillingSummary, getBillingAccountStatus, getEntitlements, startCheckout, openBillingPortal, PRO_TRIAL_DAYS } from './services/billing';
 import { PRODUCT_MONTHLY, PRODUCT_YEARLY, PRO_YEARLY, YEARLY_SAVINGS_PERCENT } from './data/prices';
 import { certifications, categories } from './data/certifications';
 import { COURSES, OTHER_COURSES } from './data/courses';
 import { GIS_PAGE } from './data/gis';
 import { HERO_SLIDES } from './data/heroSlides';
 import { PROMOTIONS } from './services/offers';
+import { holdBrowserRestore, letGo } from './services/scrollRestore';
 
 // --- Boundaries -------------------------------------------------------------
 // Sign-in state comes from a fake AuthContext; each test sets what it needs.
@@ -22,13 +23,16 @@ vi.mock('./context/AuthContext', () => ({
 // variable, so it is a getter a test can flip.
 const billing = vi.hoisted(() => ({ enabled: true }));
 vi.mock('./services/billing', async (importOriginal) => {
-  const { PRO_TRIAL_DAYS: days } = await importOriginal();
+  const { PRO_TRIAL_DAYS: days, portalErrorMessage } = await importOriginal();
   return {
     get BILLING_ENABLED() { return billing.enabled; },
     PRO_TRIAL_DAYS: days,
+    portalErrorMessage, // the real one: which words reach the member is what the tests check
     getPlan: vi.fn(),
     getProTrialStatus: vi.fn(),
     getBillingSummary: vi.fn(),
+    getBillingAccountStatus: vi.fn(),
+    getEntitlements: vi.fn(),
     startCheckout: vi.fn(),
     openBillingPortal: vi.fn(),
   };
@@ -44,10 +48,10 @@ vi.mock('./services/leads', () => ({
 }));
 vi.mock('./services/sharedAuth', () => ({ sendPasswordReset: vi.fn(), resetPassword: vi.fn() }));
 
-// Pretend the page was opened on the new name, so we can see links go through onThisName.
+// Pretend the page was opened on a third name, so a link written with either name shows it went through onThisName.
 vi.mock('./config/auth.config', async (importOriginal) => ({
   ...(await importOriginal()),
-  onThisName: (url) => url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com'),
+  onThisName: (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example'),
 }));
 
 // One coming-soon cert next to the real data, so that path is covered even while
@@ -58,7 +62,7 @@ vi.mock('./data/certifications', async (importOriginal) => {
     ...actual,
     certifications: [...actual.certifications, {
       id: 'test-coming-soon', name: 'Test Coming Soon Certification', code: 'TST-C01', level: 'Professional',
-      category: 'professional', description: 'A fixture.', url: 'https://test.aws-study-flashcards-app.com',
+      category: 'professional', description: 'A fixture.', url: 'https://test.levelupstudyhub.com',
       status: 'coming-soon', color: '#888888', examLength: '1 minute', questions: '1 question',
       officialUrl: 'https://aws.amazon.com/certification/', features: ['Fixture Feature'],
     }],
@@ -78,7 +82,7 @@ const discounted = (price, percent) => {
   const c = cents(price);
   return `$${((c - Math.round((c * percent) / 100)) / 100).toFixed(2)}`;
 };
-const onNewName = (url) => url.replace('aws-study-flashcards-app.com', 'levelupstudyhub.com');
+const onPageName = (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example');
 
 const live = certifications.filter((c) => c.status === 'available');
 const hidden = certifications.filter((c) => c.status === 'hidden');
@@ -122,6 +126,8 @@ beforeEach(() => {
   vi.mocked(getPlan).mockReset().mockResolvedValue(null);
   vi.mocked(getProTrialStatus).mockReset().mockResolvedValue(true); // a first-time buyer unless a test says otherwise
   vi.mocked(getBillingSummary).mockReset().mockResolvedValue({ plan: null, certs: [], owned: [], subscriptions: [] }); // Settings → Plan & Billing
+  vi.mocked(getBillingAccountStatus).mockReset().mockResolvedValue(true); // a Pro member bought it unless a test says otherwise
+  vi.mocked(getEntitlements).mockReset().mockResolvedValue({ plan: null, certs: [] });
   vi.mocked(startCheckout).mockReset();
   vi.mocked(openBillingPortal).mockReset();
   at(promo.end + MINUTE); // outside any sale unless a test says otherwise
@@ -207,7 +213,7 @@ describe('App', () => {
     it.each(live.map((c) => [c.name, c]))('%s: "Start Free" goes to its site through onThisName; "AWS Docs" opens the official page', (_, cert) => {
       render(<App />);
       const card = within(certCard(cert.name));
-      expect(card.getByRole('link', { name: /start free/i })).toHaveAttribute('href', onNewName(cert.url));
+      expect(card.getByRole('link', { name: /start free/i })).toHaveAttribute('href', onPageName(cert.url));
       const docs = card.getByRole('link', { name: /aws docs/i });
       expect(docs).toHaveAttribute('href', cert.officialUrl);
       expect(docs).toHaveAttribute('target', '_blank');
@@ -217,7 +223,7 @@ describe('App', () => {
     it('gives every live cert its own site, and no price of its own (every product costs the same, from prices.js)', () => {
       expect(new Set(live.map((c) => c.url)).size).toBe(live.length);
       for (const c of live) {
-        expect(c.url).toMatch(/^https:\/\/[a-z-]+\.aws-study-flashcards-app\.com$/);
+        expect(c.url).toMatch(/^https:\/\/[a-z-]+\.levelupstudyhub\.com$/);
         expect(c).not.toHaveProperty('price');
       }
     });
@@ -274,9 +280,9 @@ describe('App', () => {
       render(<App />);
       const cloud = certifications.find((c) => c.id === 'cloud-practitioner');
       expect(within(planCard('Guest Preview')).getByRole('link', { name: /try it now/i }))
-        .toHaveAttribute('href', onNewName(cloud.url));
+        .toHaveAttribute('href', onPageName(cloud.url));
       expect(within(planCard('Free Account')).getByRole('link', { name: /create free account/i }))
-        .toHaveAttribute('href', onNewName(cloud.url));
+        .toHaveAttribute('href', onPageName(cloud.url));
       expect(within(planCard('Guest Preview')).getByText('Free')).toBeInTheDocument();
       expect(within(planCard('Free Account')).getByText('Free')).toBeInTheDocument();
     });
@@ -507,6 +513,48 @@ describe('App', () => {
         expect(within(proCard()).getByRole('button', { name: 'Manage Subscription' })).toBeEnabled();
       });
 
+      it("shows the server's reason when it refuses to open the portal, not a generic retry", async () => {
+        signIn();
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        vi.mocked(getPlan).mockResolvedValue('pro');
+        vi.mocked(openBillingPortal).mockRejectedValueOnce(
+          Object.assign(new Error('This account has no billing to manage.'), { code: 'FAILED_PRECONDITION' })
+        );
+        render(<App />);
+        await userEvent.click(await within(proCard()).findByRole('button', { name: 'Manage Subscription' }));
+        expect(await within(proCard()).findByText('This account has no billing to manage.')).toBeInTheDocument();
+        expect(proCard()).not.toHaveTextContent(/try again/i);
+      });
+
+      it('Pro given by hand (no billing account): a plain line instead of a Manage button that can only fail', async () => {
+        signIn();
+        vi.mocked(getPlan).mockResolvedValue('pro');
+        vi.mocked(getBillingAccountStatus).mockResolvedValue(false);
+        render(<App />);
+        expect(await within(proCard()).findByText('Pro was given to this account, not bought, so there is no billing to manage.')).toBeInTheDocument();
+        expect(within(proCard()).getByText('Your Plan')).toBeInTheDocument();
+        expect(within(proCard()).queryByRole('button')).not.toBeInTheDocument();
+        expect(openBillingPortal).not.toHaveBeenCalled();
+      });
+
+      it('keeps Manage Subscription when the billing check cannot answer, and asks it only for Pro members', async () => {
+        signIn();
+        vi.mocked(getPlan).mockResolvedValue('pro');
+        vi.mocked(getBillingAccountStatus).mockResolvedValue(null);
+        const { unmount } = render(<App />);
+        expect(await within(proCard()).findByRole('button', { name: 'Manage Subscription' })).toBeEnabled();
+        await act(async () => {});
+        expect(getBillingAccountStatus).toHaveBeenCalledTimes(1);
+        expect(within(proCard()).getByRole('button', { name: 'Manage Subscription' })).toBeInTheDocument();
+        unmount();
+
+        vi.mocked(getBillingAccountStatus).mockClear();
+        vi.mocked(getPlan).mockResolvedValue(null);
+        render(<App />);
+        await within(proCard()).findByRole('button', { name: /start free trial|get pro/i });
+        expect(getBillingAccountStatus).not.toHaveBeenCalled();
+      });
+
       it('forgets the plan when the member signs out', async () => {
         signIn();
         vi.mocked(getPlan).mockResolvedValue('pro');
@@ -643,10 +691,10 @@ describe('App', () => {
 
       const ai = within(welcome).getByRole('link', { name: /ai practitioner/i });
       expect(ai).toHaveTextContent('Lvl 3 · 70%');
-      expect(ai).toHaveAttribute('href', onNewName(certifications.find((c) => c.id === 'ai-practitioner').url));
+      expect(ai).toHaveAttribute('href', onPageName(certifications.find((c) => c.id === 'ai-practitioner').url));
       const cloud = within(welcome).getByRole('link', { name: /cloud practitioner/i });
       expect(cloud).toHaveTextContent('Lvl 2 · 90%');
-      expect(cloud).toHaveAttribute('href', onNewName(certifications.find((c) => c.id === 'cloud-practitioner').url));
+      expect(cloud).toHaveAttribute('href', onPageName(certifications.find((c) => c.id === 'cloud-practitioner').url));
     });
 
     // Regression: the panel once had cards for AI and Cloud Practitioner only, so Solutions
@@ -661,7 +709,7 @@ describe('App', () => {
         const short = c.name.replace(/^AWS Certified /, '');
         const card = within(welcome).getByRole('link', { name: new RegExp(short.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) });
         expect(card).toHaveTextContent('Lvl 2 · 75%');
-        expect(card).toHaveAttribute('href', onNewName(c.url));
+        expect(card).toHaveAttribute('href', onPageName(c.url));
       }
     });
 
@@ -894,13 +942,13 @@ describe('App', () => {
       render(<App />);
       const column = within(footer()).getByRole('heading', { name: 'Certifications' }).parentElement;
       const hrefs = within(column).getAllByRole('link').map((a) => a.getAttribute('href'));
-      expect(hrefs.sort()).toEqual(live.map((c) => onNewName(c.url)).sort());
+      expect(hrefs.sort()).toEqual(live.map((c) => onPageName(c.url)).sort());
     });
 
     it('links to every coding course through onThisName, and to the GIS page', () => {
       render(<App />);
       const column = within(within(footer()).getByRole('heading', { name: 'Coding courses' }).parentElement);
-      for (const c of COURSES) expect(column.getByRole('link', { name: c.title })).toHaveAttribute('href', onNewName(c.url));
+      for (const c of COURSES) expect(column.getByRole('link', { name: c.title })).toHaveAttribute('href', onPageName(c.url));
       expect(column.getByRole('link', { name: /gis courses/i })).toHaveAttribute('href', `${import.meta.env.BASE_URL}gis/`);
     });
 
@@ -908,7 +956,7 @@ describe('App', () => {
       render(<App />);
       const column = within(within(footer()).getByRole('heading', { name: 'Coding courses' }).parentElement);
       for (const c of OTHER_COURSES) {
-        if (c.live) expect(column.getByRole('link', { name: c.title })).toHaveAttribute('href', onNewName(c.url));
+        if (c.live) expect(column.getByRole('link', { name: c.title })).toHaveAttribute('href', onPageName(c.url));
         else expect(column.getByRole('link', { name: `${c.title} (coming soon)` })).toHaveAttribute('href', `${import.meta.env.BASE_URL}#courses`);
       }
     });
@@ -997,6 +1045,472 @@ describe('App', () => {
     it('shows nothing after an ordinary sign-out', () => {
       render(<App />);
       expect(screen.queryByText(/another device/)).not.toBeInTheDocument();
+    });
+  });
+
+  // The header wraps onto one to three rows, so its height is measured, never assumed: html's scroll-padding-top
+  // (global.css) reads --hub-header-height, and every jump and keyboard-focus scroll stops below the header.
+  describe('room below the sticky header', () => {
+    let headerHeight;
+    const root = document.documentElement;
+    const published = () => root.style.getPropertyValue('--hub-header-height');
+    beforeEach(() => {
+      headerHeight = 71;
+      // jsdom has no layout: give the header a height and everything else none
+      vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function rect() {
+        const height = this.tagName === 'HEADER' ? headerHeight : 0;
+        return { top: 0, bottom: height, left: 0, right: 0, width: 0, height, x: 0, y: 0, toJSON() {} };
+      });
+    });
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      root.style.removeProperty('--hub-header-height');
+    });
+
+    it('publishes the header height, follows it when the header re-wraps, and stops watching when it goes away', () => {
+      const observers = [];
+      vi.stubGlobal('ResizeObserver', class {
+        constructor(callback) { this.callback = callback; this.watched = []; this.live = true; observers.push(this); }
+        observe(el) { this.watched.push(el); }
+        disconnect() { this.live = false; }
+      });
+      const { unmount } = render(<App />);
+      expect(published()).toBe('71px');
+      const watcher = observers.find((o) => o.live && o.watched.includes(header()));
+      expect(watcher).toBeDefined();
+
+      headerHeight = 151; // signed in on a laptop: two rows
+      act(() => watcher.callback([]));
+      expect(published()).toBe('151px');
+
+      unmount();
+      expect(observers.filter((o) => o.watched.length).every((o) => !o.live)).toBe(true);
+    });
+
+    it('still publishes the height once in a browser without ResizeObserver', () => {
+      vi.stubGlobal('ResizeObserver', undefined);
+      render(<App />);
+      expect(published()).toBe('71px');
+    });
+
+    it('Settings → "See plans" leaves the motion to the page, so reduced-motion visitors get no glide', async () => {
+      signIn();
+      const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(() => {});
+      render(<App />);
+      await userEvent.click(within(header()).getByRole('button', { name: 'Settings' }));
+      expect(await screen.findByText(/Your plan:/)).toHaveTextContent('Free');
+      await userEvent.click(screen.getByRole('button', { name: 'See plans' }));
+      await waitFor(() => expect(scrolled.mock.contexts.some((el) => el.id === 'plans')).toBe(true));
+      for (const [options] of scrolled.mock.calls) expect(options?.behavior).toBeUndefined();
+    });
+  });
+
+  // The sections are drawn after the browser has looked for the #hash, so the page jumps there itself, once.
+  describe('opening the page at a section (/#plans)', () => {
+    let scrolled;
+    beforeEach(() => {
+      scrolled = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(() => {});
+    });
+    const jumpedTo = () => scrolled.mock.contexts.map((el) => el.id);
+    // Longer than the two frames + fonts + two frames the page waits before jumping
+    const settle = () => act(() => new Promise((resolve) => { setTimeout(resolve, 150); }));
+    // jsdom has no navigation timing; stand one in for a reload or a Back/Forward visit
+    const visitType = (type) => {
+      const real = Object.getOwnPropertyDescriptor(performance, 'getEntriesByType');
+      Object.defineProperty(performance, 'getEntriesByType', {
+        configurable: true, writable: true, value: (kind) => (kind === 'navigation' ? [{ type }] : []),
+      });
+      return () => (real ? Object.defineProperty(performance, 'getEntriesByType', real) : delete performance.getEntriesByType);
+    };
+
+    it.each(['certifications', 'courses', 'about', 'plans', 'faq', 'resources', 'newsletter'])(
+      'lands on #%s, from its top, once',
+      async (id) => {
+        go(`/#${id}`);
+        render(<App />);
+        await waitFor(() => expect(jumpedTo()).toContain(id));
+        await settle();
+        expect(jumpedTo()).toEqual([id]);
+        expect(scrolled.mock.calls[0][0]).toEqual({ block: 'start' });
+      },
+    );
+
+    it.each([
+      ['a name that is not on the page', '/#nothing-here'],
+      ['#readiness, which the readiness check scrolls to itself', '/#readiness'],
+      ['a broken address', '/#%E0%A4%A'],
+      ['no hash at all', '/'],
+    ])('does nothing for %s', async (_, path) => {
+      go(path);
+      render(<App />);
+      await settle();
+      expect(jumpedTo()).toEqual([]);
+    });
+
+    it('does nothing when the visitor has already scrolled', async () => {
+      go('/#plans');
+      Object.defineProperty(window, 'scrollY', { configurable: true, writable: true, value: 400 });
+      try {
+        render(<App />);
+        await settle();
+        expect(jumpedTo()).toEqual([]);
+      } finally {
+        Object.defineProperty(window, 'scrollY', { configurable: true, writable: true, value: 0 });
+      }
+    });
+
+    it.each(['reload', 'back_forward'])("leaves a %s visit to the browser's own scroll restore", async (type) => {
+      go('/#plans');
+      const restore = visitType(type);
+      try {
+        render(<App />);
+        await settle();
+        expect(jumpedTo()).toEqual([]);
+      } finally {
+        restore();
+      }
+    });
+
+    it('still lands on the section after a link from another page (a plain visit)', async () => {
+      go('/#plans');
+      const restore = visitType('navigate');
+      try {
+        render(<App />);
+        await waitFor(() => expect(jumpedTo()).toEqual(['plans']));
+      } finally {
+        restore();
+      }
+    });
+  });
+
+  // While the loading screen shows, the page is too short for the browser's own scroll restore, so a reload or a
+  // Back/Forward visit used to land at the top. The page now keeps the place for each history entry itself.
+  describe('coming back to the page (reload, Back/Forward)', () => {
+    const STORE = 'hub:scrollY';
+    const html = document.documentElement;
+    let jumps;
+    let undoVisit = () => {};
+    const setScrollY = (y) => Object.defineProperty(window, 'scrollY', { configurable: true, writable: true, value: y });
+    // jsdom has no navigation timing; stand one in for the kind of visit
+    const visitType = (type) => {
+      const real = Object.getOwnPropertyDescriptor(performance, 'getEntriesByType');
+      Object.defineProperty(performance, 'getEntriesByType', {
+        configurable: true, writable: true, value: (kind) => (kind === 'navigation' ? [{ type }] : []),
+      });
+      undoVisit = () => (real ? Object.defineProperty(performance, 'getEntriesByType', real) : delete performance.getEntriesByType);
+    };
+    // Longer than the two frames + fonts + two frames the page waits before its second look
+    const settle = () => act(() => new Promise((resolve) => { setTimeout(resolve, 150); }));
+    const leave = () => act(() => { window.dispatchEvent(new Event('pagehide')); });
+    const saved = () => Object.values(JSON.parse(sessionStorage.getItem(STORE) || '{}'));
+    // Open the hub, scroll to y, leave; then come back on a visit of the given type, with the browser at the top.
+    const leaveAt = (y) => {
+      const first = render(<App />);
+      setScrollY(y);
+      leave();
+      first.unmount();
+      setScrollY(0);
+    };
+    const comeBack = (type) => {
+      visitType(type);
+      jumps.mockClear();
+      return render(<App />);
+    };
+
+    beforeEach(() => {
+      // jsdom does not scroll: record each jump and move scrollY like a browser would
+      jumps = vi.spyOn(window, 'scrollTo').mockImplementation(function scrollTo(a, b) {
+        setScrollY(typeof a === 'object' ? a.top : b);
+      });
+      // jsdom has no history.scrollRestoration either; browsers start every page on 'auto'
+      Object.defineProperty(window.history, 'scrollRestoration', { configurable: true, writable: true, value: 'auto' });
+    });
+    afterEach(() => {
+      undoVisit();
+      undoVisit = () => {};
+      setScrollY(0);
+      html.style.scrollBehavior = '';
+      delete window.history.scrollRestoration;
+    });
+
+    // When its own restore comes up short, Chrome falls back to the #section in the address and glides off there
+    it("keeps the browser's own restore out of the way meanwhile, then hands it back", async () => {
+      leaveAt(2000);
+      visitType('reload');
+      holdBrowserRestore(); // what the app does as it loads, before the page has finished parsing
+      expect(window.history.scrollRestoration).toBe('manual');
+      jumps.mockClear();
+      render(<App />);
+      expect(window.scrollY).toBe(2000);
+      await settle();
+      // Back on 'auto': the browser's restore is what makes Back between in-page #section jumps work
+      expect(window.history.scrollRestoration).toBe('auto');
+    });
+
+    it.each([
+      ['a plain visit', 'navigate', 2000],
+      ['a reload with no place saved', 'reload', null],
+    ])("leaves the browser's own restore alone on %s", (_, type, y) => {
+      if (y != null) leaveAt(y);
+      visitType(type);
+      holdBrowserRestore();
+      expect(window.history.scrollRestoration).toBe('auto');
+    });
+
+    it.each(['reload', 'back_forward'])('saves the place as the page is left and puts it back on a %s', async (type) => {
+      leaveAt(2000);
+      expect(saved()).toEqual([2000]);
+      comeBack(type);
+      // At once, before the first paint, so the top of the page never flashes up
+      expect(jumps).toHaveBeenCalledWith({ top: 2000, left: 0, behavior: 'instant' });
+      await settle();
+      expect(jumps).toHaveBeenCalledTimes(1); // the second look finds the visitor in place
+      expect(window.scrollY).toBe(2000);
+    });
+
+    it('puts the place back on the /gis/ page too', async () => {
+      go('/gis/');
+      leaveAt(900);
+      comeBack('back_forward');
+      expect(jumps).toHaveBeenCalledWith({ top: 900, left: 0, behavior: 'instant' });
+    });
+
+    it('jumps straight there, with no glide, even when the page scrolls smoothly', () => {
+      html.style.scrollBehavior = 'smooth';
+      let during = null;
+      leaveAt(1200);
+      jumps.mockImplementation(function scrollTo(a) {
+        during = html.style.scrollBehavior;
+        setScrollY(a.top);
+      });
+      comeBack('reload');
+      expect(jumps.mock.calls[0][0].behavior).toBe('instant');
+      expect(during).toBe('auto');
+      expect(html.style.scrollBehavior).toBe('smooth'); // the page's own setting comes back
+    });
+
+    it('looks again after the fonts, in case the page moved under the visitor', async () => {
+      leaveAt(2000);
+      // The first jump is undone (the browser put the page at the top again, say); the second look fixes it
+      jumps.mockImplementationOnce(() => {});
+      comeBack('reload');
+      expect(window.scrollY).toBe(0);
+      await settle();
+      expect(jumps).toHaveBeenCalledTimes(2);
+      expect(window.scrollY).toBe(2000);
+    });
+
+    it.each([
+      ['the wheel', () => new WheelEvent('wheel', { deltaY: 120 })],
+      ['a touch drag', () => new Event('touchmove')],
+      ['a press on the scrollbar', () => new MouseEvent('mousedown')],
+      ['Page Down', () => new KeyboardEvent('keydown', { key: 'PageDown' })],
+      ['the space bar', () => new KeyboardEvent('keydown', { key: ' ' })],
+    ])('stops once the visitor scrolls themselves (%s)', async (_, event) => {
+      leaveAt(2000);
+      jumps.mockImplementationOnce(() => {});
+      comeBack('reload');
+      act(() => { window.dispatchEvent(event()); });
+      await settle();
+      expect(jumps).toHaveBeenCalledTimes(1); // no second jump over the visitor's own scrolling
+    });
+
+    // Moving focus can scroll the focused element into view; pulling the page back would hide it again
+    it("stops at a Tab press too, so a keyboard visitor's focus is never pulled out of view", async () => {
+      leaveAt(2000);
+      jumps.mockImplementationOnce(() => {});
+      comeBack('reload');
+      act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' })); });
+      await settle();
+      expect(jumps).toHaveBeenCalledTimes(1);
+    });
+
+    // Safari on iOS 27 slides the page by itself a moment after a reload, after the second look
+    describe('holding the place for a moment', () => {
+      const slide = (y) => act(() => {
+        setScrollY(y);
+        window.dispatchEvent(new Event('scroll'));
+      });
+
+      it('undoes a slide the visitor did not make, after the second look', async () => {
+        leaveAt(2000);
+        comeBack('reload');
+        await settle();
+        jumps.mockClear();
+        slide(2052);
+        expect(jumps).toHaveBeenCalledWith({ top: 2000, left: 0, behavior: 'instant' });
+        expect(window.scrollY).toBe(2000);
+        slide(7600); // all the way to the #section in the address
+        expect(window.scrollY).toBe(2000);
+      });
+
+      it('undoes one that comes before the second look too', () => {
+        leaveAt(2000);
+        comeBack('back_forward');
+        jumps.mockClear();
+        slide(2030);
+        expect(window.scrollY).toBe(2000);
+      });
+
+      it.each([
+        ['the wheel', () => new WheelEvent('wheel', { deltaY: 120 })],
+        ['a touch', () => new Event('touchstart')],
+        ['a tap or click', () => new Event('pointerdown')],
+        ['any key', () => new KeyboardEvent('keydown', { key: 'Tab' })],
+        ['a #section link', () => new HashChangeEvent('hashchange')],
+      ])('lets go the moment the visitor acts (%s)', async (_, event) => {
+        leaveAt(2000);
+        comeBack('reload');
+        await settle();
+        act(() => { window.dispatchEvent(event()); });
+        jumps.mockClear();
+        slide(2600);
+        expect(jumps).not.toHaveBeenCalled();
+        expect(window.scrollY).toBe(2600);
+      });
+
+      it('lets go when focus moves (a screen reader or a script focusing a field)', async () => {
+        leaveAt(2000);
+        comeBack('reload');
+        await settle();
+        act(() => { document.body.dispatchEvent(new FocusEvent('focusin', { bubbles: true })); });
+        jumps.mockClear();
+        slide(2600);
+        expect(jumps).not.toHaveBeenCalled();
+      });
+
+      it('lets go when the app scrolls on purpose (the readiness check bringing itself into view)', async () => {
+        leaveAt(2000);
+        comeBack('reload');
+        await settle();
+        letGo();
+        jumps.mockClear();
+        slide(3400);
+        expect(jumps).not.toHaveBeenCalled();
+      });
+
+      it('lets go after two seconds', async () => {
+        leaveAt(2000);
+        comeBack('reload');
+        await act(() => new Promise((resolve) => { setTimeout(resolve, 2100); }));
+        jumps.mockClear();
+        slide(2600);
+        expect(jumps).not.toHaveBeenCalled();
+      });
+
+      it('lets go when the page goes away', () => {
+        leaveAt(2000);
+        const page = comeBack('reload');
+        page.unmount();
+        jumps.mockClear();
+        slide(2600);
+        expect(jumps).not.toHaveBeenCalled();
+      });
+
+      it('holds nothing on a plain visit', async () => {
+        leaveAt(2000);
+        comeBack('navigate');
+        await settle();
+        slide(2600);
+        expect(jumps).not.toHaveBeenCalled();
+      });
+    });
+
+    it('does nothing when the browser already put the visitor back', async () => {
+      leaveAt(2000);
+      setScrollY(2000);
+      comeBack('reload');
+      await settle();
+      expect(jumps).not.toHaveBeenCalled();
+    });
+
+    it('leaves a plain visit (a link, a typed address) at the top, even with a place saved', async () => {
+      leaveAt(2000);
+      comeBack('navigate');
+      await settle();
+      expect(jumps).not.toHaveBeenCalled();
+    });
+
+    it('does nothing on a return visit with no place saved', async () => {
+      comeBack('reload');
+      await settle();
+      expect(jumps).not.toHaveBeenCalled();
+    });
+
+    it('keeps a place for each history entry, even two with the same address', async () => {
+      const page = render(<App />);
+      setScrollY(2000);
+      leave();
+      // A new entry for the same page (an in-page link, here back to the same address), left further up
+      window.history.pushState({}, '', '/');
+      act(() => { window.dispatchEvent(new Event('hashchange')); });
+      setScrollY(500);
+      leave();
+      expect(saved().sort()).toEqual([2000, 500].sort());
+      // Back to the first entry, then reload it: it gets its own place, not the newer one
+      await act(() => new Promise((resolve) => {
+        window.addEventListener('popstate', resolve, { once: true });
+        window.history.back();
+      }));
+      page.unmount();
+      setScrollY(0);
+      comeBack('reload');
+      expect(jumps).toHaveBeenCalledWith({ top: 2000, left: 0, behavior: 'instant' });
+    });
+
+    it('forgets the place when the page is left from Settings, which a reload does not reopen', async () => {
+      signIn();
+      leaveAt(2000);
+      const page = render(<App />);
+      await userEvent.click(within(header()).getByRole('button', { name: 'Settings' }));
+      setScrollY(700);
+      leave();
+      expect(saved()).toEqual([]);
+      page.unmount();
+      setScrollY(0);
+      comeBack('reload');
+      await settle();
+      expect(jumps).not.toHaveBeenCalled();
+    });
+
+    it('never keeps more than 30 places', () => {
+      const old = Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`old${i}`, i]));
+      sessionStorage.setItem(STORE, JSON.stringify(old));
+      leaveAt(2000);
+      const store = JSON.parse(sessionStorage.getItem(STORE));
+      expect(Object.keys(store)).toHaveLength(30);
+      expect(Object.values(store)).toContain(2000); // this page's place is the newest, so it stays
+      expect(store.old0).toBeUndefined(); // the oldest go first
+    });
+
+    it('carries on without a fuss when the browser blocks storage', async () => {
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('blocked', 'SecurityError'); });
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new DOMException('blocked', 'SecurityError'); });
+      expect(() => leaveAt(2000)).not.toThrow();
+      comeBack('reload');
+      await settle();
+      expect(jumps).not.toHaveBeenCalled();
+      expect(screen.getByRole('main')).toBeInTheDocument();
+    });
+
+    describe('#readiness in the address', () => {
+      const readinessWait = () => act(() => new Promise((resolve) => { setTimeout(resolve, 400); }));
+
+      it('a plain visit still scrolls to the readiness check', async () => {
+        go('/#readiness');
+        visitType('navigate');
+        render(<App />);
+        await readinessWait();
+        expect(jumps).toHaveBeenCalled();
+      });
+
+      it.each(['reload', 'back_forward'])('a %s does not pull the visitor back up to the check', async (type) => {
+        go('/#readiness');
+        leaveAt(3000);
+        comeBack(type);
+        await readinessWait();
+        expect(jumps.mock.calls.map(([a]) => a.top)).toEqual([3000]);
+      });
     });
   });
 });

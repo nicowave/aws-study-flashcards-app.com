@@ -2,8 +2,16 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // The server call is the boundary: never reach the API from a test
 vi.mock('./awsAuth', () => ({ callFunction: vi.fn(), getTokens: vi.fn(), decodeJwt: vi.fn(), apiFetch: vi.fn() }));
+// Pretend the page was opened on a third name, so we can see the hub address go through onThisName.
+vi.mock('../config/auth.config', async (importOriginal) => ({
+  ...(await importOriginal()),
+  onThisName: (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example'),
+}));
 import { callFunction, getTokens, decodeJwt, apiFetch } from './awsAuth';
-import { getProTrialStatus, getEntitlements, getBillingSummary, startCheckout, PRO_TRIAL_DAYS } from './billing';
+import {
+  getProTrialStatus, getEntitlements, getBillingSummary, getBillingAccountStatus, startCheckout, openBillingPortal,
+  portalErrorMessage, PRO_TRIAL_DAYS,
+} from './billing';
 import { PRO_TRIAL_DAYS as TRIAL_FROM_PRICES } from '../data/prices';
 
 describe('startCheckout', () => {
@@ -142,5 +150,56 @@ describe('getBillingSummary', () => {
     vi.mocked(getTokens).mockResolvedValueOnce(null);
     await expect(getBillingSummary()).resolves.toBeNull();
     expect(apiFetch).not.toHaveBeenCalled();
+  });
+});
+
+describe('getBillingAccountStatus', () => {
+  beforeEach(() => vi.mocked(callFunction).mockReset());
+
+  it('asks the billingStatus function and returns its true/false answer', async () => {
+    vi.mocked(callFunction).mockResolvedValueOnce({ data: { hasBillingAccount: false } });
+    await expect(getBillingAccountStatus()).resolves.toBe(false);
+    expect(callFunction).toHaveBeenCalledWith('billingStatus', {});
+    vi.mocked(callFunction).mockResolvedValueOnce({ data: { hasBillingAccount: true } });
+    await expect(getBillingAccountStatus()).resolves.toBe(true);
+  });
+
+  it('null (unknown, so the Manage button stays) for an odd answer or a failed call, an older backend included', async () => {
+    vi.mocked(callFunction).mockResolvedValueOnce({ data: {} });
+    await expect(getBillingAccountStatus()).resolves.toBeNull();
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.mocked(callFunction).mockRejectedValueOnce(Object.assign(new Error('Unknown function'), { code: 'NOT_FOUND' }));
+    await expect(getBillingAccountStatus()).resolves.toBeNull();
+    vi.mocked(callFunction).mockRejectedValueOnce(new Error('offline'));
+    await expect(getBillingAccountStatus()).resolves.toBeNull();
+  });
+});
+
+describe('portalErrorMessage', () => {
+  const fallback = 'Could not open billing portal. Please try again.';
+  // callFunction throws the server's message with its status as `code`
+  const refused = (code, message) => Object.assign(new Error(message), { code });
+
+  it("shows the server's own reason when it refused on purpose", () => {
+    expect(portalErrorMessage(refused('FAILED_PRECONDITION', 'This account has no billing to manage.'), fallback)).toBe('This account has no billing to manage.');
+    expect(portalErrorMessage(refused('UNAUTHENTICATED', 'Invalid or expired sign-in'), fallback)).toBe('Invalid or expired sign-in');
+  });
+
+  it('falls back to "try again" when offline or when the server crashed', () => {
+    expect(portalErrorMessage(new Error('Failed to fetch'), fallback)).toBe(fallback);
+    expect(portalErrorMessage(refused('INTERNAL', 'Internal error'), fallback)).toBe(fallback);
+    expect(portalErrorMessage(refused('FAILED_PRECONDITION', ''), fallback)).toBe(fallback);
+    expect(portalErrorMessage(undefined, fallback)).toBe(fallback);
+  });
+});
+
+describe('openBillingPortal', () => {
+  beforeEach(() => vi.mocked(callFunction).mockReset());
+
+  it('asks Stripe to send the member back to the hub on the name the page was opened on', async () => {
+    vi.mocked(callFunction).mockResolvedValueOnce({ data: {} }); // no portal address, so nothing navigates
+    await expect(openBillingPortal()).rejects.toThrow('No portal URL returned');
+    expect(callFunction).toHaveBeenCalledTimes(1);
+    expect(callFunction).toHaveBeenCalledWith('createPortalSession', { returnUrl: 'https://page-name.example' });
   });
 });

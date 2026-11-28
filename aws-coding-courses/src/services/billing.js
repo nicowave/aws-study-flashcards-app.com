@@ -45,6 +45,42 @@ export const startCheckout = async (plan, interval = 'year', returnPath = '') =>
   }
 };
 
+// One answer per signed-in account per page: the footer and the course page both ask
+let billingStatusFor = { sub: null, answer: null };
+
+/**
+ * Whether the billing portal can open for the signed-in account: true, false, or null when
+ * unknown. False means no Stripe customer (Pro or a course given by hand, or nothing bought yet),
+ * so "Manage billing" could only fail and is not offered. Unknown keeps the button. Same rule as
+ * the hub and the games.
+ */
+export const getBillingAccountStatus = async () => {
+  let sub = null;
+  try {
+    const tokens = await getTokens();
+    if (!tokens) return null;
+    sub = decodeJwt(tokens.idToken)?.sub ?? null;
+    if (sub && billingStatusFor.sub === sub) return await billingStatusFor.answer;
+    const answer = callFunction('billingStatus', {})
+      .then(({ data }) => (typeof data?.hasBillingAccount === 'boolean' ? data.hasBillingAccount : null));
+    if (sub) billingStatusFor = { sub, answer };
+    return await answer;
+  } catch (err) {
+    // Includes a backend that predates billingStatus (NOT_FOUND): keep the button, as before
+    console.warn('[billing] Billing status lookup failed:', err.message);
+    if (sub && billingStatusFor.sub === sub) billingStatusFor = { sub: null, answer: null }; // ask again next time
+    return null;
+  }
+};
+
+/**
+ * Which message to show when the portal will not open: 'billing.none' when the server refused
+ * because there is no billing behind the account (FAILED_PRECONDITION), else 'billing.failed'.
+ * A key, not the server's words, so the bilingual course can say it in Spanish too.
+ */
+export const portalErrorKey = (err) =>
+  err?.code === 'FAILED_PRECONDITION' || /no billing/i.test(err?.message || '') ? 'billing.none' : 'billing.failed';
+
 /** Opens the Stripe customer portal (switch monthly/yearly, card, invoices, cancel); returns here. */
 export const openBillingPortal = async (returnPath = '') => {
   const { data } = await callFunction('createPortalSession', {

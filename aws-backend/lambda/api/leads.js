@@ -17,7 +17,7 @@ const { SESv2Client, SendEmailCommand } = require('@aws-sdk/client-sesv2');
 const ses = new SESv2Client({});
 const FROM = 'Nico at Level Up Study Hub <nico@nico-tek.com>';
 const REPLY_TO = 'nico@nico-tek.com';
-const HUB = 'https://aws-study-flashcards-app.com';
+const HUB = 'https://levelupstudyhub.com';
 const ADDRESS = 'Nico Tek Solutions · 5104 Lawton Dr., Bethesda, MD 20816';
 const MAX_EMAILS_PER_DAY = 3; // per address, so the form can't be used to flood someone
 
@@ -26,10 +26,10 @@ const MAX_EMAILS_PER_DAY = 3; // per address, so the form can't be used to flood
 const PRICES = { productMonthly: 1100, productYearly: 6900, proYearly: 19900 };
 
 const CERTS = {
-  'cloud-practitioner': { name: 'AWS Certified Cloud Practitioner', short: 'Cloud Practitioner', url: 'https://cloud.aws-study-flashcards-app.com' },
-  'ai-practitioner': { name: 'AWS Certified AI Practitioner', short: 'AI Practitioner', url: 'https://ai.aws-study-flashcards-app.com' },
-  'solutions-architect-associate': { name: 'AWS Certified Solutions Architect – Associate', short: 'Solutions Architect', url: 'https://architect.aws-study-flashcards-app.com' },
-  'developer-associate': { name: 'AWS Certified Developer – Associate', short: 'Developer Associate', url: 'https://developer.aws-study-flashcards-app.com' },
+  'cloud-practitioner': { name: 'AWS Certified Cloud Practitioner', short: 'Cloud Practitioner', url: 'https://cloud.levelupstudyhub.com' },
+  'ai-practitioner': { name: 'AWS Certified AI Practitioner', short: 'AI Practitioner', url: 'https://ai.levelupstudyhub.com' },
+  'solutions-architect-associate': { name: 'AWS Certified Solutions Architect – Associate', short: 'Solutions Architect', url: 'https://architect.levelupstudyhub.com' },
+  'developer-associate': { name: 'AWS Certified Developer – Associate', short: 'Developer Associate', url: 'https://developer.levelupstudyhub.com' },
 };
 
 // Same window as PROMOTIONS in callables/index.js (Oct 31 – Nov 6, Eastern)
@@ -48,7 +48,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const clean = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-const FOOTER_NOTE = "You're on the Level Up Study Hub email list (one study email a week) because you signed up or took the readiness check on aws-study-flashcards-app.com.";
+const FOOTER_NOTE = "You're on the Level Up Study Hub email list (one study email a week) because you signed up or took the readiness check on Level Up Study Hub (levelupstudyhub.com).";
 
 const footerText = (unsubscribeUrl) => `---
 ${FOOTER_NOTE} Unsubscribe: ${unsubscribeUrl}

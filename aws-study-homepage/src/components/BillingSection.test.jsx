@@ -2,12 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BillingSection from './BillingSection';
-import { getBillingSummary, openBillingPortal } from '../services/billing';
+import { getBillingSummary, getBillingAccountStatus, openBillingPortal } from '../services/billing';
 import { certifications } from '../data/certifications';
 import { COURSES, OTHER_COURSES } from '../data/courses';
 
 // The token claims, the API and Stripe are the boundary: never reach Cognito or the API from a test
-vi.mock('../services/billing', () => ({ getBillingSummary: vi.fn(), openBillingPortal: vi.fn() }));
+// portalErrorMessage is the real one: which words reach the member is what these tests check
+vi.mock('../services/billing', async (importOriginal) => ({
+  getBillingSummary: vi.fn(),
+  getBillingAccountStatus: vi.fn(),
+  openBillingPortal: vi.fn(),
+  portalErrorMessage: (await importOriginal()).portalErrorMessage,
+}));
 
 const [cert, otherCert] = certifications.filter((c) => c.status === 'available');
 const course = COURSES[0];
@@ -38,6 +44,7 @@ const note = () => screen.getByText(/billing portal/i);
 describe('BillingSection (hub Settings)', () => {
   beforeEach(() => {
     vi.mocked(getBillingSummary).mockReset();
+    vi.mocked(getBillingAccountStatus).mockReset().mockResolvedValue(true); // bought through Stripe unless a test says otherwise
     vi.mocked(openBillingPortal).mockReset();
   });
 
@@ -53,6 +60,7 @@ describe('BillingSection (hub Settings)', () => {
     expect(screen.getByText(/Your plan:/)).toHaveTextContent('Your plan: Free');
     expect(manage()).not.toBeInTheDocument();
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    expect(getBillingAccountStatus).not.toHaveBeenCalled();
     await userEvent.click(seePlans());
     expect(onSeePlans).toHaveBeenCalledTimes(1);
   });
@@ -173,6 +181,43 @@ describe('BillingSection (hub Settings)', () => {
     await screen.findByRole('alert');
     await user.click(manage());
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('Pro given by hand (no Stripe customer): says there is no billing to manage, and no button that can only fail', async () => {
+    vi.mocked(getBillingAccountStatus).mockResolvedValue(false);
+    await show({ plan: 'pro', certs: ALL_PRODUCTS, owned: [], subscriptions: [] });
+    expect(await screen.findByText(/no billing to manage/i)).toHaveTextContent('Pro was given to this account, not bought, so there is no billing to manage.');
+    expect(manage()).not.toBeInTheDocument();
+    expect(screen.queryByText(/billing portal/i)).not.toBeInTheDocument();
+    expect(seePlans()).not.toBeInTheDocument();
+  });
+
+  it('unlocks given by hand: lists them, says there is no billing to manage, still offers the plans', async () => {
+    vi.mocked(getBillingAccountStatus).mockResolvedValue(false);
+    await show({ plan: null, certs: [cert.id], owned: [cert.id], subscriptions: [] });
+    expect(await screen.findByText(/no billing to manage/i)).toHaveTextContent(/^Your unlocks were given to this account/);
+    expect(items('Purchased (lifetime access)')).toEqual([label(cert)]);
+    expect(manage()).not.toBeInTheDocument();
+    expect(seePlans()).toBeInTheDocument();
+  });
+
+  it('keeps Manage billing when the billing check cannot answer', async () => {
+    vi.mocked(getBillingAccountStatus).mockResolvedValue(null);
+    await show({ plan: 'pro', certs: ALL_PRODUCTS, owned: [], subscriptions: [sub('all-access', { interval: 'year' })] });
+    await act(async () => {});
+    expect(getBillingAccountStatus).toHaveBeenCalledTimes(1);
+    expect(manage()).toBeInTheDocument();
+    expect(screen.queryByText(/no billing to manage/i)).not.toBeInTheDocument();
+  });
+
+  it("shows the server's reason when it refuses to open the portal, not a generic retry", async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.mocked(openBillingPortal).mockRejectedValueOnce(
+      Object.assign(new Error('This account has no billing to manage.'), { code: 'FAILED_PRECONDITION' })
+    );
+    await show({ plan: 'pro', certs: ALL_PRODUCTS, owned: [], subscriptions: [] });
+    await userEvent.click(manage());
+    expect(await screen.findByRole('alert')).toHaveTextContent('This account has no billing to manage.');
   });
 
   it("when the plan can't be read, says so and offers no buttons", async () => {

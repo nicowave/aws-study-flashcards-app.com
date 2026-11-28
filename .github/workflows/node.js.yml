@@ -34,6 +34,18 @@ jobs:
     # In aws-coding-courses: the shell, Python, JS/TS engines and every tutorial's answer run through its own check.
     - if: contains(fromJSON('["aws-cloud-practitioner-game","aws-saa-study-game","aws-dva-study-game","aws-ai-study-game","aws-study-homepage","aws-dev-track","aws-coding-courses"]'), matrix.app)
       run: npm test
-    # Backend tests (checkout guards, return URLs, trial rules) load the payments Lambda, which has its own dependencies
+    # Backend tests (checkout guards, return URLs, trial rules) load the payments Lambda, which ships its own node_modules
     - if: matrix.app == 'aws-backend'
-      run: (cd lambda/callables && npm install) && npm test
+      run: npm ci --prefix lambda/callables && npm test
+
+  # deploy.sh, the new-site script and the Stripe/price scripts, run against a pretend AWS CLI and Stripe (deploy.sh is a zsh script)
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js 22
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - run: sudo apt-get update && sudo apt-get install -y zsh
+    - run: node --test scripts/*.test.mjs

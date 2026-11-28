@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PricingIcon } from './Icons';
-import { getBillingSummary, openBillingPortal } from '../services/billing';
+import { getBillingSummary, getBillingAccountStatus, openBillingPortal, portalErrorMessage } from '../services/billing';
 import { certifications } from '../data/certifications';
 import { COURSES, OTHER_COURSES } from '../data/courses';
 
@@ -42,12 +42,21 @@ const subscriptionStatus = (s) => {
  */
 const BillingSection = ({ onSeePlans }) => {
   const [summary, setSummary] = useState(undefined); // undefined = loading, null = couldn't read
+  // Can the billing portal open? false = no Stripe customer (given by hand), null = unknown
+  const [billingAccount, setBillingAccount] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     let live = true;
-    getBillingSummary().then((s) => { if (live) setSummary(s); });
+    getBillingSummary().then((s) => {
+      if (!live) return;
+      setSummary(s);
+      // Only someone with a plan, a subscription or an unlock is offered the portal; ask whether billing is behind it
+      if (s && (s.plan === 'pro' || s.certs?.length > 0 || s.owned?.length > 0 || s.subscriptions?.length > 0)) {
+        getBillingAccountStatus().then((b) => live && setBillingAccount(b));
+      }
+    });
     return () => { live = false; };
   }, []);
 
@@ -58,7 +67,7 @@ const BillingSection = ({ onSeePlans }) => {
       await openBillingPortal(); // leaves the page on success
     } catch (err) {
       console.error('[Settings] Portal failed:', err);
-      setError('Could not open the billing portal. Please try again.');
+      setError(portalErrorMessage(err, 'Could not open the billing portal. Please try again.'));
       setBusy(false);
     }
   };
@@ -72,9 +81,12 @@ const BillingSection = ({ onSeePlans }) => {
     : [];
   // Not told apart: the token's list, except for Pro, whose token lists every product
   const unlocks = !known && !isPro ? summary?.certs ?? [] : [];
-  // Anyone who paid has a Stripe customer, so the portal has their receipts
-  const hasPaid = isPro || (subscriptions?.length ?? 0) > 0 || lifetime.length > 0 || unlocks.length > 0
+  const hasAccess = isPro || (subscriptions?.length ?? 0) > 0 || lifetime.length > 0 || unlocks.length > 0
     || (summary?.certs?.length ?? 0) > 0;
+  // Anyone who paid has a Stripe customer, so the portal has their receipts. Access given by hand
+  // has none: the portal could only fail, so there is no button for it.
+  const given = hasAccess && billingAccount === false;
+  const hasPaid = hasAccess && !given;
   const mayCancel = !known || subscriptions.length > 0 || isPro;
 
   return (
@@ -130,6 +142,11 @@ const BillingSection = ({ onSeePlans }) => {
           {hasPaid && (
             <p className="billing-note">
               Invoices, your payment method{mayCancel ? ' and cancelling' : ''} are in the Stripe billing portal.
+            </p>
+          )}
+          {given && (
+            <p className="billing-note">
+              {isPro ? 'Pro was' : 'Your unlocks were'} given to this account, not bought, so there is no billing to manage.
             </p>
           )}
           {error && <p className="settings-error" role="alert">{error}</p>}

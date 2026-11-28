@@ -436,7 +436,7 @@ mkdir -p ~/aws-study-projects/bash/health-check
 cd ~/aws-study-projects/bash/health-check
 \`\`\`
 
-2. Create \`health-check.sh\` with your finished script (\`nano health-check.sh\`, paste, then Ctrl+O, Enter, Ctrl+X). Change \`SITES\` to two or three real addresses, for example \`https://aws-study-flashcards-app.com\`.
+2. Create \`health-check.sh\` with your finished script (\`nano health-check.sh\`, paste, then Ctrl+O, Enter, Ctrl+X). Change \`SITES\` to two or three real addresses, for example \`https://levelupstudyhub.com\`.
 
 3. Make it runnable, run it, and check the exit code:
 

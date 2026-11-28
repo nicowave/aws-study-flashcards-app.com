@@ -190,8 +190,9 @@ export const STRINGS = {
     'unlock.privacy': 'Privacy',
     'billing.manage': 'Manage billing',
     'billing.opening': 'Opening billing…',
-    'billing.none': 'Nothing to manage yet: this account has no subscription.',
+    'billing.none': 'This account has no billing to manage: nothing on it was bought through Stripe.',
     'billing.failed': 'Billing could not open. Please try again in a minute.',
+    'billing.given': 'It was given to this account, not bought, so there is no billing to manage.',
 
     // code blocks
     'code.copy': 'Copy',
@@ -382,8 +383,9 @@ export const STRINGS = {
     'unlock.privacy': 'Privacidad',
     'billing.manage': 'Gestionar facturación',
     'billing.opening': 'Abriendo la facturación…',
-    'billing.none': 'Todavía no hay nada que gestionar: esta cuenta no tiene ninguna suscripción.',
+    'billing.none': 'Esta cuenta no tiene facturación que gestionar: no se compró nada en ella con Stripe.',
     'billing.failed': 'No se pudo abrir la facturación. Inténtalo de nuevo en un minuto.',
+    'billing.given': 'Se dio a esta cuenta, no se compró, así que no hay facturación que gestionar.',
 
     'code.copy': 'Copiar',
     'code.copied': 'Copiado',

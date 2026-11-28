@@ -7,7 +7,7 @@ import { FAQ } from './src/data/faq.js'
 import { GIS_PAGE, GIS_WHY, GIS_COURSES, GIS_FOR, GIS_FAQ, GIS_DISCLAIMER } from './src/data/gis.js'
 import { fileURLToPath } from 'node:url'
 
-const SITE = 'https://aws-study-flashcards-app.com'
+const SITE = 'https://levelupstudyhub.com'
 const live = certifications.filter((c) => c.status === 'available')
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')

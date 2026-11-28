@@ -130,8 +130,9 @@ const Footer = ({ course, t, user }) => (
         <li><a href={onThisName('https://developer.aws-study-flashcards-app.com')}>{t('footer.devAssociate')}</a></li>
         <li><a href={onThisName('https://cloud.aws-study-flashcards-app.com')}>{t('footer.cloudPractitioner')}</a></li>
         <li><a href={HUB_URL}>{t('footer.allHub')}</a></li>
-        {/* A subscription bought on any Study Hub site is managed (or cancelled) from here too */}
-        {user && <li><ManageBilling course={course} /></li>}
+        {/* A subscription bought on any Study Hub site is managed (or cancelled) from here too,
+            when there is billing behind the account (ManageBilling asks the server) */}
+        {user && <ManageBilling course={course} item />}
       </ul>
     </div>
     <p className="fine">{t('footer.fine', new Date().getFullYear())}</p>

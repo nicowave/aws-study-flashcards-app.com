@@ -1,4 +1,4 @@
-// Bash for AWS: bash.aws-study-flashcards-app.com
+// Bash for AWS: bash.levelupstudyhub.com
 import meta from './meta.json';
 import { siblingsOf } from '../../shared/courseSites';
 import startHere from '../../shared/startHere';

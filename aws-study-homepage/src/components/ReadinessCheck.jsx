@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { submitReadiness, unsubscribe, track } from '../services/leads';
 import { currentPromotion } from '../services/offers';
 import { onThisName } from '../config/auth.config';
+import { isReturnVisit, letGo } from '../services/scrollRestore';
 import { ArrowRightIcon, TargetIcon, MailIcon } from './Icons';
 import './ReadinessCheck.css';
 
@@ -13,7 +14,7 @@ const CERTS = [
   { id: 'solutions-architect-associate', name: 'Solutions Architect', level: 'Associate', url: 'https://architect.aws-study-flashcards-app.com' },
   { id: 'developer-associate', name: 'Developer', level: 'Associate', url: 'https://developer.aws-study-flashcards-app.com' },
 ];
-const HUB = 'https://aws-study-flashcards-app.com';
+const HUB = 'https://levelupstudyhub.com';
 
 const shuffleOptions = (q) => {
   const order = q.options.map((_, i) => i);
@@ -87,14 +88,17 @@ const ReadinessCheck = () => {
   const [copied, setCopied] = useState(false);
   const sectionRef = useRef(null);
 
-  // Bring the check into view below the sticky header (tall on phones)
-  const scrollToCheck = () => {
+  // Bring the check into view below the sticky header (tall on phones). Wait for the web fonts first: when they
+  // arrive the header can wrap onto fewer rows, and a scroll measured before that ends with the card under it.
+  const scrollToCheck = () => Promise.resolve(document.fonts?.ready).then(() => {
     const el = sectionRef.current;
     if (!el) return;
     const header = document.querySelector('header');
     const offset = header && getComputedStyle(header).position === 'sticky' ? header.offsetHeight : 0;
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
-  };
+    letGo(); // a shared score reloaded: the page may still be holding the visitor's old place; this scroll wins
+    // No behavior given: the page's scroll-behavior decides, smooth unless the visitor asked for reduced motion
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset });
+  });
 
   const start = async (c) => {
     setError('');
@@ -112,12 +116,13 @@ const ReadinessCheck = () => {
   };
 
   // ?check=<cert id> (from shared scores) opens the check for that cert;
-  // #readiness links (the hero button) land below the sticky header
+  // #readiness links (the hero button) land below the sticky header. Not on a reload or Back/Forward: the address
+  // still says #readiness long after the visitor scrolled on, and the page puts them back where they were instead.
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get('check');
     const c = CERTS.find((x) => x.id === id);
     if (c) start(c);
-    else if (window.location.hash === '#readiness') setTimeout(scrollToCheck, 300);
+    else if (window.location.hash === '#readiness' && !isReturnVisit()) setTimeout(scrollToCheck, 300);
     const onHash = () => window.location.hash === '#readiness' && setTimeout(scrollToCheck, 0);
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);

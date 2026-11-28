@@ -24,7 +24,7 @@ const cognitoVerifier = CognitoJwtVerifier.create({
   tokenUse: "id",
 });
 
-const SITE_URL = "https://aws-study-flashcards-app.com";
+const SITE_URL = "https://levelupstudyhub.com";
 const ALLOWED_ORIGINS = [
   "https://aws-study-flashcards-app.com",
   "https://cloud.aws-study-flashcards-app.com",
@@ -56,8 +56,8 @@ const ALLOWED_ORIGINS = [
 ];
 
 // Where Stripe sends a buyer or member back: the address the page asked for when
-// it is one of ours, else the old hub. Each name has its own sign-in, so coming
-// back on the name the visitor opened keeps them signed in.
+// it is one of ours, else the hub on levelupstudyhub.com. Each name has its own
+// sign-in, so coming back on the name the visitor opened keeps them signed in.
 const returnBaseFor = (requested) => {
   const r = typeof requested === "string" ? requested : "";
   return ALLOWED_ORIGINS.find((o) => r === o || r.startsWith(`${o}/`)) ? r.replace(/\/$/, "") : SITE_URL;
@@ -585,14 +585,38 @@ async function proTrialStatus(data, user, stripe) {
 }
 
 // ---------------------------------------------------------------------------
+// billingStatus — () -> { hasBillingAccount: true | false }
+// Whether the billing portal can open for this account: it needs a Stripe customer, which checkout
+// creates. Pro given by hand (ENTITLEMENTS written without checkout) has none, so the sites show a
+// plain line instead of a "Manage" button that can only fail. Reads the table only, no Stripe call.
+// ---------------------------------------------------------------------------
+async function billingStatus(data, user) {
+  if (!user) throw new CallableError("UNAUTHENTICATED", "Sign in first");
+  return { hasBillingAccount: Boolean(await getCustomerId(user.uid)) };
+}
+
+// ---------------------------------------------------------------------------
 // createPortalSession — ({ returnUrl? }) -> { url }
 // ---------------------------------------------------------------------------
+// Shown to the member as is, so it says what is true in plain words, not "try again"
+const NO_BILLING_MESSAGE = "This account has no billing to manage: nothing on it was bought through Stripe, so there are no payments, invoices or card on file.";
+
 async function createPortalSession(data, user, stripe) {
   if (!user) throw new CallableError("UNAUTHENTICATED", "Sign in first");
   const customerId = await getCustomerId(user.uid);
-  if (!customerId) throw new CallableError("FAILED_PRECONDITION", "No billing account yet");
-  const session = await stripe.billingPortal.sessions.create({ customer: customerId, return_url: returnBaseFor(data?.returnUrl) });
-  return { url: session.url };
+  if (!customerId) throw new CallableError("FAILED_PRECONDITION", NO_BILLING_MESSAGE);
+  try {
+    const session = await stripe.billingPortal.sessions.create({ customer: customerId, return_url: returnBaseFor(data?.returnUrl) });
+    return { url: session.url };
+  } catch (err) {
+    // A customer saved while Stripe was in test mode, or deleted since: the live key can't see it,
+    // so there is no billing here either (checkout replaces such a customer on the next purchase)
+    if (err.code === "resource_missing" && err.param === "customer") {
+      console.warn(`[billing] Portal: Stripe has no customer ${customerId} for uid=${user.uid}`);
+      throw new CallableError("FAILED_PRECONDITION", NO_BILLING_MESSAGE);
+    }
+    throw err;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -668,13 +692,14 @@ async function stripeWebhook(event) {
 // ---------------------------------------------------------------------------
 // Router (API Gateway HTTP API, payload format 2.0)
 // ---------------------------------------------------------------------------
-const CALLABLES = { createCheckoutSession, createPortalSession, proTrialStatus };
+const CALLABLES = { createCheckoutSession, createPortalSession, proTrialStatus, billingStatus };
 
 // For aws-backend/test only: lets the tests run checkout and the webhook against a fake Stripe and table.
 exports._test = {
   createCheckoutSession,
   createPortalSession,
   proTrialStatus,
+  billingStatus,
   handleStripeEvent,
   syncCustomerEntitlements,
   planForPrice,
@@ -692,6 +717,7 @@ exports.handler = async (event) => {
   const fn = CALLABLES[name];
   if (!fn) return json(404, { error: { status: "NOT_FOUND", message: "Unknown function" } });
 
+  let user = null;
   try {
     const { stripe } = await init();
     let payload;
@@ -700,11 +726,14 @@ exports.handler = async (event) => {
     } catch {
       throw new CallableError("INVALID_ARGUMENT", "Request body must be JSON");
     }
-    const user = await authFromHeader(event);
+    user = await authFromHeader(event);
     const result = await fn(payload.data, user, stripe);
     return json(200, { result });
   } catch (err) {
     if (err instanceof CallableError) {
+      // An expected refusal, not a crash, but still one line in CloudWatch: without it a member's
+      // failed click leaves no trace (2026-11-28, the portal for Pro given by hand)
+      console.warn(`[${name}] ${err.status} uid=${user?.uid || "none"}: ${err.message}`);
       return json(HTTP_FOR_STATUS[err.status] || 500, { error: { status: err.status, message: err.message } });
     }
     console.error(`[${name}] error:`, err);
