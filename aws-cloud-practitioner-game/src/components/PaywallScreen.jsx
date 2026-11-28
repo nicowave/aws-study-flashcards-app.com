@@ -128,9 +128,7 @@ const PaywallScreen = ({ certId, certName, onBack }) => {
       {error && <p className="paywall-error" role="alert">{error}</p>}
       <p className="paywall-fine-print">
         Subscriptions renew automatically at the price shown until you cancel. Cancel anytime in
-        Manage billing (Settings). Secure payment by Stripe. Where sales tax applies, it is based on your
-        billing address, shown at checkout before you pay, and charged on each renewal too. Any card
-        processing fee is shown before you pay as well. The study guide stays free forever.{' '}
+        Manage billing (Settings). Secure payment by Stripe. Maryland and DC buyers: sales tax is added at checkout and on each renewal. Prices shown do not include it. The study guide stays free forever.{' '}
         <a href={onThisName('https://aws-study-flashcards-app.com/terms.html')} target="_blank" rel="noopener noreferrer">Terms</a>
         {' · '}
         <a href={onThisName('https://aws-study-flashcards-app.com/privacy.html')} target="_blank" rel="noopener noreferrer">Privacy</a>
