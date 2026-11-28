@@ -121,6 +121,24 @@
   margin: 0;
 }
 
+/* Terms and Privacy links: light enough to read on the card (7.3:1, AA needs 4.5:1),
+   underlined so they stand apart from the fine print around them. */
+.paywall-fine-print a {
+  color: var(--md-on-surface-variant);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.paywall-fine-print a:hover {
+  color: var(--md-on-surface);
+}
+
+.paywall-fine-print a:focus-visible {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 /* Monthly / yearly choice, Pro offer (the same block in all four games) */
 
 .paywall-sr-only {
