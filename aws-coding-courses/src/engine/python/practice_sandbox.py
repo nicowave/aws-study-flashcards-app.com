@@ -97,6 +97,14 @@ TIPS = {
                             '(Bucket, not bucket), and lists must be lists: Values=["running"].',
     'ClientError': 'AWS answered with an error. The code in brackets says why; in your program it\'s '
                    'e.response["Error"]["Code"].',
+    'Inexact': 'DynamoDB refused a number with more digits than it stores (38). A Decimal made from a float, like '
+               'Decimal(0.1), carries all of the float\'s digits. Make it from text: Decimal("0.1") or Decimal(f"{x:.2f}").',
+    'ThrottlingException': 'AWS is saying "slow down": too many requests in a short time. Wait, then try again, '
+                           'a little longer after each failure.',
+    'AccessDeniedException': "These credentials aren't allowed to make this call. Trying again won't help: "
+                             'the permissions have to change.',
+    'ValidationException': 'AWS refused the request itself, so sending it again gets the same answer. '
+                           'The message says what to change.',
     'URLError': 'The request didn\'t get an answer: the name doesn\'t exist, the connection was refused, or it timed out. '
                 'e.reason says which.',
     'HTTPError': 'The site answered, with an error status. e.code is the number, like 404 or 503.',
@@ -234,7 +242,8 @@ def _execute(code, ns):
 def _probe(expr, ns):
     if not expr:
         return None
-    saved, saved_size = list(_transcript), _size[0]
+    # Copy each chunk: printing appends to the last one, which would leak the probe's output into the run's
+    saved, saved_size = [list(chunk) for chunk in _transcript], _size[0]
     local = dict(ns)
     try:
         try:

@@ -129,15 +129,19 @@ export class FakeAws {
         case 's3 sync': return this.s3sync(ctx, opts, now);
         case 's3 rm': return this.s3rm(ctx, opts);
         case 'cloudfront create-invalidation': {
-          const d = this.distribution(opts['distribution-id'], 'CreateInvalidation');
+          // Like the real command line: a missing parameter is refused (252) before AWS is asked
+          if (!opts['distribution-id']) throw new UsageErr('aws cloudfront create-invalidation --distribution-id ID --paths "/*"\n\naws: error: the following arguments are required: --distribution-id');
           const paths = opts.paths ? [].concat(opts.paths).flatMap((p) => p.split(/\s+/)).filter(Boolean) : [];
-          if (!paths.length) throw new UsageErr('aws cloudfront create-invalidation --distribution-id ID --paths "/*"');
+          // The real one's words (aws-cli 2.42, run without --paths), also exit code 252
+          if (!paths.length) { ctx.err('\nParameter validation failed:\nMissing required parameter in input: "InvalidationBatch"\n(practice shell: add --paths "/*")\n'); return 252; }
+          const d = this.distribution(opts['distribution-id'], 'CreateInvalidation');
           const id = `I${(++this.counter).toString().padStart(3, '0')}PRACTICE${Math.floor(now / 1000) % 100000}`;
           const inv = { Id: id, Status: 'InProgress', CreateTime: iso(now), InvalidationBatch: { Paths: { Quantity: paths.length, Items: paths }, CallerReference: `cli-${Math.floor(now / 1000)}` } };
           d.invalidations.push(inv);
           return print({ Location: `https://cloudfront.amazonaws.com/2020-05-31/distribution/${opts['distribution-id']}/invalidation/${id}`, Invalidation: inv });
         }
         case 'cloudfront get-invalidation': {
+          if (!opts['distribution-id'] || !opts.id) throw new UsageErr(`aws cloudfront get-invalidation --distribution-id ID --id INVALIDATION_ID\n\naws: error: the following arguments are required: ${!opts['distribution-id'] ? '--distribution-id' : '--id'}`);
           const d = this.distribution(opts['distribution-id'], 'GetInvalidation');
           const inv = d.invalidations.find((x) => x.Id === opts.id);
           if (!inv) throw new AwsError('NoSuchInvalidation', 'GetInvalidation', 'The specified invalidation does not exist.');

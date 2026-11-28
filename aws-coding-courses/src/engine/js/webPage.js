@@ -3,7 +3,7 @@
 // stands in for what a sandboxed preview can't have:
 //   - console output and errors, sent to the practice console
 //   - localStorage, kept by the course page between runs
-//   - fetch(), answered by the step's pretend internet
+//   - fetch(), answered by the step's pretend internet (S3 presigned URLs included)
 //   - the check's probe: async code run inside the page (click, read the DOM)
 //   - loop protection, so `while (true)` can't freeze the course page
 // The page talks to its parent with postMessage, or through
@@ -15,6 +15,7 @@
 // clicks never change the learner's page or saved data.
 import { inspect } from './inspect';
 import { makeFakeFetch } from './fakeFetch';
+import { makePresigner } from './presign';
 import { guardLoops, installLoopGuard } from './loopGuard';
 
 export const LOOP_LIMIT_MS = 2000;
@@ -23,7 +24,7 @@ const escapeScript = (code) => code.replace(/<\/(script)/gi, '<\\/$1');
 
 // Runs inside the page, before anything else. It's copied in as source text,
 // so it may only use its parameters and the page's globals.
-function pageShim(config, inspect, makeFakeFetch, installLoopGuard) {
+function pageShim(config, inspect, makeFakeFetch, installLoopGuard, makePresigner) {
   installLoopGuard(window, config.loopLimit);
   const formatArgs = (args) => args.map((a) => (typeof a === 'string' ? a : inspect(a))).join(' ');
   const send = window.__practiceBridge || ((msg) => window.parent.postMessage({ __practice: true, ...msg }, '*'));
@@ -117,7 +118,8 @@ function pageShim(config, inspect, makeFakeFetch, installLoopGuard) {
   }
 
   const fetchLog = [];
-  window.fetch = makeFakeFetch(config.web || {}, fetchLog, 0.1);
+  const pretendFetch = makeFakeFetch(config.web || {}, fetchLog, 0.1, { presigner: makePresigner() });
+  window.fetch = pretendFetch;
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const $ = (sel) => {
@@ -158,8 +160,34 @@ function pageShim(config, inspect, makeFakeFetch, installLoopGuard) {
       target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
       await sleep(30);
     },
+    // Pick a file in an <input type="file">, as a person would in the file dialog:
+    // { name, type, size } (that many zero bytes) or { name, type, text }; a list
+    // for several files; nothing for "the dialog was cancelled".
+    chooseFile: async (sel, spec) => {
+      const el = $(sel);
+      const files = (Array.isArray(spec) ? spec : spec ? [spec] : []).map((f) => (f instanceof File ? f
+        : new File([f.text !== undefined ? f.text : new Uint8Array(f.size || 0)], f.name || 'file', { type: f.type || '', lastModified: f.lastModified || Date.now() })));
+      let chosen = false;
+      try {
+        const transfer = new DataTransfer();
+        for (const f of files) transfer.items.add(f);
+        el.files = transfer.files;
+        chosen = el.files.length === files.length;
+      } catch (e) { /* jsdom (the tests) has no DataTransfer */ }
+      if (!chosen) {
+        const list = Object.assign(files.slice(), { item: (i) => list[i] ?? null });
+        Object.defineProperty(el, 'files', { configurable: true, get: () => list });
+        Object.defineProperty(el, 'value', { configurable: true, get: () => (list.length ? `C:\\fakepath\\${list[0].name}` : ''), set: (v) => { if (v === '') list.length = 0; } });
+      }
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      await sleep(10);
+      return files.map((f) => ({ name: f.name, size: f.size, type: f.type }));
+    },
     storage: () => Object.fromEntries(Object.keys(local).map((k) => [k, local.getItem(k)])),
     fetchLog,
+    fetch: pretendFetch, // the pretend internet, even after a probe swapped window.fetch
+    s3: () => pretendFetch.buckets(), // what the buckets declared in scenario.web hold: { bucket: { key: { size, contentType } } }
     console: lines,
     errors,
   };
@@ -245,7 +273,7 @@ export const buildPage = ({ files, compiled = {}, lineMaps = {}, storage = {}, w
   }
 
   const config = { storage, web, runId, role, persist: role === 'view', loopLimit: LOOP_LIMIT_MS, tips: tips.map(([re, tip]) => [re.source, tip]) };
-  const shim = `<script>(${pageShim})(${JSON.stringify(config).replace(/<\//g, '<\\/')}, ${inspect}, ${makeFakeFetch}, ${installLoopGuard});</script>`;
+  const shim = `<script>(${pageShim})(${JSON.stringify(config).replace(/<\//g, '<\\/')}, ${inspect}, ${makeFakeFetch}, ${installLoopGuard}, ${makePresigner});</script>`;
   html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => `${m}\n${shim}`) : `${shim}\n${html}`;
 
   // Where each script starts in the final page, for errors that only know the page line

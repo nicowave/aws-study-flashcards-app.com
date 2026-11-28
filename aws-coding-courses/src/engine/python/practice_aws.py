@@ -1,6 +1,7 @@
 # A pretend AWS account for the practice Python, shaped like boto3: the same
 # client names, method names, parameters, responses and errors as the real
-# thing, for the services the tutorials use. Nothing leaves the browser.
+# thing, for the services the tutorials use (with a stand-in for a foundation
+# model behind bedrock-runtime). Nothing leaves the browser.
 #
 # install() registers boto3, botocore and boto3.dynamodb.conditions in
 # sys.modules; reset(scenario) loads the account from a step's scenario;
@@ -11,6 +12,7 @@ import decimal
 import fnmatch
 import hashlib
 import io
+import json
 import re
 import sys
 import types
@@ -88,6 +90,9 @@ _MODELED = {
                  'TransactionCanceledException', 'ResourceInUseException'},
     'sns': {'NotFoundException', 'InvalidParameterException', 'AuthorizationErrorException'},
     'sts': {'ExpiredTokenException'},
+    'bedrock-runtime': {'AccessDeniedException', 'InternalServerException', 'ModelErrorException', 'ModelNotReadyException',
+                        'ModelTimeoutException', 'ResourceNotFoundException', 'ServiceUnavailableException',
+                        'ThrottlingException', 'ValidationException'},
     'ec2': set(),  # EC2 models no error codes: everything is a plain ClientError
 }
 # Some error codes have a differently named class, e.g. SNS's "NotFound" is NotFoundException
@@ -139,10 +144,10 @@ def _request_id():
     return str(uuid.uuid4()).upper()
 
 
-def _meta(status=200):
+def _meta(status=200, content_type='text/xml;charset=UTF-8'):
     rid = _request_id()
     return {'RequestId': rid, 'HTTPStatusCode': status,
-            'HTTPHeaders': {'x-amzn-requestid': rid, 'content-type': 'text/xml;charset=UTF-8'}, 'RetryAttempts': 0}
+            'HTTPHeaders': {'x-amzn-requestid': rid, 'content-type': content_type}, 'RetryAttempts': 0}
 
 
 def _time(value):
@@ -167,9 +172,9 @@ def _account():
 # Clients
 # ----------------------------------------------------------------------------
 
-CLASS_NAMES = {'s3': 'S3', 'ec2': 'EC2', 'sts': 'STS', 'sns': 'SNS', 'dynamodb': 'DynamoDB'}
+CLASS_NAMES = {'s3': 'S3', 'ec2': 'EC2', 'sts': 'STS', 'sns': 'SNS', 'dynamodb': 'DynamoDB', 'bedrock-runtime': 'BedrockRuntime'}
 KNOWN_SERVICES = sorted([
-    'acm', 'apigateway', 'athena', 'autoscaling', 'ce', 'cloudformation', 'cloudfront', 'cloudtrail', 'cloudwatch',
+    'acm', 'apigateway', 'athena', 'autoscaling', 'bedrock', 'bedrock-agent', 'bedrock-runtime', 'ce', 'cloudformation', 'cloudfront', 'cloudtrail', 'cloudwatch',
     'codebuild', 'codecommit', 'codedeploy', 'codepipeline', 'cognito-idp', 'dynamodb', 'ec2', 'ecr', 'ecs', 'efs',
     'eks', 'elasticache', 'elbv2', 'events', 'firehose', 'glue', 'iam', 'kinesis', 'kms', 'lambda', 'logs',
     'organizations', 'rds', 'route53', 's3', 'scheduler', 'secretsmanager', 'ses', 'sesv2', 'sns', 'sqs', 'ssm',
@@ -284,7 +289,9 @@ class _Client:
                           'params': {k: _summary(v) for k, v in kwargs.items()}})
             result = spec['fn'](self, **kwargs)
             if isinstance(result, dict) and spec.get('meta', True):
-                result['ResponseMetadata'] = _meta(spec.get('status', 200))
+                retries = result.pop('_retries', 0)
+                result['ResponseMetadata'] = _meta(spec.get('status', 200), spec.get('content_type', 'text/xml;charset=UTF-8'))
+                result['ResponseMetadata']['RetryAttempts'] = retries
             return result
 
         call.__name__ = name
@@ -811,6 +818,425 @@ def _sns_list_subscriptions_by_topic(client, TopicArn, NextToken=None):
 
 
 # ----------------------------------------------------------------------------
+# Amazon Bedrock (bedrock-runtime): the Converse API, answered by a small
+# stand-in for a foundation model. It can do one job: summarize the text it is
+# given, as plain text or (when the prompt says JSON) as
+# {"summary", "category", "urgency"}. Replies, token counts and timings are
+# worked out from the prompt, the same way every time, so the task checks can
+# know the right answer.
+#
+# Scenario shape (aws.bedrock, every key optional):
+#   models:    {'amazon.nova-micro-v1:0': {'contextWindow': 128000}}   added to BEDROCK_MODELS
+#   denied:    ['amazon.nova-lite-v1:0']        AccessDeniedException for these models
+#   faults:    [{'code': 'ThrottlingException', 'times': 4, 'after': 0, 'match': 'HD-2105'}]
+#              the first `times` attempts (after skipping `after`) whose prompt
+#              contains `match` fail with `code`; times -1 = every attempt
+#   quirks:    [{'match': 'HD-2106', 'style': 'fenced'}]   how a JSON reply goes wrong:
+#              fenced | prose | invalid | missing | wrong-value | {'text': '...'}
+#   latencyMs: 2600                             a fixed time per call
+# ----------------------------------------------------------------------------
+
+_EU_SOURCES = ['eu-central-1', 'eu-north-1', 'eu-south-1', 'eu-south-2', 'eu-west-1', 'eu-west-3', 'il-central-1']
+_IN_REGION = ['us-east-1', 'eu-west-2', 'ap-northeast-1', 'ap-southeast-2']
+
+# inRegion: where the plain model ID works. profiles: the geography prefix of
+# each cross-Region inference profile and the Regions it can be called from.
+BEDROCK_MODELS = {
+    'amazon.nova-micro-v1:0': {'contextWindow': 128000, 'maxOutput': 10000, 'inRegion': _IN_REGION,
+                               'profiles': {'us': ['us-east-1', 'us-east-2', 'us-west-2'], 'eu': _EU_SOURCES}},
+    'amazon.nova-lite-v1:0': {'contextWindow': 300000, 'maxOutput': 10000, 'inRegion': _IN_REGION,
+                              'profiles': {'us': ['us-east-1', 'us-east-2', 'us-west-1', 'us-west-2'], 'eu': _EU_SOURCES}},
+}
+
+# code: (HTTP status, message when the scenario gives none)
+_BEDROCK_ERRORS = {
+    'AccessDeniedException': (403, 'You are not authorized to perform this action.'),
+    'InternalServerException': (500, 'An internal server error occurred. Retry your request.'),
+    'ModelErrorException': (424, 'The request failed due to an error while processing the model.'),
+    'ModelNotReadyException': (429, 'The model is not ready for inference. Wait and try your request again.'),
+    'ModelTimeoutException': (408, 'Model has timed out in processing the request. Try your request again.'),
+    'ResourceNotFoundException': (404, 'The specified resource ARN was not found.'),
+    'ServiceUnavailableException': (503, 'The service is temporarily unable to handle the request. Try again later.'),
+    'ThrottlingException': (429, 'Too many requests, please wait before trying again.'),
+    'ValidationException': (400, 'The input fails to satisfy the constraints specified by Amazon Bedrock.'),
+}
+# What the SDK's standard retry mode tries again by itself: throttling waits from 1 second, the rest from 50 ms
+_BEDROCK_RETRYABLE = {'ThrottlingException': 1.0, 'ModelNotReadyException': 1.0,
+                      'ServiceUnavailableException': 0.05, 'InternalServerException': 0.05}
+_BEDROCK_BLOCKS = ['text', 'image', 'document', 'video', 'audio', 'toolUse', 'toolResult', 'guardContent', 'cachePoint',
+                   'reasoningContent', 'citationsContent', 'searchResult']
+_BEDROCK_UNSUPPORTED = ('toolConfig', 'guardrailConfig', 'promptVariables', 'outputConfig')
+_STREAK_LIMIT = 300
+
+
+def _bedrock():
+    return STATE.setdefault('bedrock', {'models': copy.deepcopy(BEDROCK_MODELS), 'denied': [], 'faults': [], 'quirks': [],
+                                        'latencyMs': None, 'log': [], 'attempts': 0, 'streak': 0, 'seen': {}})
+
+
+def bedrock_set(faults=None, quirks=None, denied=None, latencyMs=None):
+    """For task checks: change how the pretend model misbehaves and start its counters again."""
+    b = _bedrock()
+    b.update(faults=copy.deepcopy(faults or []), quirks=copy.deepcopy(quirks or []), denied=list(denied or []),
+             latencyMs=latencyMs, streak=0)
+
+
+def _bedrock_fail(code, message=None, retries=0):
+    status, default = _BEDROCK_ERRORS[code]
+    rid = _request_id().lower()
+    text = message or default
+    raise _exc('bedrock-runtime', code)({
+        'Error': {'Code': code, 'Message': text}, 'message': text,
+        'ResponseMetadata': {'RequestId': rid, 'HTTPStatusCode': status,
+                             'HTTPHeaders': {'x-amzn-requestid': rid, 'content-type': 'application/json'},
+                             'RetryAttempts': retries},
+    }, 'Converse')
+
+
+def _tokens(text):
+    """About 4 characters to a token. Real models count differently: always read usage from the response."""
+    return -(-len(text) // 4)
+
+
+def _total_attempts(config):
+    """How often the SDK tries one call: 3 by default (standard retry mode), or what Config(retries=...) says."""
+    retries = getattr(config, 'retries', None) or {}
+    if retries.get('total_max_attempts') is not None:
+        return max(1, int(retries['total_max_attempts']))
+    if retries.get('max_attempts') is not None:  # in a Config object this one counts the retries only
+        return max(1, int(retries['max_attempts']) + 1)
+    return 5 if retries.get('mode') == 'legacy' else 3
+
+
+def _bedrock_wait(seconds):
+    """Waiting moves the practice clock on, so nobody sits through a retry or a slow model."""
+    try:
+        import practice_net
+        practice_net.advance(seconds)
+    except ImportError:  # the account is being used without the practice internet
+        pass
+
+
+def _type_error(path, value, valid):
+    return f'Invalid type for parameter {path}, value: {value!r}, type: {type(value)}, valid types: {valid}'
+
+
+def _bedrock_shape(messages, system, config):
+    """What botocore checks before sending: types, required keys, unknown keys and lowest values."""
+    seq, problems = "<class 'list'>, <class 'tuple'>", []
+
+    def blocks(path, content, allowed):
+        if not isinstance(content, (list, tuple)):
+            problems.append(_type_error(path, content, seq))
+            return
+        for n, block in enumerate(content):
+            here = f'{path}[{n}]'
+            if not isinstance(block, dict):
+                problems.append(_type_error(here, block, "<class 'dict'>"))
+                continue
+            for key in block:
+                if key not in allowed:
+                    problems.append(f'Unknown parameter in {here}: "{key}", must be one of: {", ".join(allowed)}')
+            if 'text' in block and not isinstance(block['text'], str):
+                problems.append(_type_error(f'{here}.text', block['text'], "<class 'str'>"))
+
+    if messages is not None:
+        if not isinstance(messages, (list, tuple)):
+            problems.append(_type_error('messages', messages, seq))
+        else:
+            for n, message in enumerate(messages):
+                here = f'messages[{n}]'
+                if not isinstance(message, dict):
+                    problems.append(_type_error(here, message, "<class 'dict'>"))
+                    continue
+                for key in ('role', 'content'):
+                    if key not in message:
+                        problems.append(f'Missing required parameter in {here}: "{key}"')
+                for key in message:
+                    if key not in ('role', 'content'):
+                        problems.append(f'Unknown parameter in {here}: "{key}", must be one of: role, content')
+                if 'role' in message and not isinstance(message['role'], str):
+                    problems.append(_type_error(f'{here}.role', message['role'], "<class 'str'>"))
+                if 'content' in message:
+                    blocks(f'{here}.content', message['content'], _BEDROCK_BLOCKS)
+    if system is not None:
+        blocks('system', system, ['text', 'guardContent', 'cachePoint'])
+    if config is not None:
+        if not isinstance(config, dict):
+            problems.append(_type_error('inferenceConfig', config, "<class 'dict'>"))
+        else:
+            allowed = ['maxTokens', 'temperature', 'topP', 'stopSequences']
+            for key in config:
+                if key not in allowed:
+                    problems.append(f'Unknown parameter in inferenceConfig: "{key}", must be one of: {", ".join(allowed)}')
+            for key, kinds, lowest, names in (('maxTokens', (int,), 1, "<class 'int'>"),
+                                              ('temperature', (int, float, decimal.Decimal), 0, "<class 'float'>, <class 'decimal.Decimal'>, <class 'int'>"),
+                                              ('topP', (int, float, decimal.Decimal), 0, "<class 'float'>, <class 'decimal.Decimal'>, <class 'int'>")):
+                if key not in config:
+                    continue
+                value = config[key]
+                if isinstance(value, bool) or not isinstance(value, kinds):
+                    problems.append(_type_error(f'inferenceConfig.{key}', value, names))
+                elif value < lowest:
+                    problems.append(f'Invalid value for parameter inferenceConfig.{key}, value: {value}, valid min value: {lowest}')
+            if 'stopSequences' in config and not isinstance(config['stopSequences'], (list, tuple)):
+                problems.append(_type_error('inferenceConfig.stopSequences', config['stopSequences'], seq))
+    if problems:
+        raise ParamValidationError(report='\n'.join(problems))
+
+
+def _bedrock_model(model_id, region):
+    """(model ID, its catalog entry) for a modelId as Converse takes it: a model ID, an inference profile ID or an ARN."""
+    ident = model_id
+    arn = re.match(r'arn:aws[\w-]*:bedrock:[a-z0-9-]*:(?:\d{12})?:(?:foundation-model|inference-profile)/(.+)$', model_id)
+    if arn:
+        ident = arn.group(1)
+    models = _bedrock()['models']
+    if ident in models:
+        if region not in models[ident].get('inRegion', []):
+            _bedrock_fail('ValidationException', f"Invocation of model ID {ident} with on-demand throughput isn't supported. "
+                                                 'Retry your request with the ID or ARN of an inference profile that contains this model.')
+        return ident, models[ident]
+    prefix, _, rest = ident.partition('.')
+    if rest in models and region in models[rest].get('profiles', {}).get(prefix, []):
+        return rest, models[rest]
+    _bedrock_fail('ValidationException', 'The provided model identifier is invalid.')
+
+
+def _bedrock_check(messages, system, config, spec):
+    """What the service refuses with a ValidationException. Returns (system text, [(role, text)])."""
+    turns = []
+    system_text = '\n'.join(block.get('text', '') for block in system)
+    for n, message in enumerate(messages):
+        role = message['role']
+        if role not in ('user', 'assistant', 'system'):
+            _bedrock_fail('ValidationException', f"1 validation error detected: Value '{role}' at 'messages.{n + 1}.member.role' "
+                                                 'failed to satisfy constraint: Member must satisfy enum value set: [user, assistant, system]')
+        texts = []
+        if not message['content']:
+            _bedrock_fail('ValidationException', f'The content field in the Message object at messages.{n} is empty. '
+                                                 'Add a ContentBlock object to the content field and try again.')
+        for k, block in enumerate(message['content']):
+            if 'text' not in block:
+                raise PracticeAccountError('The practice model reads text only: every content block needs a "text" key. '
+                                           'Images, documents and tools are for the real Amazon Bedrock.')
+            if not block['text'].strip():
+                _bedrock_fail('ValidationException', f'The text field in the ContentBlock object at messages.{n}.content.{k} is blank. '
+                                                     'Add text to the text field, and try again.')
+            texts.append(block['text'])
+        if role == 'system':
+            system_text = '\n'.join(filter(None, [system_text, *texts]))
+        else:
+            turns.append((role, '\n'.join(texts)))
+    if not turns or turns[0][0] != 'user':
+        _bedrock_fail('ValidationException', 'A conversation must start with a user message. '
+                                             'Try again with a conversation that starts with a user message.')
+    for (before, _), (after, _) in zip(turns, turns[1:]):
+        if before == after:
+            _bedrock_fail('ValidationException', 'A conversation must alternate between user and assistant roles. '
+                                                 'Make sure the conversation alternates between user and assistant roles and try again.')
+    if turns[-1][0] != 'user':
+        raise PracticeAccountError("The practice model doesn't continue an assistant message. End the conversation with a user message.")
+    for key in ('temperature', 'topP'):
+        if config.get(key) is not None and config[key] > 1:
+            _bedrock_fail('ValidationException', f"1 validation error detected: Value '{config[key]}' at 'inferenceConfig.{key}' "
+                                                 'failed to satisfy constraint: Member must have value less than or equal to 1')
+    if config.get('maxTokens') is not None and config['maxTokens'] > spec['maxOutput']:
+        _bedrock_fail('ValidationException', f"The maximum tokens you requested exceeds the model limit of {spec['maxOutput']}. "
+                                             f"Try again with a maximum tokens value that is lower than {spec['maxOutput']}.")
+    return system_text, turns
+
+
+def _bedrock_fault(user_text):
+    """The scenario's next failure for this prompt, if any: (code, message)."""
+    for fault in _bedrock()['faults']:
+        if fault.get('match') and fault['match'] not in user_text:
+            continue
+        fault['_seen'] = fault.get('_seen', 0) + 1
+        times, after = fault.get('times', 1), fault.get('after', 0)
+        if fault['_seen'] > after and (times < 0 or fault['_seen'] <= after + times):
+            return fault.get('code', 'ThrottlingException'), fault.get('message')
+    return None
+
+
+# --- The stand-in model -----------------------------------------------------
+
+_SUBJECT_LINE = re.compile(r'^\s*(?:subject|title)\s*:\s*(.+)$', re.I)
+_HEADER_LINE = re.compile(r'^\s*(?:ticket(?: id)?|id|from|requester|opened|team|priority|date|to)\s*:', re.I)
+_GREETING = re.compile(r'^(?:hi|hello|hey|dear|good (?:morning|afternoon|evening))\b[^.!?\n]{0,30}[,.!]\s*', re.I)
+_SIGNOFF = re.compile(r'^(?:thanks|thank you|many thanks|regards|best|cheers)\b', re.I)
+
+BEDROCK_CATEGORIES = [
+    ('Security', ('phishing', 'malware', 'virus', 'suspicious', 'ransom', 'hacked', 'breach', 'stolen')),
+    ('Network', ('vpn', 'wi-fi', 'wifi', 'network', 'internet', 'dns', 'firewall', 'ethernet', 'router', 'offline')),
+    ('Accounts', ('password', 'login', 'log in', 'sign in', 'locked out', 'mfa', 'account', 'permission', 'access to', 'license')),
+    ('Desktop Support', ('laptop', 'printer', 'monitor', 'screen', 'keyboard', 'mouse', 'battery', 'docking', 'headset',
+                         'install', 'update', 'slow', 'crash')),
+]
+_LOW_WORDS = ('no rush', 'not urgent', 'when you have time', 'whenever', 'low priority', 'nice to have', 'next week', 'next month')
+_HIGH_WORDS = ('urgent', 'asap', 'immediately', 'outage', 'is down', 'are down', "can't work", 'cannot work', 'nobody can',
+               'no one can', 'everyone', 'production', 'deadline', 'payroll', 'locked out')
+
+
+def _bedrock_split(user_text):
+    """(the request, the text to work on). Tags like <ticket>...</ticket> mark the text most clearly."""
+    tagged = re.search(r'<(\w+)>(.*?)</\1>', user_text, re.S)
+    if tagged:
+        return user_text[:tagged.start()] + user_text[tagged.end():], tagged.group(2)
+    lines = user_text.splitlines()
+    for n, line in enumerate(lines):
+        if _SUBJECT_LINE.match(line) or _HEADER_LINE.match(line):
+            return '\n'.join(lines[:n]), '\n'.join(lines[n:])
+    paragraphs = re.split(r'\n\s*\n', user_text.strip(), maxsplit=1)
+    if len(paragraphs) == 2 and paragraphs[1].strip():
+        return paragraphs[0], paragraphs[1]
+    first, newline, rest = user_text.strip().partition('\n')
+    if newline and first.rstrip().endswith(':') and rest.strip():
+        return first, rest
+    inline = re.match(r'(.{0,120}?:)\s+(.{40,})$', user_text.strip(), re.S)
+    if inline:
+        return inline.group(1), inline.group(2)
+    return '', user_text
+
+
+def bedrock_summary(data, variant=0):
+    """The stand-in's whole skill: {"summary", "category", "urgency"} for a ticket's text."""
+    subject, body = '', []
+    for line in data.splitlines():
+        found = _SUBJECT_LINE.match(line)
+        if found and not subject:
+            subject = found.group(1).strip().rstrip('.!')
+        elif not _HEADER_LINE.match(line):
+            body.append(line)
+    text = _GREETING.sub('', ' '.join(' '.join(body).split()))
+    picked = ''
+    for sentence in re.split(r'(?<=[.!?])\s+', text):
+        if not sentence.strip() or _SIGNOFF.match(sentence.strip()):
+            continue
+        picked = f'{picked} {sentence.strip()}'.strip()
+        if len(picked) >= 70:
+            break
+    if len(picked) > 200:
+        picked = picked[:197].rsplit(' ', 1)[0] + '...'
+    picked = picked[:1].upper() + picked[1:]
+    if subject and picked:
+        summary = [f'{subject}: {picked}', f'{picked} ({subject})', f'Reported: {subject}. {picked}'][variant % 3]
+    else:
+        summary = picked or (subject + '.' if subject else 'There is no text to summarize.')
+    low = f'{subject} {text}'.lower()
+    scores = [(sum(word in low for word in words), -n, name) for n, (name, words) in enumerate(BEDROCK_CATEGORIES)]
+    best = max(scores)
+    urgency = 'low' if any(w in low for w in _LOW_WORDS) else 'high' if any(w in low for w in _HIGH_WORDS) else 'medium'
+    return {'summary': summary, 'category': best[2] if best[0] else 'Other', 'urgency': urgency}
+
+
+def _bedrock_style(result, style):
+    """A JSON reply, clean or wrong in one of the ways real models get it wrong."""
+    clean = json.dumps(result)
+    if isinstance(style, dict):
+        return style.get('text', clean)
+    if style == 'fenced':
+        return '```json\n' + json.dumps(result, indent=2) + '\n```'
+    if style == 'prose':
+        return f'Here is the summary of the ticket:\n\n{clean}\n\nLet me know if you need anything else.'
+    if style == 'invalid':
+        return clean[:-1] + ',}'
+    if style == 'missing':
+        return json.dumps({k: v for k, v in result.items() if k != 'category'})
+    if style == 'wrong-value':
+        return json.dumps({**result, 'urgency': 'critical'})
+    return clean
+
+
+def _bedrock_reply(system_text, user_text, config):
+    b = _bedrock()
+    request, data = _bedrock_split(user_text)
+    # Like a real model at a higher temperature, the wording changes when the same text is sent again.
+    # The model's own default is 0.7, so a call that sets no temperature varies too.
+    temperature = config.get('temperature')
+    seen = b['seen'].get(data, 0)
+    b['seen'][data] = seen + 1
+    result = bedrock_summary(data, seen if (0.7 if temperature is None else temperature) >= 0.5 else 0)
+    if 'json' not in f'{system_text}\n{request}'.lower():
+        if len(data.split()) < 12:  # a question or a greeting, not a ticket
+            return ("I'm the practice model: a small stand-in that can only summarize help desk tickets. "
+                    'Send me a ticket of a sentence or two. A real model on Amazon Bedrock would answer this.')
+        return result['summary']
+    style = next((q.get('style') for q in b['quirks'] if q.get('match', '') in user_text), None)
+    return _bedrock_style(result, style)
+
+
+def _bedrock_attempt(client, model_id, messages, system, config, entry):
+    b = _bedrock()
+    ident, spec = _bedrock_model(model_id, client._region)
+    if ident in b['denied']:
+        _bedrock_fail('AccessDeniedException',
+                      f"User: arn:aws:iam::{_account()}:user/{STATE.get('user', 'learner')} is not authorized to perform: "
+                      f"bedrock:InvokeModel on resource: arn:aws:bedrock:{client._region}::foundation-model/{ident} "
+                      'because no identity-based policy allows the bedrock:InvokeModel action')
+    system_text, turns = _bedrock_check(messages, system, config, spec)
+    user_text = turns[-1][1]
+    entry.update(system=system_text[:6000], user=user_text[:6000], userLength=len(user_text))
+    input_tokens = _tokens(system_text) + sum(_tokens(text) for _, text in turns)
+    if input_tokens > spec['contextWindow']:
+        _bedrock_fail('ValidationException', 'Input is too long for requested model.')
+    fault = _bedrock_fault(user_text)
+    if fault:
+        b['streak'] += 1
+        if b['streak'] > _STREAK_LIMIT:
+            raise PracticeAccountError(f'More than {_STREAK_LIMIT} calls in a row have failed. Does your retry loop ever stop?')
+        _bedrock_fail(*fault)
+    b['streak'] = 0
+    reply = _bedrock_reply(system_text, user_text, config)
+    output_tokens, stop = _tokens(reply), 'end_turn'
+    limit = config.get('maxTokens')
+    if limit is not None and output_tokens > limit:  # cut off in mid-sentence, as a real model is
+        reply, output_tokens, stop = reply[:limit * 4], limit, 'max_tokens'
+    # A stop sequence ends the reply just before its first appearance
+    cuts = [reply.find(seq) for seq in config.get('stopSequences') or [] if isinstance(seq, str) and seq and seq in reply]
+    if cuts:
+        reply, stop = reply[:min(cuts)], 'stop_sequence'
+        output_tokens = _tokens(reply)
+    latency = b['latencyMs'] if b['latencyMs'] is not None else 150 + 9 * output_tokens + input_tokens // 25
+    _bedrock_wait(latency / 1000)
+    entry.update(reply=reply[:6000], stopReason=stop, inputTokens=input_tokens, outputTokens=output_tokens, latencyMs=latency)
+    return {'output': {'message': {'role': 'assistant', 'content': [{'text': reply}]}}, 'stopReason': stop,
+            'usage': {'inputTokens': input_tokens, 'outputTokens': output_tokens, 'totalTokens': input_tokens + output_tokens},
+            'metrics': {'latencyMs': latency}}
+
+
+def _bedrock_converse(client, modelId, messages=None, system=None, inferenceConfig=None, **extra):
+    for name in _BEDROCK_UNSUPPORTED:
+        if extra.get(name) is not None:
+            raise PracticeAccountError(f"The practice model doesn't support {name}. It takes modelId, messages, system and inferenceConfig.")
+    _bedrock_shape(messages, system, inferenceConfig)
+    b = _bedrock()
+    entry = {'modelId': modelId, 'region': client._region, 'messages': len(messages or []),
+             'inferenceConfig': _summary(inferenceConfig or {}), 'system': '', 'user': '', 'attempts': 0, 'error': None}
+    b['log'].append(entry)
+    allowed = _total_attempts(client.meta.config)
+    while True:
+        entry['attempts'] += 1
+        b['attempts'] += 1
+        try:
+            out = _bedrock_attempt(client, modelId, messages or [], system or [], inferenceConfig or {}, entry)
+        except ClientError as e:
+            code = e.response['Error']['Code']
+            if code in _BEDROCK_RETRYABLE and entry['attempts'] < allowed:
+                # The SDK waits and tries again by itself: 1, 2, 4... seconds after throttling, never more than 20
+                _bedrock_wait(min(20.0, _BEDROCK_RETRYABLE[code] * 2 ** (entry['attempts'] - 1)))
+                continue
+            entry['error'] = code
+            e.response['ResponseMetadata']['RetryAttempts'] = entry['attempts'] - 1
+            raise
+        out['_retries'] = entry['attempts'] - 1
+        return out
+
+
+_BEDROCK_USE_CONVERSE = 'Use converse(), as the tutorial does: one request shape that works with every model.'
+
+
+# ----------------------------------------------------------------------------
 # Service table
 # ----------------------------------------------------------------------------
 
@@ -867,6 +1293,17 @@ SERVICES = {
         'subscribe': {'fn': _sns_subscribe, 'required': ['TopicArn', 'Protocol'], 'optional': ['Endpoint', 'Attributes', 'ReturnSubscriptionArn']},
         'list_topics': {'fn': _sns_list_topics, 'optional': ['NextToken']},
         'list_subscriptions_by_topic': {'fn': _sns_list_subscriptions_by_topic, 'required': ['TopicArn'], 'optional': ['NextToken']},
+    },
+    'bedrock-runtime': {
+        'converse': {'fn': _bedrock_converse, 'required': ['modelId'],
+                     'optional': ['messages', 'system', 'inferenceConfig', 'toolConfig', 'guardrailConfig', 'additionalModelRequestFields',
+                                  'promptVariables', 'additionalModelResponseFieldPaths', 'requestMetadata', 'performanceConfig',
+                                  'serviceTier', 'outputConfig', 'projectIdentifier'],
+                     'types': {'modelId': 'str'}, 'content_type': 'application/json'},
+        'converse_stream': {'unsupported': "The practice model answers in one piece. " + _BEDROCK_USE_CONVERSE},
+        'count_tokens': {'unsupported': 'Read the token counts from a reply instead: response["usage"].'},
+        'invoke_model': {'unsupported': _BEDROCK_USE_CONVERSE},
+        'invoke_model_with_response_stream': {'unsupported': _BEDROCK_USE_CONVERSE},
     },
     'dynamodb': {
         'put_item': {'unsupported': "Use the table resource, like the tutorial: boto3.resource('dynamodb').Table('...').put_item(Item={...})."},
@@ -1059,6 +1496,11 @@ def _parse_condition(expr, names, values, op):
     return cond
 
 
+# The context boto3 serializes numbers with (boto3.dynamodb.types.DYNAMODB_CONTEXT)
+_DYNAMODB_CONTEXT = decimal.Context(Emin=-128, Emax=126, prec=38,
+                                    traps=[decimal.Clamped, decimal.Overflow, decimal.Inexact, decimal.Rounded, decimal.Underflow])
+
+
 def _store(value, path):
     """Copy a value the way DynamoDB stores it: numbers become Decimal, floats are refused."""
     if isinstance(value, bool) or value is None or isinstance(value, str):
@@ -1070,6 +1512,9 @@ def _store(value, path):
     if isinstance(value, decimal.Decimal):
         if not value.is_finite():
             raise TypeError('Infinity and NaN not supported')
+        # boto3 refuses a number DynamoDB would have to round (more than 38 digits): raises decimal.Inexact,
+        # which is what Decimal(0.1), a Decimal made from a float, runs into
+        _DYNAMODB_CONTEXT.create_decimal(value)
         return value
     if isinstance(value, (bytes, bytearray)):
         return bytes(value)
@@ -1319,6 +1764,17 @@ def install():
 # ----------------------------------------------------------------------------
 
 
+def _seed(value):
+    """A scenario's items arrive as JSON, where 0.25 is a float. In the table it's a Decimal, as if Python had stored it."""
+    if isinstance(value, float):
+        return decimal.Decimal(repr(value))
+    if isinstance(value, dict):
+        return {k: _seed(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_seed(v) for v in value]
+    return value
+
+
 def reset(scenario):
     scenario = copy.deepcopy(scenario or {})
     STATE.clear()
@@ -1342,10 +1798,38 @@ def reset(scenario):
     STATE['sns'] = {}
     for name in scenario.get('sns', []):
         STATE['sns'][f"arn:aws:sns:{STATE['region']}:{STATE['account']}:{name}"] = {'subscriptions': [], 'messages': []}
+    model = scenario.get('bedrock', {})
+    default = {'contextWindow': 128000, 'maxOutput': 10000, 'inRegion': ['us-east-1'], 'profiles': {}}
+    STATE['bedrock'] = {
+        'models': {**copy.deepcopy(BEDROCK_MODELS),
+                   **{k: {**BEDROCK_MODELS.get(k, default), **v} for k, v in model.get('models', {}).items()}},
+        'denied': list(model.get('denied', [])), 'faults': model.get('faults', []), 'quirks': model.get('quirks', []),
+        'latencyMs': model.get('latencyMs'), 'log': [], 'attempts': 0, 'streak': 0, 'seen': {},
+    }
     STATE['dynamodb'] = {}
     for name, t in scenario.get('dynamodb', {}).items():
         STATE['dynamodb'][name] = {'key': t['key'], 'types': t.get('types', {}),
-                                   'items': [{k: _store(v, k) for k, v in item.items()} for item in t.get('items', [])]}
+                                   'items': [{k: _store(_seed(v), k) for k, v in item.items()} for item in t.get('items', [])]}
+    _START.clear()
+    _START.update(checkpoint())
+
+
+_START = {}
+
+
+def checkpoint():
+    """For task checks: a copy of the account as it is now, to put back with restore()."""
+    return {'state': copy.deepcopy(STATE), 'calls': list(CALLS)}
+
+
+def restore(saved=None):
+    """For task checks: put a checkpoint() back, or with no argument, the account as the scenario started it.
+    A check can then try the learner's functions on a fresh account, whatever earlier runs did, and leave no trace."""
+    saved = saved or _START
+    state = copy.deepcopy(saved.get('state', {}))
+    STATE.clear()
+    STATE.update(state)
+    CALLS[:] = saved.get('calls', [])
 
 
 def snapshot():
@@ -1380,6 +1864,8 @@ def snapshot():
         's3': s3,
         'sns': {arn: {'messages': list(t['messages']), 'subscriptions': list(t['subscriptions'])} for arn, t in STATE.get('sns', {}).items()},
         'dynamodb': {name: plain(t['items']) for name, t in STATE.get('dynamodb', {}).items()},
+        'bedrock': {'calls': plain(STATE.get('bedrock', {}).get('log', [])[-200:]),
+                    'attempts': STATE.get('bedrock', {}).get('attempts', 0)},
         'calls': plain(CALLS[-400:]),
         'callCount': len(CALLS),
         'flags': dict(STATE.get('_flags', {})),
