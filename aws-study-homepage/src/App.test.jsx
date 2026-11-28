@@ -9,6 +9,7 @@ import { COURSES, OTHER_COURSES } from './data/courses';
 import { GIS_PAGE } from './data/gis';
 import { HERO_SLIDES } from './data/heroSlides';
 import { PROMOTIONS } from './services/offers';
+import { holdBrowserRestore } from './services/scrollRestore';
 
 // --- Boundaries -------------------------------------------------------------
 // Sign-in state comes from a fake AuthContext; each test sets what it needs.
@@ -1043,6 +1044,245 @@ describe('App', () => {
       } finally {
         restore();
       }
+    });
+  });
+
+  // While the loading screen shows, the page is too short for the browser's own scroll restore, so a reload or a
+  // Back/Forward visit used to land at the top. The page now keeps the place for each history entry itself.
+  describe('coming back to the page (reload, Back/Forward)', () => {
+    const STORE = 'hub:scrollY';
+    const html = document.documentElement;
+    let jumps;
+    let undoVisit = () => {};
+    const setScrollY = (y) => Object.defineProperty(window, 'scrollY', { configurable: true, writable: true, value: y });
+    // jsdom has no navigation timing; stand one in for the kind of visit
+    const visitType = (type) => {
+      const real = Object.getOwnPropertyDescriptor(performance, 'getEntriesByType');
+      Object.defineProperty(performance, 'getEntriesByType', {
+        configurable: true, writable: true, value: (kind) => (kind === 'navigation' ? [{ type }] : []),
+      });
+      undoVisit = () => (real ? Object.defineProperty(performance, 'getEntriesByType', real) : delete performance.getEntriesByType);
+    };
+    // Longer than the two frames + fonts + two frames the page waits before its second look
+    const settle = () => act(() => new Promise((resolve) => { setTimeout(resolve, 150); }));
+    const leave = () => act(() => { window.dispatchEvent(new Event('pagehide')); });
+    const saved = () => Object.values(JSON.parse(sessionStorage.getItem(STORE) || '{}'));
+    // Open the hub, scroll to y, leave; then come back on a visit of the given type, with the browser at the top.
+    const leaveAt = (y) => {
+      const first = render(<App />);
+      setScrollY(y);
+      leave();
+      first.unmount();
+      setScrollY(0);
+    };
+    const comeBack = (type) => {
+      visitType(type);
+      jumps.mockClear();
+      return render(<App />);
+    };
+
+    beforeEach(() => {
+      // jsdom does not scroll: record each jump and move scrollY like a browser would
+      jumps = vi.spyOn(window, 'scrollTo').mockImplementation(function scrollTo(a, b) {
+        setScrollY(typeof a === 'object' ? a.top : b);
+      });
+      // jsdom has no history.scrollRestoration either; browsers start every page on 'auto'
+      Object.defineProperty(window.history, 'scrollRestoration', { configurable: true, writable: true, value: 'auto' });
+    });
+    afterEach(() => {
+      undoVisit();
+      undoVisit = () => {};
+      setScrollY(0);
+      html.style.scrollBehavior = '';
+      delete window.history.scrollRestoration;
+    });
+
+    // When its own restore comes up short, Chrome falls back to the #section in the address and glides off there
+    it("keeps the browser's own restore out of the way meanwhile, then hands it back", async () => {
+      leaveAt(2000);
+      visitType('reload');
+      holdBrowserRestore(); // what the app does as it loads, before the page has finished parsing
+      expect(window.history.scrollRestoration).toBe('manual');
+      jumps.mockClear();
+      render(<App />);
+      expect(window.scrollY).toBe(2000);
+      await settle();
+      // Back on 'auto': the browser's restore is what makes Back between in-page #section jumps work
+      expect(window.history.scrollRestoration).toBe('auto');
+    });
+
+    it.each([
+      ['a plain visit', 'navigate', 2000],
+      ['a reload with no place saved', 'reload', null],
+    ])("leaves the browser's own restore alone on %s", (_, type, y) => {
+      if (y != null) leaveAt(y);
+      visitType(type);
+      holdBrowserRestore();
+      expect(window.history.scrollRestoration).toBe('auto');
+    });
+
+    it.each(['reload', 'back_forward'])('saves the place as the page is left and puts it back on a %s', async (type) => {
+      leaveAt(2000);
+      expect(saved()).toEqual([2000]);
+      comeBack(type);
+      // At once, before the first paint, so the top of the page never flashes up
+      expect(jumps).toHaveBeenCalledWith({ top: 2000, left: 0, behavior: 'instant' });
+      await settle();
+      expect(jumps).toHaveBeenCalledTimes(1); // the second look finds the visitor in place
+      expect(window.scrollY).toBe(2000);
+    });
+
+    it('puts the place back on the /gis/ page too', async () => {
+      go('/gis/');
+      leaveAt(900);
+      comeBack('back_forward');
+      expect(jumps).toHaveBeenCalledWith({ top: 900, left: 0, behavior: 'instant' });
+    });
+
+    it('jumps straight there, with no glide, even when the page scrolls smoothly', () => {
+      html.style.scrollBehavior = 'smooth';
+      let during = null;
+      leaveAt(1200);
+      jumps.mockImplementation(function scrollTo(a) {
+        during = html.style.scrollBehavior;
+        setScrollY(a.top);
+      });
+      comeBack('reload');
+      expect(jumps.mock.calls[0][0].behavior).toBe('instant');
+      expect(during).toBe('auto');
+      expect(html.style.scrollBehavior).toBe('smooth'); // the page's own setting comes back
+    });
+
+    it('looks again after the fonts, in case the page moved under the visitor', async () => {
+      leaveAt(2000);
+      // The first jump is undone (the browser put the page at the top again, say); the second look fixes it
+      jumps.mockImplementationOnce(() => {});
+      comeBack('reload');
+      expect(window.scrollY).toBe(0);
+      await settle();
+      expect(jumps).toHaveBeenCalledTimes(2);
+      expect(window.scrollY).toBe(2000);
+    });
+
+    it.each([
+      ['the wheel', () => new WheelEvent('wheel', { deltaY: 120 })],
+      ['a touch drag', () => new Event('touchmove')],
+      ['a press on the scrollbar', () => new MouseEvent('mousedown')],
+      ['Page Down', () => new KeyboardEvent('keydown', { key: 'PageDown' })],
+      ['the space bar', () => new KeyboardEvent('keydown', { key: ' ' })],
+    ])('stops once the visitor scrolls themselves (%s)', async (_, event) => {
+      leaveAt(2000);
+      jumps.mockImplementationOnce(() => {});
+      comeBack('reload');
+      act(() => { window.dispatchEvent(event()); });
+      await settle();
+      expect(jumps).toHaveBeenCalledTimes(1); // no second jump over the visitor's own scrolling
+    });
+
+    it('a key that does not scroll (Tab) does not count as scrolling', async () => {
+      leaveAt(2000);
+      jumps.mockImplementationOnce(() => {});
+      comeBack('reload');
+      act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' })); });
+      await settle();
+      expect(jumps).toHaveBeenCalledTimes(2);
+    });
+
+    it('does nothing when the browser already put the visitor back', async () => {
+      leaveAt(2000);
+      setScrollY(2000);
+      comeBack('reload');
+      await settle();
+      expect(jumps).not.toHaveBeenCalled();
+    });
+
+    it('leaves a plain visit (a link, a typed address) at the top, even with a place saved', async () => {
+      leaveAt(2000);
+      comeBack('navigate');
+      await settle();
+      expect(jumps).not.toHaveBeenCalled();
+    });
+
+    it('does nothing on a return visit with no place saved', async () => {
+      comeBack('reload');
+      await settle();
+      expect(jumps).not.toHaveBeenCalled();
+    });
+
+    it('keeps a place for each history entry, even two with the same address', async () => {
+      const page = render(<App />);
+      setScrollY(2000);
+      leave();
+      // A new entry for the same page (an in-page link, here back to the same address), left further up
+      window.history.pushState({}, '', '/');
+      act(() => { window.dispatchEvent(new Event('hashchange')); });
+      setScrollY(500);
+      leave();
+      expect(saved().sort()).toEqual([2000, 500].sort());
+      // Back to the first entry, then reload it: it gets its own place, not the newer one
+      await act(() => new Promise((resolve) => {
+        window.addEventListener('popstate', resolve, { once: true });
+        window.history.back();
+      }));
+      page.unmount();
+      setScrollY(0);
+      comeBack('reload');
+      expect(jumps).toHaveBeenCalledWith({ top: 2000, left: 0, behavior: 'instant' });
+    });
+
+    it('forgets the place when the page is left from Settings, which a reload does not reopen', async () => {
+      signIn();
+      leaveAt(2000);
+      const page = render(<App />);
+      await userEvent.click(within(header()).getByRole('button', { name: 'Settings' }));
+      setScrollY(700);
+      leave();
+      expect(saved()).toEqual([]);
+      page.unmount();
+      setScrollY(0);
+      comeBack('reload');
+      await settle();
+      expect(jumps).not.toHaveBeenCalled();
+    });
+
+    it('never keeps more than 30 places', () => {
+      const old = Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`old${i}`, i]));
+      sessionStorage.setItem(STORE, JSON.stringify(old));
+      leaveAt(2000);
+      const store = JSON.parse(sessionStorage.getItem(STORE));
+      expect(Object.keys(store)).toHaveLength(30);
+      expect(Object.values(store)).toContain(2000); // this page's place is the newest, so it stays
+      expect(store.old0).toBeUndefined(); // the oldest go first
+    });
+
+    it('carries on without a fuss when the browser blocks storage', async () => {
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('blocked', 'SecurityError'); });
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new DOMException('blocked', 'SecurityError'); });
+      expect(() => leaveAt(2000)).not.toThrow();
+      comeBack('reload');
+      await settle();
+      expect(jumps).not.toHaveBeenCalled();
+      expect(screen.getByRole('main')).toBeInTheDocument();
+    });
+
+    describe('#readiness in the address', () => {
+      const readinessWait = () => act(() => new Promise((resolve) => { setTimeout(resolve, 400); }));
+
+      it('a plain visit still scrolls to the readiness check', async () => {
+        go('/#readiness');
+        visitType('navigate');
+        render(<App />);
+        await readinessWait();
+        expect(jumps).toHaveBeenCalled();
+      });
+
+      it.each(['reload', 'back_forward'])('a %s does not pull the visitor back up to the check', async (type) => {
+        go('/#readiness');
+        leaveAt(3000);
+        comeBack(type);
+        await readinessWait();
+        expect(jumps.mock.calls.map(([a]) => a.top)).toEqual([3000]);
+      });
     });
   });
 });

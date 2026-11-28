@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { submitReadiness, unsubscribe, track } from '../services/leads';
 import { currentPromotion } from '../services/offers';
 import { onThisName } from '../config/auth.config';
+import { isReturnVisit } from '../services/scrollRestore';
 import { ArrowRightIcon, TargetIcon, MailIcon } from './Icons';
 import './ReadinessCheck.css';
 
@@ -114,12 +115,13 @@ const ReadinessCheck = () => {
   };
 
   // ?check=<cert id> (from shared scores) opens the check for that cert;
-  // #readiness links (the hero button) land below the sticky header
+  // #readiness links (the hero button) land below the sticky header. Not on a reload or Back/Forward: the address
+  // still says #readiness long after the visitor scrolled on, and the page puts them back where they were instead.
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get('check');
     const c = CERTS.find((x) => x.id === id);
     if (c) start(c);
-    else if (window.location.hash === '#readiness') setTimeout(scrollToCheck, 300);
+    else if (window.location.hash === '#readiness' && !isReturnVisit()) setTimeout(scrollToCheck, 300);
     const onHash = () => window.location.hash === '#readiness' && setTimeout(scrollToCheck, 0);
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
