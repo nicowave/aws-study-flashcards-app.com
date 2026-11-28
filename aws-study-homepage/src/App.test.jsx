@@ -9,7 +9,7 @@ import { COURSES, OTHER_COURSES } from './data/courses';
 import { GIS_PAGE } from './data/gis';
 import { HERO_SLIDES } from './data/heroSlides';
 import { PROMOTIONS } from './services/offers';
-import { holdBrowserRestore } from './services/scrollRestore';
+import { holdBrowserRestore, letGo } from './services/scrollRestore';
 
 // --- Boundaries -------------------------------------------------------------
 // Sign-in state comes from a fake AuthContext; each test sets what it needs.
@@ -1224,13 +1224,105 @@ describe('App', () => {
       expect(jumps).toHaveBeenCalledTimes(1); // no second jump over the visitor's own scrolling
     });
 
-    it('a key that does not scroll (Tab) does not count as scrolling', async () => {
+    // Moving focus can scroll the focused element into view; pulling the page back would hide it again
+    it("stops at a Tab press too, so a keyboard visitor's focus is never pulled out of view", async () => {
       leaveAt(2000);
       jumps.mockImplementationOnce(() => {});
       comeBack('reload');
       act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' })); });
       await settle();
-      expect(jumps).toHaveBeenCalledTimes(2);
+      expect(jumps).toHaveBeenCalledTimes(1);
+    });
+
+    // Safari on iOS 27 slides the page by itself a moment after a reload, after the second look
+    describe('holding the place for a moment', () => {
+      const slide = (y) => act(() => {
+        setScrollY(y);
+        window.dispatchEvent(new Event('scroll'));
+      });
+
+      it('undoes a slide the visitor did not make, after the second look', async () => {
+        leaveAt(2000);
+        comeBack('reload');
+        await settle();
+        jumps.mockClear();
+        slide(2052);
+        expect(jumps).toHaveBeenCalledWith({ top: 2000, left: 0, behavior: 'instant' });
+        expect(window.scrollY).toBe(2000);
+        slide(7600); // all the way to the #section in the address
+        expect(window.scrollY).toBe(2000);
+      });
+
+      it('undoes one that comes before the second look too', () => {
+        leaveAt(2000);
+        comeBack('back_forward');
+        jumps.mockClear();
+        slide(2030);
+        expect(window.scrollY).toBe(2000);
+      });
+
+      it.each([
+        ['the wheel', () => new WheelEvent('wheel', { deltaY: 120 })],
+        ['a touch', () => new Event('touchstart')],
+        ['a tap or click', () => new Event('pointerdown')],
+        ['any key', () => new KeyboardEvent('keydown', { key: 'Tab' })],
+        ['a #section link', () => new HashChangeEvent('hashchange')],
+      ])('lets go the moment the visitor acts (%s)', async (_, event) => {
+        leaveAt(2000);
+        comeBack('reload');
+        await settle();
+        act(() => { window.dispatchEvent(event()); });
+        jumps.mockClear();
+        slide(2600);
+        expect(jumps).not.toHaveBeenCalled();
+        expect(window.scrollY).toBe(2600);
+      });
+
+      it('lets go when focus moves (a screen reader or a script focusing a field)', async () => {
+        leaveAt(2000);
+        comeBack('reload');
+        await settle();
+        act(() => { document.body.dispatchEvent(new FocusEvent('focusin', { bubbles: true })); });
+        jumps.mockClear();
+        slide(2600);
+        expect(jumps).not.toHaveBeenCalled();
+      });
+
+      it('lets go when the app scrolls on purpose (the readiness check bringing itself into view)', async () => {
+        leaveAt(2000);
+        comeBack('reload');
+        await settle();
+        letGo();
+        jumps.mockClear();
+        slide(3400);
+        expect(jumps).not.toHaveBeenCalled();
+      });
+
+      it('lets go after two seconds', async () => {
+        leaveAt(2000);
+        comeBack('reload');
+        await act(() => new Promise((resolve) => { setTimeout(resolve, 2100); }));
+        jumps.mockClear();
+        slide(2600);
+        expect(jumps).not.toHaveBeenCalled();
+      });
+
+      it('lets go when the page goes away', () => {
+        leaveAt(2000);
+        const page = comeBack('reload');
+        page.unmount();
+        jumps.mockClear();
+        slide(2600);
+        expect(jumps).not.toHaveBeenCalled();
+      });
+
+      it('holds nothing on a plain visit', async () => {
+        leaveAt(2000);
+        comeBack('navigate');
+        await settle();
+        slide(2600);
+        expect(jumps).not.toHaveBeenCalled();
+      });
     });
 
     it('does nothing when the browser already put the visitor back', async () => {

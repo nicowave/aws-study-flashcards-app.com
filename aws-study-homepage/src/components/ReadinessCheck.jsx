@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { submitReadiness, unsubscribe, track } from '../services/leads';
 import { currentPromotion } from '../services/offers';
 import { onThisName } from '../config/auth.config';
-import { isReturnVisit } from '../services/scrollRestore';
+import { isReturnVisit, letGo } from '../services/scrollRestore';
 import { ArrowRightIcon, TargetIcon, MailIcon } from './Icons';
 import './ReadinessCheck.css';
 
@@ -95,6 +95,7 @@ const ReadinessCheck = () => {
     if (!el) return;
     const header = document.querySelector('header');
     const offset = header && getComputedStyle(header).position === 'sticky' ? header.offsetHeight : 0;
+    letGo(); // a shared score reloaded: the page may still be holding the visitor's old place; this scroll wins
     // No behavior given: the page's scroll-behavior decides, smooth unless the visitor asked for reduced motion
     window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset });
   });

@@ -14,7 +14,8 @@ import HeroRotator from './components/HeroRotator';
 import GisPage from './components/GisPage';
 import { captureSource } from './services/leads';
 import {
-  isReturnVisit, tagEntry, saveScroll, savedScroll, jumpTo, watchVisitor, holdBrowserRestore, releaseBrowserRestore,
+  isReturnVisit, tagEntry, saveScroll, savedScroll, jumpTo, watchVisitor, holdPlace, holdBrowserRestore,
+  releaseBrowserRestore,
 } from './services/scrollRestore';
 import {
   CloudIcon,
@@ -1122,7 +1123,8 @@ function HomepageContent() {
   // A reload or Back/Forward puts the visitor back where they were. The browser tries this itself, but while the
   // loading screen shows the page is too short, so it lands at the top (see services/scrollRestore.js). We save the
   // place as the page is left and put it back once the sections are drawn, unless the visitor has moved meanwhile;
-  // the browser is kept out of the way until then (holdBrowserRestore at the top of this file).
+  // the browser is kept out of the way until then (holdBrowserRestore at the top of this file). For two seconds
+  // after that the place is held, because Safari on iOS 27 slides the page off it by itself (holdPlace).
   const viewRef = useRef(currentPage);
   viewRef.current = currentPage;
   useLayoutEffect(() => {
@@ -1136,13 +1138,16 @@ function HomepageContent() {
 
     let cancelled = false;
     let visitor = null;
+    let hold = null;
     const saved = isReturnVisit() ? savedScroll() : null;
     if (saved > 0) {
       visitor = watchVisitor();
       const putBack = () => {
-        if (!cancelled && !visitor.moved() && Math.abs(window.scrollY - saved) > 1) jumpTo(saved);
+        if (cancelled || visitor.moved() || hold?.interrupted()) return;
+        if (Math.abs(window.scrollY - saved) > 1) jumpTo(saved);
       };
       putBack(); // before the first paint, so the top of the page never flashes up
+      hold = holdPlace(saved); // undoes any scroll the visitor did not make, until they act or two seconds pass
       // Once more after the web fonts: they can rewrap the header and the text, which moves the page under us
       const twoFrames = (fn) => requestAnimationFrame(() => requestAnimationFrame(fn));
       twoFrames(() => Promise.resolve(document.fonts?.ready).then(() => twoFrames(() => {
@@ -1156,6 +1161,7 @@ function HomepageContent() {
     return () => {
       cancelled = true;
       visitor?.stop();
+      hold?.stop();
       releaseBrowserRestore();
       window.removeEventListener('hashchange', tagEntry);
       window.removeEventListener('hub:locationchange', tagEntry);
