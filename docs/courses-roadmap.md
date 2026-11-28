@@ -73,7 +73,7 @@ Comparable courses also cover, and this one does not yet: automated tests; array
 | 7 | **Design the data: one table, many questions**: keys, `Query`, an index, pages with `LastEvaluatedKey`, shaping results with `map`/`filter`/`reduce` | Tutorials 3–4 use DynamoDB one item at a time; real apps need modelling, and array methods get a full workout | `QueryCommand` with a global secondary index and paging in the pretend DynamoDB (to confirm what exists) |
 | 8 | **The weekly digest**: a scheduled Lambda that reads the week's activity and emails each person a summary | Scheduled, no-user-waiting code is the other half of serverless; uses modules, dates and SES together | A scheduled (EventBridge Scheduler) event for `invoke`; SES exists. Probably small |
 
-Not planned for December: React. It is a course-sized topic and needs engine work (JSX, a bundler); proposed as a 2027 course of its own rather than a tutorial.
+React is not a tutorial here: it is a course of its own, decided 2026-11-28 (see "React for AWS" below).
 
 ### TypeScript for AWS — finished at 7 tutorials
 
@@ -98,6 +98,25 @@ All 8 modules and Start here are written. What is left is the launch, in `docs/l
 - [ ] **Owner:** share image, `./deploy.sh hub`, `./deploy.sh spanish`
 - [ ] **Code, after the owner's steps:** flip `live: true` (hub `courses.js`, `courseSites.js`, `llms.txt`), as step 5 of the launch doc says
 
+### React for AWS — a new course, 2027 or earlier
+
+Decided by the owner on 2026-11-28: React becomes its own course, in 2027 or sooner if December allows. It follows JavaScript for AWS (and uses TypeScript for AWS where types help), for the learner who can build a page and an API and now needs what most front-end job postings ask for.
+
+Nothing is written yet, and the outline below is a first proposal, not a plan the owner has seen.
+
+| # | Tutorial (proposed) | Why |
+|---|---|---|
+| 1 | The flashcard page again, as components (free) | Same app the learner already built, so the only new thing is React: JSX, props, state |
+| 2 | Data from an API: effects, loading and error states | The status dashboard's lessons, the React way |
+| 3 | Forms, sign-in with Cognito and protected pages | What every real app has |
+| 4 | Ship it: build, S3 + CloudFront, a pipeline | Hosting a single-page app is where AWS comes in (routing fallbacks, cache rules) |
+
+**What it needs before a tutorial can be written:**
+
+- **Code:** a `react` practice runtime. Today's web runtime runs classic scripts only (no modules, no JSX), so this means compiling JSX in the browser (the TypeScript compiler already in the engine can do it) and loading React into the sandboxed page, with the same probe and check shape as `web`. This is the largest engine job on this page; the first step is a short trial to find out how large.
+- **Code:** a course folder, site id and plan wired the way Tech Spanish was (backend lists, `deploy.sh`, hub card as "coming soon").
+- **Owner:** the name (`react.`), the site (`create-course-site.mjs`), Stripe prices, `cdk deploy`, deploys.
+
 ## Priority order
 
 One tutorial per pull request, top to bottom. If December runs out, what is above the line reached is done and the rest carries into January. Twelve tutorials is more than four weeks will hold at three passes each (author, independent tester, fact-checking reviewer); **a realistic reach is the first six to eight.**
@@ -120,6 +139,7 @@ Rules behind the order: the biggest gap against comparable courses first (testin
 | 11 | Python 8: Your own tool, packaged | Python | arguments for a run | [ ] |
 | 12 | Bash 8: Watch the logs from your desk | Bash | pretend `aws logs`, `trap` | [ ] |
 | 13 | JavaScript 8: The weekly digest | JavaScript | scheduled event | [ ] |
+| 14 | React for AWS: trial of the `react` practice runtime, then the outline for the owner | React (new) | JSX + React in the web runtime | [ ] moves up if the owner wants React before the tutorials above |
 
 ## With every tutorial
 
@@ -138,7 +158,8 @@ Each tutorial's pull request also carries, or says why not:
 - [ ] **Deploy after each merged tutorial:** `./deploy.sh bash|python|js|typescript`, and `./deploy.sh hub` when the hub's counts changed. Nothing in a cloud session can deploy.
 - [ ] **Tech Spanish launch:** steps 1–4 of `docs/launch-tech-spanish.md` (listed above).
 - [ ] **Priorities:** change the order above if it is wrong.
-- [ ] **React:** say whether a React course belongs in the 2027 plan.
+- [x] **React:** yes, as its own course, 2027 or earlier (2026-11-28).
+- [ ] **React, where in the order:** it sits at 14, after the tutorials. Move it up in the table if it should displace some of them in December.
 
 ## Not courses, kept here so nothing is lost
 
@@ -150,3 +171,4 @@ From CLAUDE.md, "Open work". Both belong to the certification games and come aft
 ## Log
 
 - 2026-11-28: tracker written. Surveyed `main` and the last 15 pull requests: no in-flight tutorial has landed.
+- 2026-11-28: roadmap merged (#98). Owner decided React becomes its own course, 2027 or earlier; added as item 14. Python 6 and the Tech Spanish pre-launch read started.
