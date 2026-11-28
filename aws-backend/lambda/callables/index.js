@@ -116,6 +116,53 @@ const promotionFor = (plan, now = Date.now()) => {
   const promo = PROMOTIONS.find((p) => now >= p.start && now < p.end);
   return promo ? { name: promo.name, coupon: promo.coupons[plan] || promo.coupons.default } : null;
 };
+
+// Sales tax through Stripe Tax, on every checkout. Stripe works the tax out from the buyer's
+// address and the product's tax code, and charges it only where the account is registered to
+// collect. The subscription Checkout makes keeps automatic tax on, so every renewal is taxed
+// the same way, from the address saved on the customer. Whether $11 means "$11 plus tax" or
+// "$11 including tax" is the default tax behavior in Stripe's Tax settings: our prices carry
+// none on purpose, so that one setting decides for all of them.
+const CHECKOUT_TAX = {
+  automatic_tax: { enabled: true },
+  // "auto": Checkout asks for as much of the address as the tax needs and no more. Maryland and
+  // DC each have one rate, so a ZIP code places a buyer; "required" would make every buyer type a
+  // full street address for nothing. Revisit if the account registers where local rates differ.
+  billing_address_collection: "auto",
+  // Checkout creates customers with an email only. Save the address it collects (renewals are
+  // taxed from it, and Stripe refuses automatic tax for a customer without one) and the name.
+  customer_update: { address: "auto", name: "auto" },
+  // A business buyer can add its legal name and tax ID, printed on its invoices
+  tax_id_collection: { enabled: true },
+};
+// Errors where Stripe looked at the request and refused it, as opposed to an outage or timeout
+const REFUSED = ["StripeInvalidRequestError", "StripePermissionError"];
+
+/**
+ * Creates the Checkout Session with sales tax on. A Stripe Tax setup problem (Tax not active, no
+ * default tax behavior for our prices, a key without a permission) must never block a sale, so if
+ * Stripe refuses the taxed session and the same session without tax works, the buyer checks out
+ * without tax. The subscription is tagged salesTax=off (findable in the Dashboard) and the log
+ * says SALES TAX OFF. Any other failure, or one the untaxed session repeats, is thrown as it was.
+ */
+async function createTaxedCheckout(stripe, params, uid) {
+  try {
+    return await stripe.checkout.sessions.create({ ...params, ...CHECKOUT_TAX });
+  } catch (err) {
+    if (!REFUSED.includes(err?.type)) throw err;
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        ...params,
+        subscription_data: { ...params.subscription_data, metadata: { ...params.subscription_data?.metadata, salesTax: "off" } },
+      });
+    } catch {
+      throw err;
+    }
+    console.error(`[billing] SALES TAX OFF for a checkout (uid=${uid}): Stripe refused automatic tax:`, err.message);
+    return session;
+  }
+}
 /** The plan a Stripe price belongs to (current or legacy), or null. */
 const planForPrice = (priceId) => {
   if (!priceId) return null;
@@ -551,18 +598,18 @@ async function createCheckoutSession(data, user, stripe) {
   if (promo) {
     try {
       const { allow_promotion_codes: _codes, ...withoutCodes } = params;
-      const session = await stripe.checkout.sessions.create({
-        ...withoutCodes,
-        discounts: [{ coupon: promo.coupon }],
-        metadata: { ...params.metadata, promotion: promo.name },
-      });
+      const session = await createTaxedCheckout(
+        stripe,
+        { ...withoutCodes, discounts: [{ coupon: promo.coupon }], metadata: { ...params.metadata, promotion: promo.name } },
+        uid
+      );
       return { url: session.url };
     } catch (err) {
       // An expired or mistyped coupon must never block a sale: charge full price
       console.error(`[billing] ${promo.coupon} not applied for ${plan}:`, err.message);
     }
   }
-  const session = await stripe.checkout.sessions.create(params);
+  const session = await createTaxedCheckout(stripe, params, uid);
   return { url: session.url };
 }
 
@@ -704,6 +751,8 @@ exports._test = {
   syncCustomerEntitlements,
   planForPrice,
   PRICES,
+  PROMOTIONS,
+  CHECKOUT_TAX,
   resetSwitchConfiguration: () => {
     switchConfigPromise = null;
   },

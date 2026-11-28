@@ -22,17 +22,23 @@
  *      { plan: 'all-access', interval: 'year' }. The old $39 price stays (move people with
  *      scripts/migrate-pro-price.mjs).
  *   3. Customer Portal. The default configuration ("Manage billing"): cancel at period end, invoice
- *      history, and NO plan switching (its product list would let a subscriber move to any other
- *      product). A second configuration tagged metadata.purpose=interval-switch lists each product's
+ *      history, NO plan switching (its product list would let a subscriber move to any other
+ *      product), and members may change their email, billing address and tax ID (renewals are taxed
+ *      from the saved address). A second configuration tagged metadata.purpose=interval-switch lists each product's
  *      monthly and yearly price (prorated; yearly to monthly waits for the end of the paid year); the
  *      backend uses it only for the monthly -> yearly confirm link, which shows that one change.
  *   4. Adds customer.subscription.created to the existing webhook endpoint (URL ending /stripe/webhook).
  *      It never creates an endpoint: the signing secret lives in the backend's secret.
- *   5. Prints the aws-backend/.env lines.
+ *   5. Checks Stripe Tax, read only: active, a default tax behavior chosen (our prices set none, so
+ *      that one setting decides "plus tax" or "tax included" for all of them), and where the account
+ *      is registered to collect. Without these, checkout sells without sales tax. It never changes
+ *      them: they are Dashboard settings and the tax behavior is the owner's decision.
+ *   6. Prints the aws-backend/.env lines.
  *
  * The key is read from the environment only and never printed. The setup key needs write access to
- * Products, Prices, Billing Portal and Webhook Endpoints (the account's standard secret key has them);
- * the backend's runtime key stays the restricted one (scripts/update-stripe-key.sh).
+ * Products, Prices, Billing Portal and Webhook Endpoints, and read access to Tax settings and
+ * registrations (the account's standard secret key has them); the backend's runtime key stays the
+ * restricted one (scripts/update-stripe-key.sh).
  */
 import { createRequire } from 'node:module'
 import { existsSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs'
@@ -66,6 +72,8 @@ const WEBHOOK_PATH = /\/stripe\/webhook\/?$/
 const HUB_URL = 'https://aws-study-flashcards-app.com'
 // The backend finds the switch configuration by this tag (callables/index.js, SWITCH_PORTAL_PURPOSE)
 export const SWITCH_PORTAL_PURPOSE = 'interval-switch'
+// What members may change in Manage billing. The address matters for sales tax: renewals use it.
+export const PORTAL_CUSTOMER_UPDATES = ['email', 'address', 'tax_id']
 export const ACTIVE = ['active', 'trialing', 'past_due'] // same list as the callables Lambda
 
 export const envName = (p, interval) => `STRIPE_PRICE_${p.env}_${interval === 'month' ? 'MONTHLY' : 'YEARLY'}`
@@ -268,13 +276,17 @@ export async function setup({ stripe, apply = false, archiveLegacy = false, know
     const price = tagged || candidates[0]
     if (price) {
       ok(`${label}: ${price.id}`)
+      taxBehaviors.push(price.tax_behavior || 'unspecified')
       if (!tagged) {
         await change(`tag ${price.id} with metadata plan=${spec.plan} interval=${interval}`, () =>
           stripe.prices.update(price.id, { metadata: { plan: spec.plan, interval } }))
       }
       return price.id
     }
+    taxBehaviors.push('unspecified')
     const created = await change(`create price ${label} on ${product?.id || `the new "${spec.name}" product`}`, () =>
+      // No tax_behavior on purpose: the default in Stripe's Tax settings decides for every price
+      // ("plus tax" or "tax included"), and once set on a price it can never be changed.
       stripe.prices.create({
         product: product.id,
         currency: 'usd',
@@ -289,6 +301,7 @@ export async function setup({ stripe, apply = false, archiveLegacy = false, know
   const env = {}
   const legacy = [] // { price, why } to archive with --archive-legacy
   const portalProducts = []
+  const taxBehaviors = [] // each sold price's own tax_behavior, 'unspecified' when the Tax default decides
 
   // 1. Products
   for (const spec of PRODUCTS) {
@@ -299,6 +312,7 @@ export async function setup({ stripe, apply = false, archiveLegacy = false, know
       env[envName(spec, 'year')] = null
       log(`  WOULD create price ${spec.plan} ${dollars(PRODUCT_MONTHLY_CENTS)}/month and ${dollars(PRODUCT_YEARLY_CENTS)}/year`)
       changes += 2
+      taxBehaviors.push('unspecified', 'unspecified')
       continue
     }
     if (!product) continue
@@ -330,7 +344,7 @@ export async function setup({ stripe, apply = false, archiveLegacy = false, know
     }
   } else {
     env[proName] = null
-    if (!apply) { log(`  WOULD create price all-access ${dollars(PRO_YEARLY_CENTS)}/year`); changes++ }
+    if (!apply) { log(`  WOULD create price all-access ${dollars(PRO_YEARLY_CENTS)}/year`); changes++; taxBehaviors.push('unspecified') }
   }
 
   // Developer Path: no longer sold. Its owners keep access through PURCHASE# rows and BUNDLES.
@@ -360,18 +374,23 @@ export async function setup({ stripe, apply = false, archiveLegacy = false, know
     invoice_history: { enabled: true },
   }
   const [current] = (await stripe.billingPortal.configurations.list({ is_default: true, limit: 1 })).data
+  // Members can correct their billing address and add a tax ID: renewals are taxed from the saved
+  // address. Anything else the portal already lets them change stays.
+  const customerUpdate = (have = []) => ({ enabled: true, allowed_updates: [...new Set([...have, ...PORTAL_CUSTOMER_UPDATES])] })
   if (!current) {
-    await change('create the default Customer Portal configuration (cancel at period end, invoices, no plan switching)', () =>
+    await change('create the default Customer Portal configuration (cancel at period end, invoices, no plan switching, address and tax ID updates)', () =>
       stripe.billingPortal.configurations.create({
         business_profile: businessProfile,
         default_return_url: HUB_URL,
-        features: { ...wantDefault, customer_update: { enabled: true, allowed_updates: ['email'] } },
+        features: { ...wantDefault, customer_update: customerUpdate() },
       }))
   } else if (defaultPortalMatches(current.features)) {
-    ok(`${current.id} (default) cancels at period end, shows invoices, has no plan switching`)
+    ok(`${current.id} (default) cancels at period end, shows invoices, has no plan switching, lets members update address and tax ID`)
   } else {
-    await change(`update portal ${current.id} (default): cancel at period end, invoice history, turn plan switching off`, () =>
-      stripe.billingPortal.configurations.update(current.id, { features: wantDefault }))
+    await change(`update portal ${current.id} (default): cancel at period end, invoice history, no plan switching, address and tax ID updates`, () =>
+      stripe.billingPortal.configurations.update(current.id, {
+        features: { ...wantDefault, customer_update: customerUpdate(current.features?.customer_update?.allowed_updates) },
+      }))
   }
 
   // Only reached through the monthly -> yearly confirm link, which shows the one change it names
@@ -419,14 +438,49 @@ export async function setup({ stripe, apply = false, archiveLegacy = false, know
       stripe.webhookEndpoints.update(ep.id, { enabled_events: [...events, WEBHOOK_EVENT] }))
   }
 
+  // 6. Stripe Tax: read only. Checkout asks for sales tax on every sale; without these settings it
+  // sells without tax (the backend falls back rather than block a sale). Dashboard → Settings → Tax.
+  log('\nStripe Tax')
+  let taxSettings = null
+  let registrations = []
+  try {
+    taxSettings = await stripe.tax.settings.retrieve()
+    registrations = await listAll((p) => stripe.tax.registrations.list({ ...p, status: 'active' }))
+  } catch (err) {
+    problems.push(`Could not read the Stripe Tax settings (${scrub(err.message)}): check Dashboard → Settings → Tax by hand.`)
+  }
+  if (taxSettings) {
+    if (taxSettings.status === 'active') ok('Stripe Tax is active')
+    else problems.push(`Stripe Tax is ${taxSettings.status || 'not set up'}, not active: checkout sells without sales tax until it is (Dashboard → Settings → Tax).`)
+    const behavior = taxSettings.defaults?.tax_behavior
+    if (behavior) ok(`default tax behavior: ${TAX_BEHAVIOR_WORDS[behavior] || behavior}`)
+    else problems.push('Stripe Tax has no default tax behavior, and our prices set none: checkout sells without sales tax until one is chosen (Dashboard → Settings → Tax → Include tax in prices).')
+    const places = registrations.map((r) => [r.country, r.country_options?.[r.country?.toLowerCase()]?.state].filter(Boolean).join('-'))
+    if (places.length) ok(`registered to collect in ${places.join(', ')}`)
+    else problems.push('No active Stripe Tax registration: checkout charges no sales tax anywhere (Dashboard → Tax → Registrations).')
+  }
+  const own = taxBehaviors.filter((b) => b !== 'unspecified').length
+  log(`  note  ${taxBehaviors.length - own} of ${taxBehaviors.length} prices follow the default tax behavior${own ? `, ${own} set their own` : ''}.` +
+    ' Stripe\'s tool that turns tax on for existing subscriptions needs it set on each price (docs/stripe-setup.md).')
+
   return { env, problems, changes }
 }
 
-/** True when the default portal cancels at period end, shows invoices and cannot switch plans. */
+// Stripe Tax's default tax behavior, in the words the Dashboard and the sites use
+const TAX_BEHAVIOR_WORDS = {
+  exclusive: 'exclusive (tax added on top of the price)',
+  inclusive: 'inclusive (tax included in the price)',
+  inferred_by_currency: 'automatic (USD prices: tax added on top)',
+}
+
+/** True when the default portal cancels at period end, shows invoices, cannot switch plans and lets
+ * members update their billing address and tax ID. */
 function defaultPortalMatches(features) {
   return features?.subscription_update?.enabled === false &&
     features.subscription_cancel?.enabled === true && features.subscription_cancel?.mode === 'at_period_end' &&
-    features.invoice_history?.enabled === true
+    features.invoice_history?.enabled === true &&
+    features.customer_update?.enabled === true &&
+    PORTAL_CUSTOMER_UPDATES.every((u) => features.customer_update.allowed_updates?.includes(u))
 }
 
 /** True when the switch portal already has what `want` asks for (product order does not matter). */

@@ -40,7 +40,9 @@ The Lambda uses a **restricted key** (`rk_live_…`) with only:
 | Subscriptions | Read |
 | Customer portal | Write |
 
-Swap it with `./scripts/update-stripe-key.sh` (asks for the key without echoing it, saves it into the secret, restarts the Lambda). The setup and migration scripts need more (Products, Prices, Billing Portal configuration, Webhook Endpoints): give them the account's standard secret key (`sk_live_…`) in the shell environment for that run only.
+Swap it with `./scripts/update-stripe-key.sh` (asks for the key without echoing it, saves it into the secret, restarts the Lambda). The setup and migration scripts need more (Products, Prices, Billing Portal configuration, Webhook Endpoints, and read access to Tax settings and registrations): give them the account's standard secret key (`sk_live_…`) in the shell environment for that run only.
+
+Sales tax adds no permission: Stripe asks only for write access to the object that carries `automatic_tax` (Checkout Sessions), and Checkout itself saves the address and tax ID onto the customer. If a refusal ever names a permission, checkout still sells (without tax, see below) and the log names it; add that permission to the key.
 
 ## Webhook
 
@@ -53,7 +55,7 @@ The signing secret (`whsec_…`) is `stripeWebhookSecret` in `study-hub/billing`
 
 ## Customer portal
 
-`stripe-subscription-setup.mjs --apply` configures two portal configurations. The default one ("Manage billing", `createPortalSession`, linked from every app that sells): cancel at period end, invoice history, and no plan switching, because its product list would let a subscriber move to any other product while access followed the old one. A second configuration tagged `metadata.purpose=interval-switch` lists each product's monthly and yearly price (prorated; yearly to monthly waits for the end of the paid year); checkout uses it only for the monthly -> yearly confirm link, which shows just that change. Entitlements read the plan from the subscription's price first, so a changed price always wins over stale metadata.
+`stripe-subscription-setup.mjs --apply` configures two portal configurations. The default one ("Manage billing", `createPortalSession`, linked from every app that sells): cancel at period end, invoice history, email, billing address and tax ID updates (renewals are taxed from the saved address), and no plan switching, because its product list would let a subscriber move to any other product while access followed the old one. A second configuration tagged `metadata.purpose=interval-switch` lists each product's monthly and yearly price (prorated; yearly to monthly waits for the end of the paid year); checkout uses it only for the monthly -> yearly confirm link, which shows just that change. Entitlements read the plan from the subscription's price first, so a changed price always wins over stale metadata.
 
 ## How checkout behaves
 
@@ -64,7 +66,27 @@ The signing secret (`whsec_…`) is `stripeWebhookSecret` in `study-hub/billing`
 - Refuses when the same email has it under another sign-in (Google vs password).
 - `returnUrl` is honoured only if it is in `ALLOWED_ORIGINS`, else the old hub.
 - Sales: `PROMOTIONS` applies a Stripe coupon automatically during its window (display copies in each app's `src/services/offers.js`).
+- Sales tax on every session, sale price included (`CHECKOUT_TAX`): see Sales tax below.
 - Metadata `{ firebaseUID, plan, interval }` goes on the session and the subscription (`firebaseUID` is our user id; the name predates AWS).
+
+## Sales tax
+
+Every Checkout Session asks Stripe Tax to add sales tax (`CHECKOUT_TAX` in `callables/index.js`):
+
+- `automatic_tax: { enabled: true }`. Stripe works the tax out from the buyer's address and the product's tax code (every Study Hub product carries `txcd_10000000`, digital), and charges it only where the account has an active registration (Maryland and DC today). The subscription keeps automatic tax, so **every renewal is taxed** too, from the address saved on the customer.
+- `billing_address_collection: 'auto'`: Checkout asks for as much address as the tax needs. Maryland and DC each have one rate, so a ZIP code is enough; `'required'` would make every buyer type a street address for nothing. Switch to `'required'` if the account registers where local rates differ inside a ZIP code.
+- `customer_update: { address: 'auto', name: 'auto' }`: checkout creates customers with an email only, so this saves the address (and name) Checkout collects. Stripe refuses automatic tax for an existing customer without a saved address unless this is set.
+- `tax_id_collection: { enabled: true }`: a business buyer can add its legal name and tax ID, printed on its invoices. In the US this changes no tax; an exemption is set by hand on the customer (`tax_exempt`) after the accountant has the certificate.
+
+Prices carry no `tax_behavior` on purpose: the default in Dashboard → Settings → Tax ("Include tax in prices") decides whether $11 means $11 plus tax (exclusive, what "Automatic" picks for USD) or $11 including tax (inclusive), for every price at once. Once set on a price, a tax behavior can never be changed.
+
+**Never blocks a sale.** If Stripe refuses the taxed session (Tax not active, no default tax behavior, a missing key permission) and the same session without tax works, the buyer checks out without tax. The subscription gets `metadata.salesTax = off` (Dashboard search: `metadata["salesTax"]:"off"`) and CloudWatch logs `SALES TAX OFF` with the reason. Turn tax on for those subscriptions once the setting is fixed. A network error or outage is thrown as before, never retried without tax.
+
+**Before turning it on:** `STRIPE_SECRET_KEY=sk_live_… node scripts/stripe-subscription-setup.mjs` (plan only) checks Stripe Tax read-only: active, a default tax behavior, the active registrations, and how many prices follow the default. It also plans the portal change above; `--apply` makes it.
+
+**Subscriptions that already exist** keep billing without tax: Checkout settings only reach new sessions. To tax their renewals, use Dashboard → Tax → [Migrations](https://dashboard.stripe.com/tax/migrations) (live mode only). It needs each price's tax behavior set on the price itself and an address or an inferred location for each customer; changes start at the next billing cycle, not prorated. Or edit a subscription by hand and turn on "Collect tax automatically".
+
+**Cost:** Stripe Tax charges per transaction (0.5% of the amount, tax included, on the pay-as-you-go plan as of November 2026), on each first payment and **each renewal**, but only where the account is registered and the amount is above zero. Free trials ($0 invoices) and buyers outside Maryland and DC cost nothing.
 
 Entitlements: the webhook writes `USER#<uid>` / `ENTITLEMENTS` (`allAccess`, `certs` = products held one by one, bought or subscribed, `active` = the running subscriptions). The pre-token Lambda turns that into `plan: 'pro'` and, for Pro, `certs` listing all nine products. `past_due` still counts; `canceled` and `unpaid` don't. Deleting an account (`DELETE /v1/me`) answers 409 while a subscription is active, trialing or past due: cancel it in Manage billing first.
 
