@@ -13,6 +13,7 @@ import NewsletterSignup from './components/NewsletterSignup';
 import HeroRotator from './components/HeroRotator';
 import GisPage from './components/GisPage';
 import { captureSource } from './services/leads';
+import { isReturnVisit, tagEntry, saveScroll, savedScroll, jumpTo, watchVisitor } from './services/scrollRestore';
 import {
   CloudIcon,
   RobotIcon,
@@ -1091,10 +1092,9 @@ function HomepageContent() {
   // them, after the browser looked for the #hash and found nothing, so jump there once ourselves: after the fonts
   // have settled the header's height, and only if the visitor has not scrolled in the meantime.
   // #readiness is left to ReadinessCheck, which already handles it. A reload or Back/Forward is left to the
-  // browser's own scroll restore: jumping to the section there would throw away the place the visitor had reached.
+  // place-keeping below: jumping to the section there would throw away the place the visitor had reached.
   useEffect(() => {
-    const visit = performance.getEntriesByType?.('navigation')?.[0]?.type;
-    if (visit === 'reload' || visit === 'back_forward') return undefined;
+    if (isReturnVisit()) return undefined;
     let id = '';
     try { id = decodeURIComponent(window.location.hash.slice(1)); } catch { return undefined; }
     const section = id && id !== 'readiness' ? document.getElementById(id) : null;
@@ -1105,6 +1105,45 @@ function HomepageContent() {
       if (!cancelled && window.scrollY === 0) section.scrollIntoView({ block: 'start' });
     })));
     return () => { cancelled = true; };
+  }, []);
+
+  // A reload or Back/Forward puts the visitor back where they were. The browser tries this itself, but while the
+  // loading screen shows the page is too short, so it lands at the top (see services/scrollRestore.js). We save the
+  // place as the page is left and put it back once the sections are drawn, unless the visitor has moved meanwhile.
+  const viewRef = useRef(currentPage);
+  viewRef.current = currentPage;
+  useLayoutEffect(() => {
+    tagEntry();
+    // An in-page link (#plans) or a Google sign-in moving the address makes a new history entry: give it an id too
+    window.addEventListener('hashchange', tagEntry);
+    window.addEventListener('hub:locationchange', tagEntry);
+    // Settings is not in the address, so a reload opens the homepage, where the Settings position means nothing
+    const onLeave = () => saveScroll(viewRef.current === 'settings' ? null : window.scrollY);
+    window.addEventListener('pagehide', onLeave);
+
+    let cancelled = false;
+    let visitor = null;
+    const saved = isReturnVisit() ? savedScroll() : null;
+    if (saved > 0) {
+      visitor = watchVisitor();
+      const putBack = () => {
+        if (!cancelled && !visitor.moved() && Math.abs(window.scrollY - saved) > 1) jumpTo(saved);
+      };
+      putBack(); // before the first paint, so the top of the page never flashes up
+      // Once more after the web fonts: they can rewrap the header and the text, which moves the page under us
+      const twoFrames = (fn) => requestAnimationFrame(() => requestAnimationFrame(fn));
+      twoFrames(() => Promise.resolve(document.fonts?.ready).then(() => twoFrames(() => {
+        putBack();
+        visitor.stop();
+      })));
+    }
+    return () => {
+      cancelled = true;
+      visitor?.stop();
+      window.removeEventListener('hashchange', tagEntry);
+      window.removeEventListener('hub:locationchange', tagEntry);
+      window.removeEventListener('pagehide', onLeave);
+    };
   }, []);
 
   const handleNavigateSettings = () => {
