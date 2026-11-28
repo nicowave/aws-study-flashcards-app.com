@@ -3,11 +3,14 @@ import React from 'react';
 import { linkProps } from './router';
 import { tutorialStats } from './progress';
 import UnlockCard from './UnlockCard';
+import ManageBilling, { useBillingAccount } from './ManageBilling';
 import Markdown from './Markdown';
 import { useT } from './i18n';
 
 const CourseHome = ({ course, progress, access, user, onSignIn }) => {
   const t = useT(course);
+  // Access given by hand has no billing behind it: say so instead of pointing at Manage billing
+  const billingAccount = useBillingAccount(Boolean(access && user));
   const firstOpen = course.tutorials.find((t) => !tutorialStats(t, progress).complete && (t.free || access)) || course.tutorials[0];
   return (
     <div className="home">
@@ -58,6 +61,19 @@ const CourseHome = ({ course, progress, access, user, onSignIn }) => {
           })}
         </ol>
       </section>
+
+      {access && user && (
+        <section className="have-access">
+          {billingAccount === false ? (
+            <p><strong>{t('home.haveAccess')}</strong> {t('billing.given')}</p>
+          ) : (
+            <>
+              <p><strong>{t('home.haveAccess')}</strong> {t('home.manageHint')}</p>
+              <ManageBilling course={course} returnPath="/" className="btn ghost" />
+            </>
+          )}
+        </section>
+      )}
 
       {!access && (
         <section className="pricing" id="pricing">

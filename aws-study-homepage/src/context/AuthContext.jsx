@@ -14,7 +14,9 @@ import {
   changePassword,
   updateUserAvatar,
   updateDisplayName,
-  deleteAccount
+  deleteAccount,
+  takeSignOutReason,
+  SIGN_OUT_MESSAGES
 } from '../services/sharedAuth';
 
 const AuthContext = createContext(null);
@@ -34,6 +36,8 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
   const [authChecked, setAuthChecked] = useState(false);
   const [error, setError] = useState(null);
   const [needsVerification, setNeedsVerification] = useState(false);
+  // Why Cognito signed this browser out on its own ('device-limit'), shown until dismissed or signed in
+  const [signOutReason, setSignOutReason] = useState(null);
 
   // Listen for auth state changes
   useEffect(() => {
@@ -54,6 +58,7 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
         console.log('[AuthContext] Auth state changed:', authUser ? 'User logged in' : 'No user');
 
         if (authUser) {
+          setSignOutReason(null);
           // Profile + game progress from the StudyHub API
           const result = await getUserData();
           if (!isMounted) return;
@@ -67,6 +72,8 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
         } else {
           setUser(null);
           setUserData(null);
+          const reason = takeSignOutReason();
+          if (reason) setSignOutReason(reason);
         }
 
         setLoading(false);
@@ -82,6 +89,8 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     setError(null);
     setNeedsVerification(false);
   };
+
+  const dismissSignOutReason = () => setSignOutReason(null);
 
   // Register with REAL email (required for verification)
   const register = async (email, password, displayName = null) => {
@@ -134,6 +143,7 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
   const logout = async () => {
     setLoading(true);
     console.log('[AuthContext] Logging out...');
+    setSignOutReason(null);
 
     const result = await logoutUser();
 
@@ -293,7 +303,10 @@ export const AuthProvider = ({ children, requireAuth = false }) => {
     changeDisplayName,
     updateAvatar,
     deleteUserAccount,
-    refreshUserData
+    refreshUserData,
+    signOutReason,
+    signOutMessage: SIGN_OUT_MESSAGES[signOutReason] || null,
+    dismissSignOutReason
   };
 
   return (

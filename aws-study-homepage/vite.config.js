@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { certifications } from './src/data/certifications.js'
-import { COURSES, OTHER_COURSES, COURSE_PRICE, BUNDLE_PRICE } from './src/data/courses.js'
+import { COURSES, OTHER_COURSES } from './src/data/courses.js'
+import { PRODUCT_MONTHLY, PRODUCT_YEARLY, PRO_YEARLY, PRO_TRIAL_DAYS } from './src/data/prices.js'
 import { FAQ } from './src/data/faq.js'
 import { GIS_PAGE, GIS_WHY, GIS_COURSES, GIS_FOR, GIS_FAQ, GIS_DISCLAIMER } from './src/data/gis.js'
 import { fileURLToPath } from 'node:url'
@@ -11,6 +12,22 @@ const live = certifications.filter((c) => c.status === 'available')
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 const dollars = (price) => price.replace('$', '')
+// Words for the crawler copy, same as the live cards
+const PRODUCT_PRICE_TEXT = `${PRODUCT_MONTHLY} a month or ${PRODUCT_YEARLY} a year`
+
+// Every certification and course is a subscription, monthly or yearly: one Offer with a
+// price per billing period (schema.org UnitPriceSpecification; P1M / P1Y are ISO 8601 durations).
+const subscriptionOffer = (url) => ({
+  '@type': 'Offer',
+  category: 'Subscription',
+  price: dollars(PRODUCT_MONTHLY),
+  priceCurrency: 'USD',
+  url,
+  priceSpecification: [
+    { '@type': 'UnitPriceSpecification', price: dollars(PRODUCT_MONTHLY), priceCurrency: 'USD', billingDuration: 'P1M' },
+    { '@type': 'UnitPriceSpecification', price: dollars(PRODUCT_YEARLY), priceCurrency: 'USD', billingDuration: 'P1Y' },
+  ],
+})
 
 // Structured data: who we are, the site, every course we sell, and the FAQ.
 function structuredData() {
@@ -24,7 +41,7 @@ function structuredData() {
     logo: 'https://nico-tek.com/assets/nico-tek-icon-512.png',
     sameAs: ['https://nico-tek.com/study-hub'],
   }
-  const course = ({ name, description, url, price, hours }) => ({
+  const course = ({ name, description, url, hours }) => ({
     '@type': 'Course',
     '@id': `${url}/#course`,
     name,
@@ -32,7 +49,7 @@ function structuredData() {
     url,
     provider: { '@id': org['@id'] },
     isAccessibleForFree: false,
-    offers: { '@type': 'Offer', category: 'Paid', price: dollars(price), priceCurrency: 'USD', url },
+    offers: subscriptionOffer(url),
     hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'Online', ...(hours && { courseWorkload: `PT${hours}H` }) },
   })
   const courses = [
@@ -40,11 +57,10 @@ function structuredData() {
       name: `${c.name} (${c.code}) practice exam and flashcards`,
       description: `${c.description} Quiz game, flashcards, study guide and a ${c.questions.split(' ')[0]}-question, ${c.examLength.replace(' minutes', '-minute')} timed exam simulator.`,
       url: c.url,
-      price: c.price,
     })),
-    ...COURSES.map((c) => course({ name: c.title, description: c.blurb, url: c.url, price: COURSE_PRICE, hours: c.hours })),
+    ...COURSES.map((c) => course({ name: c.title, description: c.blurb, url: c.url, hours: c.hours })),
     // Only live sites: crawlers shouldn't be sent to an address that doesn't answer yet
-    ...OTHER_COURSES.filter((c) => c.live).map((c) => course({ name: c.title, description: c.blurb, url: c.url, price: COURSE_PRICE, hours: c.hours })),
+    ...OTHER_COURSES.filter((c) => c.live).map((c) => course({ name: c.title, description: c.blurb, url: c.url, hours: c.hours })),
   ]
   return {
     '@context': 'https://schema.org',
@@ -65,10 +81,10 @@ function structuredData() {
   }
 }
 
-// Courses outside the Developer Path, once their site is live
+// More courses, once their site is live
 function otherCourses() {
   const items = OTHER_COURSES.filter((c) => c.live).map((c) => `
-        <li><a href="${c.url}"><strong>${esc(c.title)}</strong></a>: ${esc(c.blurb)} ${c.modules} modules, about ${c.hours} hours. ${COURSE_PRICE} once.</li>`).join('')
+        <li><a href="${c.url}"><strong>${esc(c.title)}</strong></a>: ${esc(c.blurb)} ${c.modules} modules, about ${c.hours} hours. ${PRODUCT_PRICE_TEXT}.</li>`).join('')
   return items ? `
       <h2>More courses</h2>
       <ul>${items}
@@ -80,9 +96,9 @@ function otherCourses() {
 function staticPage() {
   const certItems = live.map((c) => `
         <li><a href="${c.url}"><strong>${esc(c.name)} (${c.code})</strong></a>: ${esc(c.description)}
-          ${c.questions}, ${c.examLength}, pass mark ${c.passingScore}. One-time unlock ${c.price}.</li>`).join('')
+          ${c.questions}, ${c.examLength}, pass mark ${c.passingScore}. ${PRODUCT_PRICE_TEXT}.</li>`).join('')
   const courseItems = COURSES.map((c) => `
-        <li><a href="${c.url}"><strong>${esc(c.title)}</strong></a>: ${esc(c.blurb)} ${c.tutorials} tutorials, about ${c.hours} hours. ${COURSE_PRICE} once.</li>`).join('')
+        <li><a href="${c.url}"><strong>${esc(c.title)}</strong></a>: ${esc(c.blurb)} ${c.tutorials} tutorials, about ${c.hours} hours. ${PRODUCT_PRICE_TEXT}.</li>`).join('')
   const faqItems = FAQ.map(({ q, a }) => `
         <h3>${esc(q)}</h3>
         <p>${esc(a)}</p>`).join('')
@@ -94,12 +110,15 @@ function staticPage() {
       <h2>AWS Certifications</h2>
       <ul>${certItems}
       </ul>
-      <h2>The Developer Path: coding courses</h2>
+      <h2>Coding courses</h2>
       <p>Four coding courses for IT people who have never scripted or built a web app, ending at the Developer Associate
-        certification. Practice in your browser, then build it on your own AWS account. The first tutorial of every course is free.
-        The Developer Path bundle (all four courses plus the Developer – Associate study game) is ${BUNDLE_PRICE} once.</p>
+        certification. Practice in your browser, then build it on your own AWS account. The first tutorial of every course is free.</p>
       <ul>${courseItems}
       </ul>${otherCourses()}
+      <h2>Plans</h2>
+      <p>Start free with no account. Each certification and each coding course is ${PRODUCT_PRICE_TEXT}. Pro unlocks every
+        certification and every coding course for ${PRO_YEARLY} a year, with a ${PRO_TRIAL_DAYS}-day free trial for first-time members. Subscriptions
+        renew automatically; cancel anytime. Prices are in US dollars.</p>
       <h2>New: GIS courses</h2>
       <p><a href="/gis/">GIS courses (coming soon)</a>: understand GIS, build open-source web maps, and use GIS in real estate and international development.</p>
       <h2>Questions People Ask</h2>${faqItems}

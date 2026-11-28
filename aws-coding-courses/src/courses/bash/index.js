@@ -2,6 +2,7 @@
 import meta from './meta.json';
 import { siblingsOf } from '../../shared/courseSites';
 import startHere from '../../shared/startHere';
+import { pricingFaq } from '../../shared/pricingFaq';
 import serverHealthCheck from './tutorials/01-server-health-check';
 import logDetective from './tutorials/02-log-detective';
 import nightlyBackup from './tutorials/03-nightly-backup';
@@ -37,13 +38,14 @@ Live at https://www.example.com`,
     'Deploy a website to **S3 and CloudFront** with the right cache headers, settings in **Secrets Manager**',
     'Write safe scripts: `set -euo pipefail`, input checks, dry runs and least-privilege permissions',
   ],
-  pricingLede: 'All four tutorials with every practice task, quiz, flashcard deck and real-AWS project. Pay once, keep it. Part of the Developer Path: Bash, then Python, JavaScript and TypeScript, toward the AWS Certified Developer – Associate.',
+  pricingLede: 'All four tutorials with every practice task, quiz, flashcard deck and real-AWS project. Pay monthly or yearly and cancel anytime. Also included in Pro, with every other course and certification game.',
   faq: [
     { q: 'Do I need to know how to code?', a: 'No. If you\'re comfortable with computers (IT support, sysadmin, help desk, a technical hobby), you\'re ready. Tutorial 1 starts from your very first command.' },
     { q: 'Do I need an AWS account?', a: 'Not to start: every lesson has a practice terminal with a pretend AWS account, right in your browser. The **Build it** step at the end of each tutorial uses your own free AWS account, and *Start here* shows how to set one up with a budget alert so it can\'t surprise you.' },
     { q: 'Will the real AWS projects cost money?', a: 'Almost nothing. Everything fits in the AWS Free Tier or costs a few cents, except AWS Secrets Manager in Tutorial 4 ($0.40 a month per secret after a 30-day free trial). Each Build step ends with cleanup commands.' },
     { q: 'Mac, Windows or Linux?', a: 'All three. Mac and Linux have a terminal built in. On Windows, *Start here* shows how to install the Windows Subsystem for Linux, which gives you a real Ubuntu terminal.' },
     { q: 'Does this help with the AWS Certified Developer – Associate exam?', a: 'Yes. The exam expects you to work with the AWS command line, S3, CloudFront, IAM policies and Secrets Manager, and each tutorial ends with exam tips. Pair it with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com) for full exam practice.' },
+    pricingFaq(),
     { q: 'Is this an official AWS course?', a: 'No. Level Up Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
   ],
   afterCourse: `**Next steps:**

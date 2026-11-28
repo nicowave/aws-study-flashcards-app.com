@@ -2,6 +2,7 @@
 import meta from './meta.json';
 import { siblingsOf } from '../../shared/courseSites';
 import startHere from '../../shared/startHere';
+import { pricingFaq } from '../../shared/pricingFaq';
 import flashcardPage from './tutorials/01-flashcard-page';
 import statusDashboard from './tutorials/02-status-dashboard';
 import contactForm from './tutorials/03-contact-form';
@@ -32,13 +33,14 @@ Response:
     'Save and read data with **DynamoDB** and send email with **Amazon SES**, using the AWS SDK for JavaScript v3',
     'Add sign-in with **Amazon Cognito** and keep each person\'s data separate',
   ],
-  pricingLede: 'All four tutorials with every practice task, quiz, flashcard deck and real-AWS project. Pay once, keep it. Part of the Developer Path: Bash, Python, JavaScript and TypeScript, toward the AWS Certified Developer – Associate.',
+  pricingLede: 'All four tutorials with every practice task, quiz, flashcard deck and real-AWS project. Pay monthly or yearly and cancel anytime. Also included in Pro, with every other course and certification game.',
   faq: [
     { q: 'Do I need to know how to code?', a: 'No. If you\'re comfortable with computers, you\'re ready: Tutorial 1 starts from your first line of JavaScript. The [Bash](https://bash.aws-study-flashcards-app.com) and [Python](https://python.aws-study-flashcards-app.com) courses help, but aren\'t required.' },
     { q: 'Is it real JavaScript?', a: 'Yes. Web pages run in your own browser, and server code runs like Node.js 22 on AWS Lambda. The only pretend parts are the AWS account and the websites your code calls, so you can practice without a bill.' },
     { q: 'Do I need an AWS account?', a: 'Not to start. Every lesson practices against a pretend AWS account in your browser. The **Build it** step at the end of each tutorial uses your own free AWS account, and *Start here* shows how to set one up with a budget alert.' },
     { q: 'Will the real AWS projects cost money?', a: 'Almost nothing. Lambda, API Gateway, Cognito and SES stay within AWS\'s free amounts for these projects, and DynamoDB on-demand costs fractions of a cent at this size. Each Build step ends with cleanup commands.' },
     { q: 'Does this help with the AWS Certified Developer – Associate exam?', a: 'Yes. The exam is about writing code against Lambda, API Gateway, DynamoDB and Cognito, with security and error handling: exactly what tutorials 3 and 4 build. Each tutorial ends with exam tips. Pair it with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com).' },
+    pricingFaq(),
     { q: 'Is this an official AWS course?', a: 'No. Level Up Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
   ],
   afterCourse: `**Next steps:**

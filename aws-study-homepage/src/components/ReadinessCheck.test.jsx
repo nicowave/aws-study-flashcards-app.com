@@ -521,7 +521,7 @@ describe('ReadinessCheck', () => {
       const { unmount } = render(<ReadinessCheck />);
       await finishCheck(user);
       await screen.findByText(/on its way to/i);
-      expect(screen.getByText(new RegExp(`${promo.single}% off`))).toHaveTextContent(`${promo.label}: ${promo.single}% off the full game until ${promo.ends}`);
+      expect(screen.getByText(new RegExp(`${promo.single}% off`))).toHaveTextContent(`${promo.label}: ${promo.single}% off the first payment for the full game until ${promo.ends}`);
       unmount();
 
       vi.setSystemTime(promo.end);

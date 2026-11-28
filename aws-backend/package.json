@@ -10,12 +10,12 @@
     "test": "node --test test/*.test.js"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.160.0",
+    "aws-cdk-lib": "^2.278.0",
     "constructs": "^10.3.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
-    "aws-cdk": "^2.160.0",
+    "aws-cdk": "^2.1149.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.0"
   }

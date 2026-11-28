@@ -8,11 +8,27 @@
 //    sign-in and a password account with the same email share data.
 // 2. Adds the entitlement claims the apps read, same names as the old Firebase
 //    custom claims: plan ('pro' = all-access) and certs ('cert-a,cert-b').
+//    Pro unlocks every product, so for Pro members certs lists all of them;
+//    ENTITLEMENTS.certs in DynamoDB keeps meaning "owned one by one".
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, GetCommand, PutCommand } = require('@aws-sdk/lib-dynamodb');
 
 const TABLE_NAME = process.env.TABLE_NAME;
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+
+// Everything Pro unlocks: PRO_COVERS minus "all-access" in ../callables/coverage.js. A copy,
+// because this Lambda is uploaded on its own; test/pre-token.test.js keeps the two in step.
+const ALL_PRODUCTS = [
+  'cloud-practitioner',
+  'ai-practitioner',
+  'solutions-architect-associate',
+  'developer-associate',
+  'bash-for-aws',
+  'python-for-aws',
+  'javascript-for-aws',
+  'typescript-for-aws',
+  'tech-spanish',
+];
 
 // Google's permanent account ID, from the federated identity (or the
 // "google_<id>" username Cognito gives federated users).
@@ -72,8 +88,11 @@ exports.handler = async (event) => {
     const ent = await ddb.send(
       new GetCommand({ TableName: TABLE_NAME, Key: { PK: `USER#${uid}`, SK: 'ENTITLEMENTS' } })
     );
-    if (ent.Item?.allAccess) claims.plan = 'pro';
-    const certs = Array.isArray(ent.Item?.certs) ? ent.Item.certs : [];
+    let certs = Array.isArray(ent.Item?.certs) ? ent.Item.certs : [];
+    if (ent.Item?.allAccess) {
+      claims.plan = 'pro';
+      certs = [...new Set([...certs, ...ALL_PRODUCTS])];
+    }
     if (certs.length) claims.certs = certs.join(',');
   } catch (err) {
     // Fail open (no paid claims) rather than blocking sign-in
@@ -84,3 +103,6 @@ exports.handler = async (event) => {
   event.response = { claimsOverrideDetails: { claimsToAddOrOverride: claims } };
   return event;
 };
+
+// For aws-backend/test only
+exports._test = { ALL_PRODUCTS };

@@ -22,7 +22,7 @@ const EyeOffIcon = ({ size = 24 }) => (
 
 const AuthScreen = ({ onGuestContinue, hubUrl }) => {
   const t = useT();
-  const { login, register, googleSignIn, loading, error, clearError } = useAuth();
+  const { login, register, googleSignIn, loading, error, clearError, signOutReason } = useAuth();
   
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -151,6 +151,13 @@ const AuthScreen = ({ onGuestContinue, hubUrl }) => {
               : t('auth.signUpLede')}
           </p>
         </div>
+
+        {/* Cognito signed this browser out because the account signed in on another device */}
+        {signOutReason === 'device-limit' && (
+          <div className="auth-notice auth-signed-out" role="status">
+            <span>{t('auth.signedOutDeviceLimit')}</span>
+          </div>
+        )}
 
         {/* Google Sign-In */}
         <button

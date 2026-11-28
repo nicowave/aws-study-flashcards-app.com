@@ -26,10 +26,20 @@ If it reports **"No Route 53 record to copy"** for a name, that domain's DNS liv
 
 ## 2. Sell it (Stripe + backend)
 
-1. In Stripe (live mode), create the product **Tech Spanish ↔ Tech English** with a **one-time** price of **$19.99**.
-2. Add the price to the untracked `aws-backend/.env`:
+Like every course, it sells as a subscription: **$11/month or $69/year**, and Pro includes it.
+
+1. The prices come from the setup script, not the Dashboard. If you already ran it for the subscription launch ([subscriptions-launch.md](subscriptions-launch.md), step 1), they exist and are in `aws-backend/.env`: skip to 3. Otherwise, with the live secret key in the shell environment (never in a file):
+   ```bash
+   node scripts/stripe-subscription-setup.mjs
    ```
-   STRIPE_PRICE_TECH_SPANISH_COURSE=price_...
+   then, when the plan looks right:
+   ```bash
+   node scripts/stripe-subscription-setup.mjs --apply --write-env
+   ```
+2. Check `aws-backend/.env` has both lines:
+   ```
+   STRIPE_PRICE_TECH_SPANISH_COURSE_MONTHLY=price_...
+   STRIPE_PRICE_TECH_SPANISH_COURSE_YEARLY=price_...
    ```
 3. Deploy the backend. This also adds both spanish. names to sign-in (Cognito callback URLs), CORS and checkout's return addresses:
    ```bash
@@ -64,11 +74,11 @@ Switch the course from "coming soon" to a link, then deploy the hub and the cour
 
 - `aws-study-homepage/src/data/courses.js`: `OTHER_COURSES` → Tech Spanish → `live: true` (hub card, hub footer, search-engine and crawler copy).
 - `aws-coding-courses/src/shared/courseSites.js`: Tech Spanish → `live: true` (the "More courses" footer on every course site).
-- `aws-study-homepage/public/llms.txt`: add a section of its own after the Developer Path list (that section is about the four coding courses and their bundle):
+- `aws-study-homepage/public/llms.txt`: add a section of its own after the coding courses list:
   ```
   ## Other courses
 
-  - [Tech Spanish ↔ Tech English](https://spanish.aws-study-flashcards-app.com/): software, DevOps and AWS vocabulary in Spanish and English, with the right register for documents, the team and slang. Start here and Module 1 are free; $19.99 once. Not part of the Developer Path bundle.
+  - [Tech Spanish ↔ Tech English](https://spanish.aws-study-flashcards-app.com/): software, DevOps and AWS vocabulary in Spanish and English, with the right register for documents, the team and slang. Start here and Module 1 are free; $11/month or $69/year, renews automatically, or included in Pro.
   ```
 
 ```bash
@@ -95,7 +105,7 @@ curl -s https://spanish.aws-study-flashcards-app.com/git-everyday | grep -o 'ass
 
 - ✓ The site answers `200` (the levelupstudyhub.com name comes later, see step 1).
 - ✓ A module's address (`/git-everyday`) answers `200` (not `404`), and its page names the same bundle as `aws-coding-courses/dist/tech-spanish/assets/`.
-- ✓ In a browser: the ES | EN switch works, signing in keeps you signed in on the other study sites, and a test purchase unlocks the paid modules.
+- ✓ In a browser: the ES | EN switch works, signing in keeps you signed in on the other study sites, a Pro account opens the paid modules, and a test purchase (monthly) unlocks them. Refund it and cancel the subscription in the Stripe Dashboard afterwards.
 
 ## Later (not needed to launch)
 

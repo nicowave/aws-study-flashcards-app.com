@@ -3,7 +3,8 @@ import { render, screen, within, act, fireEvent, waitFor } from '@testing-librar
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import { useAuth } from './context/AuthContext';
-import { getPlan, getProTrialStatus, getBillingAccountStatus, getEntitlements, startCheckout, openBillingPortal, PRO_TRIAL_DAYS } from './services/billing';
+import { getPlan, getProTrialStatus, getBillingSummary, getBillingAccountStatus, getEntitlements, startCheckout, openBillingPortal, PRO_TRIAL_DAYS } from './services/billing';
+import { PRODUCT_MONTHLY, PRODUCT_YEARLY, PRO_YEARLY, YEARLY_SAVINGS_PERCENT } from './data/prices';
 import { certifications, categories } from './data/certifications';
 import { COURSES, OTHER_COURSES } from './data/courses';
 import { GIS_PAGE } from './data/gis';
@@ -18,18 +19,18 @@ vi.mock('./context/AuthContext', () => ({
   useAuth: vi.fn(),
 }));
 
-// Billing is the money boundary: never reach Stripe. BILLING_ENABLED and the Pro
-// label are build variables, so they are getters a test can flip.
-const billing = vi.hoisted(() => ({ enabled: true, label: '$39/yr' }));
+// Billing is the money boundary: never reach Stripe. BILLING_ENABLED is a build
+// variable, so it is a getter a test can flip.
+const billing = vi.hoisted(() => ({ enabled: true }));
 vi.mock('./services/billing', async (importOriginal) => {
   const { PRO_TRIAL_DAYS: days, portalErrorMessage } = await importOriginal();
   return {
     get BILLING_ENABLED() { return billing.enabled; },
-    get PRO_PRICE_LABEL() { return billing.label; },
     PRO_TRIAL_DAYS: days,
     portalErrorMessage, // the real one: which words reach the member is what the tests check
     getPlan: vi.fn(),
     getProTrialStatus: vi.fn(),
+    getBillingSummary: vi.fn(),
     getBillingAccountStatus: vi.fn(),
     getEntitlements: vi.fn(),
     startCheckout: vi.fn(),
@@ -54,7 +55,7 @@ vi.mock('./config/auth.config', async (importOriginal) => ({
 }));
 
 // One coming-soon cert next to the real data, so that path is covered even while
-// none is coming soon. It carries a price to prove a coming-soon card never shows one.
+// none is coming soon. A coming-soon card must never show a price.
 vi.mock('./data/certifications', async (importOriginal) => {
   const actual = await importOriginal();
   return {
@@ -62,7 +63,7 @@ vi.mock('./data/certifications', async (importOriginal) => {
     certifications: [...actual.certifications, {
       id: 'test-coming-soon', name: 'Test Coming Soon Certification', code: 'TST-C01', level: 'Professional',
       category: 'professional', description: 'A fixture.', url: 'https://test.levelupstudyhub.com',
-      price: '$99.99', status: 'coming-soon', color: '#888888', examLength: '1 minute', questions: '1 question',
+      status: 'coming-soon', color: '#888888', examLength: '1 minute', questions: '1 question',
       officialUrl: 'https://aws.amazon.com/certification/', features: ['Fixture Feature'],
     }],
   };
@@ -98,6 +99,7 @@ const setAuth = (over = {}) => {
     clearError: vi.fn(),
     changeUserPassword: vi.fn(), changeDisplayName: vi.fn(), updateAvatar: vi.fn(),
     deleteUserAccount: vi.fn(), refreshUserData: vi.fn(),
+    signOutMessage: null, dismissSignOutReason: vi.fn(),
   }, over);
   vi.mocked(useAuth).mockImplementation(() => auth);
 };
@@ -120,12 +122,12 @@ const go = (path) => window.history.pushState({}, '', path);
 
 beforeEach(() => {
   billing.enabled = true;
-  billing.label = '$39/yr';
   setAuth();
   vi.mocked(getPlan).mockReset().mockResolvedValue(null);
   vi.mocked(getProTrialStatus).mockReset().mockResolvedValue(true); // a first-time buyer unless a test says otherwise
+  vi.mocked(getBillingSummary).mockReset().mockResolvedValue({ plan: null, certs: [], owned: [], subscriptions: [] }); // Settings → Plan & Billing
   vi.mocked(getBillingAccountStatus).mockReset().mockResolvedValue(true); // a Pro member bought it unless a test says otherwise
-  vi.mocked(getEntitlements).mockReset().mockResolvedValue({ plan: null, certs: [] }); // Settings → Plan & Billing
+  vi.mocked(getEntitlements).mockReset().mockResolvedValue({ plan: null, certs: [] });
   vi.mocked(startCheckout).mockReset();
   vi.mocked(openBillingPortal).mockReset();
   at(promo.end + MINUTE); // outside any sale unless a test says otherwise
@@ -202,8 +204,8 @@ describe('App', () => {
       expect(card.getByText(cert.description)).toBeInTheDocument();
       expect(card.getByText(cert.examLength)).toBeInTheDocument();
       expect(card.getByText(cert.questions)).toBeInTheDocument();
-      expect(card.getByText(cert.price)).toBeInTheDocument();
-      expect(certCard(cert.name)).toHaveTextContent(`One-time unlock ${cert.price}`);
+      expect(certCard(cert.name)).toHaveTextContent(`${PRODUCT_MONTHLY}/month or ${PRODUCT_YEARLY}/year`);
+      expect(certCard(cert.name)).not.toHaveTextContent(/one-time|once\b/i);
       for (const f of cert.features) expect(card.getByText(f)).toBeInTheDocument();
       expect(card.queryByText('Coming Soon')).not.toBeInTheDocument();
     });
@@ -218,11 +220,11 @@ describe('App', () => {
       expect(docs).toHaveAttribute('rel', expect.stringContaining('noopener'));
     });
 
-    it('gives every live cert its own site and a dollar price', () => {
+    it('gives every live cert its own site, and no price of its own (every product costs the same, from prices.js)', () => {
       expect(new Set(live.map((c) => c.url)).size).toBe(live.length);
       for (const c of live) {
         expect(c.url).toMatch(/^https:\/\/[a-z-]+\.levelupstudyhub\.com$/);
-        expect(c.price).toMatch(/^\$\d+\.\d{2}$/);
+        expect(c).not.toHaveProperty('price');
       }
     });
 
@@ -245,8 +247,8 @@ describe('App', () => {
         expect(card.getAllByText('Coming Soon')).toHaveLength(2); // badge + button
         expect(card.getByRole('button', { name: 'Coming Soon' })).toBeDisabled();
         expect(card.queryByRole('link', { name: /start free/i })).not.toBeInTheDocument();
-        expect(card.queryByText(cert.price)).not.toBeInTheDocument();
-        expect(el).not.toHaveTextContent(/one-time unlock/i);
+        expect(el).not.toHaveTextContent(PRODUCT_MONTHLY);
+        expect(el).not.toHaveTextContent('/month');
       }
     });
 
@@ -268,10 +270,10 @@ describe('App', () => {
   });
 
   describe('plans', () => {
-    it('shows the four plans in order: Guest, Free account, One Certification, Pro', () => {
+    it('shows the four plans in order: Guest, Free account, One Certification or Course, Pro', () => {
       render(<App />);
       const names = [...plans().querySelectorAll('.plan-name')].map((n) => n.textContent);
-      expect(names).toEqual(['Guest Preview', 'Free Account', 'One Certification', 'Pro']);
+      expect(names).toEqual(['Guest Preview', 'Free Account', 'One Certification or Course', 'Pro']);
     });
 
     it('sends Guest and Free account to the Cloud Practitioner site through onThisName', () => {
@@ -285,18 +287,54 @@ describe('App', () => {
       expect(within(planCard('Free Account')).getByText('Free')).toBeInTheDocument();
     });
 
-    it('prices One Certification from the cheapest to the dearest live cert, by level', () => {
+    describe('One Certification or Course', () => {
+      const card = () => planCard('One Certification or Course');
+      const period = () => within(card()).getByRole('group', { name: 'Billing period' });
+      const price = () => card().querySelector('.plan-price');
+
+      it('lets the buyer pick monthly or yearly with two named radio buttons, yearly first chosen', () => {
+        render(<App />);
+        const monthly = within(period()).getByRole('radio', { name: 'Monthly' });
+        const yearly = within(period()).getByRole('radio', { name: `Yearly save ${YEARLY_SAVINGS_PERCENT}%` });
+        expect(yearly).toBeChecked();
+        expect(monthly).not.toBeChecked();
+        expect(price()).toHaveTextContent(`${PRODUCT_YEARLY}/year`);
+        expect(card()).toHaveTextContent(`Save ${YEARLY_SAVINGS_PERCENT}% against ${PRODUCT_MONTHLY} a month`);
+      });
+
+      it('shows the monthly price when Monthly is picked, and back', async () => {
+        const user = userEvent.setup();
+        render(<App />);
+        await user.click(within(period()).getByRole('radio', { name: 'Monthly' }));
+        expect(within(period()).getByRole('radio', { name: 'Monthly' })).toBeChecked();
+        expect(price()).toHaveTextContent(`${PRODUCT_MONTHLY}/month`);
+        expect(card()).toHaveTextContent(`Or ${PRODUCT_YEARLY} a year, ${YEARLY_SAVINGS_PERCENT}% less`);
+        await user.click(within(period()).getByRole('radio', { name: /yearly/i }));
+        expect(price()).toHaveTextContent(`${PRODUCT_YEARLY}/year`);
+      });
+
+      it('works from the keyboard: arrow keys move between the two periods', async () => {
+        const user = userEvent.setup();
+        render(<App />);
+        within(period()).getByRole('radio', { name: /yearly/i }).focus();
+        await user.keyboard('{ArrowLeft}');
+        expect(within(period()).getByRole('radio', { name: 'Monthly' })).toBeChecked();
+        expect(price()).toHaveTextContent(`${PRODUCT_MONTHLY}/month`);
+      });
+
+      it('says it renews and can be cancelled, never "one-time", and sends buyers to the certifications', () => {
+        render(<App />);
+        expect(card()).toHaveTextContent(/renews automatically; cancel anytime/i);
+        expect(card()).not.toHaveTextContent(/one-time|pay once|keep it/i);
+        expect(within(card()).getByRole('link', { name: /choose a certification/i })).toHaveAttribute('href', '#certifications');
+      });
+    });
+
+    it('says in the fine print that subscriptions renew automatically, with the cancel route', () => {
       render(<App />);
-      const prices = live.map((c) => cents(c.price));
-      const fmt = (c) => `$${(c / 100).toFixed(2)}`;
-      const card = planCard('One Certification');
-      expect(within(card).getByText(`${fmt(Math.min(...prices))}–${fmt(Math.max(...prices))}`)).toBeInTheDocument();
-      const byLevel = (level) => live.find((c) => c.level === level).price;
-      expect(card).toHaveTextContent(`Foundational ${byLevel('Foundational')} · Associate ${byLevel('Associate')}`);
-      for (const level of ['Foundational', 'Associate']) {
-        expect(new Set(live.filter((c) => c.level === level).map((c) => c.price)).size).toBe(1);
-      }
-      expect(within(card).getByRole('link', { name: /choose a certification/i })).toHaveAttribute('href', '#certifications');
+      const fine = plans().querySelector('.plans-fine-print');
+      expect(fine).toHaveTextContent(/subscriptions renew automatically; cancel anytime in manage billing/i);
+      expect(fine).toHaveTextContent(/keep their lifetime access/i);
     });
 
     it('links the fine print to the Terms of Service', () => {
@@ -313,24 +351,33 @@ describe('App', () => {
         expect(card.getAllByText('Coming Soon')[0]).toBeInTheDocument();
         expect(card.getByRole('button', { name: 'Coming Soon' })).toBeDisabled();
         expect(proCard()).not.toHaveTextContent(/days free|free trial|card required/i);
-        expect(card.queryByText(billing.label)).not.toBeInTheDocument();
+        expect(proCard()).not.toHaveTextContent(PRO_YEARLY);
         expect(getPlan).not.toHaveBeenCalled();
       });
 
-      it('shows the Pro price and the 7-day trial terms to a signed-out visitor', () => {
+      it('shows the Pro price and the free trial terms to a signed-out visitor', () => {
         render(<App />);
         const card = within(proCard());
-        expect(card.getByText(billing.label)).toBeInTheDocument();
+        expect(proCard().querySelector('.plan-price')).toHaveTextContent(`${PRO_YEARLY}/year`);
         expect(card.getByText(`First ${PRO_TRIAL_DAYS} days free`)).toBeInTheDocument();
         expect(proCard()).toHaveTextContent(`Card required. Cancel before day ${PRO_TRIAL_DAYS} and you pay nothing`);
         expect(proCard()).toHaveTextContent(/renews yearly\. one free trial per person/i);
         expect(getPlan).not.toHaveBeenCalled();
       });
 
-      it('falls back to the word "Pro" when no price label is set', () => {
-        billing.label = '';
+      it('includes every coding course, live or coming, and every certification', () => {
         render(<App />);
-        expect(within(proCard()).getAllByText('Pro')).toHaveLength(2); // name + price line
+        const card = within(proCard());
+        expect(card.getByText(`All ${COURSES.length + OTHER_COURSES.length} coding courses included`)).toBeInTheDocument();
+        expect(card.getByText('Every live certification unlocked')).toBeInTheDocument();
+      });
+
+      it('tells a signed-in member with no trial that Pro renews yearly', async () => {
+        signIn();
+        vi.mocked(getProTrialStatus).mockResolvedValue(null);
+        render(<App />);
+        await act(async () => {});
+        expect(proCard()).toHaveTextContent(/renews yearly until you cancel in manage billing/i);
       });
 
       it('asks a signed-out visitor to sign in (opens the sign-in box), without starting checkout', async () => {
@@ -352,7 +399,7 @@ describe('App', () => {
         const button = within(proCard()).getByRole('button', { name: /start free trial/i });
         await userEvent.click(button);
         expect(startCheckout).toHaveBeenCalledTimes(1);
-        expect(startCheckout).toHaveBeenCalledWith('all-access');
+        expect(startCheckout).toHaveBeenCalledWith('all-access', 'year');
         expect(within(proCard()).getByRole('button', { name: /redirecting/i })).toBeDisabled();
       });
 
@@ -381,7 +428,7 @@ describe('App', () => {
         expect(within(proCard()).queryByText(/could not start checkout/i)).not.toBeInTheDocument();
       });
 
-      // The server gives the free week only to people who never had Pro; the card must not
+      // The server gives the free trial only to people who never had Pro; the card must not
       // promise it to a former member, who checkout charges from day one
       it('does not promise the trial to someone who had Pro before: "Get Pro" and a clear note', async () => {
         signIn();
@@ -390,9 +437,9 @@ describe('App', () => {
         render(<App />);
         await act(async () => {});
         expect(proCard()).not.toHaveTextContent(/days free|free trial|card required/i);
-        expect(proCard()).toHaveTextContent(/had Pro before.*no free week.*starts today/i);
+        expect(proCard()).toHaveTextContent(/had Pro before.*no trial.*starts today/i);
         await userEvent.click(within(proCard()).getByRole('button', { name: /get pro/i }));
-        expect(startCheckout).toHaveBeenCalledWith('all-access');
+        expect(startCheckout).toHaveBeenCalledWith('all-access', 'year');
       });
 
       it('does not promise the trial while the answer is unknown (lookup failed)', async () => {
@@ -418,6 +465,28 @@ describe('App', () => {
         render(<App />);
         await act(async () => {});
         expect(getPlan).toHaveBeenCalledWith({ forceRefresh: true });
+      });
+
+      it('explains a checkout refused because Pro runs on the other sign-in', async () => {
+        signIn();
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        vi.mocked(startCheckout).mockRejectedValueOnce(
+          new Error('Pro is already on for this email under your other sign-in. Sign out, then sign in the other way, for example with Google.')
+        );
+        render(<App />);
+        await act(async () => {});
+        await userEvent.click(within(proCard()).getByRole('button', { name: /start free trial/i }));
+        expect(await within(proCard()).findByText(/already on for your email under your other sign-in/i)).toBeInTheDocument();
+        expect(within(proCard()).queryByText(/could not start checkout/i)).not.toBeInTheDocument();
+      });
+
+      it('after buying Pro on top of single subscriptions, says those keep billing until cancelled', async () => {
+        go('/?checkout=success&overlap=1');
+        signIn();
+        vi.mocked(getPlan).mockResolvedValue('pro');
+        render(<App />);
+        expect(await within(proCard()).findByText(/other subscriptions keep billing until you\s+cancel them/i)).toBeInTheDocument();
+        expect(within(proCard()).getByRole('button', { name: 'Manage Subscription' })).toBeEnabled();
       });
 
       it('shows a Pro member "Your Plan" and Manage Subscription, with no trial offer', async () => {
@@ -507,23 +576,25 @@ describe('App', () => {
       expect(screen.queryByRole('note')).not.toBeInTheDocument();
     });
 
-    it('shows each live cert at the sale price with its full price struck through', () => {
+    it('shows each live cert at the sale prices with the full monthly and yearly prices struck through', () => {
       at(promo.start + MINUTE);
       render(<App />);
       for (const cert of live) {
         const el = certCard(cert.name);
-        expect(within(el).getByText(discounted(cert.price, promo.single))).toBeInTheDocument();
-        expect(el.querySelector('s')).toHaveTextContent(cert.price);
+        expect(within(el).getByText(discounted(PRODUCT_MONTHLY, promo.single))).toBeInTheDocument();
+        expect(within(el).getByText(discounted(PRODUCT_YEARLY, promo.single))).toBeInTheDocument();
+        expect([...el.querySelectorAll('s')].map((x) => x.textContent)).toEqual([PRODUCT_MONTHLY, PRODUCT_YEARLY]);
       }
     });
 
-    it('shows the sale range on One Certification and the bundle discount on Pro', () => {
+    it('shows the first-payment sale on the product plan for the chosen period, and the Pro discount on Pro', async () => {
       at(promo.start + MINUTE);
       render(<App />);
-      expect(planCard('One Certification')).toHaveTextContent(
-        `${promo.label}: ${promo.single}% off, so ${discounted('$9.99', promo.single)}–${discounted('$14.99', promo.single)}`,
-      );
-      expect(proCard()).toHaveTextContent(`${promo.label}: ${promo.bundle}% off your first year until ${promo.ends}`);
+      const product = planCard('One Certification or Course');
+      expect(product).toHaveTextContent(`${promo.label}: ${promo.single}% off your first year, so ${discounted(PRODUCT_YEARLY, promo.single)}`);
+      await userEvent.click(within(product).getByRole('radio', { name: 'Monthly' }));
+      expect(product).toHaveTextContent(`${promo.label}: ${promo.single}% off your first month, so ${discounted(PRODUCT_MONTHLY, promo.single)}`);
+      expect(proCard()).toHaveTextContent(`${promo.label}: ${promo.pro}% off your first year until ${promo.ends}`);
       // the trial is still offered during a sale
       expect(within(proCard()).getByText(`First ${PRO_TRIAL_DAYS} days free`)).toBeInTheDocument();
     });
@@ -553,7 +624,7 @@ describe('App', () => {
       at(promo.end);
       render(<App />);
       expect(section('AWS Certifications').querySelector('s')).toBeNull();
-      for (const cert of live) expect(within(certCard(cert.name)).getByText(cert.price)).toBeInTheDocument();
+      for (const cert of live) expect(certCard(cert.name)).toHaveTextContent(`${PRODUCT_MONTHLY}/month or ${PRODUCT_YEARLY}/year`);
     });
 
     it('checks out the same plan during a sale (the server applies the discount)', async () => {
@@ -563,24 +634,17 @@ describe('App', () => {
       render(<App />);
       await act(async () => {});
       await userEvent.click(within(proCard()).getByRole('button', { name: /start free trial/i }));
-      expect(startCheckout).toHaveBeenCalledWith('all-access');
+      expect(startCheckout).toHaveBeenCalledWith('all-access', 'year');
     });
   });
 
-  describe('Developer Path on the homepage', () => {
-    it('sends a signed-out visitor who wants the bundle to the sign-in box', async () => {
+  describe('no bundle and no one-time wording on the homepage', () => {
+    it('never offers the Developer Path bundle or a one-time unlock', () => {
       render(<App />);
-      await userEvent.click(within(section('The Developer Path')).getByRole('button', { name: 'Sign in to get it' }));
-      expect(modal()).toBeInTheDocument();
+      const main = screen.getByRole('main');
+      expect(main).not.toHaveTextContent(/developer path|bundle|one-time|pay once|keep it\b/i);
+      expect(within(section('Coding Courses')).queryByRole('button')).not.toBeInTheDocument();
       expect(startCheckout).not.toHaveBeenCalled();
-    });
-
-    it('starts developer-path checkout for a signed-in learner', async () => {
-      signIn();
-      vi.mocked(startCheckout).mockReturnValue(new Promise(() => {}));
-      render(<App />);
-      await userEvent.click(within(section('The Developer Path')).getByRole('button', { name: 'Get the Developer Path' }));
-      expect(startCheckout).toHaveBeenCalledWith('developer-path');
     });
   });
 
@@ -954,6 +1018,33 @@ describe('App', () => {
       render(<App />);
       await userEvent.click(within(header()).getByRole('button', { name: 'Sign In' }));
       expect(screen.getByRole('heading', { name: 'Welcome Back' })).toBeInTheDocument();
+    });
+  });
+
+  describe('signed out by the device limit', () => {
+    const MESSAGE = 'You were signed out on this browser because your account signed in on another device.';
+
+    it('says why under the header, and again in the sign-in modal', async () => {
+      const user = userEvent.setup();
+      setAuth({ signOutMessage: MESSAGE });
+      render(<App />);
+      const banner = screen.getByText(MESSAGE).closest('.signed-out-banner');
+      expect(banner).toBeInTheDocument();
+      await user.click(within(banner).getByRole('button', { name: 'Sign in' }));
+      expect(within(modal()).getByText(MESSAGE)).toBeInTheDocument();
+    });
+
+    it('can be dismissed', async () => {
+      const user = userEvent.setup();
+      setAuth({ signOutMessage: MESSAGE });
+      render(<App />);
+      await user.click(screen.getByRole('button', { name: 'Dismiss' }));
+      expect(auth.dismissSignOutReason).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows nothing after an ordinary sign-out', () => {
+      render(<App />);
+      expect(screen.queryByText(/another device/)).not.toBeInTheDocument();
     });
   });
 

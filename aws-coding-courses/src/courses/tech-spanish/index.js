@@ -5,6 +5,7 @@
 import meta from './meta.json';
 import { siblingsOf } from '../../shared/courseSites';
 import { both } from '../../engine/i18n';
+import { pricingFaqBoth } from '../../shared/pricingFaq';
 import startHere from './tutorials/00-start-here';
 import gitEveryday from './tutorials/01-git-everyday';
 import talkingCode from './tutorials/02-talking-code';
@@ -19,7 +20,6 @@ const course = {
   ...meta,
   languages: ['es', 'en'],
   defaultLanguage: 'es',
-  bundle: false, // not part of the Developer Path bundle
   mark: 'ñ',
   accent: '#f2a845',
   eyebrow: both('Course · Tech Spanish ↔ Tech English', 'Curso · Tech Spanish ↔ Tech English'),
@@ -58,7 +58,7 @@ you   Got it: merged, deploying after
       'Cada módulo parte de un momento real de trabajo. Lee un poco, repasa las palabras con tarjetas, clasifica frases por registro, escribe un mensaje real y luego compruébalo.',
     ),
     'tut.finished': both('🎉 Module finished', '🎉 Módulo terminado'),
-    'app.unlocked': both(() => 'Unlocked. Every module is yours. Enjoy!', () => 'Desbloqueado. Todos los módulos son tuyos. ¡Disfrútalo!'),
+    'app.unlocked': both(() => 'Unlocked. Every module is open to you. Enjoy!', () => 'Desbloqueado. Ya puedes abrir todos los módulos. ¡Disfrútalo!'),
     'unlock.soon': both('Purchases open very soon. The free modules are ready now.', 'Las compras abren muy pronto. Los módulos gratis ya están listos.'),
     'unlock.allTutorials': both(
       (count, titles) => `All ${count} modules, including ${titles}`,
@@ -68,8 +68,8 @@ you   Got it: merged, deploying after
     'unlock.project': both('The final project: tell the same change in both languages, in the right register', 'El proyecto final: contar el mismo cambio en los dos idiomas, en el registro correcto'),
   },
   pricingLede: both(
-    'All nine modules: 200+ terms with flashcards in both directions, register drills, writing tasks and the final project. Pay once, keep it.',
-    'Los nueve módulos: más de 200 términos con tarjetas en las dos direcciones, ejercicios de registro, de escritura y el proyecto final. Pagas una vez y es tuyo.',
+    'All nine modules: 200+ terms with flashcards in both directions, register drills, writing tasks and the final project. Pay monthly or yearly and cancel anytime. Also included in Pro, with every other course and certification game.',
+    'Los nueve módulos: más de 200 términos con tarjetas en las dos direcciones, ejercicios de registro, de escritura y el proyecto final. Paga al mes o al año y cancela cuando quieras. También está incluido en Pro, junto con los demás cursos y juegos de certificación.',
   ),
   faq: [
     {
@@ -100,6 +100,7 @@ you   Got it: merged, deploying after
         'Ayuda trabajar en tecnología o cerca de ella (desarrollo, IT, soporte, preventa, producto), pero no vas a programar. Vas a escribir los mensajes que se escriben en el trabajo: mensajes de commit, pull requests, avisos en Slack y correos.',
       ),
     },
+    pricingFaqBoth(),
     {
       q: both('Is this an official AWS course?', '¿Es un curso oficial de AWS?'),
       a: both(

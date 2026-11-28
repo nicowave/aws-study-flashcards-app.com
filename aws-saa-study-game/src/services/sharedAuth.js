@@ -3,6 +3,8 @@
 // Firebase, so AuthContext and the components didn't have to change shape.
 import {
   signInWithPassword,
+  verifyPassword,
+  takeSignOutReason,
   signUp,
   resendSignUpLink,
   requestPasswordReset,
@@ -17,6 +19,7 @@ import {
   onSessionChange,
   apiFetch,
 } from './awsAuth';
+import { MAX_SIGNED_IN_DEVICES } from '../config/auth.config';
 
 const PENDING_EMAIL_KEY = 'awsStudyPendingEmail';
 
@@ -47,6 +50,18 @@ export const getStoredUserData = () => {
 // Email waiting for its verification link (so "resend" knows where to send it)
 const setPendingEmail = (email) => sessionStorage.setItem(PENDING_EMAIL_KEY, String(email || '').trim().toLowerCase());
 const getPendingEmail = () => sessionStorage.getItem(PENDING_EMAIL_KEY);
+
+// What a browser shows after Cognito signed it out on its own
+// (takeSignOutReason() says why). Course sites word it through t().
+export const SIGN_OUT_MESSAGES = {
+  'device-limit': `You were signed out on this browser because your account signed in on another device. An account can stay signed in on up to ${MAX_SIGNED_IN_DEVICES} devices.`,
+};
+
+/**
+ * Why this browser was signed out without asking ('device-limit'), or null.
+ * Reading it clears it, so call it once per sign-out (AuthContext does).
+ */
+export { takeSignOutReason };
 
 const tooManyAttempts = (code) => code === 'TooManyRequestsException' || code === 'LimitExceededException';
 
@@ -329,7 +344,8 @@ export const reauthenticateUser = async (password) => {
     return { success: false, error: 'No user signed in' };
   }
   try {
-    await signInWithPassword(user.email, password);
+    // Checks the password but keeps this browser's session (and device slot)
+    await verifyPassword(user.email, password);
     console.log('[Auth] Re-authentication successful');
     return { success: true };
   } catch (error) {
@@ -437,6 +453,10 @@ export const deleteAccount = async (password = null) => {
     return { success: true };
   } catch (error) {
     console.error('[Auth] Delete account error:', error.message);
+    // 409: a subscription is still billing. The server's text says what to do (cancel it in Manage billing first)
+    if (error.status === 409 || error.code === 'SUBSCRIPTION_ACTIVE') {
+      return { success: false, error: error.message || 'Cancel your subscription in Manage billing first' };
+    }
     return { success: false, error: 'Failed to delete account' };
   }
 };

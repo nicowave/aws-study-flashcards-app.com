@@ -14,7 +14,9 @@ import {
   changePassword,
   updateUserAvatar,
   updateDisplayName,
-  deleteAccount
+  deleteAccount,
+  takeSignOutReason,
+  SIGN_OUT_MESSAGES
 } from '../services/sharedAuth';
 
 const AuthContext = createContext(null);
@@ -33,6 +35,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isGuest, setIsGuest] = useState(isGuestUser());
+  // Why Cognito signed this browser out on its own ('device-limit'), shown until dismissed or signed in
+  const [signOutReason, setSignOutReason] = useState(null);
 
   useEffect(() => {
     console.log('[AuthContext] Setting up auth listener...');
@@ -57,6 +61,7 @@ export const AuthProvider = ({ children }) => {
           // A real sign-in supersedes guest mode
           localStorage.removeItem('awsStudyGuest');
           setIsGuest(false);
+          setSignOutReason(null);
 
           // Profile from the StudyHub API (the app's display name lives there)
           const result = await getUserData();
@@ -71,6 +76,8 @@ export const AuthProvider = ({ children }) => {
           console.log('[AuthContext] Auth state changed: No user');
           setUser(null);
           setUserData(null);
+          const reason = takeSignOutReason();
+          if (reason) setSignOutReason(reason);
         }
 
         setLoading(false);
@@ -143,6 +150,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     console.log('[AuthContext] Logging out...');
     try {
+      setSignOutReason(null);
       const result = await logoutUser();
       if (result.success) {
         setUser(null);
@@ -215,6 +223,8 @@ export const AuthProvider = ({ children }) => {
 
   // Clear error
   const clearError = () => setError(null);
+
+  const dismissSignOutReason = () => setSignOutReason(null);
 
   // Save this game's progress to the cloud
   const syncLocalProgress = async (localStats, certId) => {
@@ -335,7 +345,10 @@ export const AuthProvider = ({ children }) => {
     changeDisplayName,
     updateAvatar,
     deleteUserAccount,
-    refreshUserData
+    refreshUserData,
+    signOutReason,
+    signOutMessage: SIGN_OUT_MESSAGES[signOutReason] || null,
+    dismissSignOutReason
   };
 
   return (

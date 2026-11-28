@@ -28,7 +28,8 @@ npm run build          # dist/
 - `src/data/flashcards/module*.js`: flashcard decks
 - `src/data/studyGuide/*.js`: study guide chapters
 
-## Not deployed yet
+## Billing
 
-Publishing needs an S3 bucket and CloudFront distribution for `dva.aws-study-flashcards-app.com`, a Route 53 alias, ACM coverage,
-a `dva` target in `deploy.sh`, and a Stripe price set as `STRIPE_PRICE_DEVELOPER_ASSOCIATE` in `functions/.env`.
+Sold as a subscription, monthly or yearly (plan id `developer-associate`), or as part of Pro. The prices shown come from
+`src/services/prices.js` (the same in all four games); the Stripe prices are `STRIPE_PRICE_DEVELOPER_ASSOCIATE_MONTHLY` and
+`STRIPE_PRICE_DEVELOPER_ASSOCIATE_YEARLY` in `aws-backend/.env`. Deploy with `./deploy.sh dva` from the repo root.

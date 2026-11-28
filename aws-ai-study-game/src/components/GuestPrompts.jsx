@@ -1,13 +1,19 @@
 import React from 'react';
 import { LockIcon } from './Icons';
-import { BILLING_ENABLED, CERT_PRICE_LABEL } from '../services/billing';
-import { certSale } from './PromoBanner';
+import { BILLING_ENABLED } from '../services/billing';
+import { PRODUCT_PRICES } from '../services/prices';
+import { saleFor } from './PromoBanner';
 import './GuestPrompts.css';
 
-// "$9.99 one-time", or the sale price while a sale runs
+const both = (month, year) => `${month}/month or ${year}/year`;
+
+// "$11/month or $69/year", or the first payment's sale price while a sale runs
 const unlockPriceText = () => {
-  const sale = certSale(CERT_PRICE_LABEL);
-  return sale ? `${sale.salePrice} during the ${sale.promo.label}, normally ${sale.price}` : CERT_PRICE_LABEL;
+  const month = saleFor(PRODUCT_PRICES.month);
+  const year = saleFor(PRODUCT_PRICES.year);
+  const normal = both(PRODUCT_PRICES.month, PRODUCT_PRICES.year);
+  if (!month || !year) return normal;
+  return `${both(month.salePrice, year.salePrice)} for the first payment during the ${month.promo.label}, normally ${normal}`;
 };
 
 // Slim banner shown at the top of every screen while in guest mode.
@@ -39,8 +45,8 @@ export const GuestUpsell = ({ feature, bullets, onSignUp, onBack }) => (
         <>
           Start with a free account — no card needed, and your guest progress carries
           over automatically. It includes every flashcard deck and your first full quiz.
-          The exam simulator and every quiz domain come with this certification&apos;s
-          one-time unlock ({unlockPriceText()}).
+          The exam simulator and every quiz domain come with a subscription to this
+          certification ({unlockPriceText()}, cancel anytime) or with Pro.
         </>
       ) : (
         <>

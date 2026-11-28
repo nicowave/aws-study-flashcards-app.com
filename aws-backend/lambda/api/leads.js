@@ -21,20 +21,28 @@ const HUB = 'https://levelupstudyhub.com';
 const ADDRESS = 'Nico Tek Solutions · 5104 Lawton Dr., Bethesda, MD 20816';
 const MAX_EMAILS_PER_DAY = 3; // per address, so the form can't be used to flood someone
 
-// Prices in cents, same as aws-study-homepage/src/data/certifications.js
+// Every product is a subscription at one price; Pro is yearly only. In cents, same as
+// PRODUCT_MONTHLY / PRODUCT_YEARLY / PRO_YEARLY in the apps. The only prices in the emails.
+const PRICES = { productMonthly: 1100, productYearly: 6900, proYearly: 19900 };
+
 const CERTS = {
-  'cloud-practitioner': { name: 'AWS Certified Cloud Practitioner', short: 'Cloud Practitioner', url: 'https://cloud.levelupstudyhub.com', cents: 999 },
-  'ai-practitioner': { name: 'AWS Certified AI Practitioner', short: 'AI Practitioner', url: 'https://ai.levelupstudyhub.com', cents: 999 },
-  'solutions-architect-associate': { name: 'AWS Certified Solutions Architect – Associate', short: 'Solutions Architect', url: 'https://architect.levelupstudyhub.com', cents: 1499 },
-  'developer-associate': { name: 'AWS Certified Developer – Associate', short: 'Developer Associate', url: 'https://developer.levelupstudyhub.com', cents: 1499 },
+  'cloud-practitioner': { name: 'AWS Certified Cloud Practitioner', short: 'Cloud Practitioner', url: 'https://cloud.levelupstudyhub.com' },
+  'ai-practitioner': { name: 'AWS Certified AI Practitioner', short: 'AI Practitioner', url: 'https://ai.levelupstudyhub.com' },
+  'solutions-architect-associate': { name: 'AWS Certified Solutions Architect – Associate', short: 'Solutions Architect', url: 'https://architect.levelupstudyhub.com' },
+  'developer-associate': { name: 'AWS Certified Developer – Associate', short: 'Developer Associate', url: 'https://developer.levelupstudyhub.com' },
 };
 
 // Same window as PROMOTIONS in callables/index.js (Oct 31 – Nov 6, Eastern)
 const SALE = { start: Date.parse('2026-10-31T04:00:00Z'), end: Date.parse('2026-11-07T05:00:00Z'), percent: 31 };
-const dollars = (cents) => `$${(cents / 100).toFixed(2)}`;
+// "$11", "$47.61"
+const dollars = (cents) => (cents % 100 ? `$${(cents / 100).toFixed(2)}` : `$${cents / 100}`);
 // Rounded the way Stripe rounds the coupon (and offers.js salePrice)
-const salePrice = (cert) => dollars(cert.cents - Math.round((cert.cents * SALE.percent) / 100));
+const salePrice = (cents) => dollars(cents - Math.round((cents * SALE.percent) / 100));
 const onSale = (now = Date.now()) => now >= SALE.start && now < SALE.end;
+// What every email that sells says about billing
+const PRICE_TEXT = `${dollars(PRICES.productMonthly)}/month or ${dollars(PRICES.productYearly)}/year`;
+const TERMS_URL = `${HUB}/terms.html`;
+const RENEWAL_NOTE = 'Subscriptions renew automatically. Cancel anytime in Manage billing.';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const clean = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
@@ -121,7 +129,7 @@ function buildEmail({ cert, certId, score, total, domains, unsubscribeUrl }) {
   const domainLines = domains.map((d) => `- ${d.name}: ${d.correct}/${d.total}`).join('\n');
   const planLines = plan.map((p, i) => `Day ${i + 1}: ${p}`).join('\n');
   const saleText = saleOn
-    ? '\nHalloween deal: 31% off the full certification game until November 6, already applied at checkout.\n'
+    ? `\nHalloween deal: 31% off the full certification game until November 6, already applied at checkout. ${RENEWAL_NOTE} Terms: ${TERMS_URL}\n`
     : '';
 
   const text = `Your ${cert.name} readiness check
@@ -161,7 +169,7 @@ ${footerText(unsubscribeUrl)}`;
 ${plan.map((p, i) => `<tr><td style="vertical-align:top;padding:6px 12px 6px 0;font-size:13px;font-weight:700;color:#2f5bd3;white-space:nowrap">Day ${i + 1}</td><td style="padding:6px 0;font-size:15px;line-height:1.45">${esc(p)}</td></tr>`).join('\n')}
 </table>
 ${button(studyUrl, 'Start day 1')}
-${saleOn ? '<p style="margin:16px 0 0;padding:12px 14px;background:#fbe7d6;border-radius:8px;font-size:14px;color:#8a3d06"><strong>Halloween deal:</strong> 31% off the full certification game until November 6, already applied at checkout.</p>' : ''}
+${saleOn ? `<p style="margin:16px 0 0;padding:12px 14px;background:#fbe7d6;border-radius:8px;font-size:14px;color:#8a3d06"><strong>Halloween deal:</strong> 31% off the full certification game until November 6, already applied at checkout. ${RENEWAL_NOTE} <a href="${esc(TERMS_URL)}" style="color:#8a3d06">Terms</a></p>` : ''}
 <p style="margin:20px 0 0;font-size:15px;line-height:1.5">Reply to this email if you have a question. I read every one.<br><br>Nico<br><span style="color:#5d6070">Level Up Study Hub</span></p>
 `, unsubscribeUrl);
 
@@ -382,6 +390,10 @@ module.exports = {
   HUB,
   buildEmail,
   CERTS,
+  PRICES,
+  PRICE_TEXT,
+  TERMS_URL,
+  RENEWAL_NOTE,
   SALE,
   onSale,
   dollars,

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import PromoBanner, { certSale } from './PromoBanner';
+import PromoBanner, { saleFor } from './PromoBanner';
 import { PROMOTIONS } from '../services/offers';
+import { PRODUCT_PRICES, PRO_YEARLY } from '../services/prices';
 
 // The real sale windows from offers.js are exercised; only the clock is faked.
 const [promo] = PROMOTIONS;
@@ -32,8 +33,8 @@ describe('PromoBanner', () => {
     at(time());
     render(<PromoBanner />);
     expect(banner()).toHaveTextContent(`${promo.label} starts ${promo.starts}`);
-    expect(banner()).toHaveTextContent(`${promo.single}% off this certification`);
-    expect(banner()).toHaveTextContent(`${promo.bundle}% off Pro`);
+    expect(banner()).toHaveTextContent(`${promo.single}% off your first month or year of this certification`);
+    expect(banner()).toHaveTextContent(`${promo.pro}% off your first year of Pro`);
     expect(banner()).not.toHaveTextContent(/applied at checkout/i);
   });
 
@@ -44,8 +45,8 @@ describe('PromoBanner', () => {
   ])('shows the running sale %s', (_, time) => {
     at(time());
     render(<PromoBanner />);
-    expect(banner()).toHaveTextContent(`${promo.label}: ${promo.single}% off this certification`);
-    expect(banner()).toHaveTextContent(`${promo.bundle}% off Pro, until ${promo.ends}`);
+    expect(banner()).toHaveTextContent(`${promo.label}: ${promo.single}% off your first month or year of this certification`);
+    expect(banner()).toHaveTextContent(`${promo.pro}% off your first year of Pro, until ${promo.ends}`);
     expect(banner()).toHaveTextContent(/applied at checkout/i);
     expect(banner()).not.toHaveTextContent(/starts/i);
   });
@@ -77,34 +78,41 @@ describe('PromoBanner', () => {
   });
 });
 
-describe('certSale', () => {
+describe('saleFor', () => {
   it('is null outside a sale', () => {
     at(promo.end + MINUTE);
-    expect(certSale('$19.99 one-time')).toBeNull();
+    expect(saleFor(PRODUCT_PRICES.month)).toBeNull();
     at(promo.teaseFrom - MINUTE);
-    expect(certSale('$19.99 one-time')).toBeNull();
+    expect(saleFor(PRODUCT_PRICES.month)).toBeNull();
   });
 
   it('is null while the sale is only teased (no discount at checkout yet)', () => {
     at(promo.teaseFrom + MINUTE);
-    expect(certSale('$19.99 one-time')).toBeNull();
+    expect(saleFor(PRODUCT_PRICES.year)).toBeNull();
+    expect(saleFor(PRO_YEARLY, 'pro')).toBeNull();
   });
 
   it('gives the promotion, the normal price and the sale price while the sale runs', () => {
     at(promo.start + MINUTE);
-    expect(certSale('$19.99 one-time')).toEqual({
+    for (const price of Object.values(PRODUCT_PRICES)) {
+      expect(saleFor(price)).toEqual({ promo, price, salePrice: discounted(price, promo.single) });
+    }
+  });
+
+  it("uses the Pro discount for Pro", () => {
+    at(promo.start + MINUTE);
+    expect(saleFor(PRO_YEARLY, 'pro')).toEqual({
       promo,
-      price: '$19.99',
-      salePrice: discounted('$19.99', promo.single),
+      price: PRO_YEARLY,
+      salePrice: discounted(PRO_YEARLY, promo.pro),
     });
   });
 
-  it.each(['$9.99 one-time', '$14.99', '$29.99 lifetime', '$20 one-time', '$0.99'])(
+  it.each(['$11', '$69', '$199', '$9.99', '$0.99'])(
     'rounds the sale price of %s to the cent, below the normal price',
-    (label) => {
+    (price) => {
       at(promo.start + MINUTE);
-      const price = label.match(/\$[\d.]+/)[0];
-      const sale = certSale(label);
+      const sale = saleFor(price);
       expect(sale.price).toBe(price);
       expect(sale.salePrice).toBe(discounted(price, promo.single));
       expect(sale.salePrice).toMatch(/^\$\d+\.\d{2}$/);
@@ -112,14 +120,10 @@ describe('certSale', () => {
     },
   );
 
-  it('uses the first dollar amount in the label', () => {
+  it('is null during a sale for a price with no dollar amount, or a kind the sale does not cover', () => {
     at(promo.start + MINUTE);
-    expect(certSale('$19.99 now, was $29.99').price).toBe('$19.99');
-  });
-
-  it('is null during a sale when the label has no dollar amount', () => {
-    at(promo.start + MINUTE);
-    expect(certSale('one-time purchase')).toBeNull();
-    expect(certSale('')).toBeNull();
+    expect(saleFor('')).toBeNull();
+    expect(saleFor(undefined)).toBeNull();
+    expect(saleFor(PRODUCT_PRICES.month, 'nothing')).toBeNull();
   });
 });

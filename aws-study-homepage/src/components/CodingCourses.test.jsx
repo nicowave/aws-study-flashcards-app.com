@@ -1,17 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import CodingCourses, { PromoBanner, COURSES as EXPORTED, OTHER_COURSES as OTHER_EXPORTED } from './CodingCourses';
-import { COURSES, OTHER_COURSES, COURSE_PRICE, BUNDLE_PRICE } from '../data/courses';
-import { certifications } from '../data/certifications';
-import { useAuth } from '../context/AuthContext';
-import { startCheckout } from '../services/billing';
+import { COURSES, OTHER_COURSES } from '../data/courses';
+import { PRODUCT_MONTHLY, PRODUCT_YEARLY, PRO_YEARLY } from '../data/prices';
 import { PROMOTIONS } from '../services/offers';
 import { SITE_SUBDOMAINS } from '../config/auth.config';
 
-vi.mock('../context/AuthContext', () => ({ useAuth: vi.fn() }));
-// Billing is the money boundary: never reach Stripe.
-vi.mock('../services/billing', () => ({ startCheckout: vi.fn() }));
 // Pretend the page was opened on a third name, so a link written with either name shows it went through onThisName.
 vi.mock('../config/auth.config', async (importOriginal) => ({
   ...(await importOriginal()),
@@ -21,7 +15,7 @@ vi.mock('../config/auth.config', async (importOriginal) => ({
 const [promo] = PROMOTIONS;
 const MINUTE = 60_000;
 const at = (time) => {
-  vi.useFakeTimers({ toFake: ['Date'] }); // only the clock; userEvent still needs real timers
+  vi.useFakeTimers({ toFake: ['Date'] }); // only the clock
   vi.setSystemTime(time);
 };
 // Independent of offers.js: whole cents, discount rounded to the cent (as Stripe does).
@@ -32,16 +26,11 @@ const discounted = (price, percent) => {
 };
 const onPageName = (url) => url.replace(/aws-study-flashcards-app\.com|levelupstudyhub\.com/, 'page-name.example');
 
-const signedIn = (yes) => vi.mocked(useAuth).mockReturnValue({ isAuthenticated: yes, user: yes ? { email: 'a@example.com' } : null });
-const courseCard = (title) => screen.getByRole('heading', { name: title, level: 3 }).closest('a');
-const bundle = () => screen.getByRole('heading', { name: /developer path bundle/i }).closest('div').parentElement;
-const bundleButton = () => within(bundle()).getByRole('button');
+const courseCard = (title) => screen.getByRole('heading', { name: title, level: 3 }).closest('.course-card');
+const proCallout = () => screen.getByRole('heading', { name: /every course and every certification/i }).closest('div').parentElement;
+const ALL_COURSES = COURSES.length + OTHER_COURSES.length;
 
-let onShowLogin;
 beforeEach(() => {
-  signedIn(false);
-  vi.mocked(startCheckout).mockReset();
-  onShowLogin = vi.fn();
   at(promo.end + MINUTE); // outside any sale unless a test says otherwise
 });
 
@@ -50,31 +39,33 @@ describe('CodingCourses', () => {
     expect(EXPORTED).toBe(COURSES);
   });
 
-  it('is the #courses section', () => {
-    render(<CodingCourses onShowLogin={onShowLogin} />);
-    expect(screen.getByRole('heading', { level: 2 }).closest('section')).toHaveAttribute('id', 'courses');
+  it('is the #courses section, and the bundle is gone', () => {
+    render(<CodingCourses />);
+    const section = screen.getByRole('heading', { level: 2 }).closest('section');
+    expect(section).toHaveAttribute('id', 'courses');
+    expect(section).not.toHaveTextContent(/developer path|bundle|one-time|once\b/i);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument(); // nothing is bought here
   });
 
   describe('course cards', () => {
     it('shows one card per course from courses.js, in order', () => {
-      render(<CodingCourses onShowLogin={onShowLogin} />);
+      render(<CodingCourses />);
       const titles = screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent);
       expect(titles.slice(0, COURSES.length)).toEqual(COURSES.map((c) => c.title));
     });
 
-    it.each(COURSES.map((c) => [c.title, c]))('%s: tutorials, hours, blurb, mark and price', (_, c) => {
-      render(<CodingCourses onShowLogin={onShowLogin} />);
+    it.each(COURSES.map((c) => [c.title, c]))('%s: tutorials, hours, blurb, mark and the monthly and yearly price', (_, c) => {
+      render(<CodingCourses />);
       const card = within(courseCard(c.title));
       expect(card.getByText(`${c.tutorials} tutorials · about ${c.hours} hours`)).toBeInTheDocument();
       expect(card.getByText(c.blurb)).toBeInTheDocument();
       expect(card.getByText(c.mark)).toBeInTheDocument();
-      expect(card.getByText(COURSE_PRICE)).toBeInTheDocument();
-      expect(courseCard(c.title)).toHaveTextContent(/one-time unlock/i);
+      expect(courseCard(c.title)).toHaveTextContent(`${PRODUCT_MONTHLY}/month or ${PRODUCT_YEARLY}/year`);
       expect(card.getByText(/start free/i)).toBeInTheDocument();
     });
 
     it.each(COURSES.map((c) => [c.title, c]))('%s: the whole card links to its site through onThisName', (_, c) => {
-      render(<CodingCourses onShowLogin={onShowLogin} />);
+      render(<CodingCourses />);
       expect(courseCard(c.title)).toHaveAttribute('href', onPageName(c.url));
     });
 
@@ -97,35 +88,44 @@ describe('CodingCourses', () => {
     });
 
     it('never strikes a price through outside a sale', () => {
-      const { container } = render(<CodingCourses onShowLogin={onShowLogin} />);
+      const { container } = render(<CodingCourses />);
       expect(container.querySelector('s')).toBeNull();
       expect(screen.queryByText(new RegExp(promo.label))).not.toBeInTheDocument();
     });
   });
 
-  describe('more courses (outside the Developer Path)', () => {
+  describe('Pro call-out (in place of the old bundle)', () => {
+    it('says Pro covers every course and certification, for the Pro price, and links to the plans', () => {
+      render(<CodingCourses />);
+      expect(within(proCallout()).getByText(PRO_YEARLY)).toBeInTheDocument();
+      expect(proCallout()).toHaveTextContent(`all ${ALL_COURSES} coding courses and every certification`);
+      expect(within(proCallout()).getByRole('link', { name: 'See Pro' })).toHaveAttribute('href', '#plans');
+    });
+  });
+
+  describe('more courses', () => {
     const other = OTHER_COURSES[0];
-    const card = () => screen.getByRole('heading', { name: other.title, level: 3 }).closest('.course-card');
+    const card = () => courseCard(other.title);
     const withLive = (live, fn) => { const was = other.live; other.live = live; try { fn(); } finally { other.live = was; } };
 
-    it('re-exports the list and keeps the Developer Path list at four courses', () => {
+    it('re-exports the list and keeps it apart from the four main courses', () => {
       expect(OTHER_EXPORTED).toBe(OTHER_COURSES);
       expect(OTHER_COURSES.length).toBeGreaterThan(0);
       expect(COURSES.map((c) => c.id)).not.toContain(other.id);
     });
 
-    it('shows modules, hours, blurb and price, and says it is not in the bundle', () => {
-      render(<CodingCourses onShowLogin={onShowLogin} />);
+    it('shows modules, hours, blurb and price, and says Pro includes it', () => {
+      render(<CodingCourses />);
       const c = within(card());
       expect(c.getByText(`${other.modules} modules · about ${other.hours} hours`)).toBeInTheDocument();
       expect(c.getByText(other.blurb)).toBeInTheDocument();
-      expect(c.getByText(COURSE_PRICE)).toBeInTheDocument();
-      expect(c.getByText(/not part of the developer path bundle/i)).toBeInTheDocument();
+      expect(card()).toHaveTextContent(`${PRODUCT_MONTHLY}/month or ${PRODUCT_YEARLY}/year`);
+      expect(c.getByText(/included in pro/i)).toBeInTheDocument();
     });
 
     it('is a card without a link while its site is not live', () => {
       withLive(false, () => {
-        render(<CodingCourses onShowLogin={onShowLogin} />);
+        render(<CodingCourses />);
         expect(card().tagName).toBe('DIV');
         expect(within(card()).getByText('Coming soon')).toBeInTheDocument();
         expect(screen.queryByRole('link', { name: new RegExp(other.title) })).not.toBeInTheDocument();
@@ -134,7 +134,7 @@ describe('CodingCourses', () => {
 
     it('links to its site through onThisName once live', () => {
       withLive(true, () => {
-        render(<CodingCourses onShowLogin={onShowLogin} />);
+        render(<CodingCourses />);
         expect(card()).toHaveAttribute('href', onPageName(other.url));
         expect(within(card()).getByText(/start free/i)).toBeInTheDocument();
       });
@@ -142,114 +142,35 @@ describe('CodingCourses', () => {
 
     it('takes part in sales like the other courses', () => {
       at(promo.start + MINUTE);
-      render(<CodingCourses onShowLogin={onShowLogin} />);
-      expect(within(card()).getByText(discounted(COURSE_PRICE, promo.single))).toBeInTheDocument();
-    });
-  });
-
-  describe('Developer Path bundle', () => {
-    it('offers all four courses plus the Developer Associate game for the bundle price', () => {
-      render(<CodingCourses onShowLogin={onShowLogin} />);
-      expect(within(bundle()).getByText(BUNDLE_PRICE)).toBeInTheDocument();
-      expect(bundle()).toHaveTextContent(/all four courses plus the developer associate study game/i);
-      expect(COURSES).toHaveLength(4);
-    });
-
-    it('states the one-by-one total that matches the real prices, and the bundle saves money', () => {
-      const dva = certifications.find((c) => c.id === 'developer-associate');
-      const total = COURSES.length * cents(COURSE_PRICE) + cents(dva.price);
-      render(<CodingCourses onShowLogin={onShowLogin} />);
-      expect(bundle()).toHaveTextContent(`$${(total / 100).toFixed(2)} if bought one by one`);
-      expect(cents(BUNDLE_PRICE)).toBeLessThan(total);
-    });
-
-    it('asks a signed-out visitor to sign in instead of starting checkout', async () => {
-      render(<CodingCourses onShowLogin={onShowLogin} />);
-      expect(bundleButton()).toHaveTextContent('Sign in to get it');
-      await userEvent.click(bundleButton());
-      expect(onShowLogin).toHaveBeenCalledTimes(1);
-      expect(startCheckout).not.toHaveBeenCalled();
-    });
-
-    it('starts checkout for the developer-path plan when a signed-in learner clicks', async () => {
-      signedIn(true);
-      vi.mocked(startCheckout).mockReturnValue(new Promise(() => {})); // redirecting
-      render(<CodingCourses onShowLogin={onShowLogin} />);
-      expect(bundleButton()).toHaveTextContent('Get the Developer Path');
-      await userEvent.click(bundleButton());
-      expect(startCheckout).toHaveBeenCalledTimes(1);
-      expect(startCheckout).toHaveBeenCalledWith('developer-path');
-      expect(onShowLogin).not.toHaveBeenCalled();
-    });
-
-    it('locks the button while redirecting so a double click cannot start two checkouts', async () => {
-      signedIn(true);
-      vi.mocked(startCheckout).mockReturnValue(new Promise(() => {}));
-      render(<CodingCourses onShowLogin={onShowLogin} />);
-      await userEvent.dblClick(bundleButton());
-      expect(bundleButton()).toHaveTextContent('Redirecting…');
-      expect(bundleButton()).toBeDisabled();
-      expect(startCheckout).toHaveBeenCalledTimes(1);
-    });
-
-    it('shows an error and lets the learner try again when checkout fails', async () => {
-      signedIn(true);
-      vi.spyOn(console, 'error').mockImplementation(() => {});
-      vi.mocked(startCheckout).mockRejectedValueOnce(new Error('network down'));
-      render(<CodingCourses onShowLogin={onShowLogin} />);
-      await userEvent.click(bundleButton());
-      expect(await screen.findByText('Could not start checkout. Please try again.')).toBeInTheDocument();
-      expect(bundleButton()).toBeEnabled();
-      expect(bundleButton()).toHaveTextContent('Get the Developer Path');
-
-      vi.mocked(startCheckout).mockReturnValue(new Promise(() => {}));
-      await userEvent.click(bundleButton());
-      expect(startCheckout).toHaveBeenCalledTimes(2);
-      expect(screen.queryByText('Could not start checkout. Please try again.')).not.toBeInTheDocument();
+      render(<CodingCourses />);
+      expect(within(card()).getByText(discounted(PRODUCT_MONTHLY, promo.single))).toBeInTheDocument();
     });
   });
 
   describe('during a sale', () => {
-    it('shows each course at the sale price with the full price struck through', () => {
+    it('shows each course at the sale price, monthly and yearly, with the full prices struck through', () => {
       at(promo.start + MINUTE);
-      render(<CodingCourses onShowLogin={onShowLogin} />);
+      render(<CodingCourses />);
       for (const c of COURSES) {
         const card = courseCard(c.title);
-        expect(within(card).getByText(discounted(COURSE_PRICE, promo.single))).toBeInTheDocument();
-        expect(card.querySelector('s')).toHaveTextContent(COURSE_PRICE);
+        expect(within(card).getByText(discounted(PRODUCT_MONTHLY, promo.single))).toBeInTheDocument();
+        expect(within(card).getByText(discounted(PRODUCT_YEARLY, promo.single))).toBeInTheDocument();
+        expect([...card.querySelectorAll('s')].map((s) => s.textContent)).toEqual([PRODUCT_MONTHLY, PRODUCT_YEARLY]);
       }
-    });
-
-    it('shows the bundle at its own (bundle) discount, with the sale pill', () => {
-      at(promo.start + MINUTE);
-      render(<CodingCourses onShowLogin={onShowLogin} />);
-      expect(within(bundle()).getByText(discounted(BUNDLE_PRICE, promo.bundle))).toBeInTheDocument();
-      expect(bundle().querySelector('s')).toHaveTextContent(BUNDLE_PRICE);
-      expect(bundle()).toHaveTextContent(`${promo.label}: ${promo.bundle}% off until ${promo.ends}`);
     });
 
     it('keeps full prices while the sale is only being teased', () => {
       at(promo.teaseFrom + MINUTE);
-      const { container } = render(<CodingCourses onShowLogin={onShowLogin} />);
+      const { container } = render(<CodingCourses />);
       expect(container.querySelector('s')).toBeNull();
-      expect(screen.getAllByText(COURSE_PRICE)).toHaveLength(COURSES.length + OTHER_COURSES.length);
-      expect(within(bundle()).getByText(BUNDLE_PRICE)).toBeInTheDocument();
+      expect(screen.getAllByText(PRODUCT_MONTHLY)).toHaveLength(ALL_COURSES);
     });
 
     it('goes back to full price the moment the sale ends', () => {
       at(promo.end);
-      const { container } = render(<CodingCourses onShowLogin={onShowLogin} />);
+      const { container } = render(<CodingCourses />);
       expect(container.querySelector('s')).toBeNull();
-      expect(screen.queryByText(discounted(COURSE_PRICE, promo.single))).not.toBeInTheDocument();
-    });
-
-    it('still checks out the same plan (the server applies the discount)', async () => {
-      at(promo.start + MINUTE);
-      signedIn(true);
-      vi.mocked(startCheckout).mockReturnValue(new Promise(() => {}));
-      render(<CodingCourses onShowLogin={onShowLogin} />);
-      await userEvent.click(bundleButton());
-      expect(startCheckout).toHaveBeenCalledWith('developer-path');
+      expect(screen.queryByText(discounted(PRODUCT_MONTHLY, promo.single))).not.toBeInTheDocument();
     });
   });
 });
@@ -271,8 +192,9 @@ describe('PromoBanner', () => {
     at(promo.teaseFrom + MINUTE);
     render(<PromoBanner />);
     expect(banner()).toHaveTextContent(`${promo.label} starts ${promo.starts}`);
-    expect(banner()).toHaveTextContent(`${promo.single}% off every course and certification`);
-    expect(banner()).toHaveTextContent(`${promo.bundle}% off the Developer Path bundle and Pro`);
+    expect(banner()).toHaveTextContent(`${promo.single}% off the first payment of every course and certification`);
+    expect(banner()).toHaveTextContent(`${promo.pro}% off your first year of Pro`);
+    expect(banner()).not.toHaveTextContent(/bundle|developer path/i);
     expect(banner()).not.toHaveTextContent(/applied at checkout/i);
   });
 
@@ -282,7 +204,7 @@ describe('PromoBanner', () => {
   ])('shows the running sale %s', (_, time) => {
     at(time());
     render(<PromoBanner />);
-    expect(banner()).toHaveTextContent(`${promo.label}: ${promo.single}% off every course and certification`);
+    expect(banner()).toHaveTextContent(`${promo.label}: ${promo.single}% off the first payment of every course and certification`);
     expect(banner()).toHaveTextContent(`until ${promo.ends}`);
     expect(banner()).toHaveTextContent(/applied at checkout/i);
     expect(banner()).not.toHaveTextContent(/starts/i);

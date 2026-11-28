@@ -1,5 +1,6 @@
 // AWS Certification data
 // Status: 'available' | 'coming-soon' | 'hidden' (kept in data, not rendered)
+// No prices here: every certification costs the same, from src/data/prices.js.
 
 export const certifications = [
   // Foundational
@@ -12,7 +13,6 @@ export const certifications = [
     description: 'Validate your overall understanding of AWS Cloud fundamentals, including core services, security, architecture, pricing, and support.',
     subdomain: 'cloud',
     url: 'https://cloud.levelupstudyhub.com',
-    price: '$9.99', // one-time unlock; keep in sync with VITE_CERT_PRICE_LABEL in that app
     status: 'available',
     icon: '☁️',
     color: '#3fb950',
@@ -31,7 +31,6 @@ export const certifications = [
     description: 'Demonstrate foundational knowledge of AI/ML concepts, generative AI, and AWS AI services including Amazon Bedrock, SageMaker, and more.',
     subdomain: 'ai',
     url: 'https://ai.levelupstudyhub.com',
-    price: '$9.99', // one-time unlock; keep in sync with VITE_CERT_PRICE_LABEL in that app
     status: 'available',
     icon: '🤖',
     color: '#a78bfa',
@@ -52,7 +51,6 @@ export const certifications = [
     description: 'Validate your ability to design distributed systems on AWS, covering compute, networking, storage, and database services.',
     subdomain: 'architect',
     url: 'https://architect.levelupstudyhub.com',
-    price: '$14.99', // one-time unlock; keep in sync with VITE_CERT_PRICE_LABEL in that app
     status: 'available',
     icon: '🏗️',
     color: '#67e8f9',
@@ -71,7 +69,6 @@ export const certifications = [
     description: 'Prove your proficiency in developing, deploying, and debugging cloud-based applications using AWS services.',
     subdomain: 'developer',
     url: 'https://developer.levelupstudyhub.com',
-    price: '$14.99', // one-time unlock; keep in sync with VITE_CERT_PRICE_LABEL in that app
     status: 'available',
     icon: '👨‍💻',
     color: '#a371f7',

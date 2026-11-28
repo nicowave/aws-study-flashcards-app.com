@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        app: [aws-study-homepage, aws-cloud-practitioner-game, aws-ai-study-game, aws-saa-study-game, aws-dva-study-game, aws-dev-track, aws-backend]
+        app: [aws-study-homepage, aws-cloud-practitioner-game, aws-ai-study-game, aws-saa-study-game, aws-dva-study-game, aws-dev-track, aws-coding-courses, aws-backend]
 
     defaults:
       run:
@@ -23,27 +23,29 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js 20
+    # 22: the courses' jsdom 30 needs Node ^22.22 (Promise.withResolvers), and the Lambdas run on Node 22
+    - name: Use Node.js 22
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 22
     - run: npm install
     - run: npm run build
-    # Component tests, plus (in the four games) the official-sources check on every question and card
-    - if: contains(fromJSON('["aws-cloud-practitioner-game","aws-saa-study-game","aws-dva-study-game","aws-ai-study-game","aws-study-homepage","aws-dev-track"]'), matrix.app)
+    # Component tests, plus (in the four games) the official-sources check on every question and card.
+    # In aws-coding-courses: the shell, Python, JS/TS engines and every tutorial's answer run through its own check.
+    - if: contains(fromJSON('["aws-cloud-practitioner-game","aws-saa-study-game","aws-dva-study-game","aws-ai-study-game","aws-study-homepage","aws-dev-track","aws-coding-courses"]'), matrix.app)
       run: npm test
-    # The payments Lambda ships its own node_modules, and the backend tests load it
+    # Backend tests (checkout guards, return URLs, trial rules) load the payments Lambda, which ships its own node_modules
     - if: matrix.app == 'aws-backend'
       run: npm ci --prefix lambda/callables && npm test
 
-  # deploy.sh and the new-site script, run against a pretend AWS CLI (deploy.sh is a zsh script)
+  # deploy.sh, the new-site script and the Stripe/price scripts, run against a pretend AWS CLI and Stripe (deploy.sh is a zsh script)
   scripts:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js 20
+    - name: Use Node.js 22
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 22
     - run: sudo apt-get update && sudo apt-get install -y zsh
-    - run: node --test scripts/deploy.test.mjs scripts/create-course-site.test.mjs scripts/file-names.test.mjs
+    - run: node --test scripts/*.test.mjs

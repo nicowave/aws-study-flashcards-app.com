@@ -17,7 +17,7 @@ const req = createRequire(callables); // resolves the SDK from the function's ow
 process.env.TABLE_NAME = "test-table";
 process.env.USER_POOL_ID = "us-east-1_TestPool1";
 process.env.USER_POOL_CLIENT_ID = "test-client";
-process.env.STRIPE_PRICE_ALL_ACCESS = "price_pro";
+process.env.STRIPE_PRICE_ALL_ACCESS_YEARLY = "price_pro";
 
 // Every user already has a Stripe customer; nothing else is stored
 const lib = req("@aws-sdk/lib-dynamodb");

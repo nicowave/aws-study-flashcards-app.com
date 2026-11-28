@@ -10,6 +10,7 @@ import { useProgress } from './engine/progress';
 import { hasCourseAccess } from './services/billing';
 import CourseHome from './engine/CourseHome';
 import TutorialPage from './engine/TutorialPage';
+import ManageBilling from './engine/ManageBilling';
 import { currentPromotion } from './services/offers';
 import { onThisName } from './config/auth.config';
 import { LangProvider, useLang, useLocalized, useT } from './engine/i18n';
@@ -101,7 +102,7 @@ const PromoBanner = ({ access, t }) => {
   const sale = currentPromotion();
   if (!sale) return null;
   const { promo, live } = sale;
-  const deal = t('promo.deal', promo.single, promo.bundle);
+  const deal = t('promo.deal', promo.single, promo.pro);
   return (
     <div className="promo-banner" role="note">
       <span aria-hidden="true">🎃</span>
@@ -113,7 +114,7 @@ const PromoBanner = ({ access, t }) => {
   );
 };
 
-const Footer = ({ course, t }) => (
+const Footer = ({ course, t, user }) => (
   <footer className="site-footer">
     <div>
       <strong>{t('footer.moreCourses')}</strong>
@@ -129,6 +130,9 @@ const Footer = ({ course, t }) => (
         <li><a href={onThisName('https://developer.aws-study-flashcards-app.com')}>{t('footer.devAssociate')}</a></li>
         <li><a href={onThisName('https://cloud.aws-study-flashcards-app.com')}>{t('footer.cloudPractitioner')}</a></li>
         <li><a href={HUB_URL}>{t('footer.allHub')}</a></li>
+        {/* A subscription bought on any Study Hub site is managed (or cancelled) from here too,
+            when there is billing behind the account (ManageBilling asks the server) */}
+        {user && <ManageBilling course={course} item />}
       </ul>
     </div>
     <p className="fine">{t('footer.fine', new Date().getFullYear())}</p>
@@ -136,7 +140,7 @@ const Footer = ({ course, t }) => (
 );
 
 const Content = () => {
-  const { user, logout, loading } = useAuth();
+  const { user, logout, loading, signOutReason, dismissSignOutReason } = useAuth();
   const path = usePath();
   const localized = useLocalized(course);
   const t = useT(localized);
@@ -174,6 +178,14 @@ const Content = () => {
     <div className="site" style={{ '--accent': course.accent }}>
       <PromoBanner access={access} t={t} />
       <Header course={localized} t={t} user={user} onSignIn={openSignIn} onSignOut={logout} />
+      {/* Cognito signed this browser out because the account signed in on another device */}
+      {signOutReason === 'device-limit' && !user && (
+        <div className="notice info" role="status">
+          <span>{t('auth.signedOutDeviceLimit')}</span>
+          <button type="button" className="btn small" onClick={() => openSignIn()}>{t('nav.signIn')}</button>
+          <button type="button" className="link-btn" onClick={dismissSignOutReason} aria-label={t('app.dismiss')}>✕</button>
+        </div>
+      )}
       {notice && (
         <div className={`notice ${notice.kind}`} role="status">
           <span>{t(notice.key, localized.language)}</span>
@@ -192,7 +204,7 @@ const Content = () => {
           </div>
         )}
       </div>
-      <Footer course={localized} t={t} />
+      <Footer course={localized} t={t} user={user} />
       {loading && <span className="sr-only">{t('app.checkingSignIn')}</span>}
     </div>
   );

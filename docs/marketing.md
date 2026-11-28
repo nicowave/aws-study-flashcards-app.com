@@ -46,6 +46,8 @@ Any follow-up email must honor `unsubscribed` and include the unsubscribe link: 
 | Thu Nov 5 | `48-hours` | The deal ends Friday at midnight Eastern: price, what's in the full game, their score |
 | Fri Nov 6 | `last-day` | Last day of the deal; promises no more sale emails |
 
+Prices in these emails come from `PRICES` in `leads.js` (the sale emails quote the yearly subscription with the coupon, say it renews automatically and link the Terms). Never write one-time wording in a new email: everything sold is a subscription now.
+
 Who gets them: everyone on the list except people who unsubscribed and people who signed up in the last 24 hours. The two sale emails also skip anyone who already owns that certification (matched through their sign-in email). The sale emails send nothing outside the sale window. Each person gets each email once (`sent_<campaign>` on their PROFILE item), so a retried run continues where it stopped.
 
 Preview one email to one address (sends it, marks nothing, ignores the rules above):

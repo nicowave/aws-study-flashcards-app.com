@@ -2,6 +2,7 @@
 import meta from './meta.json';
 import { siblingsOf } from '../../shared/courseSites';
 import startHere from '../../shared/startHere';
+import { pricingFaq } from '../../shared/pricingFaq';
 import spreadsheetReport from './tutorials/01-spreadsheet-report';
 import awsBill from './tutorials/02-aws-bill';
 import uptimeAlerts from './tutorials/03-uptime-alerts';
@@ -35,7 +36,7 @@ Response:
     'Process uploads automatically with **S3 events**, **Lambda** and **DynamoDB**, safely retried',
     'Handle the errors real code meets: timeouts, missing keys, AWS error codes, duplicates and bad input',
   ],
-  pricingLede: 'All four tutorials with every practice task, quiz, flashcard deck and real-AWS project. Pay once, keep it. Part of the Developer Path: Bash, then Python, JavaScript and TypeScript, toward the AWS Certified Developer – Associate.',
+  pricingLede: 'All four tutorials with every practice task, quiz, flashcard deck and real-AWS project. Pay monthly or yearly and cancel anytime. Also included in Pro, with every other course and certification game.',
   faq: [
     { q: 'Do I need to know how to code?', a: 'No. If you\'re comfortable with computers (IT support, sysadmin, help desk, a technical hobby), you\'re ready. Tutorial 1 starts from your very first line of Python. The [Bash course](https://bash.aws-study-flashcards-app.com) helps but isn\'t required.' },
     { q: 'Is it real Python?', a: 'Yes: Python 3.13, running in your browser through Pyodide. The only pretend parts are the AWS account and the internet it talks to, so you can practice without a bill or a real website going down.' },
@@ -43,6 +44,7 @@ Response:
     { q: 'Will the real AWS projects cost money?', a: 'Almost nothing. Lambda, EventBridge, SNS email and S3 stay within AWS\'s monthly free amounts for these projects, and DynamoDB on-demand costs fractions of a cent at this size. Each Build step ends with cleanup commands.' },
     { q: 'Mac, Windows or Linux?', a: 'All three. Tutorial 1\'s Build step shows how to install Python on each, and *Start here* sets up a terminal.' },
     { q: 'Does this help with the AWS Certified Developer – Associate exam?', a: 'Yes. A third of that exam is writing code against AWS services: Lambda, DynamoDB, S3 and SNS, with retries, error handling and permissions. Each tutorial ends with exam tips. Pair it with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com) for full exam practice.' },
+    pricingFaq(),
     { q: 'Is this an official AWS course?', a: 'No. Level Up Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
   ],
   afterCourse: `**Next steps:**

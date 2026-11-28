@@ -3,7 +3,7 @@ import { render, screen, within, act, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SettingsPage from './SettingsPage';
 import { useAuth } from '../context/AuthContext';
-import { getEntitlements } from '../services/billing';
+import { getBillingSummary } from '../services/billing';
 import { isAnalyticsOptedOut, setAnalyticsOptOut } from '../services/analytics';
 
 // Auth, analytics and billing are faked here. Plan & Billing shows only once checkout is
@@ -11,7 +11,7 @@ import { isAnalyticsOptedOut, setAnalyticsOptOut } from '../services/analytics';
 const billing = vi.hoisted(() => ({ enabled: false }));
 vi.mock('../services/billing', () => ({
   get BILLING_ENABLED() { return billing.enabled; },
-  getEntitlements: vi.fn(),
+  getBillingSummary: vi.fn(),
   getBillingAccountStatus: vi.fn(async () => true),
   openBillingPortal: vi.fn(),
 }));
@@ -486,7 +486,7 @@ describe('SettingsPage: Plan & Billing', () => {
 
   it('shows once checkout is on, and "See plans" calls onSeePlans', async () => {
     billing.enabled = true;
-    vi.mocked(getEntitlements).mockResolvedValue({ plan: null, certs: [] });
+    vi.mocked(getBillingSummary).mockResolvedValue({ plan: null, certs: [], owned: [], subscriptions: [] });
     setAuth();
     const onSeePlans = vi.fn();
     render(<SettingsPage onBack={vi.fn()} onSeePlans={onSeePlans} />);

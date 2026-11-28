@@ -2214,8 +2214,69 @@
   text-decoration: underline;
 }
 
-.plan-price-range {
-  font-size: 26px;
+.plan-per {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Monthly / yearly: native radios styled as a two-part switch */
+.interval-toggle {
+  display: inline-flex;
+  align-self: flex-start;
+  gap: 2px;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  min-width: 0;
+}
+
+.interval-toggle legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.interval-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.interval-option input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+.interval-option.selected {
+  background: var(--accent-primary);
+  color: var(--brand-ink);
+}
+
+.interval-option:focus-within {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.interval-save {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .plan-trial {
@@ -2256,6 +2317,10 @@
   color: var(--text-primary);
 }
 
+.cert-price > strong:first-child {
+  margin-left: 0;
+}
+
 /* Reset code sent (sign-in modal) */
 .auth-notice-box {
   padding: 12px 16px;
@@ -2288,7 +2353,7 @@
   margin: 12px auto 0;
 }
 
-/* ---------- Coding courses, the bundle, sales ---------- */
+/* ---------- Coding courses, Pro call-out, sales ---------- */
 .course-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; }
 .course-mark { font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; }
 .course-go { margin-top: auto; padding-top: 12px; font-weight: 600; color: var(--accent-secondary); }
@@ -2298,9 +2363,9 @@
 .course-note { margin: 4px 0 0; font-size: 0.85rem; opacity: 0.75; }
 .course-card.coming-soon { cursor: default; }
 .course-card.coming-soon .course-go { color: inherit; opacity: 0.7; }
-.bundle-card { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 22px 26px; border-radius: 14px; border: 1px solid rgba(236, 72, 153, 0.35); background: rgba(236, 72, 153, 0.07); }
-.bundle-card h3 { margin: 6px 0; }
-.bundle-card p { margin: 0; max-width: 60ch; }
+.courses-pro-card { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 22px 26px; border-radius: 14px; border: 1px solid rgba(236, 72, 153, 0.35); background: rgba(236, 72, 153, 0.07); }
+.courses-pro-card h3 { margin: 6px 0; }
+.courses-pro-card p { margin: 0; max-width: 60ch; }
 .sale-pill { display: inline-block; background: var(--brand-pop); color: var(--brand-ink); font-weight: 700; font-size: 0.78rem; padding: 3px 10px; border-radius: 999px; margin: 6px 0; }
 .promo-banner { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; padding: 8px 16px; background: linear-gradient(90deg, rgba(139, 92, 246, 0.22), rgba(236, 72, 153, 0.22), rgba(34, 211, 238, 0.22)), var(--surface-base); color: var(--text-primary); font-size: 0.9rem; text-align: center; }
 
@@ -2573,4 +2638,51 @@
   .gis-course-list {
     grid-template-columns: 1fr;
   }
+}
+
+/* ========================================
+   Signed out by the device limit (banner under the header, note in the sign-in modal)
+   ======================================== */
+.auth-info-box {
+  padding: 12px 16px;
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.45;
+  margin-bottom: 16px;
+}
+
+.signed-out-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  padding: 10px 16px;
+  background: rgba(34, 211, 238, 0.1);
+  border-bottom: 1px solid rgba(34, 211, 238, 0.3);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.signed-out-banner-signin {
+  padding: 6px 14px;
+  border: 1px solid var(--accent-tertiary);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent-tertiary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.signed-out-banner-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
 }

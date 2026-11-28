@@ -1,0 +1,36 @@
+/* Settings → Plan & Billing (the same file in all four games) */
+
+.billing-settings-text {
+  color: var(--md-on-surface-variant);
+  font-size: 0.9rem;
+  margin: 0 0 14px;
+}
+
+.billing-settings-btn {
+  background: transparent;
+  color: var(--md-primary);
+  border: 1px solid var(--md-primary);
+  border-radius: var(--md-radius-md);
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.billing-settings-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--md-primary) 12%, transparent);
+}
+
+.billing-settings-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.billing-settings-fine {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+}
+
+.billing-settings-fine a {
+  color: var(--md-on-surface-variant);
+}
