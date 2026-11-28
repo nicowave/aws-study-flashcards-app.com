@@ -110,6 +110,46 @@ export const jumpTo = (y) => {
   root.style.scrollBehavior = inline;
 };
 
+// For a short while after the place is back, the page holds it: a scroll the visitor did not make is undone.
+// Why: Safari on iOS 27 (not iOS 18, not Chrome) slides the page by itself about a fifth of a second after a reload,
+// a line or two down, and now and then all the way to the #section in the address. It starts after the hub's second
+// look, so the second look cannot catch it, and it happens with or without the hub's hold on the browser's restore.
+// The hold ends the moment the visitor does anything at all (a touch, a click, any key, focus moving), when the
+// address changes, when the app scrolls on purpose (letGo), and after KEEP_MS whatever happens.
+const KEEP_MS = 2000;
+const VISITOR_ACTS = ['wheel', 'touchstart', 'touchmove', 'pointerdown', 'mousedown', 'keydown', 'focusin',
+  'hashchange', 'hub:locationchange', 'pagehide'];
+// interrupted() is true when the visitor or the app ended the hold (not the clock): then nothing may move the page
+// back any more, the second look included. A Tab press counts, because moving focus can scroll the focused element
+// into view, and pulling the page back would hide it again.
+let letGoNow = () => {};
+export const holdPlace = (y, ms = KEEP_MS) => {
+  let done = false;
+  let interrupted = false;
+  const onScroll = () => {
+    if (Math.abs(window.scrollY - y) > 1) jumpTo(y);
+  };
+  const end = () => {
+    if (done) return;
+    done = true;
+    clearTimeout(timer);
+    window.removeEventListener('scroll', onScroll);
+    for (const t of VISITOR_ACTS) window.removeEventListener(t, onAct, { capture: true });
+    if (letGoNow === onAct) letGoNow = () => {};
+  };
+  const onAct = () => {
+    if (!done) interrupted = true;
+    end();
+  };
+  const timer = setTimeout(end, ms);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  for (const t of VISITOR_ACTS) window.addEventListener(t, onAct, { capture: true, passive: true });
+  letGoNow = onAct;
+  return { stop: end, interrupted: () => interrupted };
+};
+// The app calls this just before a scroll it makes on purpose, so the hold does not undo it.
+export const letGo = () => letGoNow();
+
 // True once the visitor has moved the page themselves (wheel, touch, scroll keys, a press on the scrollbar).
 // Scroll events cannot tell: the browser's own restore and our jump fire them too.
 const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar']);
