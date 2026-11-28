@@ -9,7 +9,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
   setup, mergeEnv, writeEnvFile, keyProblem, scrub, envLines, envName, parseEnv,
-  PRODUCTS, PRO, PRODUCT_MONTHLY_CENTS, PRODUCT_YEARLY_CENTS, PRO_YEARLY_CENTS, WEBHOOK_EVENT, SWITCH_PORTAL_PURPOSE,
+  PRODUCTS, PRO, PRODUCT_TAX_CODE, PRODUCT_MONTHLY_CENTS, PRODUCT_YEARLY_CENTS, PRO_YEARLY_CENTS, WEBHOOK_EVENT, SWITCH_PORTAL_PURPOSE,
   PORTAL_CUSTOMER_UPDATES,
 } from './stripe-subscription-setup.mjs'
 import { COURSES, OTHER_COURSES } from '../aws-study-homepage/src/data/courses.js'
@@ -194,6 +194,7 @@ test('apply on an empty account creates 9 products x 2 prices plus Pro, the port
   const created = stripe.calls.filter((c) => c.name === 'products.create').map((c) => c.args[0])
   assert.deepEqual(created.map((p) => p.metadata.plan), [...PRODUCTS.map((p) => p.plan), 'all-access'])
   assert.equal(created.find((p) => p.metadata.plan === 'tech-spanish').name, 'Tech Spanish ↔ Tech English')
+  assert.ok(created.every((p) => p.tax_code === PRODUCT_TAX_CODE), 'new products get the Study Hub tax code, not the account default')
 
   const prices = stripe.calls.filter((c) => c.name === 'prices.create').map((c) => c.args[0])
   assert.equal(prices.length, 19)
@@ -244,9 +245,17 @@ test('on the live-like account it reuses every product, adopts a hand-made price
   // Only Tech Spanish is new.
   assert.deepEqual(stripe.calls.filter((c) => c.name === 'products.create').map((c) => c.args[0].metadata.plan), ['tech-spanish'])
   // Hand-made course products get their plan tag; Python is found through its .env price.
-  const tagged = Object.fromEntries(stripe.calls.filter((c) => c.name === 'products.update').map((c) => [c.args[0], c.args[1].metadata.plan]))
+  const updates = stripe.calls.filter((c) => c.name === 'products.update')
+  const tagged = Object.fromEntries(updates.filter((c) => c.args[1].metadata).map((c) => [c.args[0], c.args[1].metadata.plan]))
   assert.deepEqual(tagged, { prod_bash: 'bash-for-aws', prod_py: 'python-for-aws', prod_js: 'javascript-for-aws', prod_ts: 'typescript-for-aws' })
   assert.equal(stripe.s.prices.find((p) => p.id === env.STRIPE_PRICE_PYTHON_COURSE_MONTHLY).product, 'prod_py')
+  // Every sold product ends on the Study Hub tax code: the new one at creation, the old ones corrected.
+  assert.equal(stripe.calls.find((c) => c.name === 'products.create').args[0].tax_code, PRODUCT_TAX_CODE)
+  assert.equal(updates.filter((c) => c.args[1].tax_code === PRODUCT_TAX_CODE).length, 9)
+  for (const spec of [...PRODUCTS, PRO]) {
+    const mine = stripe.s.products.filter((p) => p.metadata?.plan === spec.plan)
+    assert.ok(mine.length === 1 && mine[0].tax_code === PRODUCT_TAX_CODE, `${spec.plan} carries the tax code`)
+  }
 
   // The hand-made $11/month price is reused and tagged, not duplicated; the EUR one is ignored.
   assert.equal(env.STRIPE_PRICE_CLOUD_PRACTITIONER_MONTHLY, 'price_cp_month_hand')
