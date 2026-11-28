@@ -217,7 +217,7 @@ const VALIDATE_BODY = `
         return None, f"order_date {row['order_date']!r} is not a date like 2026-10-29"
 ${VALIDATE_TAIL}`;
 
-const VALIDATE_FUNCTION = `${VALIDATE_HEAD}${VALIDATE_BODY}`;
+export const VALIDATE_FUNCTION = `${VALIDATE_HEAD}${VALIDATE_BODY}`;
 
 const VALIDATE_STARTER = `# orders.py: is this row a real order?
 ${VALIDATE_HEAD}

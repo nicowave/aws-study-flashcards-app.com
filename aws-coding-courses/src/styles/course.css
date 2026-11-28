@@ -189,7 +189,7 @@ section h2 { font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.01em; }
 .md h4 { font-size: 1rem; margin: 22px 0 6px; }
 .md p, .md ul, .md ol { margin: 0 0 14px; }
 .md li { margin-bottom: 4px; }
-.md :not(pre) > code { background: var(--surface-3); border-radius: 5px; padding: 1px 6px; font-size: 0.88em; color: var(--text); }
+.md :not(pre) > code { background: var(--surface-3); border-radius: 5px; padding: 1px 6px; font-size: 0.88em; color: var(--text); overflow-wrap: break-word; }
 .md blockquote { margin: 18px 0; padding: 10px 16px; border-left: 3px solid var(--info); background: var(--surface); border-radius: 0 8px 8px 0; color: var(--text); }
 .md blockquote p:last-child { margin-bottom: 0; }
 .md table { border-collapse: collapse; width: 100%; margin: 0 0 18px; font-size: 0.94rem; display: block; overflow-x: auto; }
@@ -206,7 +206,7 @@ section h2 { font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.01em; }
 .lang-console pre { color: var(--muted); }
 
 /* ---------- practice ---------- */
-.practice { display: grid; gap: 14px; margin: 22px 0; }
+.practice { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin: 22px 0; }
 .task { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--info); border-radius: var(--radius); padding: 14px 18px; }
 .task.passed { border-left-color: var(--ok); }
 .task-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 6px; }
@@ -215,7 +215,7 @@ section h2 { font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.01em; }
 .task-tools { display: flex; gap: 14px; }
 .task .md p:last-child { margin-bottom: 0; }
 .task-hint, .task-answer, .task-success { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
-.task-feedback { margin-top: 10px; color: var(--warn); font-size: 0.92rem; }
+.task-feedback { margin-top: 10px; color: var(--warn); font-size: 0.92rem; overflow-wrap: anywhere; }
 .downloads { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
 .practice-tools { display: flex; justify-content: flex-end; }
 
@@ -249,9 +249,9 @@ section h2 { font-size: 1.6rem; margin: 0 0 8px; letter-spacing: -0.01em; }
 @media (max-width: 640px) { .web-preview iframe { height: 300px; } }
 
 .editor { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--term-bg); }
-.editor-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--surface-2); padding: 4px 8px 0; }
+.editor-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; background: var(--surface-2); padding: 4px 8px 0; }
 .editor-tab { font-family: var(--mono); font-size: 0.8rem; background: var(--term-bg); color: var(--text); padding: 6px 12px; border-radius: 6px 6px 0 0; }
-.editor-actions { display: flex; gap: 6px; padding-bottom: 4px; }
+.editor-actions { display: flex; gap: 6px; padding-bottom: 4px; margin-left: auto; }
 .editor-body { display: flex; }
 .editor-gutter { font-family: var(--mono); font-size: 0.86rem; line-height: 1.55; color: var(--faint); padding: 10px 8px 10px 12px; text-align: right; user-select: none; overflow: hidden; }
 .editor textarea { flex: 1; min-width: 0; background: transparent; color: var(--text); border: 0; outline: 0; resize: vertical; font-family: var(--mono); font-size: 0.86rem; line-height: 1.55; padding: 10px 12px; white-space: pre; overflow-x: auto; tab-size: 2; }

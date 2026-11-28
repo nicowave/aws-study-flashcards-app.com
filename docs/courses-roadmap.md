@@ -92,7 +92,8 @@ Comparable courses also cover, and this one does not yet: `unknown` and validati
 
 All 8 modules and Start here are written. What is left is the launch, in `docs/launch-tech-spanish.md`; every step there creates AWS or Stripe resources or deploys, so every step is the owner's.
 
-- [ ] **Code:** pre-launch read of all 9 modules as a learner in both interface languages, in a real browser (nothing found yet because nothing has been run; this item is the check)
+- [x] **Code:** pre-launch read of all 9 modules as a learner in both interface languages, in a real browser. Done 2026-11-28 (#100): no wrong answers, AWS facts or crashes; a quiz that lost its options to Markdown and several writing checks fixed. Not checked: sign-in, checkout and saved progress with a real account, Safari, a native reader from each region.
+- [ ] **Owner, before launch:** the judgement calls listed in #100: the unlock card says "All 8 modules" and lists 7 while `pricingLede` says nine; writing steps check key terms only (say so in the step?); *cachear* is team talk in Module 2 and slang in Module 8; flashcards show internal tags in English.
 - [ ] **Owner:** create the site (`create-course-site.mjs --from typescript --to spanish --apply`)
 - [ ] **Owner:** Stripe prices in `aws-backend/.env`, then `cdk deploy`
 - [ ] **Owner:** share image, `./deploy.sh hub`, `./deploy.sh spanish`
@@ -126,11 +127,11 @@ Rules behind the order: the biggest gap against comparable courses first (testin
 | # | Item | Course | Engine work | State |
 |---|---|---|---|---|
 | 0 | Tutorials in flight (Bash 5, Python 5, JavaScript 5, TypeScript 4) | all | other session | [x] Bash 5, Python 5, JavaScript 5 (pull request from `claude/confident-franklin-osujab`) · [ ] TypeScript 4 still being written |
-| 1 | Python 6: Test it before it ships | Python | little or none | [ ] |
+| 1 | Python 6: Test it before it ships | Python | `unittest.main()`, clean logging per run, Lambda-style log lines | [~] #102 |
 | 2 | TypeScript 5: Never trust input | TypeScript | none | [ ] waits for TypeScript 4 to be readable |
 | 3 | JavaScript 6: Test the API before your users do | JavaScript | `node:test`, `node:assert` | [ ] |
 | 4 | Bash 6: The server fleet report | Bash | pretend `aws ec2` | [ ] |
-| 5 | Tech Spanish pre-launch read | Tech Spanish | none | [ ] |
+| 5 | Tech Spanish pre-launch read | Tech Spanish | none | [x] 2026-11-28 (#100) |
 | 6 | Python 7: A queue between two jobs | Python | pretend `sqs` (Python) | [ ] |
 | 7 | TypeScript 6: Test the stack | TypeScript | CDK assertions | [ ] after item 3 |
 | 8 | JavaScript 7: Design the data | JavaScript | DynamoDB `Query` + index | [ ] |
@@ -161,6 +162,18 @@ Each tutorial's pull request also carries, or says why not:
 - [x] **React:** yes, as its own course, 2027 or earlier (2026-11-28).
 - [ ] **React, where in the order:** it sits at 14, after the tutorials. Move it up in the table if it should displace some of them in December.
 
+## Found along the way, not fixed
+
+Small things seen while writing or testing, each too small or too far from the tutorial at hand to fix there.
+
+- [~] Python 3, "The alerting Lambda function": could only pass on a first run (#103).
+- [ ] The editor's line numbers drift on phones in every course (`.editor-gutter` is missing from the small-screen rule in `aws-coding-courses/src/styles`). From the other session.
+- [ ] "Build it" steps outside Bash 4 and 5 may still describe the old CloudFront console and Secrets Manager's former 30-day free trial. From the other session; not yet checked tutorial by tutorial.
+- [ ] Lambda's `nodejs22.x` runtime is due to be deprecated on 30 May 2027; JavaScript 3 to 5 use it. From the other session; date not re-read here.
+- [ ] No "Build it" step of Bash 5, Python 5, Python 6 or JavaScript 5 has been run on a real AWS account. **Owner**, or anyone with an account.
+- [ ] Check messages are shown as plain text, so the backticks every course writes in them appear literally. A `TaskBox` change for all courses.
+- [ ] The three phone-width fixes in #102 change CSS every course shares; only the Python site was looked at.
+
 ## Not courses, kept here so nothing is lost
 
 From CLAUDE.md, "Open work". Both belong to the certification games and come after the courses.
@@ -172,3 +185,4 @@ From CLAUDE.md, "Open work". Both belong to the certification games and come aft
 
 - 2026-11-28: tracker written. Surveyed `main` and the last 15 pull requests: no in-flight tutorial has landed.
 - 2026-11-28: roadmap merged (#98). Owner decided React becomes its own course, 2027 or earlier; added as item 14. Python 6 and the Tech Spanish pre-launch read started.
+- 2026-11-28: #99 (React), #100 (Tech Spanish fixes) and #101 (Bash 5, Python 5, JavaScript 5) merged. Python 6 is in #102, a fix for Python 3 in #103. TypeScript 4 is still with the other session, so TypeScript 5 waits. For agents: read the AWS CLI reference; never run a real `aws` program in a session.

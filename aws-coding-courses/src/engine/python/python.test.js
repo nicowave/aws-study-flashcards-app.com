@@ -671,3 +671,97 @@ def lambda_handler(event, context):
     expect(r.stdout).toBe('');
   });
 });
+
+describe('probes', () => {
+  it('keeps what a probe prints out of the console, after a file and after a console line', async () => {
+    const probe = 'print("from the probe")\nRESULT = 1';
+    const r = await run('print("mine")', { probe });
+    expect(r.stdout).toBe('mine\n');
+    const cell = await py.cell({ source: 'print("typed")\n1 + 1', probe });
+    expect(cell.stdout).toBe('typed\n2\n');
+    expect(cell.probe).toEqual({ value: 1 });
+  });
+});
+
+describe('unittest', () => {
+  const TESTS = `import unittest
+from orders import double
+
+class TestDouble(unittest.TestCase):
+    def test_two(self):
+        self.assertEqual(double(2), EXPECTED)
+
+if __name__ == "__main__":
+    unittest.main()
+`;
+
+  it('unittest.main() finds the tests in the file that was run, and in files it imports from', async () => {
+    await py.reset({});
+    const files = { 'orders.py': 'def double(x):\n    return x * 2\n' };
+    let r = await py.run({ path: 'test_orders.py', files: { ...files, 'test_orders.py': TESTS.replace('EXPECTED', '4') } });
+    expect(r.stderr).toMatch(/Ran 1 test in [\s\S]*OK/);
+    expect(r).toMatchObject({ exitCode: 0, error: null });
+    r = await py.run({ path: 'test_orders.py', files: { ...files, 'test_orders.py': TESTS.replace('EXPECTED', '5') } });
+    expect(r.stderr).toContain('AssertionError: 4 != 5');
+    expect(r.stderr).toContain('File "test_orders.py", line 6, in test_two');
+    expect(r).toMatchObject({ exitCode: 1, error: null });
+  });
+
+  it('says so when a file has no tests', async () => {
+    const r = await run('import unittest\nunittest.main()');
+    expect(r.stderr).toContain('NO TESTS RAN');
+    expect(r.exitCode).toBe(5);
+  });
+
+  it('runs tests defined in the console, and ending with unittest.main() is not an error', async () => {
+    await py.reset({});
+    const r = await py.cell({ source: 'import unittest\nclass T(unittest.TestCase):\n    def test_a(self):\n        self.assertEqual(1, 1)\n\nunittest.main()' });
+    expect(r.stderr).toMatch(/Ran 1 test in [\s\S]*OK/);
+    expect(r).toMatchObject({ exitCode: 0, error: null });
+    const after = await py.cell({ source: 'T.__module__' });
+    expect(after.stdout).toBe("'__main__'\n");
+  });
+});
+
+describe('logging', () => {
+  it('starts every run like a new Python: no handlers, WARNING and above only', async () => {
+    let r = await run('import logging\nlogging.basicConfig(level=logging.DEBUG, format="%(levelname)s %(message)s")\nlogging.getLogger("orders").debug("detail")');
+    expect(r.stderr).toBe('DEBUG detail\n');
+    r = await py.run({ path: 'main.py', files: { 'main.py': 'import logging\nlog = logging.getLogger("orders")\nlog.info("quiet")\nlog.warning("loud")\nprint(logging.getLogger().handlers)' } });
+    expect(r.stderr).toBe('loud\n');
+    expect(r.stdout).toBe('[]\n');
+  });
+
+  it('writes log lines the way Lambda does when a file is invoked as a function', async () => {
+    const r = await run(`import logging
+logging.basicConfig(level=logging.DEBUG)  # does nothing in Lambda: logging is already set up
+logger = logging.getLogger()
+def lambda_handler(event, context):
+    logger.info("not shown: Lambda starts at WARNING")
+    logger.warning("Rejected %s", "globex.csv")
+    logger.setLevel(logging.INFO)
+    logger.info("Processed %d orders", 12)
+    try:
+        int("two")
+    except ValueError:
+        logger.exception("Bad quantity")
+    return context.aws_request_id`, { path: 'lambda_function.py', invoke: { event: {} } });
+    const id = r.invoke.response;
+    const lines = r.stdout.split('\n');
+    expect(lines[0]).toMatch(new RegExp(`^\\[WARNING\\]\\t\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d\\.\\d{3}Z\\t${id}\\tRejected globex.csv$`));
+    expect(lines[1]).toMatch(new RegExp(`^\\[INFO\\]\\t[^\\t]+\\t${id}\\tProcessed 12 orders$`));
+    expect(lines[2]).toMatch(/^\[ERROR\]\t.*\tBad quantity$/);
+    expect(r.stdout).toContain('File "lambda_function.py", line 10, in lambda_handler');
+    expect(r.stdout).toContain('ValueError');
+    expect(r.stdout).not.toContain('not shown');
+    expect(r.stderr).toBe('');
+  });
+
+  it('goes back to plain Python logging in the console once the invocation is over', async () => {
+    await run('import logging\nlogger = logging.getLogger()\ndef lambda_handler(event, context):\n    logger.warning("in Lambda")\n    return 1',
+      { path: 'lambda_function.py', invoke: { event: {} } });
+    const r = await py.cell({ source: 'logger.warning("in the console")\nlogger.handlers' });
+    expect(r.stderr).toBe('in the console\n');
+    expect(r.stdout).toBe('[]\n');
+  });
+});

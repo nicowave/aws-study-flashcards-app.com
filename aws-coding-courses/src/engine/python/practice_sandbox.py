@@ -9,6 +9,7 @@ import builtins
 import importlib
 import json
 import linecache
+import logging
 import os
 import shutil
 import sys
@@ -27,7 +28,10 @@ MAX_OUTPUT = 200_000
 
 _transcript = []
 _size = [0]
-_repl = {}
+# The console's variables are a real module named __main__, so tools that look
+# their caller up there (unittest.main() finds the tests in it) work.
+_main = types.ModuleType('__main__')
+_repl = _main.__dict__
 _env_keys = set()
 
 
@@ -182,7 +186,7 @@ def _plain(value, depth=0):
 def _forget_user_modules():
     for name, mod in list(sys.modules.items()):
         f = getattr(mod, '__file__', None) or ''
-        if f.startswith(HOME):
+        if f.startswith(HOME) and mod is not _main:
             del sys.modules[name]
     importlib.invalidate_caches()
 
@@ -221,6 +225,42 @@ def _begin():
     os.chdir(HOME)
     if HOME not in sys.path:
         sys.path.insert(0, HOME)
+
+
+def _reset_logging():
+    """A new Python process starts with no log handlers and the root logger at WARNING."""
+    root = logging.getLogger()
+    for h in list(root.handlers):
+        root.removeHandler(h)
+    root.setLevel(logging.WARNING)
+    logging.disable(logging.NOTSET)
+    for logger in list(logging.Logger.manager.loggerDict.values()):
+        if isinstance(logger, logging.Logger):
+            for h in list(logger.handlers):
+                logger.removeHandler(h)
+            logger.setLevel(logging.NOTSET)
+            logger.propagate = True
+            logger.disabled = False
+
+
+class _LambdaLogHandler(logging.Handler):
+    """What the Lambda Python runtime adds to the root logger (text log format):
+    [LEVEL] <UTC time> <request ID> <message>, at WARNING unless the code sets a level."""
+
+    request_id = ''
+
+    def emit(self, record):
+        try:
+            when = datetime.datetime.fromtimestamp(record.created, datetime.timezone.utc)
+            stamp = when.strftime('%Y-%m-%dT%H:%M:%S.') + f'{when.microsecond // 1000:03d}Z'
+            text = record.getMessage()
+            if record.exc_info:
+                te = traceback.TracebackException(*record.exc_info)
+                _trim(te)
+                text += '\n' + ''.join(te.format()).rstrip('\n').replace(HOME + '/', '')
+            _say('out', f'[{record.levelname}]\t{stamp}\t{self.request_id}\t{text}')
+        except Exception:  # noqa: BLE001 - a bad log call must not stop the function
+            self.handleError(record)
 
 
 def _execute(code, ns):
@@ -290,6 +330,7 @@ def _invoke(ns, invoke):
         _say('err', f"Handler '{handler_name}' missing: the file needs a function named {handler_name}(event, context).")
         return {'error': {'type': 'Runtime.HandlerNotFound', 'message': f'Handler {handler_name} missing'}}
     ctx = LambdaContext(invoke.get('function', 'practice-function'), invoke.get('timeout', 30))
+    _LambdaLogHandler.request_id = ctx.aws_request_id
     event = json.loads(json.dumps(invoke.get('event', {})))
     _say('info', f'START RequestId: {ctx.aws_request_id} Version: $LATEST')
     started = time.perf_counter()
@@ -333,21 +374,36 @@ def run_file(path, probe=None, invoke=None):
         _say('err', f"python: can't open file '{path}': [Errno 2] No such file or directory")
         return {'error': {'type': 'FileNotFoundError', 'message': path, 'line': None}, 'exitCode': 2}
     linecache.checkcache(path)
+    _reset_logging()
     module_name = os.path.splitext(os.path.basename(path))[0] if invoke else '__main__'
-    ns = {'__name__': module_name, '__file__': full, '__builtins__': builtins}
+    module = types.ModuleType(module_name)
+    ns = module.__dict__
+    ns.update({'__file__': full, '__builtins__': builtins})
     sys.argv = [path]
     try:
         code = compile(source, path, 'exec')
     except SyntaxError as e:
         return {'error': _report(e), 'exitCode': 1}
-    error, exit_code = _execute(code, ns)
-    result = {'error': error, 'exitCode': exit_code}
-    if invoke and error is None:
-        result['invoke'] = _invoke(ns, invoke)
+    if invoke:
+        _LambdaLogHandler.request_id = ''
+        logging.getLogger().addHandler(_LambdaLogHandler())
+    sys.modules[module_name] = module  # unittest.main() loads the tests from sys.modules['__main__']
+    try:
+        error, exit_code = _execute(code, ns)
+        result = {'error': error, 'exitCode': exit_code}
+        if invoke and error is None:
+            result['invoke'] = _invoke(ns, invoke)
+    finally:
+        sys.modules.pop(module_name, None)
+        sys.modules['__main__'] = _main
     _repl.clear()
     _repl.update(ns)
     _repl['__name__'] = '__main__'
     result['probe'] = _probe(probe, ns)
+    # The invocation is over: console lines typed next are plain Python again
+    root = logging.getLogger()
+    for h in [h for h in root.handlers if isinstance(h, _LambdaLogHandler)]:
+        root.removeHandler(h)
     return result
 
 
@@ -369,6 +425,8 @@ def run_cell(source, probe=None):
             if value is not None:
                 _repl['_'] = value
                 _say('out', repr(value))
+        except SystemExit as e:  # e.g. unittest.main() as the last line: it ends by exiting
+            exit_code = int(e.code) if isinstance(e.code, int) else 0 if e.code is None else 1
         except BaseException as e:  # noqa: BLE001
             error, exit_code = _report(e), 1
     return {'error': error, 'exitCode': exit_code, 'probe': _probe(probe, _repl)}
@@ -391,6 +449,7 @@ def reset(scenario):
     practice_aws.reset(scenario.get('aws'))
     practice_net.reset(scenario.get('web'), scenario.get('certs'))
     _forget_user_modules()
+    _reset_logging()
     _repl.clear()
     _repl.update({'__name__': '__main__', '__builtins__': builtins})
     if scenario.get('setup'):
@@ -435,6 +494,7 @@ def install():
     helper.__dict__.update(context=LambdaContext, aws=practice_aws, net=practice_net, files=_files,
                            PracticeAccountError=practice_aws.PracticeAccountError)
     sys.modules['practice'] = helper
+    sys.modules['__main__'] = _main
     os.makedirs(HOME, exist_ok=True)
     os.chdir(HOME)
     if HOME not in sys.path:
