@@ -122,18 +122,31 @@ const VISITOR_ACTS = ['wheel', 'touchstart', 'touchmove', 'pointerdown', 'moused
 // interrupted() is true when the visitor or the app ended the hold (not the clock): then nothing may move the page
 // back any more, the second look included. A Tab press counts, because moving focus can scroll the focused element
 // into view, and pulling the page back would hide it again.
+//
+// When the address has no #section, the place is also put back each time the page grows, from a ResizeObserver on
+// the body. Why: most of Safari's slide is its scroll anchoring. As the sections above the place finish drawing, it
+// moves the page to keep what is on screen still. A scroll event only reports that on the next frame, after the moved
+// frame is painted, so undoing it there showed as a flick (up to 120 px, measured on iOS 27). A ResizeObserver runs
+// after the page is laid out and before it is painted, so the move is undone before anyone sees it.
+// Not with a #section in the address: there, whenever anchoring's move is held off (undone this early, or anchoring
+// switched off), Safari glides to that section instead, and the page bounced by up to 960 px. Left to the scroll
+// events, it flicks a few dozen pixels at most. Browsers without ResizeObserver keep the scroll events too.
 let letGoNow = () => {};
 export const holdPlace = (y, ms = KEEP_MS) => {
   let done = false;
   let interrupted = false;
-  const onScroll = () => {
+  const putBack = () => {
     if (Math.abs(window.scrollY - y) > 1) jumpTo(y);
   };
+  const early = !window.location.hash && typeof ResizeObserver === 'function' && document.body;
+  const grows = early ? new ResizeObserver(putBack) : null;
+  grows?.observe(document.body);
   const end = () => {
     if (done) return;
     done = true;
     clearTimeout(timer);
-    window.removeEventListener('scroll', onScroll);
+    grows?.disconnect();
+    window.removeEventListener('scroll', putBack);
     for (const t of VISITOR_ACTS) window.removeEventListener(t, onAct, { capture: true });
     if (letGoNow === onAct) letGoNow = () => {};
   };
@@ -142,7 +155,7 @@ export const holdPlace = (y, ms = KEEP_MS) => {
     end();
   };
   const timer = setTimeout(end, ms);
-  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('scroll', putBack, { passive: true });
   for (const t of VISITOR_ACTS) window.addEventListener(t, onAct, { capture: true, passive: true });
   letGoNow = onAct;
   return { stop: end, interrupted: () => interrupted };
