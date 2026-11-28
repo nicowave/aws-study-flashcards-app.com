@@ -70,8 +70,17 @@
   padding: 0;
 }
 
+/* Keep everything that scrolls the page to an element (in-page links, scrollIntoView, keyboard focus) clear of the
+   sticky header: its real height comes from the Header (--hub-header-height), plus 16 px so a focus ring fits too. */
 html {
-  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--hub-header-height, 72px) + 16px);
+}
+
+/* Smooth jumps only for people who have not asked their system for less motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {

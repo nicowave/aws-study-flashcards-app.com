@@ -116,13 +116,15 @@
   display: none;
 }
 
-/* The header can now be two rows tall, so a jump from a header link would land the section title under it.
-   Stop 80 px short, as the readiness and newsletter sections already do. */
+/* In-page jumps stop 16 px below the sticky header, however tall it is (scroll-padding-top in global.css). These
+   sections open with 80 px of empty padding, so -72 px (24 - 16 - 80) lands the title 24 px below the header (25 px
+   for About and FAQ, which also have a 1 px top border), level with where the readiness and newsletter cards land. */
 .certifications-section,
 .about-section,
 .plans-section,
+.faq-section,
 .resources-section {
-  scroll-margin-top: 80px;
+  scroll-margin-top: -72px;
 }
 
 /* ========================================
@@ -2392,7 +2394,7 @@
 }
 
 .gis-section {
-  scroll-margin-top: 80px; /* same clearance as the home page's anchored sections */
+  scroll-margin-top: -48px; /* title 24 px below the header, like the home page's sections (24 - 16 - 56) */
   max-width: 1100px;
   margin: 0 auto;
   padding: 56px 24px;

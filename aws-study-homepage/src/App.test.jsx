@@ -910,4 +910,139 @@ describe('App', () => {
       expect(screen.getByRole('heading', { name: 'Welcome Back' })).toBeInTheDocument();
     });
   });
+
+  // The header wraps onto one to three rows, so its height is measured, never assumed: html's scroll-padding-top
+  // (global.css) reads --hub-header-height, and every jump and keyboard-focus scroll stops below the header.
+  describe('room below the sticky header', () => {
+    let headerHeight;
+    const root = document.documentElement;
+    const published = () => root.style.getPropertyValue('--hub-header-height');
+    beforeEach(() => {
+      headerHeight = 71;
+      // jsdom has no layout: give the header a height and everything else none
+      vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function rect() {
+        const height = this.tagName === 'HEADER' ? headerHeight : 0;
+        return { top: 0, bottom: height, left: 0, right: 0, width: 0, height, x: 0, y: 0, toJSON() {} };
+      });
+    });
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      root.style.removeProperty('--hub-header-height');
+    });
+
+    it('publishes the header height, follows it when the header re-wraps, and stops watching when it goes away', () => {
+      const observers = [];
+      vi.stubGlobal('ResizeObserver', class {
+        constructor(callback) { this.callback = callback; this.watched = []; this.live = true; observers.push(this); }
+        observe(el) { this.watched.push(el); }
+        disconnect() { this.live = false; }
+      });
+      const { unmount } = render(<App />);
+      expect(published()).toBe('71px');
+      const watcher = observers.find((o) => o.live && o.watched.includes(header()));
+      expect(watcher).toBeDefined();
+
+      headerHeight = 151; // signed in on a laptop: two rows
+      act(() => watcher.callback([]));
+      expect(published()).toBe('151px');
+
+      unmount();
+      expect(observers.filter((o) => o.watched.length).every((o) => !o.live)).toBe(true);
+    });
+
+    it('still publishes the height once in a browser without ResizeObserver', () => {
+      vi.stubGlobal('ResizeObserver', undefined);
+      render(<App />);
+      expect(published()).toBe('71px');
+    });
+
+    it('Settings → "See plans" leaves the motion to the page, so reduced-motion visitors get no glide', async () => {
+      signIn();
+      const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(() => {});
+      render(<App />);
+      await userEvent.click(within(header()).getByRole('button', { name: 'Settings' }));
+      expect(await screen.findByText(/Your plan:/)).toHaveTextContent('Free');
+      await userEvent.click(screen.getByRole('button', { name: 'See plans' }));
+      await waitFor(() => expect(scrolled.mock.contexts.some((el) => el.id === 'plans')).toBe(true));
+      for (const [options] of scrolled.mock.calls) expect(options?.behavior).toBeUndefined();
+    });
+  });
+
+  // The sections are drawn after the browser has looked for the #hash, so the page jumps there itself, once.
+  describe('opening the page at a section (/#plans)', () => {
+    let scrolled;
+    beforeEach(() => {
+      scrolled = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(() => {});
+    });
+    const jumpedTo = () => scrolled.mock.contexts.map((el) => el.id);
+    // Longer than the two frames + fonts + two frames the page waits before jumping
+    const settle = () => act(() => new Promise((resolve) => { setTimeout(resolve, 150); }));
+    // jsdom has no navigation timing; stand one in for a reload or a Back/Forward visit
+    const visitType = (type) => {
+      const real = Object.getOwnPropertyDescriptor(performance, 'getEntriesByType');
+      Object.defineProperty(performance, 'getEntriesByType', {
+        configurable: true, writable: true, value: (kind) => (kind === 'navigation' ? [{ type }] : []),
+      });
+      return () => (real ? Object.defineProperty(performance, 'getEntriesByType', real) : delete performance.getEntriesByType);
+    };
+
+    it.each(['certifications', 'courses', 'about', 'plans', 'faq', 'resources', 'newsletter'])(
+      'lands on #%s, from its top, once',
+      async (id) => {
+        go(`/#${id}`);
+        render(<App />);
+        await waitFor(() => expect(jumpedTo()).toContain(id));
+        await settle();
+        expect(jumpedTo()).toEqual([id]);
+        expect(scrolled.mock.calls[0][0]).toEqual({ block: 'start' });
+      },
+    );
+
+    it.each([
+      ['a name that is not on the page', '/#nothing-here'],
+      ['#readiness, which the readiness check scrolls to itself', '/#readiness'],
+      ['a broken address', '/#%E0%A4%A'],
+      ['no hash at all', '/'],
+    ])('does nothing for %s', async (_, path) => {
+      go(path);
+      render(<App />);
+      await settle();
+      expect(jumpedTo()).toEqual([]);
+    });
+
+    it('does nothing when the visitor has already scrolled', async () => {
+      go('/#plans');
+      Object.defineProperty(window, 'scrollY', { configurable: true, writable: true, value: 400 });
+      try {
+        render(<App />);
+        await settle();
+        expect(jumpedTo()).toEqual([]);
+      } finally {
+        Object.defineProperty(window, 'scrollY', { configurable: true, writable: true, value: 0 });
+      }
+    });
+
+    it.each(['reload', 'back_forward'])("leaves a %s visit to the browser's own scroll restore", async (type) => {
+      go('/#plans');
+      const restore = visitType(type);
+      try {
+        render(<App />);
+        await settle();
+        expect(jumpedTo()).toEqual([]);
+      } finally {
+        restore();
+      }
+    });
+
+    it('still lands on the section after a link from another page (a plain visit)', async () => {
+      go('/#plans');
+      const restore = visitType('navigate');
+      try {
+        render(<App />);
+        await waitFor(() => expect(jumpedTo()).toEqual(['plans']));
+      } finally {
+        restore();
+      }
+    });
+  });
 });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { certifications, categories } from './data/certifications';
 import SettingsPage from './components/SettingsPage';
@@ -137,8 +137,45 @@ const Header = ({ onShowLogin, onNavigateSettings, onGis = false }) => {
     await logout();
   };
 
+  // The header wraps onto one to three rows (more on phones and with long member names), so no fixed number can
+  // say how much of the page it covers. Publish its real height for scroll-padding-top in global.css: in-page
+  // jumps and keyboard focus then stop just below it instead of under it.
+  const headerRef = useRef(null);
+  useLayoutEffect(() => {
+    const el = headerRef.current;
+    const root = document.documentElement;
+    const publish = () => root.style.setProperty('--hub-header-height', `${el.getBoundingClientRect().height}px`);
+    publish();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const observer = new ResizeObserver(publish);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Firefox only moves the page for a newly focused control when none of it is visible, so a control half under the
+  // header stays half hidden. And in a short window (a phone held sideways) a course card can be taller than the room
+  // left under the header; Chrome and Firefox then leave its top under the header. When keyboard focus lands on the
+  // page under the header (or close enough that its focus ring would be), bring the control out, from its top if it
+  // cannot fit; scroll-padding makes it stop below the header. Clicks on links and buttons (not :focus-visible) and
+  // the sign-in dialog are left alone; a clicked text field counts as :focus-visible, so a half-hidden one is brought
+  // out too.
+  useEffect(() => {
+    const onFocusIn = (e) => {
+      const target = e.target;
+      const header = headerRef.current;
+      if (!header || !target.closest || !target.closest('main, footer')) return;
+      try { if (!target.matches(':focus-visible')) return; } catch { return; } // no :focus-visible: leave focus alone
+      const box = target.getBoundingClientRect();
+      const below = header.getBoundingClientRect().bottom;
+      if (box.top >= below + 8) return; // 8 px: room for the widest focus ring here (2 px outline, 4 px apart)
+      target.scrollIntoView({ block: box.height + 16 > window.innerHeight - below ? 'start' : 'nearest' });
+    };
+    document.addEventListener('focusin', onFocusIn);
+    return () => document.removeEventListener('focusin', onFocusIn);
+  }, []);
+
   return (
-    <header className="header">
+    <header className="header" ref={headerRef}>
       <div className="header-content">
         <div className="logo">
           {/* The Level Up Study Hub lockup. 28 px tall = one third of its 84-unit drawing, so its edges land on whole pixels.
@@ -1050,6 +1087,26 @@ function HomepageContent() {
     }
   }, [isAuthenticated, currentPage]);
 
+  // A bookmark or a link can open the hub at a section (/#plans). The sections only exist once React has drawn
+  // them, after the browser looked for the #hash and found nothing, so jump there once ourselves: after the fonts
+  // have settled the header's height, and only if the visitor has not scrolled in the meantime.
+  // #readiness is left to ReadinessCheck, which already handles it. A reload or Back/Forward is left to the
+  // browser's own scroll restore: jumping to the section there would throw away the place the visitor had reached.
+  useEffect(() => {
+    const visit = performance.getEntriesByType?.('navigation')?.[0]?.type;
+    if (visit === 'reload' || visit === 'back_forward') return undefined;
+    let id = '';
+    try { id = decodeURIComponent(window.location.hash.slice(1)); } catch { return undefined; }
+    const section = id && id !== 'readiness' ? document.getElementById(id) : null;
+    if (!section || section.tagName !== 'SECTION') return undefined;
+    let cancelled = false;
+    const twoFrames = (fn) => requestAnimationFrame(() => requestAnimationFrame(fn));
+    twoFrames(() => Promise.resolve(document.fonts?.ready).then(() => twoFrames(() => {
+      if (!cancelled && window.scrollY === 0) section.scrollIntoView({ block: 'start' });
+    })));
+    return () => { cancelled = true; };
+  }, []);
+
   const handleNavigateSettings = () => {
     if (isAuthenticated) {
       setCurrentPage('settings');
@@ -1065,7 +1122,8 @@ function HomepageContent() {
   // Settings → "See plans": back to the homepage, at the plans section
   const handleSeePlans = () => {
     setCurrentPage('home');
-    setTimeout(() => document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' }), 0);
+    // No behavior given: the page's scroll-behavior decides, smooth unless the visitor asked for reduced motion
+    setTimeout(() => document.getElementById('plans')?.scrollIntoView({ block: 'start' }), 0);
   };
 
   return (
