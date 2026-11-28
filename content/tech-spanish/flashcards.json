@@ -567,7 +567,7 @@
     {
       "id": "ts-mvp-en-es",
       "front": "MVP (minimum viable product)",
-      "back": "producto mínimo viable (PMV). En el equipo: \"el MVP\" (se pronuncia en español: \"eme-uve-pe\"). Ej.: \"Nuestro MVP corre en una sola Lambda.\"",
+      "back": "producto mínimo viable (PMV). En el equipo: \"el MVP\" (se pronuncia en español: \"eme-uve-pe\" o, en Latinoamérica, \"eme-ve-pe\"). Ej.: \"Nuestro MVP corre en una sola Lambda.\"",
       "hint": "Our MVP runs on a single Lambda.",
       "tags": [
         "dev",
@@ -1557,7 +1557,7 @@
     {
       "id": "ts-cd-en-es",
       "front": "continuous delivery / deployment (CD)",
-      "back": "entrega continua / implementación continua. En el equipo: \"CI/CD\" (se dice \"ci-di\" o \"ce-i-ce-de\"). Ej.: \"Con entrega continua, main siempre se puede desplegar.\"",
+      "back": "entrega continua / implementación continua. En el equipo: \"CI/CD\" (se dice en inglés, \"si-ai si-di\", o en español, \"ce-i ce-de\"). Ej.: \"Con entrega continua, main siempre se puede desplegar.\"",
       "hint": "With CD, main is always deployable.",
       "tags": [
         "devops",
@@ -2389,7 +2389,7 @@
     {
       "id": "ts-serverless-en-es",
       "front": "serverless",
-      "back": "sin servidor. En el equipo: \"serverless\" — casi siempre en inglés. Ej.: \"Lambda es sin servidor: nunca administras servidores.\"",
+      "back": "sin servidor. En el equipo: \"serverless\" — casi siempre en inglés. Ej.: \"Lambda es un servicio sin servidor: nunca administras servidores.\"",
       "hint": "Lambda is serverless: you never manage servers.",
       "tags": [
         "cloud",
@@ -2401,7 +2401,7 @@
       "id": "ts-serverless-es-en",
       "front": "sin servidor",
       "back": "serverless. E.g. \"Lambda is serverless: you never manage servers.\"",
-      "hint": "Lambda es sin servidor: nunca administras servidores.",
+      "hint": "Lambda es un servicio sin servidor: nunca administras servidores.",
       "tags": [
         "cloud",
         "es-en"
@@ -3415,7 +3415,7 @@
     {
       "id": "ts-record-en-es",
       "front": "record",
-      "back": "registro. En el equipo: \"registro\". Ej.: \"Inserta un registro por pedido.\" ⚠ \"Registro\" también es log y entrada de DNS: en español una misma palabra cubre tres ideas.",
+      "back": "registro. En el equipo: \"registro\". Ej.: \"Inserta un registro por pedido.\" ⚠ \"Registro\" también es log, entrada de DNS y alta de un usuario: en español una misma palabra cubre varias ideas.",
       "hint": "Insert one record per order.",
       "tags": [
         "data",

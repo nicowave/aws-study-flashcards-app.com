@@ -62,6 +62,135 @@ describe('web pages', () => {
   });
 });
 
+describe('files and presigned uploads', () => {
+  const BUCKET = 'https://study-photos.s3.us-east-1.amazonaws.com';
+  const UPLOAD_PAGE = {
+    'index.html': '<!doctype html><html><head></head><body><input id="photo" type="file"><button id="go">Upload</button><p id="out"></p><img id="preview" hidden><script src="app.js"></script></body></html>',
+    'app.js': `const input = document.querySelector('#photo');
+const out = document.querySelector('#out');
+input.addEventListener('change', () => {
+  const file = input.files[0];
+  out.textContent = file ? file.name + ' ' + file.size + ' ' + file.type + ' ' + !!input.value : 'none';
+  if (file) document.querySelector('#preview').src = URL.createObjectURL(file);
+});
+document.querySelector('#go').addEventListener('click', async () => {
+  const file = input.files[0];
+  const res = await fetch('https://api.example.com/uploads', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ contentType: file.type, size: file.size }) });
+  const { url } = await res.json();
+  const put = await fetch(url, { method: 'PUT', headers: window.wrongType ? { 'Content-Type': 'text/html' } : {}, body: file });
+  out.textContent = put.ok ? 'uploaded' : put.status + ' ' + (await put.text()).match(/<Code>(.*?)<\\/Code>/)[1];
+});`,
+  };
+  const web = {
+    [BUCKET]: { s3: { 'uploads/ana/old.jpg': { size: 1200, contentType: 'image/jpeg', modified: '2026-11-20T18:02:11Z' } } },
+    'POST https://api.example.com/uploads': {
+      respond: "return { json: { url: s3.presign({ bucket: 'study-photos', key: 'uploads/ana/new.jpg', contentType: request.json.contentType, contentLength: request.json.size, expiresIn: 300 }) } };",
+    },
+  };
+
+  it('lets a probe choose a file, and cancel the dialog', async () => {
+    const res = await runWebPage({
+      files: UPLOAD_PAGE,
+      web,
+      probe: `const chosen = await practice.chooseFile('#photo', { name: 'whiteboard.jpg', type: 'image/jpeg', size: 2100000 });
+const first = practice.text('#out');
+const preview = practice.$('#preview').src;
+await practice.chooseFile('#photo');
+const none = practice.text('#out');
+await practice.chooseFile('#photo', { name: 'notes.txt', type: 'text/plain', text: 'hello' });
+return { chosen, first, preview, none, text: practice.text('#out'), count: practice.$('#photo').files.length };`,
+    });
+    expect(res.result.errors).toEqual([]);
+    expect(res.probe).toMatchObject({
+      chosen: [{ name: 'whiteboard.jpg', size: 2100000, type: 'image/jpeg' }],
+      first: 'whiteboard.jpg 2100000 image/jpeg true', none: 'none', text: 'notes.txt 5 text/plain true', count: 1,
+    });
+    expect(res.probe.preview).toMatch(/^blob:/);
+  });
+
+  it('lets a probe choose several files at once', async () => {
+    const res = await runWebPage({
+      files: { ...UPLOAD_PAGE, 'app.js': "const input = document.querySelector('#photo');\ninput.addEventListener('change', () => { document.querySelector('#out').textContent = [...input.files].map((f) => f.name + ':' + f.size).join(' '); });" },
+      web,
+      probe: `const chosen = await practice.chooseFile('#photo', [{ name: 'a.jpg', type: 'image/jpeg', size: 10 }, { name: 'b.txt', type: 'text/plain', text: 'héllo' }]);
+return { chosen, text: practice.text('#out'), count: practice.$('#photo').files.length, second: practice.$('#photo').files.item(1).name };`,
+    });
+    expect(res.result.errors).toEqual([]);
+    expect(res.probe).toEqual({
+      chosen: [{ name: 'a.jpg', size: 10, type: 'image/jpeg' }, { name: 'b.txt', size: 6, type: 'text/plain' }],
+      text: 'a.jpg:10 b.txt:6', count: 2, second: 'b.txt',
+    });
+  });
+
+  it('gives respond the request, answers 500 when it throws, and prefers an entry for the method', async () => {
+    const res = await runWebPage({
+      files: { 'index.html': '<!doctype html><html><head></head><body><script src="app.js"></script></body></html>', 'app.js': '' },
+      web: {
+        ...web,
+        'POST https://api.example.com/x': { respond: "return { status: 201, json: { json: request.json, query: request.query, header: request.headers['x-test'], method: request.method } };" },
+        'https://api.example.com/x': { json: { any: true } },
+        'https://api.example.com/boom': { respond: 'throw new Error("kaput");' },
+        'https://api.example.com/sign': { respond: "return { json: { get: s3.presign({ method: 'GET', bucket: 'study-photos', key: 'notes/a.txt', expiresIn: 60 }), put: s3.presign({ bucket: 'study-photos', key: 'free.bin' }), other: s3.presign({ bucket: 'not-declared', key: 'k' }), has: [s3.has('study-photos'), s3.has('not-declared')], listed: s3.list('study-photos', 'notes/').map((o) => o.key) } };" },
+        'https://study-photos.s3.us-east-1.amazonaws.com': { s3: { 'notes/a.txt': 'hello', 'uploads/ana/old.jpg': { size: 1200, contentType: 'image/jpeg' } } },
+      },
+      probe: `const ask = async (url, init) => { try { const r = await fetch(url, init); return [r.status, await r.text(), r.headers.get('content-type')]; } catch (e) { return e.name + ': ' + e.message; } };
+const out = {};
+out.post = await ask('https://api.example.com/x?a=1&b=two%20words', { method: 'POST', headers: { 'X-Test': 'yes' }, body: JSON.stringify({ n: 1 }) });
+out.get = await ask('https://api.example.com/x');
+out.boom = await ask('https://api.example.com/boom');
+const signed = JSON.parse((await ask('https://api.example.com/sign'))[1]);
+out.signed = [signed.has, signed.listed];
+out.read = await ask(signed.get);
+out.readWithPut = (await ask(signed.get, { method: 'PUT', body: 'x' }))[0];
+out.anyBody = (await ask(signed.put, { method: 'PUT', body: new Uint8Array(7) }))[0]; // nothing but the address was signed
+out.twoAuths = (await ask(signed.put, { method: 'PUT', headers: { Authorization: 'Bearer abc' }, body: 'x' })).slice(0, 2).map((v) => (typeof v === 'string' ? (v.match(/<Code>(.*?)<\\/Code>/) || [])[1] : v));
+out.undeclared = await ask(signed.other, { method: 'PUT', body: 'x' });
+out.unsigned = (await ask('https://study-photos.s3.us-east-1.amazonaws.com/notes/a.txt'))[0];
+out.failed = practice.fetchLog.filter((e) => e.failed).map((e) => [e.url, e.failed]);
+out.stored = practice.s3()['study-photos']['free.bin'];
+return out;`,
+    });
+    expect(res.result.errors).toEqual([]);
+    expect(res.probe.post).toEqual([201, '{"json":{"n":1},"query":{"a":"1","b":"two words"},"header":"yes","method":"POST"}', 'application/json']);
+    expect(res.probe.get).toEqual([200, '{"any":true}', 'application/json']);
+    expect(res.probe.boom).toEqual([500, '{"message":"Internal Server Error"}', 'application/json']);
+    expect(res.probe.failed).toEqual([['https://api.example.com/boom', 'kaput']]);
+    expect(res.probe.signed).toEqual([[true, false], ['notes/a.txt']]);
+    expect(res.probe.read).toEqual([200, 'hello', 'binary/octet-stream']);
+    expect(res.probe.readWithPut).toBe(403);
+    expect(res.probe.anyBody).toBe(200);
+    expect(res.probe.twoAuths).toEqual([400, 'InvalidArgument']);
+    // A page gets no readable answer from a bucket that isn't there (no CORS headers): fetch fails
+    expect(res.probe.undeclared).toBe('TypeError: Failed to fetch');
+    expect(res.probe.unsigned).toBe(403);
+    expect(res.probe.stored).toEqual({ size: 7, contentType: 'binary/octet-stream', metadata: {} });
+  });
+
+  it('uploads a file to a presigned URL, and S3 refuses what was not signed', async () => {
+    const res = await runWebPage({
+      files: UPLOAD_PAGE,
+      web,
+      probe: `await practice.chooseFile('#photo', { name: 'whiteboard.jpg', type: 'image/jpeg', size: 48211 });
+await practice.click('#go');
+await practice.until(() => practice.text('#out') === 'uploaded', 2000);
+const good = practice.text('#out');
+const put = practice.fetchLog.find((e) => e.method === 'PUT');
+window.wrongType = true;
+await practice.click('#go');
+await practice.until(() => /^403/.test(practice.text('#out')), 2000);
+return { good, put: [put.bodySize, put.bodyType, put.fileName, put.sent['content-type'], put.result, put.body], bad: practice.text('#out'), s3: practice.s3() };`,
+    });
+    expect(res.result.errors).toEqual([]);
+    expect(res.probe.good).toBe('uploaded');
+    expect(res.probe.put).toEqual([48211, 'image/jpeg', 'whiteboard.jpg', 'image/jpeg', 200, '[body]']);
+    expect(res.probe.bad).toBe('403 SignatureDoesNotMatch');
+    expect(res.probe.s3).toEqual({ 'study-photos': {
+      'uploads/ana/old.jpg': { size: 1200, contentType: 'image/jpeg', metadata: {} },
+      'uploads/ana/new.jpg': { size: 48211, contentType: 'image/jpeg', metadata: {} },
+    } });
+  });
+});
+
 describe('loop protection', () => {
   it('stops an endless while loop and the page keeps working', async () => {
     const started = Date.now();

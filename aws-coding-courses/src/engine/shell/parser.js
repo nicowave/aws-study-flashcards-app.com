@@ -1,12 +1,12 @@
 // Tokenizer + parser for the practice shell's Bash subset: pipes, && || ;,
-// redirects, if/elif/else, for, while/until, { } groups, ( ) subshells,
+// redirects, if/elif/else, case, for, while/until, { } groups, ( ) subshells,
 // functions and (( )) arithmetic. Words keep their raw quoting; the
 // interpreter expands them when the command runs.
 
 export class ParseError extends Error {}
 
-const OPS = ['&&', '||', ';;', '>>', '&>', '|', ';', '&', '>', '<', '(', ')'];
-const RESERVED = new Set(['if', 'then', 'elif', 'else', 'fi', 'for', 'in', 'do', 'done', 'while', 'until', '{', '}', 'function', '!']);
+const OPS = ['&&', '||', ';;', '<<<', '>>', '&>', '|', ';', '&', '>', '<', '(', ')'];
+const RESERVED = new Set(['if', 'then', 'elif', 'else', 'fi', 'for', 'in', 'do', 'done', 'while', 'until', 'case', 'esac', '{', '}', 'function', '!']);
 
 // Copies a balanced $( ... ) / $(( ... )) starting at src[i] === '(' and
 // returns the index just after the closing paren.
@@ -66,6 +66,13 @@ export function tokenize(src) {
       continue;
     }
 
+    // ]] closes the test even with ; & | ) right behind it: if [[ -f x ]]; then
+    if (inTest && src.startsWith(']]', i) && (i + 2 >= src.length || ' \t\r\n;&|)'.includes(src[i + 2]))) {
+      push({ t: 'word', v: ']]' });
+      i += 2;
+      continue;
+    }
+
     if (!inTest) {
       const op = OPS.find((o) => src.startsWith(o, i));
       if (op) { push({ t: 'op', v: op }); i += op.length; continue; }
@@ -76,6 +83,8 @@ export function tokenize(src) {
     while (i < src.length) {
       const ch = src[i];
       if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') break;
+      // name=(a b c) and name+=(d): an array assignment is one word, parentheses included
+      if (ch === '(' && /^[A-Za-z_][A-Za-z0-9_]*\+?=$/.test(src.slice(start, i))) { i = skipParens(src, i); continue; }
       if (!inTest && OPS.some((o) => src.startsWith(o, i))) {
         // 2>file, 2>>file, 2>&1: a single-digit word right before > is a file descriptor
         if ((ch === '>' || ch === '<') && i - start === 1 && /[0-9]/.test(src[start])) {
@@ -89,6 +98,14 @@ export function tokenize(src) {
         break;
       }
       if (ch === '\\') { i += 2; continue; }
+      if (ch === '$' && src[i + 1] === "'") {
+        // $'...': backslash escapes are allowed inside, including \'
+        let end = i + 2;
+        while (end < src.length && src[end] !== "'") end += src[end] === '\\' ? 2 : 1;
+        if (end >= src.length) throw new ParseError("unexpected end of input: missing '");
+        i = end + 1;
+        continue;
+      }
       if (ch === "'") {
         const end = src.indexOf("'", i + 1);
         if (end === -1) throw new ParseError("unexpected end of input: missing '");
@@ -116,7 +133,7 @@ export function tokenize(src) {
   return tokens;
 }
 
-const ASSIGN = /^([A-Za-z_][A-Za-z0-9_]*)(\+?)=/;
+const ASSIGN = /^([A-Za-z_][A-Za-z0-9_]*)(?:\[([^\]]+)\])?(\+?)=/;
 
 export function parse(src) {
   const tokens = tokenize(src);
@@ -141,7 +158,7 @@ export function parse(src) {
       const tok = peek();
       if (!tok) break;
       if (tok.t === 'word' && stops.includes(tok.v)) break;
-      if (tok.t === 'op' && tok.v === ')') break;
+      if (tok.t === 'op' && (tok.v === ')' || tok.v === ';;')) break;
       const node = parseAndOr();
       let background = false;
       if (isOp('&')) { pos++; background = true; }
@@ -185,6 +202,8 @@ export function parse(src) {
     let op = tok.v;
     if (!tok.fd && op === '>' && isOp('&')) { pos++; op = '>&'; }
     const target = next();
+    // << EOF: say what is missing here, instead of pointing at a stray "<"
+    if (op === '<' && target?.t === 'op' && target.v === '<') throw new ParseError('syntax error: here-documents (<< EOF) are not part of this practice shell. Print the lines with echo, or pass one line with <<< "text"');
     if (!target || target.t !== 'word') throw new ParseError(`syntax error near unexpected token '${target?.v ?? 'newline'}'`);
     return { op, fd, target: target.v };
   }
@@ -203,6 +222,7 @@ export function parse(src) {
     if (tok.t === 'word') {
       switch (tok.v) {
         case 'if': return parseRedirects(parseIf());
+        case 'case': return parseRedirects(parseCase());
         case 'for': return parseRedirects(parseFor());
         case 'while':
         case 'until': return parseRedirects(parseWhile());
@@ -219,7 +239,7 @@ export function parse(src) {
           skipNewlines();
           return { type: 'func', name, body: parseCommand() };
         }
-        case 'then': case 'elif': case 'else': case 'fi': case 'do': case 'done': case '}':
+        case 'then': case 'elif': case 'else': case 'fi': case 'do': case 'done': case 'esac': case '}':
           throw new ParseError(`syntax error near unexpected token '${tok.v}'`);
         default:
           // name() { ... }
@@ -243,7 +263,7 @@ export function parse(src) {
       if (tok.t !== 'word') break;
       const m = !node.words.length && tok.v.match(ASSIGN);
       if (m) {
-        node.assigns.push({ name: m[1], append: !!m[2], raw: tok.v.slice(m[0].length) });
+        node.assigns.push({ name: m[1], index: m[2], append: !!m[3], raw: tok.v.slice(m[0].length) });
       } else {
         node.words.push(tok.v);
       }
@@ -277,6 +297,35 @@ export function parse(src) {
     }
     expectWord('fi');
     return { type: 'if', clauses, elseBody };
+  }
+
+  // case WORD in  pattern | pattern) commands ;;  ...  esac
+  function parseCase() {
+    pos++; // case
+    const word = next();
+    if (!word || word.t !== 'word') throw new ParseError(`syntax error near unexpected token '${word?.v ?? 'newline'}'`);
+    expectWord('in');
+    const clauses = [];
+    for (;;) {
+      skipNewlines();
+      if (!peek()) throw new ParseError("syntax error: unexpected end of input (expected 'esac')");
+      if (isWord('esac')) break;
+      if (isOp('(')) pos++;
+      const patterns = [];
+      for (;;) {
+        const tok = next();
+        if (!tok || tok.t !== 'word') throw new ParseError(`syntax error near unexpected token '${tok?.v ?? 'newline'}'`);
+        patterns.push(tok.v);
+        if (!isOp('|')) break;
+        pos++;
+      }
+      if (!isOp(')')) throw new ParseError(`syntax error: expected ')' after the pattern '${patterns[patterns.length - 1]}'`);
+      pos++;
+      clauses.push({ patterns, body: parseList(['esac']) });
+      if (isOp(';;')) pos++;
+    }
+    pos++; // esac
+    return { type: 'case', word: word.v, clauses };
   }
 
   function parseFor() {

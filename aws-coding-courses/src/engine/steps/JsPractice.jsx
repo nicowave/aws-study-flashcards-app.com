@@ -241,7 +241,8 @@ export const WebPracticeArea = forwardRef(({ step, storageId, done, onDone }, re
           <button type="button" className="code-btn run-code" onClick={() => !busy && run()}>{busy ? 'Running…' : '▶ Run'}</button>
         </div>
         {page && <iframe key={page.id} ref={frame} title="Page preview" sandbox="allow-scripts allow-modals allow-forms" srcDoc={page.html} />}
-        {checkPage && <iframe key={`check-${checkPage.id}`} ref={checkFrame} className="web-check-frame" title="Page check" aria-hidden="true" tabIndex={-1} sandbox="allow-scripts allow-forms" srcDoc={checkPage.html} />}
+        {/* Pinned to the window (and invisible): browsers slow the timers of a frame that is scrolled out of view to about one a second, which would make a check with a dozen waits run out of time */}
+        {checkPage && <iframe key={`check-${checkPage.id}`} ref={checkFrame} className="web-check-frame" style={{ position: 'fixed', left: 0, top: 0, bottom: 'auto' }} title="Page check" aria-hidden="true" tabIndex={-1} sandbox="allow-scripts allow-forms" srcDoc={checkPage.html} />}
       </div>
       <PyConsole
         ref={out} onSubmit={evaluate} busy={false} status={isTs ? tsStatus : 'ready'}

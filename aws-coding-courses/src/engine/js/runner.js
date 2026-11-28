@@ -11,6 +11,7 @@
 import { linkModules, cellImports, SDK_URL, CDK_URL, ModuleError } from './modules';
 import { inspect, formatArgs } from './inspect';
 import { makeFakeFetch } from './fakeFetch';
+import { makePresigner } from './presign';
 import { TIPS } from './tips';
 
 export { TIPS };
@@ -66,6 +67,8 @@ export const createJsRunner = ({ importModule = (url) => import(/* @vite-ignore 
   let scope = null;
   let pendingTimers = 0;
   let activity = 0;
+  // One presigner signs URLs (the SDK's getSignedUrl) and checks requests to them (the pretend fetch)
+  const presigner = makePresigner();
 
   const proc = {
     env: {},
@@ -118,7 +121,7 @@ export const createJsRunner = ({ importModule = (url) => import(/* @vite-ignore 
   });
 
   const install = () => {
-    const fetchFn = makeFakeFetch(scenario.web || {}, webLog, 0.1);
+    const fetchFn = makeFakeFetch(scenario.web || {}, webLog, 0.1, { presigner, store: sdk?.presignedStore });
     const trackedFetch = (...args) => {
       activity += 1;
       pendingTimers += 1;
@@ -185,7 +188,10 @@ export const createJsRunner = ({ importModule = (url) => import(/* @vite-ignore 
   };
 
   const load = async () => {
-    sdk = sdk || await importModule(SDK_URL);
+    if (!sdk) {
+      sdk = await importModule(SDK_URL);
+      sdk.usePresigner(presigner);
+    }
     cdk = cdk || await importModule(CDK_URL);
   };
 
@@ -245,6 +251,7 @@ export const createJsRunner = ({ importModule = (url) => import(/* @vite-ignore 
     resetAws: (aws) => sdk.reset(aws),
     web: scenario.web || {},
     webLog,
+    fetch: (...args) => globalThis.__practice.fetch(...args), // the pretend internet, presigned S3 URLs included
     setSite: (url, entry) => { (scenario.web = scenario.web || {})[url] = entry; },
     context: lambdaContext,
     apiEvent,

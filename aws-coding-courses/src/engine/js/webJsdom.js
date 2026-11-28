@@ -15,6 +15,10 @@ const openPage = (html, storage) => {
     url: 'https://practice.local/',
     virtualConsole: new VirtualConsole(),
     beforeParse(window) {
+      // jsdom has no blob: addresses; a page that previews a chosen file still needs the two functions
+      let blobs = 0;
+      if (!window.URL.createObjectURL) window.URL.createObjectURL = () => { blobs += 1; return `blob:https://practice.local/${String(blobs).padStart(8, '0')}-0000-4000-8000-000000000000`; };
+      if (!window.URL.revokeObjectURL) window.URL.revokeObjectURL = () => {};
       window.__practiceBridge = (msg) => {
         if (msg.type === 'console') page.lines.push({ level: msg.level, text: msg.text });
         if (msg.type === 'error') page.errors.push({ text: msg.text, file: msg.file, line: msg.line, tip: msg.tip });

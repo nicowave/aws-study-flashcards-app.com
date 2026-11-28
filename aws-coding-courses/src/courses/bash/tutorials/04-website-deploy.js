@@ -405,7 +405,7 @@ That \`.env\` guard exists because of a real mistake: one deploy ran without the
 
 2. **A private bucket:** \`aws s3 mb s3://my-site-yourname-2026\` (leave *Block all public access* on).
 
-3. **A CloudFront distribution** in the console: *Create distribution* → origin = your bucket → **Origin access: Origin access control settings** → *Create new OAC* → default root object \`index.html\`. After it's created, copy the bucket policy CloudFront offers and paste it into the bucket's *Permissions* tab. Note the distribution ID and its \`https://xxxx.cloudfront.net\` address.
+3. **A CloudFront distribution** in the console: *Create distribution* → give it a name → **Single website or app** → *Next* → origin type **Amazon S3** → *Browse S3* and choose your bucket → keep **Use recommended origin settings** → *Next* → on the **Enable security protections** page, choose not to enable them (they are AWS WAF, which is billed separately) → *Next* → *Create distribution*. If a page offers pricing plans, choose **Pay as you go**. With the recommended settings, CloudFront sets up origin access control (OAC) and adds the bucket policy for you: the bucket stays private and only your distribution can read it. Then, on the distribution's *General* tab, choose *Edit* in the *Settings* pane and set **Default root object** to \`index.html\`. Note the distribution ID and its \`https://xxxx.cloudfront.net\` address.
 
 4. **The settings secret:**
 
@@ -425,7 +425,7 @@ Open the CloudFront address. Change a word in \`index.html\`, deploy again, and 
 
 6. Push \`deploy.sh\` to GitHub. It contains no bucket names, IDs or keys, so it's safe to share. That's the point.
 
-**Cost:** S3 and CloudFront fit in the free tier for a small site. Secrets Manager is free for 30 days, then $0.40 a month per secret. To clean up: disable and delete the distribution, \`aws s3 rb s3://my-site-yourname-2026 --force\`, and \`aws secretsmanager delete-secret --secret-id deploy/staging\`.`,
+**Cost:** S3 and CloudFront fit in the free tier for a small site. Secrets Manager costs $0.40 a month per secret; on an account opened since July 15, 2025, your Free Tier credits pay for it while they last. To clean up: disable and delete the distribution, \`aws s3 rb s3://my-site-yourname-2026 --force\`, and \`aws secretsmanager delete-secret --secret-id deploy/staging\`.`,
       checklist: [
         'My site is live at its CloudFront address, from a private bucket',
         'The deploy settings are in Secrets Manager, not in the script',

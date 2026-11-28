@@ -97,7 +97,7 @@ export default {
 - Una **clave de API** (*API key*; "la API key" con el equipo) es una cadena larga que identifica a una app cuando llama a una API. Las llamadas a AWS se firman con una **clave de acceso** (*access key*): un ID de clave de acceso más una clave de acceso secreta, válida hasta que alguien la desactive. Siempre que puedas, usa credenciales temporales de un rol de IAM.
 - Un **secreto** (*secret*) es cualquier valor que debe quedar oculto: claves, contraseñas, cadenas de conexión. AWS Secrets Manager los guarda y puede rotarlos automáticamente. **Rotar** una clave (*rotate*) es sustituirla por una nueva y retirar la anterior.
 - El **cifrado** (*encryption*) transforma los datos para que solo pueda leerlos quien tenga la clave: **cifrar** es *encrypt* y **descifrar**, *decrypt*. Con el equipo oirás *encriptar* por todas partes; en un documento, *cifrar* es la opción más cuidada.
-- **En reposo** (*at rest*) son los datos guardados; **en tránsito** (*in transit*), los que viajan por la red. Piensa en una caja fuerte y un camión blindado: riesgos distintos, cerraduras distintas. S3 cifra los objetos nuevos por defecto, y TLS (HTTPS) protege los datos en tránsito.
+- **En reposo** (*at rest*) son los datos guardados; **en tránsito** (*in transit*), los que viajan por la red. Piensa en una caja fuerte y un camión blindado: riesgos distintos, cerraduras distintas. S3 cifra en reposo los objetos nuevos de forma predeterminada, y TLS (HTTPS) protege los datos en tránsito.
 - Un **certificado** (*certificate*; "el SSL" con el equipo) acredita la identidad de un dominio y hace posible TLS. ACM emite certificados públicos gratuitos (en us-east-1 para CloudFront).`,
         ),
         termTable(SECRETS),
@@ -535,8 +535,8 @@ Próximos pasos: proponemos una sesión de trabajo el 3 de diciembre para acorda
           ),
           options: [
             'AdministratorAccess',
-            '"Action": "dynamodb:*", "Resource": "*"',
-            both('"Action": ["dynamodb:GetItem", "dynamodb:Query"], "Resource": "<ARN of that table>"', '"Action": ["dynamodb:GetItem", "dynamodb:Query"], "Resource": "<ARN de esa tabla>"'),
+            '`"Action": "dynamodb:*", "Resource": "*"`',
+            both('`"Action": ["dynamodb:GetItem", "dynamodb:Query"], "Resource": "<ARN of that table>"`', '`"Action": ["dynamodb:GetItem", "dynamodb:Query"], "Resource": "<ARN de esa tabla>"`'),
             both('Use the root user\'s access keys in the function', 'Usar las claves de acceso del usuario raíz en la función'),
           ],
           answer: 2,

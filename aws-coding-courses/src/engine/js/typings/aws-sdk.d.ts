@@ -17,6 +17,10 @@ declare module '@aws-sdk/types' {
     retryMode?: 'standard' | 'adaptive';
     /** S3 only: follow a bucket to its own Region instead of failing with PermanentRedirect */
     followRegionRedirects?: boolean;
+    /** S3 only: when the SDK adds its own checksum to an upload. Default 'WHEN_SUPPORTED'. */
+    requestChecksumCalculation?: 'WHEN_SUPPORTED' | 'WHEN_REQUIRED';
+    /** S3 only: when the SDK checks a download against its checksum. Default 'WHEN_SUPPORTED'. */
+    responseChecksumValidation?: 'WHEN_SUPPORTED' | 'WHEN_REQUIRED';
   }
   /** Every command remembers its input and output types, so send() returns the right shape. */
   export class Command<Input extends object, Output extends MetadataBearer> {
@@ -160,11 +164,25 @@ declare module '@aws-sdk/client-s3' {
   }
   export class GetObjectCommand extends Command<{ Bucket: string; Key: string }, GetObjectCommandOutput> {}
   export class HeadObjectCommand extends Command<{ Bucket: string; Key: string }, Omit<GetObjectCommandOutput, 'Body'>> {}
-  export interface PutObjectCommandInput { Bucket: string; Key: string; Body?: string | Uint8Array; ContentType?: string; CacheControl?: string; Metadata?: Record<string, string>; }
+  export interface PutObjectCommandInput { Bucket: string; Key: string; Body?: string | Uint8Array; ContentType?: string; ContentLength?: number; CacheControl?: string; Metadata?: Record<string, string>; }
   export class PutObjectCommand extends Command<PutObjectCommandInput, MetadataBearer & { ETag?: string }> {}
   export class DeleteObjectCommand extends Command<{ Bucket: string; Key: string }, MetadataBearer> {}
   export interface CopyObjectCommandInput { Bucket: string; Key: string; CopySource: string; ContentType?: string; Metadata?: Record<string, string>; MetadataDirective?: 'COPY' | 'REPLACE'; }
   export class CopyObjectCommand extends Command<CopyObjectCommandInput, MetadataBearer & { CopyObjectResult?: { ETag?: string; LastModified?: Date } }> {}
+}
+
+declare module '@aws-sdk/s3-request-presigner' {
+  import { Command } from '@aws-sdk/types';
+  import { S3Client } from '@aws-sdk/client-s3';
+  export interface PresignOptions {
+    /** Seconds until the URL stops working. Default 900, at most 604800 (a week). */
+    expiresIn?: number;
+    /** Headers that aren't x-amz-* and must be part of the signature, like content-type. */
+    signableHeaders?: Set<string>;
+    unhoistableHeaders?: Set<string>;
+    hoistableHeaders?: Set<string>;
+  }
+  export function getSignedUrl(client: S3Client, command: Command<any, any>, options?: PresignOptions): Promise<string>;
 }
 
 declare module '@aws-sdk/client-sts' {

@@ -715,7 +715,7 @@
         "casual": "MVP",
         "slang": "MVP"
       },
-      "atWork": "\"el MVP\" (se pronuncia en español: \"eme-uve-pe\")",
+      "atWork": "\"el MVP\" (se pronuncia en español: \"eme-uve-pe\" o, en Latinoamérica, \"eme-ve-pe\")",
       "region": null,
       "falseFriend": null,
       "example": {
@@ -1611,7 +1611,7 @@
         "casual": "CD",
         "slang": null
       },
-      "atWork": "\"CI/CD\" (se dice \"ci-di\" o \"ce-i-ce-de\")",
+      "atWork": "\"CI/CD\" (se dice en inglés, \"si-ai si-di\", o en español, \"ce-i ce-de\")",
       "region": null,
       "falseFriend": null,
       "example": {
@@ -2402,7 +2402,7 @@
       "falseFriend": null,
       "example": {
         "en": "Lambda is serverless: you never manage servers.",
-        "es": "Lambda es sin servidor: nunca administras servidores."
+        "es": "Lambda es un servicio sin servidor: nunca administras servidores."
       },
       "note": {
         "text": "Forma que usa la documentación de AWS en español (traducción automática: en caso de duda manda la versión en inglés). \"Auto Scaling\" queda en inglés como nombre del servicio; el concepto es \"escalado automático\".",
@@ -3494,7 +3494,7 @@
       },
       "atWork": "\"registro\"",
       "region": null,
-      "falseFriend": "\"Registro\" también es log y entrada de DNS: en español una misma palabra cubre tres ideas.",
+      "falseFriend": "\"Registro\" también es log, entrada de DNS y alta de un usuario: en español una misma palabra cubre varias ideas.",
       "example": {
         "en": "Insert one record per order.",
         "es": "Inserta un registro por pedido."

@@ -344,6 +344,8 @@ const PAGE_HTML = `<!doctype html>
 </html>`;
 
 const PAGE_CSS = `body { font-family: system-ui, sans-serif; margin: 2rem; color: #1d2733; }
+/* hidden must win: form { display: grid } below would show the sign-in form again */
+[hidden] { display: none !important; }
 main { max-width: 30rem; }
 form { display: grid; gap: 0.7rem; }
 label { display: grid; gap: 0.2rem; font-size: 0.9rem; }

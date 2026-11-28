@@ -7,6 +7,7 @@ import serverHealthCheck from './tutorials/01-server-health-check';
 import logDetective from './tutorials/02-log-detective';
 import nightlyBackup from './tutorials/03-nightly-backup';
 import websiteDeploy from './tutorials/04-website-deploy';
+import deployManySites from './tutorials/05-deploy-many-sites';
 
 const course = {
   ...meta,
@@ -14,7 +15,7 @@ const course = {
   accent: '#89d185',
   eyebrow: 'Coding course · Bash',
   headline: 'Automate the work you already do by hand.',
-  lede: 'Bash for AWS teaches the command-line scripting IT teams use every day: health checks, log digging, backups to Amazon S3 and one-command website deploys. No programming background needed.',
+  lede: 'Bash for AWS teaches the command-line scripting IT teams use every day: health checks, log digging, backups to Amazon S3, and one-command deploys for one website or many. No programming background needed.',
   heroNote: 'Start here and Tutorial 1 are free. Nothing to install to begin: the practice terminal runs in your browser.',
   heroTerminal: `$ ./health-check.sh
 2026-10-29 07:00:01 OK disk is 62% full
@@ -36,24 +37,26 @@ Live at https://www.example.com`,
     'Run jobs on a schedule with cron, with logs you can trust',
     'Upload, list and clean up files in **Amazon S3** with the AWS command line',
     'Deploy a website to **S3 and CloudFront** with the right cache headers, settings in **Secrets Manager**',
+    'Deploy many sites with one script that carries on after a failure and reports the truth: a summary line per site, and exit codes other tools can act on',
+    'Test a deploy script without touching AWS, with a pretend `aws` that records every call and fails when you tell it to',
     'Write safe scripts: `set -euo pipefail`, input checks, dry runs and least-privilege permissions',
   ],
-  pricingLede: 'All four tutorials with every practice task, quiz, flashcard deck and real-AWS project. Pay monthly or yearly and cancel anytime. Also included in Pro, with every other course and certification game.',
+  pricingLede: 'All five tutorials with every practice task, quiz, flashcard deck and real-AWS project. Pay monthly or yearly and cancel anytime. Also included in Pro, with every other course and certification game.',
   faq: [
     { q: 'Do I need to know how to code?', a: 'No. If you\'re comfortable with computers (IT support, sysadmin, help desk, a technical hobby), you\'re ready. Tutorial 1 starts from your very first command.' },
     { q: 'Do I need an AWS account?', a: 'Not to start: every lesson has a practice terminal with a pretend AWS account, right in your browser. The **Build it** step at the end of each tutorial uses your own free AWS account, and *Start here* shows how to set one up with a budget alert so it can\'t surprise you.' },
-    { q: 'Will the real AWS projects cost money?', a: 'Almost nothing. Everything fits in the AWS Free Tier or costs a few cents, except AWS Secrets Manager in Tutorial 4 ($0.40 a month per secret after a 30-day free trial). Each Build step ends with cleanup commands.' },
+    { q: 'Will the real AWS projects cost money?', a: 'Almost nothing. Everything fits in the AWS Free Tier or costs a few cents, except AWS Secrets Manager in Tutorial 4: $0.40 a month per secret, which the Free Tier credits of a new AWS account pay for while they last. Each Build step ends with cleanup steps.' },
     { q: 'Mac, Windows or Linux?', a: 'All three. Mac and Linux have a terminal built in. On Windows, *Start here* shows how to install the Windows Subsystem for Linux, which gives you a real Ubuntu terminal.' },
     { q: 'Does this help with the AWS Certified Developer – Associate exam?', a: 'Yes. The exam expects you to work with the AWS command line, S3, CloudFront, IAM policies and Secrets Manager, and each tutorial ends with exam tips. Pair it with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com) for full exam practice.' },
     pricingFaq(),
     { q: 'Is this an official AWS course?', a: 'No. Level Up Study Hub is an independent study site by Nico Tek Solutions. AWS is a trademark of Amazon.com, Inc.' },
   ],
   afterCourse: `**Next steps:**
-- Put the four scripts on your résumé as a "Bash automation" project, linking to your GitHub.
+- Put the five scripts on your résumé as a "Bash automation" project, linking to your GitHub.
 - Practice for the exam with the [Developer Associate study game](https://developer.aws-study-flashcards-app.com).
 - Continue with [Python for AWS](https://python.aws-study-flashcards-app.com): the language AWS automation runs on, with boto3, Lambda and DynamoDB.`,
   siblings: siblingsOf(meta.id),
-  tutorials: [startHere, serverHealthCheck, logDetective, nightlyBackup, websiteDeploy],
+  tutorials: [startHere, serverHealthCheck, logDetective, nightlyBackup, websiteDeploy, deployManySites],
 };
 
 export default course;

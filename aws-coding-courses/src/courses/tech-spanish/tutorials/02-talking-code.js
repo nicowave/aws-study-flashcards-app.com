@@ -18,8 +18,8 @@ export default {
   free: false,
   title: both('Talking about code', 'Hablar de código'),
   situation: both(
-    'Your team in Monterrey and Valencia builds the backend for a study app: Lambda functions in Node.js, DynamoDB, an API in front. Pull requests are reviewed in English, because half the reviewers are in Seattle, but the daily stand-up is in Spanish. Today Diego joins the team and asks you to explain the `getProgress` handler in Spanish. Then, on a call about Sam\'s pull request, Marta says "aquí falta cachear la excepción", and Sam asks: "Wait, what are we caching?"',
-    'Tu equipo de Monterrey y Valencia construye el backend de una app de estudio: funciones Lambda en Node.js, DynamoDB y una API delante. Las pull requests se revisan en inglés, porque la mitad de quienes revisan están en Seattle, pero la daily es en español. Hoy entra Diego al equipo y te pide que le expliques en español el handler `getProgress`. Luego, en una llamada sobre la pull request de Sam, Marta dice "aquí falta cachear la excepción", y Sam pregunta: "Wait, what are we caching?"',
+    'Your team in Monterrey and Valencia builds the backend for a study app: Lambda functions in Node.js, DynamoDB, an API in front. Pull requests are reviewed in English, because half the reviewers are in Seattle, but the daily stand-up is in Spanish. Today Diego joins the team and asks you to explain the getProgress handler in Spanish. Then, on a call about Sam\'s pull request, Marta says "aquí falta cachear la excepción", and Sam asks: "Wait, what are we caching?"',
+    'Tu equipo de Monterrey y Valencia construye el backend de una app de estudio: funciones Lambda en Node.js, DynamoDB y una API delante. Las pull requests se revisan en inglés, porque la mitad de quienes revisan están en Seattle, pero la daily es en español. Hoy entra Diego al equipo y te pide que le expliques en español el handler getProgress. Luego, en una llamada sobre la pull request de Sam, Marta dice "aquí falta cachear la excepción", y Sam pregunta: "Wait, what are we caching?"',
   ),
   overview: both(
     'Code reviews, stand-ups and docs are full of the same few dozen words: types, functions, exceptions, libraries, promises. Most look alike in both languages, and that is exactly where the traps hide: *matriz* is not always a matrix, *cachear* can mean catch or cache, and *librería* is a bookstore. In four short lessons you learn the words in three registers, how to read code aloud in either language, and then you write two real texts: a Spanish explanation of a Lambda handler and an English review comment about a missing `await`.',
@@ -355,7 +355,7 @@ export default {
       minWords: 45,
       mustUse: [
         { any: ['await*'], label: 'await' },
-        { any: ['promise*', 'resolv*', 'settl*', 'finish*', 'complet*'], label: 'promise / finishes' },
+        { any: ['promise*', 'resolv*', 'settl*', 'finish*', 'complet*', 'saved', 'saves', 'written', 'stored', 'persist*', 'succeed*'], label: 'promise / finishes' },
         { any: ['return*'], label: 'returns' },
         { any: ['catch*', 'handle', 'handles', 'handled', 'handling'], label: 'catch / handle' },
         { any: ['exception*', 'error*', 'throw*', 'raise*', 'reject*'], label: 'exception / throws' },

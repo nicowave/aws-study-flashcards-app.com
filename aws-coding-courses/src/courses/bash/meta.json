@@ -3,7 +3,7 @@
   "language": "Bash",
   "title": "Bash for AWS",
   "pageTitle": "Bash for AWS — learn shell scripting with real AWS tasks",
-  "description": "Learn Bash by doing the jobs IT teams really ask for: health checks, log digging, backups to Amazon S3 and one-command website deploys. Practice in your browser, then build it on your own AWS account.",
+  "description": "Learn Bash by doing the jobs IT teams really ask for: health checks, log digging, backups to Amazon S3, and one-command deploys for one website or many. Practice in your browser, then build it on your own AWS account.",
   "url": "https://bash.levelupstudyhub.com",
-  "hours": 10
+  "hours": 14
 }

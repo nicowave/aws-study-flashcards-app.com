@@ -48,6 +48,7 @@ export const PACKAGES = {
   '@aws-sdk/client-sesv2': reexport(SDK, ['SESv2Client', 'SendEmailCommand', 'MessageRejected', 'ServiceException as SESv2ServiceException', ...ERRORS]),
   '@aws-sdk/client-s3': reexport(SDK, ['S3Client', 'ListBucketsCommand', 'ListObjectsV2Command', 'GetObjectCommand', 'HeadObjectCommand', 'PutObjectCommand',
     'DeleteObjectCommand', 'CopyObjectCommand', 'paginateListObjectsV2', 'NoSuchKey', 'NoSuchBucket', 'NotFound', 'ServiceException as S3ServiceException', ...ERRORS]),
+  '@aws-sdk/s3-request-presigner': reexport(SDK, ['getSignedUrl']),
   '@aws-sdk/client-sts': reexport(SDK, ['STSClient', 'GetCallerIdentityCommand', 'ServiceException as STSServiceException', ...ERRORS]),
   '@aws-sdk/client-cloudfront': reexport(SDK, ['CloudFrontClient', 'CreateInvalidationCommand', 'GetInvalidationCommand', 'ListDistributionsCommand',
     'NoSuchDistribution', 'ServiceException as CloudFrontServiceException', ...ERRORS]),
