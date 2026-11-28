@@ -19,6 +19,8 @@ aws cognito-idp describe-user-pool --user-pool-id "$POOL_ID" --query UserPool.Us
 - `LITE`: the deploy in step 2 moves the pool to Essentials. Essentials is billed differently above the free monthly active users; check [Amazon Cognito pricing](https://aws.amazon.com/cognito/pricing/) against last month's active users before you go on.
 - `PLUS`: stop. Change `featurePlan` in `aws-backend/lib/study-hub-stack.ts` to `cognito.FeaturePlan.PLUS` first, or the deploy downgrades the pool.
 
+The deploy also moves both sign-in domains from the classic hosted UI to **managed login**, Cognito's newer sign-in pages, with Cognito's default style. Cognito refuses the device limit while any domain still serves the classic pages. The apps send "Sign in with Google" straight to Google, so in normal use nobody sees these pages.
+
 ## 1. Create the prices in Stripe
 
 `scripts/stripe-subscription-setup.mjs` makes the 18 product prices ($11/month and $69/year for each of the 9 products) and the $199/year Pro price, sets up the Customer Portal (Manage billing: cancel at period end and invoices, no plan switching; a separate configuration for the monthly-to-yearly confirm link) and adds `customer.subscription.created` to the existing webhook. It finds what already exists, so running it twice changes nothing. Without `--apply` it only reads Stripe and prints the plan.

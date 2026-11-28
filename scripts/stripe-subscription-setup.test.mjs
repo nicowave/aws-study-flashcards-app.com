@@ -23,6 +23,14 @@ const taxReady = () => ({ status: 'active', defaults: { tax_behavior: 'inferred_
 const registration = (state) => ({ id: `taxreg_${state}`, country: 'US', status: 'active', country_options: { us: { state, type: 'state_sales_tax' } } })
 
 // A pretend Stripe: the resources and methods the script uses, with Stripe's list pagination.
+// Live Stripe refused the switch portal on 28 Nov 2026 without this:
+// "Cannot enable subscription updates while payment method update is disabled".
+function refuseSwitchWithoutCardUpdates(features = {}) {
+  if (features.subscription_update?.enabled && !features.payment_method_update?.enabled) {
+    throw new Error('Cannot enable subscription updates while payment method update is disabled.')
+  }
+}
+
 function fakeStripe(state = {}) {
   const s = {
     products: [], prices: [], portal: null, switchPortal: null, endpoints: [], pageSize: 100,
@@ -80,6 +88,7 @@ function fakeStripe(state = {}) {
         },
         create: async (p) => {
           rec('portal.create', p)
+          refuseSwitchWithoutCardUpdates(p.features)
           if (p.metadata?.purpose === SWITCH_PORTAL_PURPOSE) return (s.switchPortal = { id: 'bpc_switch', is_default: false, ...p })
           return (s.portal = { id: 'bpc_new', is_default: true, ...p })
         },
@@ -87,6 +96,7 @@ function fakeStripe(state = {}) {
           rec('portal.update', id, p)
           const target = [s.portal, s.switchPortal].find((c) => c?.id === id)
           assert.ok(target, `no portal configuration ${id}`)
+          refuseSwitchWithoutCardUpdates({ ...target.features, ...p.features })
           target.features = { ...target.features, ...p.features }
           return target
         },
@@ -200,6 +210,7 @@ test('apply on an empty account creates 9 products x 2 prices plus Pro, the port
   // "Manage billing" can't switch plans: its product list would let a subscriber move to any product
   assert.equal(stripe.s.portal.features.subscription_update.enabled, false)
   assert.equal(stripe.s.switchPortal.metadata.purpose, SWITCH_PORTAL_PURPOSE)
+  assert.equal(stripe.s.switchPortal.features.payment_method_update.enabled, true)
   const su = stripe.s.switchPortal.features.subscription_update
   assert.equal(su.enabled, true)
   assert.deepEqual(su.default_allowed_updates, ['price'])

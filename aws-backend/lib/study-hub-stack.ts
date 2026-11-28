@@ -226,6 +226,9 @@ export class StudyHubBackendStack extends cdk.Stack {
     const domainPrefix = this.node.tryGetContext('cognitoDomainPrefix') ?? 'study-hub-auth-418272768335';
     const userPoolDomain = userPool.addDomain('HostedUiDomain', {
       cognitoDomain: { domainPrefix },
+      // Managed login, not the classic hosted UI: Cognito refuses the device
+      // limit (session tracking) while any domain of the pool serves the classic pages.
+      managedLoginVersion: cognito.ManagedLoginVersion.NEWER_MANAGED_LOGIN,
     });
 
     // Branded sign-in address, so Google's consent screen shows our domain.
@@ -240,6 +243,7 @@ export class StudyHubBackendStack extends cdk.Stack {
           'arn:aws:acm:us-east-1:418272768335:certificate/9c5abd7d-76d2-4506-9f2b-1f067e761abc',
         ),
       },
+      managedLoginVersion: cognito.ManagedLoginVersion.NEWER_MANAGED_LOGIN, // see HostedUiDomain
     });
     const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, 'SiteZone', {
       hostedZoneId: 'Z03018293W2CBVCSFY7I2',
@@ -296,6 +300,17 @@ export class StudyHubBackendStack extends cdk.Stack {
       enableTokenRevocation: true,
     });
     webClient.node.addDependency(googleProvider);
+
+    // Managed login shows its pages only to an app client with a style. Google
+    // sign-in goes straight to Google, but error and logout pages still render,
+    // so give the one web client Cognito's default style.
+    new cognito.CfnManagedLoginBranding(this, 'WebClientLoginStyle', {
+      userPoolId: userPool.userPoolId,
+      clientId: webClient.userPoolClientId,
+      useCognitoProvidedValues: true,
+    });
+    // Both domains must be on managed login before the device limit switches on.
+    sessionLimit.node.addDependency(userPoolDomain, authDomain);
 
     // -----------------------------------------------------------------
     // HTTP API + Lambda skeleton

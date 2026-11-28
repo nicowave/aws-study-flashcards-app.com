@@ -395,6 +395,9 @@ export async function setup({ stripe, apply = false, archiveLegacy = false, know
 
   // Only reached through the monthly -> yearly confirm link, which shows the one change it names
   const wantSwitch = {
+    // Stripe refuses subscription_update unless payment_method_update is on too
+    // ("Cannot enable subscription updates while payment method update is disabled").
+    payment_method_update: { enabled: true },
     subscription_update: {
       enabled: true,
       default_allowed_updates: ['price'],
