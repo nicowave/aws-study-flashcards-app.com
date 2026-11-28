@@ -739,7 +739,8 @@ const Plans = ({ onShowLogin }) => (
     </div>
     <p className="plans-fine-print">
       Prices are in US dollars. Subscriptions renew automatically; cancel anytime in Manage billing (Settings, Plan &amp; Billing).
-      Applicable sales tax and any card processing fee are shown at checkout before you pay. Payments are processed
+      Where sales tax applies, it is based on your billing address, shown at checkout before you pay, and charged on
+      each renewal too. Any card processing fee is shown before you pay as well. Payments are processed
       securely by Stripe for Nico Tek Solutions. Unlocks bought before subscriptions keep their lifetime access.{' '}
       <a href="/terms.html">Terms of Service</a>
     </p>

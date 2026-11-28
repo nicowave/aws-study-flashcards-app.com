@@ -51,12 +51,13 @@ lib.DynamoDBDocumentClient.prototype.send = async function send(cmd) {
   throw new Error(`unexpected command ${cmd.constructor.name}`);
 };
 
-const { createCheckoutSession, planForPrice, resetSwitchConfiguration } = require(callables)._test;
+const { createCheckoutSession, planForPrice, resetSwitchConfiguration, PROMOTIONS, CHECKOUT_TAX } = require(callables)._test;
 const { alreadyCovered, coverageFor, PRO_COVERS, PRODUCTS } = require("../lambda/callables/coverage");
 
-// Fake Stripe: one customer per test, its subscriptions, and a record of checkout and portal sessions
-function fakeStripe({ subs = [], otherCustomers = [], failSubscriptionList = false, failPortalFlow = false, portalConfigs = [] } = {}) {
-  const calls = { sessions: [], portal: [], customersCreated: 0 };
+// Fake Stripe: one customer per test, its subscriptions, and a record of checkout and portal sessions.
+// `refuseSession(params)` returns an error to throw for a checkout request (recorded in calls.refused).
+function fakeStripe({ subs = [], otherCustomers = [], failSubscriptionList = false, failPortalFlow = false, portalConfigs = [], refuseSession = () => null } = {}) {
+  const calls = { sessions: [], refused: [], portal: [], customersCreated: 0 };
   const byCustomer = { cus_me: subs };
   for (const c of otherCustomers) byCustomer[c.id] = c.subs;
   return {
@@ -78,6 +79,11 @@ function fakeStripe({ subs = [], otherCustomers = [], failSubscriptionList = fal
     checkout: {
       sessions: {
         create: async (params) => {
+          const refusal = refuseSession(params);
+          if (refusal) {
+            calls.refused.push(params);
+            throw refusal;
+          }
           calls.sessions.push(params);
           return { id: "cs_test", url: "https://checkout.stripe.test/session" };
         },
@@ -534,4 +540,152 @@ test("the price decides the plan: a portal switch to another product's price is 
   stripe = fakeStripe({ subs: [sub("active", "price_py_month", "cloud-practitioner", "month")] });
   await createCheckoutSession({ plan: "cloud-practitioner", interval: "month" }, user, stripe);
   assert.equal(stripe.calls.sessions.length, 1, "Cloud Practitioner is no longer paid for, so it sells");
+});
+
+// ---------------------------------------------------------------------------
+// Sales tax (Stripe Tax)
+// ---------------------------------------------------------------------------
+
+const stripeError = (type, message) => Object.assign(new Error(message), { type });
+const taxed = (params) => Boolean(params.automatic_tax?.enabled);
+// Captures console.error lines while fn runs, so a test can read the log and the run stays quiet
+async function withErrorLog(fn) {
+  const lines = [];
+  const original = console.error;
+  console.error = (...args) => lines.push(args.join(" "));
+  try {
+    return { result: await fn(), lines };
+  } finally {
+    console.error = original;
+  }
+}
+// A sale running right now, for the length of one test
+async function duringPromotion(coupons, fn) {
+  const promo = { name: "test-sale", start: Date.now() - 60_000, end: Date.now() + 60_000, coupons };
+  PROMOTIONS.unshift(promo);
+  try {
+    return await fn();
+  } finally {
+    PROMOTIONS.splice(PROMOTIONS.indexOf(promo), 1);
+  }
+}
+
+test("every checkout collects sales tax: automatic tax, the buyer's address saved for renewals, business tax IDs", async () => {
+  for (const [data, label] of [
+    [{ plan: "cloud-practitioner", interval: "month" }, "a product, monthly"],
+    [{ plan: "python-for-aws", interval: "year" }, "a course, yearly"],
+    [{ plan: "all-access" }, "Pro with its free trial"],
+  ]) {
+    account({ customer: false });
+    const stripe = fakeStripe();
+    await createCheckoutSession(data, user, stripe);
+    assert.equal(stripe.calls.sessions.length, 1, label);
+    const s = stripe.calls.sessions[0];
+    assert.deepEqual(s.automatic_tax, { enabled: true }, label);
+    assert.equal(s.billing_address_collection, "auto", label);
+    assert.deepEqual(s.customer_update, { address: "auto", name: "auto" }, label);
+    assert.deepEqual(s.tax_id_collection, { enabled: true }, label);
+    assert.equal(s.customer, "cus_me", "customer_update only works on a customer Checkout is given");
+    assert.equal(s.subscription_data.metadata.salesTax, undefined, label);
+  }
+});
+
+test("the settings checked above are the ones checkout sends", () => {
+  assert.deepEqual(CHECKOUT_TAX, {
+    automatic_tax: { enabled: true },
+    billing_address_collection: "auto",
+    customer_update: { address: "auto", name: "auto" },
+    tax_id_collection: { enabled: true },
+  });
+});
+
+test("a sale price is taxed too: the coupon and automatic tax go in the same session", async () => {
+  account();
+  const stripe = fakeStripe();
+  await duringPromotion({ "all-access": "PRO_SALE", default: "PRODUCT_SALE" }, () =>
+    createCheckoutSession({ plan: "solutions-architect-associate", interval: "month" }, user, stripe)
+  );
+  assert.equal(stripe.calls.sessions.length, 1);
+  const s = stripe.calls.sessions[0];
+  assert.deepEqual(s.discounts, [{ coupon: "PRODUCT_SALE" }]);
+  assert.equal(s.allow_promotion_codes, undefined, "Stripe allows a discount or promotion codes, not both");
+  assert.equal(s.metadata.promotion, "test-sale");
+  assert.ok(taxed(s));
+  assert.deepEqual(s.customer_update, { address: "auto", name: "auto" });
+});
+
+test("an unusable sale coupon still ends in a taxed checkout at full price", async () => {
+  account();
+  const stripe = fakeStripe({
+    refuseSession: (p) => (p.discounts ? stripeError("StripeInvalidRequestError", "No such coupon: 'GONE'") : null),
+  });
+  const { result } = await withErrorLog(() =>
+    duringPromotion({ default: "GONE" }, () => createCheckoutSession({ plan: "cloud-practitioner", interval: "year" }, user, stripe))
+  );
+  assert.equal(result.url, "https://checkout.stripe.test/session");
+  assert.equal(stripe.calls.refused.length, 2, "with tax, then without: the coupon fails both ways");
+  assert.equal(stripe.calls.sessions.length, 1);
+  const s = stripe.calls.sessions[0];
+  assert.equal(s.discounts, undefined);
+  assert.ok(taxed(s), "full price is still taxed");
+  assert.equal(s.subscription_data.metadata.salesTax, undefined);
+});
+
+test("a Stripe Tax setup problem never blocks a sale: checkout without tax, tagged and logged", async () => {
+  for (const type of ["StripeInvalidRequestError", "StripePermissionError"]) {
+    account();
+    const stripe = fakeStripe({
+      refuseSession: (p) => (taxed(p) ? stripeError(type, "Stripe Tax has not been activated on your account.") : null),
+    });
+    const { result, lines } = await withErrorLog(() =>
+      createCheckoutSession({ plan: "developer-associate", interval: "month", returnUrl: HUB }, user, stripe)
+    );
+    assert.equal(result.url, "https://checkout.stripe.test/session", type);
+    assert.equal(stripe.calls.refused.length, 1, type);
+    assert.equal(stripe.calls.sessions.length, 1, type);
+    const s = stripe.calls.sessions[0];
+    for (const field of Object.keys(CHECKOUT_TAX)) assert.equal(s[field], undefined, `${type}: no ${field} without tax`);
+    assert.equal(s.subscription_data.metadata.salesTax, "off", "the subscription can be found later to turn tax on");
+    assert.equal(s.subscription_data.metadata.firebaseUID, "u1", "the rest of the metadata stays");
+    assert.deepEqual(s.metadata, { firebaseUID: "u1", plan: "developer-associate", interval: "month" });
+    assert.deepEqual(s.line_items, [{ price: "price_dva_month", quantity: 1 }]);
+    assert.ok(lines.some((l) => /SALES TAX OFF/.test(l) && /uid=u1/.test(l) && /not been activated/.test(l)), type);
+  }
+});
+
+test("Pro keeps its free trial when it has to check out without tax", async () => {
+  account({ customer: false });
+  const stripe = fakeStripe({ refuseSession: (p) => (taxed(p) ? stripeError("StripeInvalidRequestError", "tax_behavior") : null) });
+  await withErrorLog(() => createCheckoutSession({ plan: "all-access" }, user, stripe));
+  const s = stripe.calls.sessions[0];
+  assert.equal(s.subscription_data.trial_period_days, 14);
+  assert.deepEqual(s.subscription_data.trial_settings, { end_behavior: { missing_payment_method: "cancel" } });
+  assert.equal(s.subscription_data.metadata.salesTax, "off");
+});
+
+test("a sale price keeps its coupon when it has to check out without tax", async () => {
+  account();
+  const stripe = fakeStripe({ refuseSession: (p) => (taxed(p) ? stripeError("StripeInvalidRequestError", "no tax") : null) });
+  await withErrorLog(() =>
+    duringPromotion({ default: "PRODUCT_SALE" }, () => createCheckoutSession({ plan: "cloud-practitioner", interval: "month" }, user, stripe))
+  );
+  assert.equal(stripe.calls.sessions.length, 1);
+  assert.deepEqual(stripe.calls.sessions[0].discounts, [{ coupon: "PRODUCT_SALE" }]);
+  assert.equal(stripe.calls.sessions[0].subscription_data.metadata.salesTax, "off");
+});
+
+test("an outage is not a reason to drop tax: the error is thrown, nothing is retried", async () => {
+  account();
+  const stripe = fakeStripe({ refuseSession: () => stripeError("StripeConnectionError", "socket hang up") });
+  await assert.rejects(createCheckoutSession({ plan: "cloud-practitioner", interval: "month" }, user, stripe), /socket hang up/);
+  assert.equal(stripe.calls.refused.length, 1);
+  assert.equal(stripe.calls.sessions.length, 0);
+});
+
+test("a refusal that has nothing to do with tax is thrown as Stripe gave it", async () => {
+  account();
+  const stripe = fakeStripe({ refuseSession: (p) => stripeError("StripeInvalidRequestError", taxed(p) ? "No such price: 'price_clf_month'" : "second error") });
+  await assert.rejects(createCheckoutSession({ plan: "cloud-practitioner", interval: "month" }, user, stripe), /No such price/);
+  assert.equal(stripe.calls.refused.length, 2, "tried once without tax, which failed too");
+  assert.equal(stripe.calls.sessions.length, 0);
 });

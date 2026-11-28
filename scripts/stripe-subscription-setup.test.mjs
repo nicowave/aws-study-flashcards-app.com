@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url'
 import {
   setup, mergeEnv, writeEnvFile, keyProblem, scrub, envLines, envName, parseEnv,
   PRODUCTS, PRO, PRODUCT_MONTHLY_CENTS, PRODUCT_YEARLY_CENTS, PRO_YEARLY_CENTS, WEBHOOK_EVENT, SWITCH_PORTAL_PURPOSE,
+  PORTAL_CUSTOMER_UPDATES,
 } from './stripe-subscription-setup.mjs'
 import { COURSES, OTHER_COURSES } from '../aws-study-homepage/src/data/courses.js'
 import * as hubPrices from '../aws-study-homepage/src/data/prices.js'
@@ -17,9 +18,17 @@ import * as hubPrices from '../aws-study-homepage/src/data/prices.js'
 const SCRIPT = fileURLToPath(new URL('./stripe-subscription-setup.mjs', import.meta.url))
 const WRITES = /\.(create|update|del)$/
 
+// Stripe Tax as the live account has it: active, the "Automatic" default, registered in Maryland and DC
+const taxReady = () => ({ status: 'active', defaults: { tax_behavior: 'inferred_by_currency', tax_code: 'txcd_10000000' } })
+const registration = (state) => ({ id: `taxreg_${state}`, country: 'US', status: 'active', country_options: { us: { state, type: 'state_sales_tax' } } })
+
 // A pretend Stripe: the resources and methods the script uses, with Stripe's list pagination.
 function fakeStripe(state = {}) {
-  const s = { products: [], prices: [], portal: null, switchPortal: null, endpoints: [], pageSize: 100, ...state }
+  const s = {
+    products: [], prices: [], portal: null, switchPortal: null, endpoints: [], pageSize: 100,
+    taxSettings: taxReady(), registrations: [registration('MD'), registration('DC')],
+    ...state,
+  }
   const calls = []
   let n = 0
   const nextId = (prefix) => `${prefix}_new${++n}`
@@ -86,6 +95,15 @@ function fakeStripe(state = {}) {
     webhookEndpoints: {
       list: async (p) => page(s.endpoints, p),
       update: async (id, p) => (rec('webhookEndpoints.update', id, p), merge(find(s.endpoints, id), p)),
+    },
+    tax: {
+      settings: {
+        retrieve: async () => {
+          if (s.taxSettings instanceof Error) throw s.taxSettings
+          return s.taxSettings
+        },
+      },
+      registrations: { list: async (p) => page(s.registrations.filter((r) => !p.status || r.status === p.status), p) },
     },
   }
 }
@@ -191,7 +209,11 @@ test('apply on an empty account creates 9 products x 2 prices plus Pro, the port
   assert.ok(!su.products.some((p) => p.prices.includes(env.STRIPE_PRICE_ALL_ACCESS_YEARLY)), 'Pro has nothing to switch to')
   assert.deepEqual(stripe.s.portal.features.subscription_cancel, { enabled: true, mode: 'at_period_end' })
   assert.equal(stripe.s.portal.features.invoice_history.enabled, true)
+  // Renewals are taxed from the saved address, so members can correct it (and add a tax ID)
+  assert.deepEqual(stripe.s.portal.features.customer_update, { enabled: true, allowed_updates: ['email', 'address', 'tax_id'] })
   assert.match(stripe.s.portal.business_profile.terms_of_service_url, /\/terms\.html$/)
+  // No tax behavior on new prices: the default in the Tax settings decides for all of them
+  assert.ok(prices.every((p) => !('tax_behavior' in p)))
 
   assert.deepEqual(stripe.s.endpoints[0].enabled_events, [...endpoint().enabled_events, WEBHOOK_EVENT])
   assert.ok(envLines(env).every((l) => /^STRIPE_PRICE_[A-Z_]+=price_/.test(l)))
@@ -230,9 +252,12 @@ test('on the live-like account it reuses every product, adopts a hand-made price
   assert.ok(stripe.s.prices.every((p) => p.active))
   assert.ok(!stripe.calls.some((c) => c.name === 'prices.update' && c.args[1].active === false))
 
-  // The default portal already has no switching, so it stays; only the switch configuration is new.
-  // The other webhook endpoint is not touched.
-  assert.equal(stripe.calls.filter((c) => c.name === 'portal.update').length, 0)
+  // The default portal already has no switching; it only gains address and tax ID updates. The
+  // switch configuration is new. The other webhook endpoint is not touched.
+  const portalUpdates = stripe.calls.filter((c) => c.name === 'portal.update')
+  assert.deepEqual(portalUpdates.map((c) => c.args[0]), ['bpc_1'])
+  assert.deepEqual(stripe.s.portal.features.customer_update, { enabled: true, allowed_updates: PORTAL_CUSTOMER_UPDATES })
+  assert.equal(stripe.s.portal.features.subscription_update.enabled, false)
   assert.deepEqual(stripe.calls.filter((c) => c.name === 'portal.create').map((c) => c.args[0].metadata?.purpose), [SWITCH_PORTAL_PURPOSE])
   assert.deepEqual(stripe.s.endpoints[1].enabled_events, ['invoice.paid'])
   assert.ok(stripe.s.endpoints[0].enabled_events.includes(WEBHOOK_EVENT))
@@ -389,6 +414,57 @@ test('the command refuses a test key without --test-mode and never prints the ke
   const w = run({ STRIPE_SECRET_KEY: secret }, ['--test-mode', '--write-env'])
   assert.equal(w.code, 2)
   assert.match(w.out, /--env-file/)
+})
+
+test('a portal that only lets members change their email gains address and tax ID, keeping what it had', async () => {
+  const first = fakeStripe({ endpoints: [endpoint()] })
+  await setup({ stripe: first, apply: true, log: quiet })
+  first.s.portal.features.customer_update = { enabled: true, allowed_updates: ['email', 'phone'] }
+  const again = fakeStripe(first.s)
+  const lines = []
+  await setup({ stripe: again, log: (l) => lines.push(l) })
+  assert.deepEqual(again.writes(), [], 'plan mode changes nothing')
+  assert.match(lines.join('\n'), /WOULD update portal bpc_new \(default\):.*address and tax ID/)
+  await setup({ stripe: again, apply: true, log: quiet })
+  assert.deepEqual(again.writes().map((c) => [c.name, c.args[0]]), [['portal.update', 'bpc_new']])
+  assert.deepEqual(again.s.portal.features.customer_update.allowed_updates, ['email', 'phone', 'address', 'tax_id'])
+})
+
+test('Stripe Tax ready: reported, never changed, and no problem', async () => {
+  const stripe = fakeStripe({ endpoints: [endpoint()] })
+  const lines = []
+  const { problems } = await setup({ stripe, apply: true, log: (l) => lines.push(l) })
+  assert.deepEqual(problems, [])
+  const out = lines.join('\n')
+  assert.match(out, /ok {4}Stripe Tax is active/)
+  assert.match(out, /default tax behavior: automatic \(USD prices: tax added on top\)/)
+  assert.match(out, /registered to collect in US-MD, US-DC/)
+  assert.match(out, /note {2}19 of 19 prices follow the default tax behavior\./)
+  assert.ok(!stripe.calls.some((c) => c.name.startsWith('tax.')), 'the script never writes tax settings')
+})
+
+test('Stripe Tax not ready: each gap is a problem, in plan mode too', async () => {
+  const cases = [
+    [{ taxSettings: { status: 'pending', defaults: { tax_behavior: 'exclusive' } } }, /Stripe Tax is pending, not active/],
+    [{ taxSettings: { status: 'active', defaults: { tax_behavior: null } } }, /no default tax behavior, and our prices set none/],
+    [{ registrations: [] }, /No active Stripe Tax registration/],
+    [{ registrations: [{ ...registration('MD'), status: 'expired' }] }, /No active Stripe Tax registration/],
+    [{ taxSettings: Object.assign(new Error('This key lacks tax_settings_read'), { type: 'StripePermissionError' }) }, /Could not read the Stripe Tax settings \(This key lacks/],
+  ]
+  for (const [state, pattern] of cases) {
+    const stripe = fakeStripe({ endpoints: [endpoint()], ...state })
+    const { problems } = await setup({ stripe, log: quiet })
+    assert.equal(problems.length, 1, `${pattern}: ${problems.join(' | ')}`)
+    assert.match(problems[0], pattern)
+  }
+})
+
+test('prices with their own tax behavior are counted apart', async () => {
+  const live = liveLike()
+  live.prices.find((p) => p.id === 'price_cp_month_hand').tax_behavior = 'inclusive'
+  const lines = []
+  await setup({ stripe: fakeStripe(live), known: KNOWN, log: (l) => lines.push(l) })
+  assert.match(lines.join('\n'), /18 of 19 prices follow the default tax behavior, 1 set their own/)
 })
 
 test('a default portal that still switches plans gets switching turned off', async () => {
