@@ -75,6 +75,29 @@ export const getProTrialStatus = async () => {
   }
 };
 
+/**
+ * Whether the billing portal can open for this account: true, false, or null when unknown. False
+ * means no Stripe customer (Pro given by hand, never bought), so there is nothing to manage and
+ * the page shows a plain line instead of a button that can only fail. Unknown keeps the button.
+ */
+export const getBillingAccountStatus = async () => {
+  try {
+    const { data } = await callFunction('billingStatus', {});
+    return typeof data?.hasBillingAccount === 'boolean' ? data.hasBillingAccount : null;
+  } catch (err) {
+    // Includes a backend that predates billingStatus (NOT_FOUND): keep the button, as before
+    console.warn('[billing] Billing status lookup failed:', err.message);
+    return null;
+  }
+};
+
+/**
+ * What to show when the portal will not open: the server's own reason when it refused on purpose
+ * (no billing to manage, an expired sign-in), else the fallback (offline, or a crash on our side).
+ */
+export const portalErrorMessage = (err, fallback) =>
+  err?.code && err.code !== 'INTERNAL' && err.message ? err.message : fallback;
+
 /** Opens the Stripe customer portal (manage / cancel / invoices). */
 export const openBillingPortal = async () => {
   // Come back to the hub on the name the member opened (on the old name that is the old hub, as

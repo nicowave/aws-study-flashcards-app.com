@@ -3,7 +3,7 @@ import { render, screen, within, act, fireEvent, waitFor } from '@testing-librar
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import { useAuth } from './context/AuthContext';
-import { getPlan, getProTrialStatus, getEntitlements, startCheckout, openBillingPortal, PRO_TRIAL_DAYS } from './services/billing';
+import { getPlan, getProTrialStatus, getBillingAccountStatus, getEntitlements, startCheckout, openBillingPortal, PRO_TRIAL_DAYS } from './services/billing';
 import { certifications, categories } from './data/certifications';
 import { COURSES, OTHER_COURSES } from './data/courses';
 import { GIS_PAGE } from './data/gis';
@@ -22,13 +22,15 @@ vi.mock('./context/AuthContext', () => ({
 // label are build variables, so they are getters a test can flip.
 const billing = vi.hoisted(() => ({ enabled: true, label: '$39/yr' }));
 vi.mock('./services/billing', async (importOriginal) => {
-  const { PRO_TRIAL_DAYS: days } = await importOriginal();
+  const { PRO_TRIAL_DAYS: days, portalErrorMessage } = await importOriginal();
   return {
     get BILLING_ENABLED() { return billing.enabled; },
     get PRO_PRICE_LABEL() { return billing.label; },
     PRO_TRIAL_DAYS: days,
+    portalErrorMessage, // the real one: which words reach the member is what the tests check
     getPlan: vi.fn(),
     getProTrialStatus: vi.fn(),
+    getBillingAccountStatus: vi.fn(),
     getEntitlements: vi.fn(),
     startCheckout: vi.fn(),
     openBillingPortal: vi.fn(),
@@ -122,6 +124,7 @@ beforeEach(() => {
   setAuth();
   vi.mocked(getPlan).mockReset().mockResolvedValue(null);
   vi.mocked(getProTrialStatus).mockReset().mockResolvedValue(true); // a first-time buyer unless a test says otherwise
+  vi.mocked(getBillingAccountStatus).mockReset().mockResolvedValue(true); // a Pro member bought it unless a test says otherwise
   vi.mocked(getEntitlements).mockReset().mockResolvedValue({ plan: null, certs: [] }); // Settings → Plan & Billing
   vi.mocked(startCheckout).mockReset();
   vi.mocked(openBillingPortal).mockReset();
@@ -439,6 +442,48 @@ describe('App', () => {
         await userEvent.click(await within(proCard()).findByRole('button', { name: 'Manage Subscription' }));
         expect(await within(proCard()).findByText('Could not open billing portal. Please try again.')).toBeInTheDocument();
         expect(within(proCard()).getByRole('button', { name: 'Manage Subscription' })).toBeEnabled();
+      });
+
+      it("shows the server's reason when it refuses to open the portal, not a generic retry", async () => {
+        signIn();
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        vi.mocked(getPlan).mockResolvedValue('pro');
+        vi.mocked(openBillingPortal).mockRejectedValueOnce(
+          Object.assign(new Error('This account has no billing to manage.'), { code: 'FAILED_PRECONDITION' })
+        );
+        render(<App />);
+        await userEvent.click(await within(proCard()).findByRole('button', { name: 'Manage Subscription' }));
+        expect(await within(proCard()).findByText('This account has no billing to manage.')).toBeInTheDocument();
+        expect(proCard()).not.toHaveTextContent(/try again/i);
+      });
+
+      it('Pro given by hand (no billing account): a plain line instead of a Manage button that can only fail', async () => {
+        signIn();
+        vi.mocked(getPlan).mockResolvedValue('pro');
+        vi.mocked(getBillingAccountStatus).mockResolvedValue(false);
+        render(<App />);
+        expect(await within(proCard()).findByText('Pro was given to this account, not bought, so there is no billing to manage.')).toBeInTheDocument();
+        expect(within(proCard()).getByText('Your Plan')).toBeInTheDocument();
+        expect(within(proCard()).queryByRole('button')).not.toBeInTheDocument();
+        expect(openBillingPortal).not.toHaveBeenCalled();
+      });
+
+      it('keeps Manage Subscription when the billing check cannot answer, and asks it only for Pro members', async () => {
+        signIn();
+        vi.mocked(getPlan).mockResolvedValue('pro');
+        vi.mocked(getBillingAccountStatus).mockResolvedValue(null);
+        const { unmount } = render(<App />);
+        expect(await within(proCard()).findByRole('button', { name: 'Manage Subscription' })).toBeEnabled();
+        await act(async () => {});
+        expect(getBillingAccountStatus).toHaveBeenCalledTimes(1);
+        expect(within(proCard()).getByRole('button', { name: 'Manage Subscription' })).toBeInTheDocument();
+        unmount();
+
+        vi.mocked(getBillingAccountStatus).mockClear();
+        vi.mocked(getPlan).mockResolvedValue(null);
+        render(<App />);
+        await within(proCard()).findByRole('button', { name: /start free trial|get pro/i });
+        expect(getBillingAccountStatus).not.toHaveBeenCalled();
       });
 
       it('forgets the plan when the member signs out', async () => {

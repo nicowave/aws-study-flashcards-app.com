@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PricingIcon } from './Icons';
-import { getEntitlements, openBillingPortal } from '../services/billing';
+import { getEntitlements, getBillingAccountStatus, openBillingPortal, portalErrorMessage } from '../services/billing';
 import { certifications } from '../data/certifications';
 import { COURSES, OTHER_COURSES } from '../data/courses';
 
@@ -19,12 +19,19 @@ const purchaseName = (id) => PURCHASE_NAMES.get(id) || id;
  */
 const BillingSection = ({ onSeePlans }) => {
   const [ent, setEnt] = useState(undefined); // undefined = loading, null = couldn't read
+  // Can the billing portal open? false = no Stripe customer (given by hand), null = unknown
+  const [billingAccount, setBillingAccount] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     let live = true;
-    getEntitlements().then((e) => { if (live) setEnt(e); });
+    getEntitlements().then((e) => {
+      if (!live) return;
+      setEnt(e);
+      // Only someone with a plan or an unlock is offered the portal; ask whether billing is behind it
+      if (e && (e.plan === 'pro' || e.certs.length > 0)) getBillingAccountStatus().then((b) => live && setBillingAccount(b));
+    });
     return () => { live = false; };
   }, []);
 
@@ -35,15 +42,18 @@ const BillingSection = ({ onSeePlans }) => {
       await openBillingPortal(); // leaves the page on success
     } catch (err) {
       console.error('[Settings] Portal failed:', err);
-      setError('Could not open the billing portal. Please try again.');
+      setError(portalErrorMessage(err, 'Could not open the billing portal. Please try again.'));
       setBusy(false);
     }
   };
 
   const isPro = ent?.plan === 'pro';
   const unlocks = ent?.certs ?? [];
-  // Anyone who paid has a Stripe customer, so the portal has their receipts
-  const hasPaid = isPro || unlocks.length > 0;
+  const hasAccess = isPro || unlocks.length > 0;
+  // Anyone who paid has a Stripe customer, so the portal has their receipts. Access given by hand
+  // has none: the portal could only fail, so there is no button for it.
+  const given = hasAccess && billingAccount === false;
+  const hasPaid = hasAccess && !given;
 
   return (
     <div className="settings-section billing-section">
@@ -77,6 +87,11 @@ const BillingSection = ({ onSeePlans }) => {
           </div>
           {hasPaid && (
             <p className="billing-note">Invoices, your payment method{isPro ? ' and cancelling' : ''} are in the Stripe billing portal.</p>
+          )}
+          {given && (
+            <p className="billing-note">
+              {isPro ? 'Pro was' : 'Your unlocks were'} given to this account, not bought, so there is no billing to manage.
+            </p>
           )}
           {error && <p className="settings-error" role="alert">{error}</p>}
         </>
